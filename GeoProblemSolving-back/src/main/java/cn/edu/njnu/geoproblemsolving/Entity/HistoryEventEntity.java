@@ -1,0 +1,44 @@
+package cn.edu.njnu.geoproblemsolving.Entity;
+
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Document(collection = "HistoryEvent")
+public class HistoryEventEntity {
+
+    private String historyId;
+    private String scopeId; //查询条件Id
+    private String description;
+    private String createTime;
+
+    public void setCreateTime(String createTime) {
+        this.createTime = createTime;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setScopeId(String scopeId) {
+        this.scopeId = scopeId;
+    }
+
+    public void setHistoryId(String historyId) {
+        this.historyId = historyId;
+    }
+
+    public String getCreateTime() {
+        return createTime;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getScopeId() {
+        return scopeId;
+    }
+
+    public String getHistoryId() {
+        return historyId;
+    }
+}
