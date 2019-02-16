@@ -476,6 +476,9 @@ export default {
     };
     this.socketApi.sendSock(this.send_msg, this.socketCallback);
   },
+  mounted(){
+    console.log(this.msglist);
+  },
   destroyed() {
     this.socketApi.close();
   },
