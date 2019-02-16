@@ -3,13 +3,13 @@
     <Row>
       <Col span="22" offset="1">
         <div class="whitespace"></div>
-        <Button
+        <!-- <Button
           type="primary"
           style="float:right;height:60px;margin-right:40px;line-height:30px;font-size:30px;"
           @click="goWorkspace(subProjectList[0].subProjectId)"
           icon="md-home"
           title="workspace"
-        ></Button>
+        ></Button> -->
         <div class="projectTitle">
           <h1
             style="text-align:center"
@@ -76,12 +76,10 @@
               title="Invite others join in the Project"
             >
               <!-- <br> -->
-              <div class="form_style">
-                <span></span>
-              </div>
+
               <div class="form_style">
                 <span>Title</span>
-                <Input style="width:300px" v-model="emailTitle"/>
+                <Input style="width:75%" v-model="emailTitle"/>
               </div>
               <br>
               <div class="form_style">
@@ -89,14 +87,16 @@
                 <Input
                   type="textarea"
                   :rows="4"
-                  style="width:300px"
+                  style="width:75%"
                   :placeholder="this.emailFormat + this.currentProjectDetail.title + ', you can copy the projectId ' + this.currentProjectDetail.projectId +'and apply for join in it'"
                   v-model="emailContent"
                 />
               </div>
               <br>
-              <div class="form_style">
+              <div style="display:flex" class="emailOperate">
                 <Button @click="copyDefault()" type="success">Use default</Button>
+                <Button type="primary">Project ID</Button>
+                <Button type="danger">Project Name</Button>
               </div>
             </Modal>
           </div>
@@ -389,14 +389,21 @@
 .form_style {
   display: flex;
   align-items: center;
-  justify-content: center;
+  /* justify-content: center; */
 }
 .form_style span {
-  width: 20%;
+  min-width: 20%;
   text-align: center;
 }
-.form_style input {
-  width: 70%;
+.emailOperate{
+  display:flex;
+  padding: 0 10px;
+  justify-content:center;
+}
+.emailOperate button{
+  /* padding:0 10px; */
+  margin-left:10px;
+  margin-right:10px;
 }
 </style>
 <script>

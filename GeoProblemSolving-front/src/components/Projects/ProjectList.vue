@@ -4,14 +4,25 @@
   <div>
     <Row>
       <Col span="22" offset="1">
-        <div class="topPanel" style="margin-top:50px;">
+        <div class="topPanel" style="margin-top:50px;float:right;display:flex">
           <Button
             router-link
             :to="{path:'newproject'}"
             type="success"
-            style="float:right;margin-right:2.5%"
+            style="margin-right:2.5%"
             title="create"
+            icon="md-add"
+
           >Create</Button>
+           <Button
+            type="primary"
+            style="margin-right:2.5%"
+            title="join"
+            icon="md-person-add"
+            @click="joinModal=true"
+          >Join</Button>
+        </div>
+        <div class="topPanel" style="margin-top:50px;">
         </div>
         <br>
         <div class="Tabpane">
@@ -63,12 +74,15 @@
                 @on-ok="join(currentTab)"
                 @on-cancel="cancel"
               >
+              <div style="display:flex;align-items:center">
                 <span style="margin-right:5%">ProjectId:</span>
                 <input
                   v-model="joinProjectId"
                   placeholder="Enter ProjectId you want to participate ..."
                   style="width: 400px"
                 >
+              </div>
+
               </Modal>
               <Modal
                 v-model="quitModal"

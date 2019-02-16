@@ -59,10 +59,10 @@ export default {
     return {};
   },
   mounted() {
-    let headerWidth = window.innerWidth+'px';
+    // let headerWidth = window.innerWidth+'px';
     // console.log("浏览器窗口的宽度是："+ headerWidth);
-    $(".header").css("width",headerWidth);
-    $(".ivu-menu-item").css("margin-left", "1.5%");
+    // $(".header").css("width",headerWidth);
+    // $(".ivu-menu-item").css("margin-left", "1.5%");
     // $(".ivu-menu ivu-menu-dark ivu-menu-horizontal").css("z-index", "0");
   },
   components: {
@@ -123,29 +123,29 @@ export default {
   height: 40px;
   z-index: 1;
   margin-top: 5px;
-  margin-left: 5%;
+  margin-left: 2.5%;
 }
 .header span {
   font-size: 15px;
 }
 .header {
   /* position: fixed; */
-  z-index: 999;
+  z-index: 2;
   /* top:0; */
   /* width: 98%; */
   height: 60px;
 }
 .userState {
   position: absolute;
-  left: 90%;
+  margin-left: 90%;
   top: 0px;
   min-width: 200px;
   z-index: 1;
 }
 .content {
   padding-top: 5px;
-  width:100%;
-  /* margin-left: 2.5%;
-  margin-right: 2.5%; */
+  width:95%;
+  margin-left: 2.5%;
+  margin-right: 2.5%;
 }
 </style>

@@ -577,12 +577,6 @@ body {
   /* text-align:center; */
   height: 40px;
 }
-/* .logOutBtn{
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 40px;
-} */
 /* 表示空格间距的 */
 .whitespace {
   height: 20px;

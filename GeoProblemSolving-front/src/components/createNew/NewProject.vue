@@ -159,7 +159,8 @@ h1 {
   line-height: 60px;
   border: 1px solid transparent;
   border-radius: 4px;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: scroll;
   background: #fff;
   position: relative;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
@@ -202,7 +203,8 @@ h1 {
   width: 58px;
   height: 58px;
   line-height: 58px;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: scroll;
   border-width: 0.75px;
   border-style: dashed;
   border-color: lightslategray;
