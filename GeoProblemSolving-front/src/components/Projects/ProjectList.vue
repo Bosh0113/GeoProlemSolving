@@ -28,24 +28,25 @@
       <div class="ProjectList">
         <div v-for="(item,index) in currentProjectList" :data="currentProjectList" :key="item.index">
           <!-- Card卡片用来承载工程的信息，包含title，img，以及一些基本信息 -->
-          <Col span="6" offset="1" v-if="item.privacy=='public'">
+          <Col span="6" offset="1" v-if="item.privacy=='Public'">
             <Card style="height:620px;margin:20px 0 20px 0">
               <h1 style="text-align:center" @click="goSingleProject(item.projectId)">{{item.title}}</h1>
-              <p style="padding:10px;height:auto">{{item.description}}</p>
+              <p style="height:auto;padding:0 40px 0 40px">{{item.description}}</p>
               <div style="height:300px;display:flex;justify-content:center">
                 <img :src="item.picture" v-if="item.picture!=''&&item.picture!='undefined'">
                 <avatar :username="item.title" :size="300" :title="item.title" :rounded="false" v-else></avatar>
               </div>
+              <div class="whitespace"></div>
               <div style="height:40px;align-items:center;display:flex;padding:0 20px 0 20px">
                 <span
-                  style="height:20px;width:45%;background-color:#2d8cf0;color:white;text-align:center;"
-                >Creater</span>
+                  style="height:20px;width:45%;color:white;text-align:center;"
+                ><Tag color="primary">Creater</Tag></span>
                 <span style="height:20px;margin-left:5%">{{item.creator}}</span>
               </div>
               <div style="height:40px;align-items:center;display:flex;padding:0 20px 0 20px">
                 <span
-                  style="height:20px;width:45%;background-color:#2d8cf0;color:white;text-align:center;"
-                >Create time</span>
+                  style="height:20px;width:45%;color:white;text-align:center;"
+                ><Tag color="primary">Create time</Tag></span>
                 <span style="height:20px;margin-left:5%">{{item.createTime}}</span>
               </div>
               <div class="whitespace"></div>
@@ -276,7 +277,7 @@ export default {
                 "?key=" +
                 "userId" +
                 "&value=" +
-                that.currentProjectList[i]["managerId"], 
+                that.currentProjectList[i]["managerId"],
                 type:"GET",
                 async:false,
                 success:function(data){

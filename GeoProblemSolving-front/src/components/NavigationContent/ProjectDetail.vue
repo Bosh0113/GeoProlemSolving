@@ -7,7 +7,9 @@
           type="primary"
           style="float:right;height:60px;margin-right:40px;line-height:30px;font-size:30px;"
           @click="goWorkspace(subProjectList[0].subProjectId)"
-        >WorkSpace</Button>
+          icon="md-home"
+          title="workspace"
+        ></Button>
         <div class="projectTitle">
           <h1
             style="text-align:center"
@@ -19,7 +21,6 @@
           <div class="detail_image">
             <img
               :src="currentProjectDetail.picture"
-              style="-moz-background-size:100% 100%; background-size:100% 100%;"
             >
           </div>
           <div class="detail_description">
@@ -118,22 +119,27 @@
                     style="margin:-5px 5px 0 5px"
                     v-show="subProject.editable===true"
                     @click="editSubProjectShow(index)"
-                  >Authorize</Button>
+                    icon="md-happy"
+                    title="Authorize"
+                  ></Button>
                   <Button
                     type="success"
                     slot="extra"
                     style="margin:-5px 5px 0 5px"
                     v-show="subProject.editable===true"
                     @click="editSubProjectShow(index)"
-                  >Edit</Button>
+                    icon="ios-brush"
+                    title="edit"
+                  ></Button>
 
                   <Button
                     type="error"
                     slot="extra"
                     style="margin:-5px 5px 0 5px"
                     v-show="subProject.editable===true"
-                    @click="deleteSubProjectModal = true"
-                  >Remove</Button>
+                    icon="md-close"
+                    title="remove"
+                  ></Button>
                   <Modal
                     v-model="deleteSubProjectModal"
                     title="Delete sub project"
@@ -304,14 +310,12 @@
   height: auto;
   display: flex;
 }
-.detail_image {
-  min-width: 30%;
-  max-width: 40%;
+.detail_image img{
+  width:100%;
 }
 .detail_description {
-  padding-left: 20px;
-  padding-right: 20px;
-  max-width: 60%;
+  padding:0 20px;
+  min-width:60%;
 }
 .detail_description p {
   padding: 0 20px 0 20px;
