@@ -131,7 +131,7 @@ public class SubProjectDaoImpl implements ISubProjectDao {
             JSONArray newMembers1=(JSONArray)method.joinGroup(newMembers,userId,foreManagerId,mongoTemplate);
             Update update=new Update();
             update.set("members",newMembers1);
-            update.set("manager",userId);
+            update.set("managerId",userId);
             mongoTemplate.updateFirst(query,update,SubProjectEntity.class);
             return mongoTemplate.findOne(query,SubProjectEntity.class);
         }catch (Exception e){
