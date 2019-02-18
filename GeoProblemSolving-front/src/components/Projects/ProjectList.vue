@@ -28,7 +28,7 @@
       <div class="ProjectList">
         <div v-for="(item,index) in currentProjectList" :data="currentProjectList" :key="item.index">
           <!-- Card卡片用来承载工程的信息，包含title，img，以及一些基本信息 -->
-          <Col span="6" offset="1" v-if="item.privacy=='public'">
+          <Col span="6" offset="1" v-if="item.privacy=='Public'">
             <Card style="height:620px;margin:20px 0 20px 0">
               <h1 style="text-align:center" @click="goSingleProject(item.projectId)">{{item.title}}</h1>
               <p style="padding:10px;height:auto">{{item.description}}</p>

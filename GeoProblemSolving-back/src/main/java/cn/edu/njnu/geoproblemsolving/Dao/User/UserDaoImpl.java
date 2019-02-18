@@ -3,12 +3,15 @@ package cn.edu.njnu.geoproblemsolving.Dao.User;
 
 import cn.edu.njnu.geoproblemsolving.Entity.UserEntity;
 import cn.edu.njnu.geoproblemsolving.Dao.Method.CommonMethod;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
+import springfox.documentation.spring.web.json.Json;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -47,6 +50,15 @@ public class UserDaoImpl implements IUserDao {
         }
         else {
             UserEntity user=mongoTemplate.findOne(query,UserEntity.class);
+
+            // encode
+            JSONArray projects = user.getJoinedProjects();
+            int number = projects.size();
+            for(int i = 0;i<number;i++){
+                Object project = projects.get(i);
+
+            }
+
             user.setPassword("");
             return user;
         }

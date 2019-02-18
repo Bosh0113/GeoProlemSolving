@@ -467,6 +467,10 @@ export default {
   sortMsglist() {},
   created() {
     let roomId = localStorage.getItem("subProjectId");
+    //截去随机位
+    if (roomId !== null && roomId !== undefined) {
+      roomId = roomId.slice(0, -4);
+    }
     this.socketApi.initWebSocket("ChatServer/" + roomId);
 
     this.send_msg = {

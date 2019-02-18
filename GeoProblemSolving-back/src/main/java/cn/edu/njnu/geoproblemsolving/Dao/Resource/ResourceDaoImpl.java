@@ -1,5 +1,6 @@
 package cn.edu.njnu.geoproblemsolving.Dao.Resource;
 
+import cn.edu.njnu.geoproblemsolving.Dao.Method.EncodeUtil;
 import cn.edu.njnu.geoproblemsolving.Entity.ResourceEntity;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Component
@@ -92,7 +94,13 @@ public class ResourceDaoImpl implements IResourceDao{
                         }
                         ResourceEntity resourceEntity=new ResourceEntity();
                         resourceEntity.setResourceId(resourceId);
-                        resourceEntity.setScopeId(request.getParameter("scopeId"));
+
+                        // decode scopeId
+                        String sId = request.getParameter("scopeId");
+                        String scopeId = new String(EncodeUtil.decode(sId));
+                        scopeId = scopeId.substring(0,scopeId.length()-2);
+
+                        resourceEntity.setScopeId(scopeId);
                         resourceEntity.setName(fileNames);
                         resourceEntity.setDescription(request.getParameter("description"));
                         resourceEntity.setType(request.getParameter("type"));
@@ -103,7 +111,7 @@ public class ResourceDaoImpl implements IResourceDao{
                         mongoTemplate.save(resourceEntity);
                     }
                     else {
-                        return "Size";
+                        return "Size over";
                     }
                 }
             }
@@ -116,9 +124,30 @@ public class ResourceDaoImpl implements IResourceDao{
     @Override
     public Object readResource(String key,String value){
         try {
+            // decode scopeId
+            String sId = value;
+            String scopeId = new String(EncodeUtil.decode(sId));
+            value = scopeId.substring(0,scopeId.length()-2);
+
             Query query=new Query(Criteria.where(key).is(value));
             if (!mongoTemplate.find(query,ResourceEntity.class).isEmpty()){
-                return mongoTemplate.find(query,ResourceEntity.class);
+
+                // encode scopeId
+                List<ResourceEntity> resourceEntitites = mongoTemplate.find(query,ResourceEntity.class);
+                for(int i = 0;i < resourceEntitites.size();i++){
+                    // get
+                    ResourceEntity resourceEntitity = resourceEntitites.get(i);
+                    scopeId = resourceEntitity.getScopeId();
+
+                    // encode
+                    String randomID = UUID.randomUUID().toString().substring(0,2);
+                    scopeId = EncodeUtil.encode((scopeId + randomID).getBytes());
+
+                    // set
+                    resourceEntitity.setScopeId(scopeId);
+                }
+
+                return resourceEntitites;
             }else {
                 return "None";
             }

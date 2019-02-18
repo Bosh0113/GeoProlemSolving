@@ -2,6 +2,7 @@ package cn.edu.njnu.geoproblemsolving.Dao.Project;
 
 import cn.edu.njnu.geoproblemsolving.Entity.ProjectEntity;
 import cn.edu.njnu.geoproblemsolving.Dao.Method.CommonMethod;
+import cn.edu.njnu.geoproblemsolving.Dao.Method.EncodeUtil;
 import cn.edu.njnu.geoproblemsolving.Entity.UserEntity;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -12,7 +13,9 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
+import java.util.UUID;
 
 @Component
 public class ProjectDaoImpl implements IProjectDao{
@@ -30,17 +33,44 @@ public class ProjectDaoImpl implements IProjectDao{
 
     @Override
     public Object readProject(String key,String value){
+        if(key.equals("projectId")){
+            // decode
+            String pid = value;
+            String projectId = new String(EncodeUtil.decode(pid));
+            value = projectId.substring(0,projectId.length()-2);
+        }
         Query query=Query.query(Criteria.where(key).is(value));
         if(mongoTemplate.find(query,ProjectEntity.class).isEmpty()){
             return "None";
         }
         else {
-            return mongoTemplate.find(query,ProjectEntity.class);
+            List<ProjectEntity> projectEntities = mongoTemplate.find(query,ProjectEntity.class);
+
+            for(int i = 0;i < projectEntities.size();i++){
+                // get
+                ProjectEntity projectEntity = projectEntities.get(i);
+                String projectId = projectEntity.getProjectId();
+
+                // encode
+                String randomID = UUID.randomUUID().toString().substring(0,2);
+                projectId = EncodeUtil.encode((projectId + randomID).getBytes());
+
+                // set
+                projectEntity.setProjectId(projectId);
+            }
+
+            return projectEntities;
         }
     }
 
     @Override
     public void deleteProject(String key,String value){
+
+        // decode
+        String pid = value;
+        String projectId = new String(EncodeUtil.decode(pid));
+        value = projectId.substring(0,projectId.length()-2);
+
         Query query=Query.query(Criteria.where(key).is(value));
         mongoTemplate.remove(query,"Project");
     }
@@ -48,7 +78,11 @@ public class ProjectDaoImpl implements IProjectDao{
     @Override
     public String updateProject(HttpServletRequest request){
         try{
-            Query query=new Query(Criteria.where("projectId").is(request.getParameter("projectId")));
+            // decode
+            String pid = request.getParameter("projectId");
+            String projectId = new String(EncodeUtil.decode(pid));
+
+            Query query=new Query(Criteria.where("projectId").is(projectId));
             CommonMethod method=new CommonMethod();
             Update update=method.setUpdate(request);
             mongoTemplate.updateFirst(query,update,ProjectEntity.class);

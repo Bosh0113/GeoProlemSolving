@@ -1,7 +1,10 @@
 package cn.edu.njnu.geoproblemsolving.Entity;
 
+import cn.edu.njnu.geoproblemsolving.Dao.Method.EncodeUtil;
 import com.alibaba.fastjson.JSONArray;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.UUID;
 
 
 @Document(collection = "Project")

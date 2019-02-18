@@ -700,6 +700,7 @@ export default {
               desc: "File uploaded successfully",
               duration: 2
             });
+            this.getAllResource();
             // 创建一个函数根据pid去后台查询该项目下的资源
           }
           // console.log(res.data);
