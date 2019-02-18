@@ -147,7 +147,7 @@
           ></Step>
         </Steps>
       </Col>
-      <Col span="4" offset="1">
+      <Col span="4" offset="1" v-show="isManager">
         <Button type="info" @click="addModal = true">Add</Button>
         <Modal
           width="600px"
@@ -188,7 +188,7 @@
               v-model="updateModuleTitle"
               placeholder="Enter something..."
               style="width: 400px"
-              :placeholder="moduleList[currentModuleIndex].title"
+              :placeholder="moduleTitle"
             />
           </div>
           <div class="editNodeStyle">
@@ -197,7 +197,7 @@
               <Option
                 v-for="(item,index) in typeList"
                 :key="item.index"
-                :value="moduleList[currentModuleIndex].type"
+                :value="item"
               >{{ item }}</Option>
             </Select>
           </div>
@@ -207,13 +207,14 @@
               v-model="updateModuleDescription"
               style="width:400px"
               :rows="6"
-              :placeholder="moduleList[currentModuleIndex].description"
+              :placeholder="moduleDescription"
             ></textarea>
           </div>
         </Modal>
       </Col>
     </Row>
     <br>
+    <div v-if="moduleList.length>0">
     <p style="margin:10px 5%;text-indent:25px">{{currentModule.description}}</p>
     <Row>
       <Col span="4" offset="1" v-bind="this.participants">
@@ -321,7 +322,10 @@
         </div>
       </Col>
     </Row>
-    
+    </div>
+    <div v-else>
+      <h1>No module had been created!</h1>
+    </div>
       <!-- createTaskModal -->
       <Modal
         v-model="createTaskModal"
@@ -410,6 +414,9 @@ export default {
   },
   data() {
     return {
+      //登陆者身份
+      isManager:false,//为管理者
+      //
       options: {
         dropzoneSelector: "ul",
         draggableSelector: "li",
@@ -496,11 +503,6 @@ export default {
       singleTask: [],
       //后台拿到的Module集合，渲染成一条轴用的
       moduleList: [
-        {
-          title: "",
-          description: "",
-          type: ""
-        }
       ],
       //Step是否展示
       stepShow: false,
@@ -525,27 +527,9 @@ export default {
         endTime: "",
         state: ""
       },
-      taskTodo: [
-        { taskName: "task1", description: "description" },
-        { taskName: "task2", description: "description" },
-        { taskName: "task3", description: "description" },
-        { taskName: "task4", description: "description" },
-        { taskName: "task5", description: "description" }
-      ],
-      taskDoing: [
-        { taskName: "task6", description: "description" },
-        { taskName: "task7", description: "description" },
-        { taskName: "task8", description: "description" },
-        { taskName: "task9", description: "description" },
-        { taskName: "task10", description: "description" }
-      ],
-      taskDone: [
-        { taskName: "task11", description: "description" },
-        { taskName: "task12", description: "description" },
-        { taskName: "task13", description: "description" },
-        { taskName: "task14", description: "description" },
-        { taskName: "task15", description: "description" }
-      ]
+      taskTodo: [],
+      taskDoing: [],
+      taskDone: []
     };
   },
   created() {
@@ -553,9 +537,6 @@ export default {
     this.stepShow = false;
     this.getAllModules();
     // this.inquiryTask();
-  },
-  updated() {
-    console.log(this.taskInfo.startTime);
   },
   methods: {
     //初始化函数，作用是控制侧边栏的高度，设置右边通知栏弹出时候的距顶高度以及延迟的时间
@@ -576,8 +557,12 @@ export default {
         )
         .then(res => {
           if (res.data != "None") {
-            let membersList = res.data[0]["members"];
-            let manager = { userId: res.data[0]["managerId"] };
+            let subProjectInfo=res.data[0];
+            if(subProjectInfo.managerId==this.$store.state.userId){
+              this.isManager=true;
+            }
+            let membersList = subProjectInfo["members"];
+            let manager = { userId: subProjectInfo["managerId"] };
             membersList.unshift(manager);
             let participantsTemp = [];
             for (let i = 0; i < membersList.length; i++) {
@@ -663,13 +648,8 @@ export default {
         });
     },
     delModule() {
-      let delObject = new URLSearchParams();
-      delObject.append(
-        "moduleId",
-        this.moduleList[this.currentModuleIndex].moduleId
-      );
       this.axios
-        .post("http://localhost:8081/module/delete", delObject)
+        .get("http://localhost:8081/module/delete"+"?moduleId="+this.moduleList[this.currentModuleIndex].moduleId)
         .then(res => {
           if (res.data === "Success") {
             this.deleteModuleSuccess();
