@@ -2,14 +2,16 @@ package cn.edu.njnu.geoproblemsolving.Entity;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Date;
+
 @Document(collection = "Task")
 public class TaskEntity {
     private String moduleId;
     private String taskId;
     private String taskName;
     private String description;
-    private String startTime;
-    private String endTime;
+    private Date startTime;
+    private Date endTime;
     private String state;   //_todo; doing; done.
     private String creatorId;
     private String createTime;
@@ -39,7 +41,7 @@ public class TaskEntity {
         return moduleId;
     }
 
-    public String getEndTime() {
+    public Date getEndTime() {
         return endTime;
     }
 
@@ -47,7 +49,7 @@ public class TaskEntity {
         return creatorId;
     }
 
-    public String getStartTime() {
+    public Date getStartTime() {
         return startTime;
     }
 
@@ -71,8 +73,8 @@ public class TaskEntity {
         this.taskId = taskId;
     }
 
-    public void setEndTime(String endTime) {
-        this.endTime = endTime;
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
     }
 
     public void setCreatorId(String creatorId) {
@@ -83,8 +85,8 @@ public class TaskEntity {
         this.moduleId = moduleId;
     }
 
-    public void setStartTime(String startTime) {
-        this.startTime = startTime;
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
     }
 
     public void setState(String state) {
