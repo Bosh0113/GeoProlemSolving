@@ -64,12 +64,12 @@
             @click="addTag(inputTag)"
             style="margin-left:2.5%"
           >Add Tag</Button>
-          <div v-show="this.formInline.emailList!=[]" style="margin-left:5%">
+          <div style="margin-left:5%">
             <Tag
               color="primary"
               v-for="(item,index) in this.formInline.tagList"
               :key="index"
-              closeable
+              closable
               @on-close="deleteTag(index)"
             >{{item}}</Tag>
           </div>
@@ -159,8 +159,8 @@ h1 {
   line-height: 60px;
   border: 1px solid transparent;
   border-radius: 4px;
-  overflow-x: hidden;
-  overflow-y: scroll;
+  /* overflow-x: hidden; */
+  /* overflow-y: scroll; */
   background: #fff;
   position: relative;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
@@ -203,8 +203,6 @@ h1 {
   width: 58px;
   height: 58px;
   line-height: 58px;
-  overflow-x: hidden;
-  overflow-y: scroll;
   border-width: 0.75px;
   border-style: dashed;
   border-color: lightslategray;

@@ -1,110 +1,3 @@
-<style scoped>
-.projectTitle {
-  display: flex;
-  justify-content: center;
-  align-items: cenetr;
-  height: auto;
-}
-.detail {
-  height: auto;
-  display: flex;
-}
-.detail_image img {
-  width: 100%;
-}
-.detail_description {
-  padding: 0 20px;
-  min-width: 60%;
-}
-.detail_description p {
-  padding: 0 20px 0 20px;
-}
-.projectEditPanel {
-  display: block;
-  align-items: center;
-  text-align: center;
-  height: 60px;
-  padding-right: 20px;
-}
-.projectEditPanel button {
-  margin-top: 5px;
-  height: 40px;
-  float: right;
-}
-.projectMembersPanel {
-  display: flex;
-  /* justify-content: center; */
-  align-items: center;
-  padding: 20px;
-  height: 100px;
-  border: 1px solid gray;
-  /* background-color: lightblue; */
-}
-.subprojectPanel {
-  min-height: 200px;
-  height: auto;
-  /* background-color:lightblue; */
-  border: 1px solid gray;
-  display: flex;
-  align-items: center;
-}
-.subProjectListStyle {
-  height: auto;
-  align-items: center;
-  width: 90%;
-}
-.subProjectTitle:hover {
-  cursor: pointer;
-}
-.subProjectCreate {
-  height: 100px;
-  display: flex;
-  align-items: center;
-  padding: 0 20px 0 20px;
-}
-.subProjectCreate button {
-  height: 40px;
-  display: flex;
-  align-items: center;
-  line-height: 20px;
-  font-size: 20px;
-}
-.whitespace {
-  height: 20px;
-}
-.createSubProjectPanel {
-  display: flex;
-}
-.createSubProjectPanelInput {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.subProjectStyle {
-  height: auto;
-  margin: 10px;
-}
-/* 邀请其他人的邮件表单样式 */
-.form_style {
-  display: flex;
-  align-items: center;
-  /* justify-content: center; */
-}
-.form_style span {
-  min-width: 20%;
-  text-align: center;
-}
-.emailOperate {
-  display: flex;
-  padding: 0 10px;
-  justify-content: center;
-}
-.emailOperate button {
-  /* padding:0 10px; */
-  margin-left: 10px;
-  margin-right: 10px;
-}
-</style>
 <template>
   <div>
     <Row>
@@ -183,15 +76,7 @@
               title="Invite others join in the Project"
             >
               <!-- <br> -->
-              <div class="form_style">
-                <span>Reciver</span><!-- <Tag v-for="item in count" :key="item" :name="item" closable @on-close="handleClose2">标签{{ item + 1 }}</Tag> -->
-                <Input v-model="inputEmail" style="width:200px"/>
-                <Button icon="ios-add" type="dashed" size="small" @click="addEmail(inputEmail)">Add</Button>
-              </div>
-              <div style="margin-left:20%;width:80%">
-                <Tag v-for="(item,index) in inviteEmailList" :key="index" color="success" @on-close="delEmail(index)" closable>{{item}}</Tag>
-              </div>
-              <br>
+
               <div class="form_style">
                 <span>Title</span>
                 <Input style="width:75%" v-model="emailTitle"/>
@@ -232,7 +117,7 @@
                     slot="extra"
                     style="margin:-5px 5px 0 5px"
                     v-show="subProject.editable===true"
-                    @click="handOverSubProjectShow(index)"
+                    @click="editSubProjectShow(index)"
                     icon="md-happy"
                     title="Authorize"
                   ></Button>
@@ -245,15 +130,26 @@
                     icon="ios-brush"
                     title="edit"
                   ></Button>
+
                   <Button
                     type="error"
                     slot="extra"
                     style="margin:-5px 5px 0 5px"
                     v-show="subProject.editable===true"
-                    @click="deleteSubProjectShow(index)"
                     icon="md-close"
                     title="remove"
                   ></Button>
+                  <Modal
+                    v-model="deleteSubProjectModal"
+                    title="Delete sub project"
+                    ok-text="assure"
+                    cancel-text="cancel"
+                    @on-ok="deleteSubProject(subProject.subProjectId)"
+                    @on-cancel="cancel"
+                    width="800px"
+                  >
+                    <p>Once the deletion is confirmed, all module and resource information under the subsystem will be deleted. Please choose carefully.</p>
+                  </Modal>
                   <p
                     slot="title"
                     @click="goWorkspace(subProject.subProjectId)"
@@ -280,68 +176,38 @@
                 </Card>
               </Col>
             </div>
+            <Modal
+              v-model="editSubProjectModal"
+              ok-text="submit"
+              cancel-text="cancel"
+              @on-ok="editSubProject()"
+              @on-cancel="cancel()"
+              title="edit sub project info"
+              width="800px"
+            >
+              <div>
+                <div class="createSubProjectPanelInput">
+                  <span style="width:20%;text-align:center">Title</span>
+                  <Input
+                    v-model="subProjectTitleEdit"
+                    style="width: 800px;"
+                    :placeholder="subProjectTitleEdit"
+                  />
+                </div>
+                <br>
+                <div class="createSubProjectPanelInput">
+                  <span style="width:20%;text-align:center">Description</span>
+                  <Input
+                    v-model="subProjectDescriptionEdit"
+                    :placeholder="subProjectDescriptionEdit"
+                    style="width: 800px;"
+                    :rows="4"
+                    type="textarea"
+                  />
+                </div>
+              </div>
+            </Modal>
           </div>
-          <Modal
-            v-model="handOverSubProjectModal"
-            title="Appoint new manager"
-            ok-text="ok"
-            cancel-text="cancel"
-            @on-ok="handOverSubProject()"
-            @on-cancel="cancel"
-            width="500px"
-          >
-            <div style="height:100px;background:azure">
-              <RadioGroup v-model="newManagerId">
-                <Radio v-for="(member,index) in subjectMembers" :key="member.index" :label="member.userId">
-                  <span>
-                    {{member.userName}}
-                  </span>
-                </Radio>
-              </RadioGroup>
-            </div>
-          </Modal>
-          <Modal
-            v-model="editSubProjectModal"
-            ok-text="submit"
-            cancel-text="cancel"
-            @on-ok="editSubProject()"
-            @on-cancel="cancel()"
-            title="edit sub project info"
-            width="800px"
-          >
-            <div>
-              <div class="createSubProjectPanelInput">
-                <span style="width:20%;text-align:center">Title</span>
-                <Input
-                  v-model="subProjectTitleEdit"
-                  style="width: 800px;"
-                  :placeholder="subProjectTitleEdit"
-                />
-              </div>
-              <br>
-              <div class="createSubProjectPanelInput">
-                <span style="width:20%;text-align:center">Description</span>
-                <Input
-                  v-model="subProjectDescriptionEdit"
-                  :placeholder="subProjectDescriptionEdit"
-                  style="width: 800px;"
-                  :rows="4"
-                  type="textarea"
-                />
-              </div>
-            </div>
-          </Modal>
-          <Modal
-            v-model="deleteSubProjectModal"
-            title="Delete sub project"
-            ok-text="assure"
-            cancel-text="cancel"
-            @on-ok="deleteSubProject()"
-            @on-cancel="cancel"
-            width="800px"
-          >
-            <p>Once the deletion is confirmed, all module and resource information under the subsystem will be deleted. Please choose carefully.</p>
-          </Modal>
           <div class="subProjectCreate">
             <Button type="success" @click="subProjectModal = true">Create</Button>
             <Modal
@@ -432,6 +298,113 @@
     </Row>
   </div>
 </template>
+<style scoped>
+.projectTitle {
+  display: flex;
+  justify-content: center;
+  align-items: cenetr;
+  height: auto;
+}
+.detail {
+  height: auto;
+  display: flex;
+}
+.detail_image img{
+  width:100%;
+}
+.detail_description {
+  padding:0 20px;
+  min-width:60%;
+}
+.detail_description p {
+  padding: 0 20px 0 20px;
+}
+.projectEditPanel {
+  display: block;
+  align-items: center;
+  text-align: center;
+  height: 60px;
+  padding-right: 20px;
+}
+.projectEditPanel button {
+  margin-top: 5px;
+  height: 40px;
+  float: right;
+}
+.projectMembersPanel {
+  display: flex;
+  /* justify-content: center; */
+  align-items: center;
+  padding: 20px;
+  height: 100px;
+  border: 1px solid gray;
+  /* background-color: lightblue; */
+}
+.subprojectPanel {
+  min-height: 200px;
+  height: auto;
+  /* background-color:lightblue; */
+  border: 1px solid gray;
+  display: flex;
+  align-items: center;
+}
+.subProjectListStyle {
+  height: auto;
+  align-items: center;
+  width: 90%;
+}
+.subProjectTitle:hover {
+  cursor: pointer;
+}
+.subProjectCreate {
+  height: 100px;
+  display: flex;
+  align-items: center;
+  padding: 0 20px 0 20px;
+}
+.subProjectCreate button {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  line-height: 20px;
+  font-size: 20px;
+}
+.whitespace {
+  height: 20px;
+}
+.createSubProjectPanel {
+  display: flex;
+}
+.createSubProjectPanelInput {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.subProjectStyle {
+  height: auto;
+  margin: 10px;
+}
+/* 邀请其他人的邮件表单样式 */
+.form_style {
+  display: flex;
+  align-items: center;
+  /* justify-content: center; */
+}
+.form_style span {
+  min-width: 20%;
+  text-align: center;
+}
+.emailOperate{
+  display:flex;
+  padding: 0 10px;
+  justify-content:center;
+}
+.emailOperate button{
+  /* padding:0 10px; */
+  margin-left:10px;
+  margin-right:10px;
+}
+</style>
 <script>
 export default {
   data() {
@@ -443,14 +416,15 @@ export default {
       },
       //确定用户是否有更新项目的权限，控制是否显示编辑的按钮，只有创建者才有权对项目进行编辑
       projectEditAble: false,
-      //移交权限给新的管理者
-      handOverSubProjectModal:false,
-      newManagerId:"",
-      subjectMembers:[],
       //编辑项目的按钮
       editinfoModal: false,
       //子项目的列表
-      subProjectList: [],
+      subProjectList: [
+        {
+          title: "",
+          description: ""
+        }
+      ],
       //创建子项目的模态框
       subProjectModal: false,
       subProjectTitle: "",
@@ -466,8 +440,6 @@ export default {
       editSubProjectindex: 0,
       //邀请的modal
       inviteModal: false,
-      inputEmail:"",
-      inviteEmailList:[],
       //邮件格式
       emailTitle: "",
       emailContent: "",
@@ -514,8 +486,9 @@ export default {
     };
   },
   created: function() {
-    // alert(111);
     this.getAllResource();
+    this.getProjectDeatil();
+    this.getAllSubProject();
   },
   methods: {
     getProjectDeatil() {
@@ -589,6 +562,7 @@ export default {
             // console.log(res.data);
             this.subProjectTitle = "";
             this.subProjectDescription = "";
+
             this.getAllSubProject();
           } else {
             this.$Message.info("fail");
@@ -598,55 +572,6 @@ export default {
     },
     inviteModalShow() {
       this.inviteModal = true;
-    },
-    addEmail(email){
-      this.inviteEmailList.push(email);
-      this.inputEmail = "";
-      console.log("邀请的成员邮箱数组如下:"+ this.inviteEmailList);
-    },
-    delEmail(index){
-      this.inviteEmailList.splice(index, 1);
-    },
-    invite(){
-      var emailFormBody={};
-      emailFormBody["recipient"] = this.inviteEmailList.toString();
-      emailFormBody["mailTitle"] = this.emailTitle;
-      emailFormBody["mailContent"] = this.emailContent;
-      console.log(emailFormBody);
-      this.axios.post("http://localhost:8081//email/send", emailFormBody)
-      .then(res=> {
-        console.log(res.data);
-      })
-      .catch(err=> {
-        console.log(err.data);
-      })
-      // console.log("inviteEmailList的类型是:" + typeof(this.inviteEmailList).toString());
-      // console.log(this.inviteEmailList.toString());
-      // emailFormBody[recipient] = ""
-      // let emailFormBody=n,
-      // emailFormBody[]
-    },
-    handOverSubProjectShow(index){
-      this.editSubProjectindex = index;
-      this.subjectMembers=this.subProjectList[index].members;
-      this.handOverSubProjectModal=true;
-    },
-    handOverSubProject(){
-      this.axios
-        .get(
-          "http://localhost:8081/subProject/manager?" +
-            "subProjectId=" +
-            this.subProjectList[this.editSubProjectindex].subProjectId+
-            "&userId="+
-            this.newManagerId
-        )
-        .then(res => {
-          console.log(res.data);
-          this.getAllSubProject();
-        })
-        .catch(err => {
-          console.log(err.data);
-        });
     },
     editSubProjectShow(index) {
       this.editSubProjectindex = index;
@@ -676,16 +601,11 @@ export default {
           console.log(err.data);
         });
     },
-    deleteSubProjectShow(index) {
-      this.editSubProjectindex = index;
-      this.deleteSubProjectModal = true;
-    },
-    deleteSubProject() {
+    deleteSubProject(subPId) {
+      console.log("删除的子项目id是" + subPId);
       this.axios
         .get(
-          "http://localhost:8081/subProject/delete?" +
-            "subProjectId=" +
-            this.subProjectList[this.editSubProjectindex].subProjectId
+          "http://localhost:8081/subProject/delete?" + "subProjectId=" + subPId
         )
         .then(res => {
           console.log(res.data);
@@ -786,11 +706,12 @@ export default {
         .post("http://localhost:8081/resource/upload", formData)
         .then(res => {
           if (res != "None") {
-            this.$Notice.open({
+            this.$Notice.success({
               title: "Upload notification title",
               desc: "File uploaded successfully",
               duration: 2
             });
+            this.getAllResource();
             // 创建一个函数根据pid去后台查询该项目下的资源
           }
           // console.log(res.data);
@@ -825,23 +746,17 @@ export default {
         });
     },
     // showProjectResource(resource){
+
     // }
     show(index) {
       // alert(this.projectResourceList[index].pathURL);
       window.open(this.projectResourceList[index].pathURL);
-      // 做一个判断，是否有权限下载此文件
-      // this.$Modal.info({
-      // title: "User Info",
-      // content:"111"
-      // content: `Name：${this.data6[index].name}<br>Age：${
-      //   this.data6[index].age
-      // }<br>Address：${this.data6[index].address}`
-      // });
     }
   },
-  mounted: function() {
-    this.getProjectDeatil();
-    this.getAllSubProject();
-  }
+  // mounted: function() {
+  //   this.getProjectDeatil();
+  //   this.getAllSubProject();
+  // }
 };
 </script>
+
