@@ -638,7 +638,7 @@ export default {
     addModule() {
       // 更换格式写成json字符串的形式提交到后台
       let Module = {};
-      Module["projectId"] = localStorage.getItem("projectId");
+      // Module["projectId"] = localStorage.getItem("projectId");
       Module["subProjectId"] = localStorage.getItem("subProjectId");
       Module["title"] = this.moduleTitle;
       Module["description"] = this.moduleDescription;

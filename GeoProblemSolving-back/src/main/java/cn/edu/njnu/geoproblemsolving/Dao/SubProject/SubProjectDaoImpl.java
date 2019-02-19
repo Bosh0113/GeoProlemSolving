@@ -28,8 +28,10 @@ public class SubProjectDaoImpl implements ISubProjectDao {
         try {
             // decode projectId
             String pid = subProject.getProjectId();
-            String projectId = new String(EncodeUtil.decode(pid));
-            subProject.setProjectId(projectId.substring(0,projectId.length()-2));
+            if(pid.length() > 36) {
+                String projectId = new String(EncodeUtil.decode(pid));
+                subProject.setProjectId(projectId.substring(0, projectId.length() - 2));
+            }
 
             mongoTemplate.save(subProject);
             return subProject.getSubProjectId();
@@ -42,9 +44,11 @@ public class SubProjectDaoImpl implements ISubProjectDao {
     public Object readSubProject(String key,String value){
         try {
             // decode
-            String pid = value;
-            String projectId = new String(EncodeUtil.decode(pid));
-            value = projectId.substring(0,projectId.length()-2);
+            String projectId = value;
+            if(projectId.length() > 36) {
+                String pid = new String(EncodeUtil.decode(projectId));
+                value = pid.substring(0, pid.length() - 2);
+            }
 
             Query query=new Query(Criteria.where(key).is(value));
             if (mongoTemplate.find(query,SubProjectEntity.class).isEmpty()){
@@ -56,18 +60,13 @@ public class SubProjectDaoImpl implements ISubProjectDao {
                 for(int i = 0;i < subProjectEntities.size();i++){
                     // get
                     SubProjectEntity subProjectEntity = subProjectEntities.get(i);
-
-                    String subProjectId = subProjectEntity.getSubProjectId();
                     projectId = subProjectEntity.getProjectId();
-
                     // encode
-                    String randomID = UUID.randomUUID().toString().substring(0,2);
-                    subProjectId = EncodeUtil.encode((subProjectId + randomID).getBytes());
-                    randomID = UUID.randomUUID().toString().substring(0,2);
-                    projectId = EncodeUtil.encode((projectId + randomID).getBytes());
-
+                    if(projectId.length() == 36) {
+                        String randomID = UUID.randomUUID().toString().substring(0, 2);
+                        projectId = EncodeUtil.encode((projectId + randomID).getBytes());
+                    }
                     // set
-                    subProjectEntity.setSubProjectId(subProjectId);
                     subProjectEntity.setProjectId(projectId);
                 }
 
@@ -81,11 +80,6 @@ public class SubProjectDaoImpl implements ISubProjectDao {
     @Override
     public String deleteSubProject(String key,String value){
         try {
-            // decode
-            String spid = value;
-            String subProjectId = new String(EncodeUtil.decode(spid));
-            value = subProjectId.substring(0,subProjectId.length()-2);
-
             Query query=new Query(Criteria.where(key).is(value));
             mongoTemplate.remove(query,SubProjectEntity.class);
             return "Success";
@@ -97,11 +91,8 @@ public class SubProjectDaoImpl implements ISubProjectDao {
     @Override
     public String updateSubProject(HttpServletRequest request){
         try {
-            // decode
-            String spid = request.getParameter("subProjectId");
-            String subProjectId = new String(EncodeUtil.decode(spid));
-
-            Query query=new Query(Criteria.where("subProjectId").is(request.getParameter("subProjectId")));
+            String subProjectId = request.getParameter("subProjectId");
+            Query query=new Query(Criteria.where("subProjectId").is(subProjectId));
             CommonMethod method=new CommonMethod();
             Update update=method.setUpdate(request);
             mongoTemplate.updateFirst(query,update,SubProjectEntity.class);
@@ -142,6 +133,7 @@ public class SubProjectDaoImpl implements ISubProjectDao {
     @Override
     public String quitSubProject(String subProjectId,String userId){
         try {
+
             Query query=new Query(Criteria.where("subProjectId").is(subProjectId));
             if (!mongoTemplate.find(query,SubProjectEntity.class).isEmpty()){
                 SubProjectEntity subProject=mongoTemplate.findOne(query,SubProjectEntity.class);
@@ -173,7 +165,7 @@ public class SubProjectDaoImpl implements ISubProjectDao {
             JSONArray newMembers1=(JSONArray)method.joinGroup(newMembers,userId,foreManagerId,mongoTemplate);
             Update update=new Update();
             update.set("members",newMembers1);
-            update.set("manager",userId);
+            update.set("managerId",userId);
             mongoTemplate.updateFirst(query,update,SubProjectEntity.class);
             return mongoTemplate.findOne(query,SubProjectEntity.class);
         }catch (Exception e){

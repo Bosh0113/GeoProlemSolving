@@ -96,9 +96,11 @@ public class ResourceDaoImpl implements IResourceDao{
                         resourceEntity.setResourceId(resourceId);
 
                         // decode scopeId
-                        String sId = request.getParameter("scopeId");
-                        String scopeId = new String(EncodeUtil.decode(sId));
-                        scopeId = scopeId.substring(0,scopeId.length()-2);
+                        String scopeId = request.getParameter("scopeId");
+                        if(scopeId.length() > 36) {
+                            String sid = new String(EncodeUtil.decode(scopeId));
+                            scopeId = sid.substring(0, sid.length() - 2);
+                        }
 
                         resourceEntity.setScopeId(scopeId);
                         resourceEntity.setName(fileNames);
@@ -126,26 +128,29 @@ public class ResourceDaoImpl implements IResourceDao{
         try {
             // decode scopeId
             String sId = value;
-            String scopeId = new String(EncodeUtil.decode(sId));
-            value = scopeId.substring(0,scopeId.length()-2);
-
+            if(sId.length() > 36) {
+                String scopeId = new String(EncodeUtil.decode(sId));
+                value = scopeId.substring(0, scopeId.length() - 2);
+            }
             Query query=new Query(Criteria.where(key).is(value));
+
             if (!mongoTemplate.find(query,ResourceEntity.class).isEmpty()){
 
                 // encode scopeId
                 List<ResourceEntity> resourceEntitites = mongoTemplate.find(query,ResourceEntity.class);
-                for(int i = 0;i < resourceEntitites.size();i++){
-                    // get
-                    ResourceEntity resourceEntitity = resourceEntitites.get(i);
-                    scopeId = resourceEntitity.getScopeId();
 
-                    // encode
-                    String randomID = UUID.randomUUID().toString().substring(0,2);
-                    scopeId = EncodeUtil.encode((scopeId + randomID).getBytes());
-
-                    // set
-                    resourceEntitity.setScopeId(scopeId);
-                }
+//                for(int i = 0;i < resourceEntitites.size();i++){
+//                    // get
+//                    ResourceEntity resourceEntitity = resourceEntitites.get(i);
+//                    String scopeId = resourceEntitity.getScopeId();
+//                    // encode
+//                    if(scopeId.length() == 36) {
+//                        String randomID = UUID.randomUUID().toString().substring(0, 2);
+//                        scopeId = EncodeUtil.encode((scopeId + randomID).getBytes());
+//                    }
+//                    // set
+//                    resourceEntitity.setScopeId(scopeId);
+//                }
 
                 return resourceEntitites;
             }else {

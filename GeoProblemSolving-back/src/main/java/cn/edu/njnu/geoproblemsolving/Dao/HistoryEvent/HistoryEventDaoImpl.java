@@ -1,6 +1,5 @@
 package cn.edu.njnu.geoproblemsolving.Dao.HistoryEvent;
 
-import cn.edu.njnu.geoproblemsolving.Dao.Method.EncodeUtil;
 import cn.edu.njnu.geoproblemsolving.Entity.HistoryEventEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -24,11 +23,6 @@ public class HistoryEventDaoImpl implements IHistoryEventDao {
     @Override
     public String saveHistoryEvent(HistoryEventEntity historyEvent){
         try {
-            // decode subprojectId
-            String sid = historyEvent.getScopeId();
-            String scopeId = new String(EncodeUtil.decode(sid));
-            historyEvent.setScopeId(scopeId.substring(0,scopeId.length()-2));
-
             Date date=new Date();
             SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
             historyEvent.setCreateTime(dateFormat.format(date));
@@ -43,27 +37,10 @@ public class HistoryEventDaoImpl implements IHistoryEventDao {
     @Override
     public Object inquiryHistoryEvent(String scopeId){
         try {
-            // decode scopeId
-            String sId = scopeId;
-            scopeId = new String(EncodeUtil.decode(sId));
-            scopeId = scopeId.substring(0,scopeId.length()-2);
-
             Query query=new Query(Criteria.where("scopeId").is(scopeId));
 
-            // encode scopeId
             List<HistoryEventEntity> historyEventEntities = mongoTemplate.find(query,HistoryEventEntity.class);
-            for(int i = 0;i < historyEventEntities.size();i++){
-                // get
-                HistoryEventEntity historyEventEntity = historyEventEntities.get(i);
-                scopeId = historyEventEntity.getScopeId();
 
-                // encode
-                String randomID = UUID.randomUUID().toString().substring(0,2);
-                scopeId = EncodeUtil.encode((scopeId + randomID).getBytes());
-
-                // set
-                historyEventEntity.setScopeId(scopeId);
-            }
             return historyEventEntities;
 
         }catch (Exception e){

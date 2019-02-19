@@ -36,8 +36,10 @@ public class ProjectDaoImpl implements IProjectDao{
         if(key.equals("projectId")){
             // decode
             String pid = value;
-            String projectId = new String(EncodeUtil.decode(pid));
-            value = projectId.substring(0,projectId.length()-2);
+            if(pid.length() > 36) {
+                String projectId = new String(EncodeUtil.decode(pid));
+                value = projectId.substring(0, projectId.length() - 2);
+            }
         }
         Query query=Query.query(Criteria.where(key).is(value));
         if(mongoTemplate.find(query,ProjectEntity.class).isEmpty()){
@@ -52,8 +54,10 @@ public class ProjectDaoImpl implements IProjectDao{
                 String projectId = projectEntity.getProjectId();
 
                 // encode
-                String randomID = UUID.randomUUID().toString().substring(0,2);
-                projectId = EncodeUtil.encode((projectId + randomID).getBytes());
+                if(projectId.length() == 36) {
+                    String randomID = UUID.randomUUID().toString().substring(0, 2);
+                    projectId = EncodeUtil.encode((projectId + randomID).getBytes());
+                }
 
                 // set
                 projectEntity.setProjectId(projectId);
@@ -68,8 +72,10 @@ public class ProjectDaoImpl implements IProjectDao{
 
         // decode
         String pid = value;
-        String projectId = new String(EncodeUtil.decode(pid));
-        value = projectId.substring(0,projectId.length()-2);
+        if(pid.length() > 36) {
+            String projectId = new String(EncodeUtil.decode(pid));
+            value = projectId.substring(0, projectId.length() - 2);
+        }
 
         Query query=Query.query(Criteria.where(key).is(value));
         mongoTemplate.remove(query,"Project");
@@ -79,8 +85,11 @@ public class ProjectDaoImpl implements IProjectDao{
     public String updateProject(HttpServletRequest request){
         try{
             // decode
-            String pid = request.getParameter("projectId");
-            String projectId = new String(EncodeUtil.decode(pid));
+            String projectId = request.getParameter("projectId");
+            if(projectId.length() > 36) {
+                String pid = new String(EncodeUtil.decode(projectId));
+                projectId = pid.substring(0, pid.length() - 2);
+            }
 
             Query query=new Query(Criteria.where("projectId").is(projectId));
             CommonMethod method=new CommonMethod();
@@ -96,6 +105,12 @@ public class ProjectDaoImpl implements IProjectDao{
     @Override
     public Object joinProject(String projectId,String userId){
         try{
+            // decode
+            if(projectId.length() > 36) {
+                String pId = new String(EncodeUtil.decode(projectId));
+                projectId = pId.substring(0, pId.length() - 2);
+            }
+
             Query queryProject=new Query(Criteria.where("projectId").is(projectId));
             if (!mongoTemplate.find(queryProject,ProjectEntity.class).isEmpty()){
                 ProjectEntity project=mongoTemplate.findOne(queryProject,ProjectEntity.class);
@@ -135,6 +150,12 @@ public class ProjectDaoImpl implements IProjectDao{
     @Override
     public String quitProject(String projectId,String userId){
         try {
+            // decode
+            if(projectId.length() > 36) {
+                String pId = new String(EncodeUtil.decode(projectId));
+                projectId = pId.substring(0, pId.length() - 2);
+            }
+
             Query queryProject=new Query(Criteria.where("projectId").is(projectId));
             if (!mongoTemplate.find(queryProject,ProjectEntity.class).isEmpty()){
                 ProjectEntity project=mongoTemplate.findOne(queryProject,ProjectEntity.class);
@@ -167,6 +188,12 @@ public class ProjectDaoImpl implements IProjectDao{
     @Override
     public Object changeManager(String projectId,String userId){
         try {
+            // decode
+            if(projectId.length() > 36) {
+                String pId = new String(EncodeUtil.decode(projectId));
+                projectId = pId.substring(0, pId.length() - 2);
+            }
+
             Query query =new Query(Criteria.where("projectId").is(projectId));
             ProjectEntity project=mongoTemplate.findOne(query,ProjectEntity.class);
             String foreManagerId= project.getManagerId();
