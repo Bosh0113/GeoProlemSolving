@@ -306,8 +306,24 @@ export default {
     },
     //进入项目详情页面的函数
     goSingleProject(id) {
-      this.$router.push({ path: `project/${id}` });
-      // console.log(id);
+      let isManager,isMember;
+      for (let i = 0; i<this.currentProjectList.length;i++){
+        if(this.currentProjectList[i]["projectId"] === id){
+          isManager = this.currentProjectList[i]["isMember"];
+          isMember = this.currentProjectList[i]["isMember"];
+        }
+      }
+      if (this.$store.getters.userState){
+        if ( isManager || isMember){
+          this.$router.push({ path: `project/${id}` });
+        }
+        else{
+          alert("No access.");
+        }
+      }
+      else{
+        this.$router.push({path:'/login'});
+      }
     }
   }
 };

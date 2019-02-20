@@ -1,298 +1,3 @@
-<template>
-  <div>
-    <Row>
-      <Col span="22" offset="1">
-        <div class="whitespace"></div>
-        <Button
-          type="primary"
-          style="float:right;height:60px;margin-right:40px;line-height:30px;font-size:30px;"
-          @click="goWorkspace(subProjectList[0].subProjectId)"
-        >WorkSpace</Button>
-        <div class="projectTitle">
-          <h1
-            style="text-align:center"
-            v-if="currentProjectDetail"
-          >{{currentProjectDetail["title"]}}</h1>
-        </div>
-        <div class="whitespace"></div>
-        <div class="detail">
-          <div class="detail_image">
-            <img
-              :src="currentProjectDetail.picture"
-              style="-moz-background-size:100% 100%; background-size:100% 100%;"
-            >
-          </div>
-          <div class="detail_description">
-            <p
-              style="font-size:20px"
-              v-if="currentProjectDetail"
-            >{{currentProjectDetail.introduction}}</p>
-            <div class="projectEditPanel">
-              <Button
-                v-show="this.projectEditAble === true"
-                type="primary"
-                style="font-size:20px;"
-                @click="editinfoModal=true"
-              >Edit projcet Info</Button>
-            </div>
-            <Modal
-              v-model="editinfoModal"
-              ok-text="submit"
-              cancel-text="cancel"
-              @on-ok="submit"
-              @on-cancel="cancel"
-              title="edit Project Infomation"
-            ></Modal>
-          </div>
-        </div>
-        <div class="whitespace"></div>
-        <h1 style="text-align:center">Members</h1>
-        <div class="projectMembersPanel">
-          <div style="width:80%">
-            <Tag
-              v-for="member in currentProjectDetail.members"
-              color="primary"
-              :key="member.index"
-              style="height:40px;line-height:40px;font-size:20px;margin-left:0.5%;margin-right:0.5%"
-            >{{member.userName}}</Tag>
-          </div>
-          <div style="width:20%">
-            <Button
-              type="success"
-              style="display:flex;justify-content:center;align-items:center;height:40px;;float:right"
-            >
-              <span
-                style="height:30px;line-height:30px;font-size:20px"
-                @click="inviteModalShow()"
-              >Invite</span>
-            </Button>
-            <Modal
-              v-model="inviteModal"
-              @on-ok="invite()"
-              @on-cancel="cancel()"
-              ok-text="Assure"
-              cancel-text="Cancel"
-              title="Invite others join in the Project"
-            >
-              <!-- <br> -->
-              <div class="form_style">
-                <span></span>
-              </div>
-              <div class="form_style">
-                <span>Title</span>
-                <Input style="width:300px" v-model="emailTitle"/>
-              </div>
-              <br>
-              <div class="form_style">
-                <span>Content</span>
-                <Input
-                  type="textarea"
-                  :rows="4"
-                  style="width:300px"
-                  :placeholder="this.emailFormat + this.currentProjectDetail.title + ', you can copy the projectId ' + this.currentProjectDetail.projectId +'and apply for join in it'"
-                  v-model="emailContent"
-                />
-              </div>
-              <br>
-              <div class="form_style">
-                <Button @click="copyDefault()" type="success">Use default</Button>
-              </div>
-            </Modal>
-          </div>
-        </div>
-        <div class="whitespace"></div>
-        <h1 style="text-align:center">Sub projects</h1>
-        <div class="subprojectPanel">
-          <div class="subProjectListStyle" v-show="subProjectList!=[]">
-            <div class="whitespace"></div>
-            <div
-              v-for="(subProject,index) in subProjectList"
-              :key="subProject.index"
-              v-show="subProjectList[0].title!=''"
-            >
-              <Col span="6" offset="1">
-                <Card class="subProjectStyle">
-                  <Button
-                    type="primary"
-                    slot="extra"
-                    style="margin:-5px 5px 0 5px"
-                    v-show="subProject.editable===true"
-                    @click="editSubProjectShow(index)"
-                  >Authorize</Button>
-                  <Button
-                    type="success"
-                    slot="extra"
-                    style="margin:-5px 5px 0 5px"
-                    v-show="subProject.editable===true"
-                    @click="editSubProjectShow(index)"
-                  >Edit</Button>
-
-                  <Button
-                    type="error"
-                    slot="extra"
-                    style="margin:-5px 5px 0 5px"
-                    v-show="subProject.editable===true"
-                    @click="deleteSubProjectModal = true"
-                  >Remove</Button>
-                  <Modal
-                    v-model="deleteSubProjectModal"
-                    title="Delete sub project"
-                    ok-text="assure"
-                    cancel-text="cancel"
-                    @on-ok="deleteSubProject(subProject.subProjectId)"
-                    @on-cancel="cancel"
-                    width="800px"
-                  >
-                    <p>Once the deletion is confirmed, all module and resource information under the subsystem will be deleted. Please choose carefully.</p>
-                  </Modal>
-                  <p
-                    slot="title"
-                    @click="goWorkspace(subProject.subProjectId)"
-                    class="subProjectTitle"
-                  >{{subProject["title"]}}</p>
-                  <p>{{subProject["description"]}}</p>
-                  <!-- <hr> -->
-                  <br>
-                  <div>
-                    <span
-                      style="float:left;color:white;background-color:#2d8cf0;padding:2.5px"
-                    >Manager</span>
-                    <span style="float:right;padding:2.5px">{{subProject.manager}}</span>
-                  </div>
-                  <br>
-                  <div class="whitespace"></div>
-                  <div>
-                    <span
-                      style="float:left;;color:white;background-color:#2d8cf0;padding:2.5px"
-                    >createtime</span>
-                    <span style="float:right;padding:2.5px">{{subProject["createTime"]}}</span>
-                  </div>
-                  <div class="whitespace"></div>
-                </Card>
-              </Col>
-            </div>
-            <Modal
-              v-model="editSubProjectModal"
-              ok-text="submit"
-              cancel-text="cancel"
-              @on-ok="editSubProject()"
-              @on-cancel="cancel()"
-              title="edit sub project info"
-              width="800px"
-            >
-              <div>
-                <div class="createSubProjectPanelInput">
-                  <span style="width:20%;text-align:center">Title</span>
-                  <Input
-                    v-model="subProjectTitleEdit"
-                    style="width: 800px;"
-                    :placeholder="subProjectList[editSubProjectindex].title"
-                  />
-                </div>
-                <br>
-                <div class="createSubProjectPanelInput">
-                  <span style="width:20%;text-align:center">Description</span>
-                  <Input
-                    v-model="subProjectDescriptionEdit"
-                    :placeholder="subProjectList[this.editSubProjectindex].description"
-                    style="width: 800px;"
-                    :rows="4"
-                    type="textarea"
-                  />
-                </div>
-              </div>
-            </Modal>
-          </div>
-          <div class="subProjectCreate">
-            <Button type="success" @click="subProjectModal = true">Create</Button>
-            <Modal
-              v-model="subProjectModal"
-              ok-text="create"
-              cancel-text="cancel"
-              @on-ok="createSubProject()"
-              @on-cancel="cancel()"
-              title="Create sub project"
-              width="800px;"
-            >
-              <div>
-                <div class="createSubProjectPanelInput">
-                  <span style="width:20%;text-align:center">Title</span>
-                  <Input
-                    v-model="subProjectTitle"
-                    placeholder="Sub project title"
-                    style="width: 800px;"
-                  />
-                </div>
-                <br>
-                <div class="createSubProjectPanelInput">
-                  <span style="width:20%;text-align:center">Description</span>
-                  <Input
-                    v-model="subProjectDescription"
-                    placeholder="Sub project description"
-                    style="width: 800px;"
-                    :rows="4"
-                    type="textarea"
-                  />
-                </div>
-              </div>
-            </Modal>
-          </div>
-        </div>
-        <div class="whitespace"></div>
-        <h1 style="text-align:center">Resource</h1>
-        <div class="resourceCard"></div>
-        <div class="resourcePanel" style="min-height:200px;background-color:lightblue">
-          <!-- <input id="uploadFile" type="file" class="model file" data-show-preview="false" data-show-upload="false"> -->
-          <Button id="upload" type="primary" @click="uploadFileModalShow()">Upload</Button>
-          <Modal
-            v-model="uploadFileModal"
-            title="upload file"
-            @on-ok="submitFile()"
-            @on-cancel="cancel()"
-            ok-text="submit"
-            cancel-text="cancel"
-            width="600px"
-          >
-            <div style="display:flex;text-align:center;align-items:center;justify-content:center">
-              <span style="width:20%">Type</span>
-              <Input v-model="fileType"/>
-            </div>
-            <br>
-            <div style="display:flex;text-align:center;align-items:center;justify-content:center">
-              <span style="width:20%">Description</span>
-              <Input type="textarea" :rows="2" v-model="fileDescription"/>
-            </div>
-            <br>
-            <input type="file" @change="getFile($event)" style="margin-left:20%">
-          </Modal>
-          <!-- <form name="form名称" action="http://localhost:8081/resource/upload"  method="post" enctype ="multipart/form-data"> -->
-          <!-- <input type="file" name="">
-            <input type="text" name="">
-          <input type="submit" value="提交">-->
-          <!-- </form> -->
-        </div>
-        <Col span="20" offset="2">
-          <Table :columns="projectTableColName" :data="this.projectResourceList" v-show="this.projectResourceList!=[]&&this.projectResourceList!='None'">
-            <template slot-scope="{ row }" slot="name">
-              <strong>{{ row.name }}</strong>
-            </template>
-            <template slot-scope="{ row, index }" slot="action">
-              <Button
-                type="success"
-                size="small"
-                style="margin-right: 5px"
-                :href="projectResourceList[index].pathURL"
-                @click="show(index)"
-              >DownLoad</Button>
-              <!-- <Button type="error" size="small" @click="remove(index)">Delete</Button> -->
-            </template>
-          </Table>
-          <!-- 需要两部分的值，一个是表头，一个是列表项 -->
-        </Col>
-      </Col>
-    </Row>
-  </div>
-</template>
 <style scoped>
 .projectTitle {
   display: flex;
@@ -304,14 +9,12 @@
   height: auto;
   display: flex;
 }
-.detail_image {
-  min-width: 30%;
-  max-width: 40%;
+.detail_image img {
+  width: 100%;
 }
 .detail_description {
-  padding-left: 20px;
-  padding-right: 20px;
-  max-width: 60%;
+  padding: 0 20px;
+  min-width: 60%;
 }
 .detail_description p {
   padding: 0 20px 0 20px;
@@ -385,36 +88,373 @@
 .form_style {
   display: flex;
   align-items: center;
-  justify-content: center;
+  /* justify-content: center; */
 }
 .form_style span {
-  width: 20%;
+  min-width: 20%;
   text-align: center;
 }
-.form_style input {
-  width: 70%;
+.emailOperate {
+  display: flex;
+  padding: 0 10px;
+  justify-content: center;
+}
+.emailOperate button {
+  /* padding:0 10px; */
+  margin-left: 10px;
+  margin-right: 10px;
 }
 </style>
+<template>
+  <div>
+    <Row>
+      <Col span="22" offset="1">
+        <div class="whitespace"></div>
+        <!-- <Button
+          type="primary"
+          style="float:right;height:60px;margin-right:40px;line-height:30px;font-size:30px;"
+          @click="goWorkspace(subProjectList[0].subProjectId)"
+          icon="md-home"
+          title="workspace"
+        ></Button>-->
+        <div class="projectTitle">
+          <h1
+            style="text-align:center"
+            v-if="currentProjectDetail"
+          >{{currentProjectDetail["title"]}}</h1>
+        </div>
+        <div class="whitespace"></div>
+        <div class="detail">
+          <div class="detail_image">
+            <img :src="currentProjectDetail.picture">
+          </div>
+          <div class="detail_description">
+            <p
+              style="font-size:20px"
+              v-if="currentProjectDetail"
+            >{{currentProjectDetail.introduction}}</p>
+            <div class="projectEditPanel">
+              <Button
+                v-show="this.isProjectManager"
+                type="primary"
+                style="font-size:20px;"
+                @click="editinfoModal=true"
+              >Edit projcet Info</Button>
+            </div>
+            <Modal
+              v-model="editinfoModal"
+              ok-text="submit"
+              cancel-text="cancel"
+              @on-ok="submit"
+              @on-cancel="cancel"
+              title="edit Project Infomation"
+            ></Modal>
+          </div>
+        </div>
+        <div class="whitespace"></div>
+        <h1 style="text-align:center">Members</h1>
+        <div class="projectMembersPanel">
+          <div style="width:80%">
+            <Tag
+              color="success"
+              style="height:40px;line-height:40px;font-size:20px;margin-left:0.5%;margin-right:0.5%"
+            >{{this.projectManager.userName}}</Tag>
+            <Tag
+              v-for="member in currentProjectDetail.members"
+              color="primary"
+              :key="member.index"
+              style="height:40px;line-height:40px;font-size:20px;margin-left:0.5%;margin-right:0.5%"
+            >{{member.userName}}</Tag>
+          </div>
+          <div style="width:20%">
+            <Button
+              v-show="this.isProjectManager"
+              type="success"
+              style="display:flex;justify-content:center;align-items:center;height:40px;;float:right"
+            >
+              <span
+                style="height:30px;line-height:30px;font-size:20px"
+                @click="inviteModalShow()"
+              >Invite</span>
+            </Button>
+            <Modal
+              v-model="inviteModal"
+              @on-ok="invite()"
+              @on-cancel="cancel()"
+              ok-text="Assure"
+              cancel-text="Cancel"
+              title="Invite others join in the Project"
+            >
+              <!-- <br> -->
+              <div class="form_style">
+                <span>Title</span>
+                <Input style="width:75%" v-model="emailTitle"/>
+              </div>
+              <br>
+              <div class="form_style">
+                <span>Content</span>
+                <Input
+                  type="textarea"
+                  :rows="4"
+                  style="width:75%"
+                  :placeholder="this.emailFormat + this.currentProjectDetail.title + ', you can copy the projectId ' + this.currentProjectDetail.projectId +'and apply for join in it'"
+                  v-model="emailContent"
+                />
+              </div>
+              <br>
+              <div style="display:flex" class="emailOperate">
+                <Button @click="copyDefault()" type="success">Use default</Button>
+                <Button type="primary">Project ID</Button>
+                <Button type="error">Project Name</Button>
+              </div>
+            </Modal>
+          </div>
+        </div>
+        <div class="whitespace"></div>
+        <h1 style="text-align:center">Sub projects</h1>
+        <div class="subprojectPanel">
+          <div class="subProjectListStyle">
+            <div class="whitespace"></div>
+            <div v-for="(subProject,index) in subProjectList" :key="subProject.index">
+              <Col span="6" offset="1">
+                <Card class="subProjectStyle">
+                  <Button
+                    type="primary"
+                    slot="extra"
+                    style="margin:-5px 5px 0 5px"
+                    v-show="subProject.editable===true"
+                    @click="handOverSubProjectShow(index)"
+                    icon="md-happy"
+                    title="Authorize"
+                  ></Button>
+                  <Button
+                    type="success"
+                    slot="extra"
+                    style="margin:-5px 5px 0 5px"
+                    v-show="subProject.editable===true"
+                    @click="editSubProjectShow(index)"
+                    icon="ios-brush"
+                    title="edit"
+                  ></Button>
+                  <Button
+                    type="error"
+                    slot="extra"
+                    style="margin:-5px 5px 0 5px"
+                    v-show="subProject.editable===true"
+                    @click="deleteSubProjectShow(index)"
+                    icon="md-close"
+                    title="remove"
+                  ></Button>
+                  <p
+                    slot="title"
+                    @click="goWorkspace(subProject.subProjectId)"
+                    class="subProjectTitle"
+                  >{{subProject["title"]}}</p>
+                  <p>{{subProject["description"]}}</p>
+                  <!-- <hr> -->
+                  <br>
+                  <div>
+                    <span
+                      style="float:left;color:white;background-color:#2d8cf0;padding:2.5px"
+                    >Manager</span>
+                    <span style="float:right;padding:2.5px">{{subProject.manager}}</span>
+                  </div>
+                  <br>
+                  <div class="whitespace"></div>
+                  <div>
+                    <span
+                      style="float:left;;color:white;background-color:#2d8cf0;padding:2.5px"
+                    >createtime</span>
+                    <span style="float:right;padding:2.5px">{{subProject["createTime"]}}</span>
+                  </div>
+                  <div class="whitespace"></div>
+                </Card>
+              </Col>
+            </div>
+          </div>
+          <Modal
+            v-model="handOverSubProjectModal"
+            title="Appoint new manager"
+            ok-text="ok"
+            cancel-text="cancel"
+            @on-ok="handOverSubProject()"
+            @on-cancel="cancel"
+            width="500px"
+          >
+            <div style="height:100px;background:azure">
+              <RadioGroup v-model="newManagerId">
+                <Radio
+                  v-for="(member,index) in subjectMembers"
+                  :key="member.index"
+                  :label="member.userId"
+                >
+                  <span>{{member.userName}}</span>
+                </Radio>
+              </RadioGroup>
+            </div>
+          </Modal>
+          <Modal
+            v-model="editSubProjectModal"
+            ok-text="submit"
+            cancel-text="cancel"
+            @on-ok="editSubProject()"
+            @on-cancel="cancel()"
+            title="edit sub project info"
+            width="800px"
+          >
+            <div>
+              <div class="createSubProjectPanelInput">
+                <span style="width:20%;text-align:center">Title</span>
+                <Input
+                  v-model="subProjectTitleEdit"
+                  style="width: 800px;"
+                  :placeholder="subProjectTitleEdit"
+                />
+              </div>
+              <br>
+              <div class="createSubProjectPanelInput">
+                <span style="width:20%;text-align:center">Description</span>
+                <Input
+                  v-model="subProjectDescriptionEdit"
+                  :placeholder="subProjectDescriptionEdit"
+                  style="width: 800px;"
+                  :rows="4"
+                  type="textarea"
+                />
+              </div>
+            </div>
+          </Modal>
+          <Modal
+            v-model="deleteSubProjectModal"
+            title="Delete sub project"
+            ok-text="assure"
+            cancel-text="cancel"
+            @on-ok="deleteSubProject()"
+            @on-cancel="cancel"
+            width="800px"
+          >
+            <p>Once the deletion is confirmed, all module and resource information under the subsystem will be deleted. Please choose carefully.</p>
+          </Modal>
+          <div class="subProjectCreate">
+            <Button
+              type="success"
+              @click="subProjectModal = true"
+              v-show="this.isProjectManager||this.isProjectMember"
+            >Create</Button>
+            <Modal
+              v-model="subProjectModal"
+              ok-text="create"
+              cancel-text="cancel"
+              @on-ok="createSubProject()"
+              @on-cancel="cancel()"
+              title="Create sub project"
+              width="800px;"
+            >
+              <div>
+                <div class="createSubProjectPanelInput">
+                  <span style="width:20%;text-align:center">Title</span>
+                  <Input
+                    v-model="subProjectTitle"
+                    placeholder="Sub project title"
+                    style="width: 800px;"
+                  />
+                </div>
+                <br>
+                <div class="createSubProjectPanelInput">
+                  <span style="width:20%;text-align:center">Description</span>
+                  <Input
+                    v-model="subProjectDescription"
+                    placeholder="Sub project description"
+                    style="width: 800px;"
+                    :rows="4"
+                    type="textarea"
+                  />
+                </div>
+              </div>
+            </Modal>
+          </div>
+        </div>
+        <div class="whitespace"></div>
+        <h1 style="text-align:center">Resource</h1>
+        <div class="resourceCard"></div>
+        <div class="resourcePanel" style="min-height:200px;background-color:lightblue">
+          <!-- <input id="uploadFile" type="file" class="model file" data-show-preview="false" data-show-upload="false"> -->
+          <Button
+            id="upload"
+            type="primary"
+            @click="uploadFileModalShow()"
+            v-show="this.isProjectManager||this.isProjectMember"
+          >Upload</Button>
+          <Modal
+            v-model="uploadFileModal"
+            title="upload file"
+            @on-ok="submitFile()"
+            @on-cancel="cancel()"
+            ok-text="submit"
+            cancel-text="cancel"
+            width="600px"
+          >
+            <div style="display:flex;text-align:center;align-items:center;justify-content:center">
+              <span style="width:20%">Type</span>
+              <Input v-model="fileType"/>
+            </div>
+            <br>
+            <div style="display:flex;text-align:center;align-items:center;justify-content:center">
+              <span style="width:20%">Description</span>
+              <Input type="textarea" :rows="2" v-model="fileDescription"/>
+            </div>
+            <br>
+            <input type="file" @change="getFile($event)" style="margin-left:20%">
+          </Modal>
+          <!-- <form name="form名称" action="http://localhost:8081/resource/upload"  method="post" enctype ="multipart/form-data"> -->
+          <!-- <input type="file" name="">
+            <input type="text" name="">
+          <input type="submit" value="提交">-->
+          <!-- </form> -->
+        </div>
+        <Col span="20" offset="2">
+          <Table
+            :columns="projectTableColName"
+            :data="this.projectResourceList"
+            v-show="this.projectResourceList!=[]&&this.projectResourceList!='None'"
+          >
+            <template slot-scope="{ row }" slot="name">
+              <strong>{{ row.name }}</strong>
+            </template>
+            <template slot-scope="{ row, index }" slot="action">
+              <Button
+                type="success"
+                size="small"
+                style="margin-right: 5px"
+                :href="projectResourceList[index].pathURL"
+                @click="show(index)"
+              >DownLoad</Button>
+              <!-- <Button type="error" size="small" @click="remove(index)">Delete</Button> -->
+            </template>
+          </Table>
+          <!-- 需要两部分的值，一个是表头，一个是列表项 -->
+        </Col>
+      </Col>
+    </Row>
+  </div>
+</template>
 <script>
 export default {
   data() {
     return {
-      currentProjectDetail: {
-        members: [],
-        introduction: "",
-        projectId: ""
-      },
+      currentProjectDetail: {},
+      projectManager: {},
       //确定用户是否有更新项目的权限，控制是否显示编辑的按钮，只有创建者才有权对项目进行编辑
-      projectEditAble: false,
+      isProjectManager: false,
+      isProjectMember: false,
+      //移交权限给新的管理者
+      handOverSubProjectModal: false,
+      newManagerId: "",
+      subjectMembers: [],
       //编辑项目的按钮
       editinfoModal: false,
       //子项目的列表
-      subProjectList: [
-        {
-          title: "",
-          description: ""
-        }
-      ],
+      subProjectList: [],
       //创建子项目的模态框
       subProjectModal: false,
       subProjectTitle: "",
@@ -476,11 +516,29 @@ export default {
     };
   },
   created: function() {
-    // alert(111);
     this.getAllResource();
+    this.getProjectDetail();
+    this.getAllSubProject();
+  },
+  // add by mzy for navigation guards
+  beforeRouteEnter: (to, from, next) => {
+    // alert(this.isProjectManager);
+    next(vm => {
+      
+      console.log(vm.$store.getters.userState);
+      if (!vm.$store.getters.userState) {
+        next("/login");
+      } else {
+        if (!vm.isProjectManager || !vm.isProjectMember) {
+          alert("No access");
+          // next('/project');
+          vm.$router.go(-1);
+        }
+      }
+    });
   },
   methods: {
-    getProjectDeatil() {
+    getProjectDetail() {
       let pid = this.$route.params.id;
       let queryObject = { key: "projectId", value: pid };
       var that = this;
@@ -502,6 +560,23 @@ export default {
           } else {
             let obj = res.data;
             that.currentProjectDetail = obj[0];
+            that.projectManager.userId = that.currentProjectDetail["managerId"];
+            $.ajax({
+              url:
+                "http://localhost:8081/user/inquiry" +
+                "?key=" +
+                "userId" +
+                "&value=" +
+                that.projectManager.userId,
+              type: "GET",
+              async: false,
+              success: function(data) {
+                that.projectManager.userName = data.userName;
+              },
+              error: function(err) {
+                console.log("Get manager name fail.");
+              }
+            });
             localStorage.setItem(
               "projectId",
               that.currentProjectDetail.projectId
@@ -510,17 +585,24 @@ export default {
             that.currentProjectDetail.tag = that.currentProjectDetail.tag.split(
               ","
             );
-            that.judgeEditableProperty(that.currentProjectDetail.managerId);
+            that.managerIdentity(that.currentProjectDetail.managerId);
+            that.memberIdentity(that.currentProjectDetail.members);
             // this.getAllSubProject(queryObject);
           }
         })
         .catch(err => {});
     },
-    judgeEditableProperty(data) {
-      // console.log(data);
-      if (data === this.$store.state.userId) {
-        this.projectEditAble = true;
-        console.log(this.projectEditAble);
+    managerIdentity(managerId) {
+      if (managerId === this.$store.state.userId) {
+        this.isProjectManager = true;
+      }
+    },
+    memberIdentity(members) {
+      for (let i = 0; i < members.length; i++) {
+        if (members[i].userId === this.$store.state.userId) {
+          this.isProjectMember = true;
+          break;
+        }
       }
     },
     // 修改项目的按钮
@@ -551,7 +633,6 @@ export default {
             // console.log(res.data);
             this.subProjectTitle = "";
             this.subProjectDescription = "";
-
             this.getAllSubProject();
           } else {
             this.$Message.info("fail");
@@ -561,6 +642,28 @@ export default {
     },
     inviteModalShow() {
       this.inviteModal = true;
+    },
+    handOverSubProjectShow(index) {
+      this.editSubProjectindex = index;
+      this.subjectMembers = this.subProjectList[index].members;
+      this.handOverSubProjectModal = true;
+    },
+    handOverSubProject() {
+      this.axios
+        .get(
+          "http://localhost:8081/subProject/manager?" +
+            "subProjectId=" +
+            this.subProjectList[this.editSubProjectindex].subProjectId +
+            "&userId=" +
+            this.newManagerId
+        )
+        .then(res => {
+          console.log(res.data);
+          this.getAllSubProject();
+        })
+        .catch(err => {
+          console.log(err.data);
+        });
     },
     editSubProjectShow(index) {
       this.editSubProjectindex = index;
@@ -590,11 +693,16 @@ export default {
           console.log(err.data);
         });
     },
-    deleteSubProject(subPId) {
-      console.log("删除的子项目id是" + subPId);
+    deleteSubProjectShow(index) {
+      this.editSubProjectindex = index;
+      this.deleteSubProjectModal = true;
+    },
+    deleteSubProject() {
       this.axios
         .get(
-          "http://localhost:8081/subProject/delete?" + "subProjectId=" + subPId
+          "http://localhost:8081/subProject/delete?" +
+            "subProjectId=" +
+            this.subProjectList[this.editSubProjectindex].subProjectId
         )
         .then(res => {
           console.log(res.data);
@@ -735,7 +843,6 @@ export default {
         });
     },
     // showProjectResource(resource){
-
     // }
     show(index) {
       // alert(this.projectResourceList[index].pathURL);
@@ -749,11 +856,6 @@ export default {
       // }<br>Address：${this.data6[index].address}`
       // });
     }
-  },
-  mounted: function() {
-    this.getProjectDeatil();
-    this.getAllSubProject();
   }
 };
 </script>
-

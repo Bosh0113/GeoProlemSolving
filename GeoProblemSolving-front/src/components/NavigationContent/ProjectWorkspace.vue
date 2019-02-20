@@ -137,7 +137,7 @@
   <div>
     <Row>
       <Col span="18" offset="1">
-        <Steps :current="order" size="small" v-show="stepShow">
+        <Steps :current="order" size="small">
           <Step
             v-for="(list,index) in moduleList"
             :key="index"
@@ -147,7 +147,7 @@
           ></Step>
         </Steps>
       </Col>
-      <Col span="4" offset="1">
+      <Col span="4" offset="1" v-show="isSubProjectManager">
         <Button type="info" @click="addModal = true">Add</Button>
         <Modal
           width="600px"
@@ -188,7 +188,7 @@
               v-model="updateModuleTitle"
               placeholder="Enter something..."
               style="width: 400px"
-              :placeholder="moduleList[currentModuleIndex].title"
+              :placeholder="moduleTitle"
             />
           </div>
           <div class="editNodeStyle">
@@ -197,7 +197,7 @@
               <Option
                 v-for="(item,index) in typeList"
                 :key="item.index"
-                :value="moduleList[currentModuleIndex].type"
+                :value="item"
               >{{ item }}</Option>
             </Select>
           </div>
@@ -207,13 +207,14 @@
               v-model="updateModuleDescription"
               style="width:400px"
               :rows="6"
-              :placeholder="moduleList[currentModuleIndex].description"
+              :placeholder="moduleDescription"
             ></textarea>
           </div>
         </Modal>
       </Col>
     </Row>
     <br>
+    <div v-if="moduleList.length>0">
     <p style="margin:10px 5%;text-indent:25px">{{currentModule.description}}</p>
     <Row>
       <Col span="4" offset="1" v-bind="this.participants">
@@ -234,6 +235,7 @@
               type="success"
               style="text-align:center;width:100px"
               @click="getModuleMembers()"
+              v-show="isSubProjectManager"
             >Invite</Button>
             <Modal
               v-model="inviteModal"
@@ -249,78 +251,7 @@
           </div>
         </div>
       </Col>
-      <Button type="success" @click="createTaskModalShow()">Create Task</Button>
-      <!-- createTaskModal -->
-      <Modal
-        v-model="createTaskModal"
-        title="Create task panel"
-        @on-ok="createTask()"
-        @on-cancel="cancel()"
-        width="800px">
-        <div class="taskFormItem">
-          <span style="width:30%">taskName</span>
-          <Input style="width: 300px" :placeholder="this.taskPlaceHolder.name" v-model="taskInfo.taskName"/>
-        </div>
-        <div class="whiteSpace"></div>
-        <div class="taskFormItem">
-          <span style="width:30%">description</span>
-          <Input style="width: 300px" :placeholder="this.taskPlaceHolder.description" type="textarea" :rows="4" v-model="taskInfo.description"/>
-        </div>
-        <div class="whiteSpace"></div>
-        <div class="taskFormItem">
-          <span style="width:30%">start Time</span>
-          <DatePicker type="datetime" :placeholder="this.taskPlaceHolder.startTime" style="width: 300px" v-model="taskInfo.startTime"></DatePicker>
-        </div>
-        <div class="whiteSpace"></div>
-        <div class="taskFormItem">
-          <span style="width:30%">end Time</span>
-          <DatePicker type="datetime" :placeholder="this.taskPlaceHolder.endTime"style="width: 300px" v-model="taskInfo.endTime"></DatePicker>
-        </div>
-        <div class="whiteSpace"></div>
-        <div class="taskFormItem">
-          <span style="width:30%">state</span>
-          <RadioGroup v-model="taskInfo.state" disabled>
-              <Radio label="todo"></Radio>
-              <Radio label="doing"></Radio>
-              <Radio label="done"></Radio>
-          </RadioGroup>
-        </div>
-      </Modal>
-      <Modal
-        v-model="editTaskModal"
-        title="Edit task panel"
-        @on-ok="updateTask()"
-        @on-cancel="cancel()"
-        width="800px">
-        <div class="taskFormItem">
-          <span style="width:30%">taskName</span>
-          <Input style="width: 300px" :placeholder="this.taskPlaceHolder.name" v-model="taskInfo.taskName"/>
-        </div>
-        <div class="whiteSpace"></div>
-        <div class="taskFormItem">
-          <span style="width:30%">description</span>
-          <Input style="width: 300px" :placeholder="this.taskPlaceHolder.description" type="textarea" :rows="4" v-model="taskInfo.description"/>
-        </div>
-        <div class="whiteSpace"></div>
-        <div class="taskFormItem">
-          <span style="width:30%">start Time</span>
-          <DatePicker type="datetime" :placeholder="this.taskPlaceHolder.startTime" style="width: 300px" v-model="taskInfo.startTime"></DatePicker>
-        </div>
-        <div class="whiteSpace"></div>
-        <div class="taskFormItem">
-          <span style="width:30%">end Time</span>
-          <DatePicker type="datetime" :placeholder="this.taskPlaceHolder.endTime"style="width: 300px" v-model="taskInfo.endTime"></DatePicker>
-        </div>
-        <div class="whiteSpace"></div>
-        <div class="taskFormItem">
-          <span style="width:30%">state</span>
-          <RadioGroup v-model="taskInfo.state" disabled>
-              <Radio label="todo"></Radio>
-              <Radio label="doing"></Radio>
-              <Radio label="done"></Radio>
-          </RadioGroup>
-        </div>
-      </Modal>
+      <Button type="success" @click="createTaskModalShow()" v-show="isSubProjectManager||isSubProjectMember">Create Task</Button>
       <Col span="3" offset="1">
       <template>
         <h3>Todo</h3>
@@ -392,6 +323,81 @@
         </div>
       </Col>
     </Row>
+    </div>
+    <div v-else>
+      <h1>No module had been created!</h1>
+    </div>
+      <!-- createTaskModal -->
+      <Modal
+        v-model="createTaskModal"
+        title="Create task panel"
+        @on-ok="createTask()"
+        @on-cancel="cancel()"
+        width="800px">
+        <div class="taskFormItem">
+          <span style="width:30%">taskName</span>
+          <Input style="width: 300px" :placeholder="this.taskPlaceHolder.name" v-model="taskInfo.taskName"/>
+        </div>
+        <div class="whiteSpace"></div>
+        <div class="taskFormItem">
+          <span style="width:30%">description</span>
+          <Input style="width: 300px" :placeholder="this.taskPlaceHolder.description" type="textarea" :rows="4" v-model="taskInfo.description"/>
+        </div>
+        <div class="whiteSpace"></div>
+        <div class="taskFormItem">
+          <span style="width:30%">start Time</span>
+          <DatePicker type="datetime" :placeholder="this.taskPlaceHolder.startTime" style="width: 300px" v-model="taskInfo.startTime"></DatePicker>
+        </div>
+        <div class="whiteSpace"></div>
+        <div class="taskFormItem">
+          <span style="width:30%">end Time</span>
+          <DatePicker type="datetime" :placeholder="this.taskPlaceHolder.endTime"style="width: 300px" v-model="taskInfo.endTime"></DatePicker>
+        </div>
+        <div class="whiteSpace"></div>
+        <div class="taskFormItem">
+          <span style="width:30%">state</span>
+          <RadioGroup v-model="taskInfo.state" disabled>
+              <Radio label="todo"></Radio>
+              <Radio label="doing"></Radio>
+              <Radio label="done"></Radio>
+          </RadioGroup>
+        </div>
+      </Modal>
+      <Modal
+        v-model="editTaskModal"
+        title="Edit task panel"
+        @on-ok="updateTask()"
+        @on-cancel="cancel()"
+        width="800px">
+        <div class="taskFormItem">
+          <span style="width:30%">taskName</span>
+          <Input style="width: 300px" :placeholder="this.taskPlaceHolder.name" v-model="taskInfo.taskName"/>
+        </div>
+        <div class="whiteSpace"></div>
+        <div class="taskFormItem">
+          <span style="width:30%">description</span>
+          <Input style="width: 300px" :placeholder="this.taskPlaceHolder.description" type="textarea" :rows="4" v-model="taskInfo.description"/>
+        </div>
+        <div class="whiteSpace"></div>
+        <div class="taskFormItem">
+          <span style="width:30%">start Time</span>
+          <DatePicker type="datetime" :placeholder="this.taskPlaceHolder.startTime" style="width: 300px" v-model="taskInfo.startTime"></DatePicker>
+        </div>
+        <div class="whiteSpace"></div>
+        <div class="taskFormItem">
+          <span style="width:30%">end Time</span>
+          <DatePicker type="datetime" :placeholder="this.taskPlaceHolder.endTime"style="width: 300px" v-model="taskInfo.endTime"></DatePicker>
+        </div>
+        <div class="whiteSpace"></div>
+        <div class="taskFormItem">
+          <span style="width:30%">state</span>
+          <RadioGroup v-model="taskInfo.state" disabled>
+              <Radio label="todo"></Radio>
+              <Radio label="doing"></Radio>
+              <Radio label="done"></Radio>
+          </RadioGroup>
+        </div>
+      </Modal>
   </div>
 </template>
 <script>
@@ -409,56 +415,15 @@ export default {
   },
   data() {
     return {
-      options: {
-        dropzoneSelector: "ul",
-        draggableSelector: "li",
-        handlerSelector: null,
-        multipleDropzonesItemsDraggingEnabled: true,
-        showDropzoneAreas: true,
-        onDrop: function(event) {},
-        onDragstart: function(event) {},
-        onDragend: function(event) {}
-      },
+      //登陆者身份
+      isSubProjectManager:false,//为管理者
+      isSubProjectMember:false,//为成员
       // 关于邀请的模态框
       inviteModal: false,
       sidebarHeight: "",
-      datalist: ["1", "2", "3"],
-      datalist2: [
-        {
-          name: "Water resource collection",
-          participants: [
-            { name: "lyc", work: "collect data", area: "gis" },
-            { name: "xdw", work: "collect data", area: "gis" },
-            { name: "mzy", work: "collect data", area: "gis" },
-            { name: "zbc", work: "collect data", area: "gis" }
-          ]
-        },
-        {
-          name: "Water data analysement",
-          participants: [
-            { name: "lyc", work: "collect data", area: "gis" },
-            { name: "xdw", work: "collect data", area: "gis" }
-          ]
-        },
-        {
-          name: "water models building",
-          participants: [
-            { name: "xdw", work: "collect data", area: "gis" },
-            { name: "zbc", work: "collect data", area: "gis" }
-          ]
-        },
-        {
-          name: "water models simulation",
-          participants: [
-            { name: "lyc", work: "collect data", area: "gis" },
-            { name: "zbc", work: "collect data", area: "gis" }
-          ]
-        }
-      ],
       participants: [],
       memberlist: [],
-      order: 0,
-      current: 0,
+      // current: 0,
       addModal: false,
       delModal: false,
       //编辑的模态框
@@ -491,24 +456,14 @@ export default {
       drawerOpen: false,
       //后台获取的module下的task列表
       taskList: [],
-      //后台获取的单个task的内容
-      singleTask: [],
       //后台拿到的Module集合，渲染成一条轴用的
-      moduleList: [
-        {
-          title: "",
-          description: "",
-          type: ""
-        }
-      ],
-      //Step是否展示
-      stepShow: false,
+      moduleList: [],
       //当前模块的索引
       currentModuleIndex: 0,
       //创建任务的模态框
       createTaskModal: false,
       //编辑任务的模态框
-      editTaskModal:false,
+      editTaskModal: false,
       //task的placeHolder默认值
       taskPlaceHolder: {
         description: "please input the task description.",
@@ -517,44 +472,16 @@ export default {
         endTime: "set the time of the task's end time"
       },
       //task相关
-      taskInfo:{
-        taskName:"",
-        description:"",
-        startTime:"",
-        endTime:"",
-        state:""
-      },
-      taskTodo: [
-        { taskName: "task1", description: "description" },
-        { taskName: "task2", description: "description" },
-        { taskName: "task3", description: "description" },
-        { taskName: "task4", description: "description" },
-        { taskName: "task5", description: "description" }
-      ],
-      taskDoing: [
-        { taskName: "task6", description: "description" },
-        { taskName: "task7", description: "description" },
-        { taskName: "task8", description: "description" },
-        { taskName: "task9", description: "description" },
-        { taskName: "task10", description: "description" }
-      ],
-      taskDone: [
-        { taskName: "task11", description: "description" },
-        { taskName: "task12", description: "description" },
-        { taskName: "task13", description: "description" },
-        { taskName: "task14", description: "description" },
-        { taskName: "task15", description: "description" }
-      ]
+      taskInfo: {},
+      taskTodo: [],
+      taskDoing: [],
+      taskDone: []
     };
   },
   created() {
     this.init();
-    this.stepShow = false;
     this.getAllModules();
     // this.inquiryTask();
-  },
-  updated(){
-    console.log(this.taskInfo.startTime);
   },
   methods: {
     //初始化函数，作用是控制侧边栏的高度，设置右边通知栏弹出时候的距顶高度以及延迟的时间
@@ -571,12 +498,15 @@ export default {
           "http://localhost:8081/subProject/inquiry" +
             "?key=subProjectId" +
             "&value=" +
-            localStorage.getItem("subProjectId")
+            this.$route.params.id
         )
         .then(res => {
           if (res.data != "None") {
-            let membersList = res.data[0]["members"];
-            let manager = { userId: res.data[0]["managerId"] };
+            let subProjectInfo=res.data[0];
+            this.managerIdentity(subProjectInfo.managerId);
+            this.memberIdentity(subProjectInfo["members"]);
+            let membersList = subProjectInfo["members"];
+            let manager = { userId: subProjectInfo["managerId"] };
             membersList.unshift(manager);
             let participantsTemp = [];
             for (let i = 0; i < membersList.length; i++) {
@@ -599,6 +529,19 @@ export default {
         })
         .catch(err => {});
     },
+    managerIdentity(managerId) {
+      if (managerId === this.$store.state.userId) {
+        this.isSubProjectManager = true;
+      }
+    },
+    memberIdentity(members){
+      for(let i=0;i<members.length;i++){
+        if(members[i].userId===this.$store.state.userId){
+          this.isSubProjectMember=true;
+          break;
+        }
+      }
+    },
     showDetail(item, title, id) {
       this.currentModuleIndex = item;
       this.currentModule = this.moduleList[item];
@@ -620,17 +563,14 @@ export default {
             subProjectId
         )
         .then(res => {
-          // console.log(res.data);
           if (res.data != "None") {
             this.moduleList = res.data;
             this.currentModule = this.moduleList[0];
             if (this.currentModule != "") {
               this.inquiryTask();
             }
-            this.stepShow = true;
           } else if (res.data == "None") {
-            this.stepShow = false;
-            // this.$Message.info("There are no moduldes in this sub project,click create button to cerate one")
+            // this.$Message.info("There are no moduldes in this sub project,click create button to create one")
           }
         })
         .catch(err => {});
@@ -662,13 +602,8 @@ export default {
         });
     },
     delModule() {
-      let delObject = new URLSearchParams();
-      delObject.append(
-        "moduleId",
-        this.moduleList[this.currentModuleIndex].moduleId
-      );
       this.axios
-        .post("http://localhost:8081/module/delete", delObject)
+        .get("http://localhost:8081/module/delete"+"?moduleId="+this.moduleList[this.currentModuleIndex].moduleId)
         .then(res => {
           if (res.data === "Success") {
             this.deleteModuleSuccess();
@@ -755,14 +690,14 @@ export default {
     //创建任务
     createTaskModalShow() {
       //定义一个控制创建任务模态框开启的函数
-      let taskDefult={
-        taskName:"",
-        description:"",
-        startTime:"",
-        endTime:"",
-        state:""
-      }
-      this.taskInfo=taskDefult;
+      let taskDefult = {
+        taskName: "",
+        description: "",
+        startTime: "",
+        endTime: "",
+        state: ""
+      };
+      this.taskInfo = taskDefult;
       this.createTaskModal = true;
     },
     createTask() {
@@ -783,21 +718,21 @@ export default {
         .then(res => {
           this.inquiryTask();
         })
-        .catch(err => {
-        });
+        .catch(err => {});
     },
     //打开task编辑器
-    editOneTask(index,taskList){
+    editOneTask(index, taskList) {
       this.axios
         .get(
           "http://localhost:8081/task/inquiry?" +
-            "key=taskId" +"&value="+
+            "key=taskId" +
+            "&value=" +
             taskList[index]["taskId"]
         )
         .then(res => {
-          let result=res.data;
+          let result = res.data;
           this.$set(this, "taskInfo", result[0]);
-          // console.log(this.taskInfo);
+          console.log(this.taskInfo);
           this.editTaskModal = true;
         })
         .catch(err => {
@@ -805,27 +740,26 @@ export default {
         });
     },
     //更新某个task
-    updateTask(){
-      let taskForm =  new URLSearchParams();
-      taskForm.append("taskId",this.taskInfo.taskId);
-      taskForm.append("taskName",this.taskInfo.taskName);
+    updateTask() {
+      let taskForm = new URLSearchParams();
+      taskForm.append("taskId", this.taskInfo.taskId);
+      taskForm.append("taskName", this.taskInfo.taskName);
       taskForm.append("description", this.taskInfo.description);
       taskForm.append("startTime", this.taskInfo.startTime);
       taskForm.append("endTime", this.taskInfo.endTime);
-      taskForm.append("state",this.taskInfo.state);
+      taskForm.append("state", this.taskInfo.state);
       this.axios
-          .post("http://localhost:8081/task/update", taskForm)
-          .then(res => {
-            if(res.data!="None"&&res.data!="Fail"){
-              this.inquiryTask();
-            }
-            else{
-              this.$Message.error("Fail!");
-            }
-          })
-          .catch(err => {
-            console.log(err.data);
-          });
+        .post("http://localhost:8081/task/update", taskForm)
+        .then(res => {
+          if (res.data != "None" && res.data != "Fail") {
+            this.inquiryTask();
+          } else {
+            this.$Message.error("Fail!");
+          }
+        })
+        .catch(err => {
+          console.log(err.data);
+        });
     },
     //查询task
     inquiryTask() {
@@ -897,12 +831,15 @@ export default {
     },
     taskRemove(index, taskList) {
       this.axios
-        .get("http://localhost:8081/task/delete"+"?taskId="+taskList[index]["taskId"])
+        .get(
+          "http://localhost:8081/task/delete" +
+            "?taskId=" +
+            taskList[index]["taskId"]
+        )
         .then(res => {
-          if(res.data=="Success"){
+          if (res.data == "Success") {
             taskList.splice(index, 1);
-          }
-          else{
+          } else {
             this.$Message.error("Fail!");
           }
         })
