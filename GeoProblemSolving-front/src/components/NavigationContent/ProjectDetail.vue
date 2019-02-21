@@ -137,7 +137,7 @@
             >{{currentProjectDetail.introduction}}</p>
             <div class="projectEditPanel">
               <Button
-                v-show="this.projectEditAble === true"
+                v-show="this.isProjectManager"
                 type="primary"
                 style="font-size:20px;"
                 @click="editinfoModal=true"
@@ -158,6 +158,11 @@
         <div class="projectMembersPanel">
           <div style="width:80%">
             <Tag
+              color="success"
+              style="height:40px;line-height:40px;font-size:20px;margin-left:0.5%;margin-right:0.5%">
+            {{this.projectManager.userName}}
+            </Tag>
+            <Tag
               v-for="member in currentProjectDetail.members"
               color="primary"
               :key="member.index"
@@ -166,6 +171,7 @@
           </div>
           <div style="width:20%">
             <Button
+              v-show="this.isProjectManager"
               type="success"
               style="display:flex;justify-content:center;align-items:center;height:40px;;float:right"
             >
@@ -335,7 +341,7 @@
             <p>Once the deletion is confirmed, all module and resource information under the subsystem will be deleted. Please choose carefully.</p>
           </Modal>
           <div class="subProjectCreate">
-            <Button type="success" @click="subProjectModal = true">Create</Button>
+            <Button type="success" @click="subProjectModal = true" v-show="this.isProjectManager||this.isProjectMember">Create</Button>
             <Modal
               v-model="subProjectModal"
               ok-text="create"
@@ -374,7 +380,7 @@
         <div class="resourceCard"></div>
         <div class="resourcePanel" style="min-height:200px;background-color:lightblue">
           <!-- <input id="uploadFile" type="file" class="model file" data-show-preview="false" data-show-upload="false"> -->
-          <Button id="upload" type="primary" @click="uploadFileModalShow()">Upload</Button>
+          <Button id="upload" type="primary" @click="uploadFileModalShow()" v-show="this.isProjectManager||this.isProjectMember">Upload</Button>
           <Modal
             v-model="uploadFileModal"
             title="upload file"
@@ -428,13 +434,11 @@
 export default {
   data() {
     return {
-      currentProjectDetail: {
-        members: [],
-        introduction: "",
-        projectId: ""
-      },
+      currentProjectDetail: {},
+      projectManager:{},
       //确定用户是否有更新项目的权限，控制是否显示编辑的按钮，只有创建者才有权对项目进行编辑
-      projectEditAble: false,
+      isProjectManager: false,
+      isProjectMember:false,
       //移交权限给新的管理者
       handOverSubProjectModal:false,
       newManagerId:"",
@@ -504,11 +508,12 @@ export default {
     };
   },
   created: function() {
-    // alert(111);
     this.getAllResource();
+    this.getProjectDetail();
+    this.getAllSubProject();
   },
   methods: {
-    getProjectDeatil() {
+    getProjectDetail() {
       let pid = this.$route.params.id;
       let queryObject = { key: "projectId", value: pid };
       var that = this;
@@ -530,6 +535,23 @@ export default {
           } else {
             let obj = res.data;
             that.currentProjectDetail = obj[0];
+            that.projectManager.userId=that.currentProjectDetail["managerId"]
+            $.ajax({
+                url:
+                  "http://localhost:8081/user/inquiry" +
+                  "?key=" +
+                  "userId" +
+                  "&value=" +
+                  that.projectManager.userId,
+                type: "GET",
+                async: false,
+                success: function(data) {
+                  that.projectManager.userName = data.userName;
+                },
+                error:function(err){
+                  console.log("Get manager name fail.");
+                }
+              });
             localStorage.setItem(
               "projectId",
               that.currentProjectDetail.projectId
@@ -538,17 +560,24 @@ export default {
             that.currentProjectDetail.tag = that.currentProjectDetail.tag.split(
               ","
             );
-            that.judgeEditableProperty(that.currentProjectDetail.managerId);
+            that.managerIdentity(that.currentProjectDetail.managerId);
+            that.memberIdentity(that.currentProjectDetail.members);
             // this.getAllSubProject(queryObject);
           }
         })
         .catch(err => {});
     },
-    judgeEditableProperty(data) {
-      // console.log(data);
-      if (data === this.$store.state.userId) {
-        this.projectEditAble = true;
-        console.log(this.projectEditAble);
+    managerIdentity(managerId) {
+      if (managerId === this.$store.state.userId) {
+        this.isProjectManager = true;
+      }
+    },
+    memberIdentity(members){
+      for(let i=0;i<members.length;i++){
+        if(members[i].userId===this.$store.state.userId){
+          this.isProjectMember=true;
+          break;
+        }
       }
     },
     // 修改项目的按钮
@@ -802,9 +831,5 @@ export default {
       // });
     }
   },
-  mounted: function() {
-    this.getProjectDeatil();
-    this.getAllSubProject();
-  }
 };
 </script>

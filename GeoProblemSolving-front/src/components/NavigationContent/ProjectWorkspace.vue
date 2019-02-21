@@ -137,7 +137,7 @@
   <div>
     <Row>
       <Col span="18" offset="1">
-        <Steps :current="order" size="small" v-show="stepShow">
+        <Steps :current="order" size="small">
           <Step
             v-for="(list,index) in moduleList"
             :key="index"
@@ -147,7 +147,7 @@
           ></Step>
         </Steps>
       </Col>
-      <Col span="4" offset="1" v-show="isManager">
+      <Col span="4" offset="1" v-show="isSubProjectManager">
         <Button type="info" @click="addModal = true">Add</Button>
         <Modal
           width="600px"
@@ -234,23 +234,46 @@
             <Button
               type="success"
               style="text-align:center;width:100px"
-              @click="getModuleMembers()"
+              @click="inviteMembersModalShow()"
+              v-if="isSubProjectManager"
             >Invite</Button>
+            <Button
+              type="warning"
+              style="text-align:center;width:100px"
+              @click="quitModal=true"
+              v-else-if="isSubProjectMember"
+            >Quit</Button>
             <Modal
-              v-model="inviteModal"
-              width="800px"
-              title="Invite group member join in the module"
-              @on-ok="ok"
+              v-model="quitModal"
+              width="400px"
+              title="Quit subProject"
+              @on-ok="quitSubProject()"
               @on-cancel="cancel"
             >
-              <div style="display:flex;justify-content:center;align-items:center">
-
+            <h2>Are you sure to quit this subproject?</h2>
+            </Modal>
+            <Modal
+              v-model="inviteModal"
+              width="400px"
+              title="Invite group member join in the subProject"
+              @on-ok="inviteMembers"
+              @on-cancel="cancel"
+            >
+              <div>
+                <p>Members:</p>
+                <Tag v-for="participant in participants" :key="participant.index">{{participant.userName}}</Tag>
+                <p>Candidates:</p>
+                <CheckboxGroup v-model="inviteList">
+                  <Checkbox v-for="candidate in this.candidates" :key="candidate.index" :label="candidate.userId">
+                    <span>{{candidate.userName}}</span>
+                  </Checkbox>
+                </CheckboxGroup>
               </div>
             </Modal>
           </div>
         </div>
       </Col>
-      <Button type="success" @click="createTaskModalShow()">Create Task</Button>
+      <Button type="success" @click="createTaskModalShow()" v-show="isSubProjectManager||isSubProjectMember">Create Task</Button>
       <Col span="3" offset="1">
       <template>
         <h3>Todo</h3>
@@ -415,58 +438,16 @@ export default {
   data() {
     return {
       //登陆者身份
-      isManager:false,//为管理者
-      //
-      options: {
-        dropzoneSelector: "ul",
-        draggableSelector: "li",
-        handlerSelector: null,
-        multipleDropzonesItemsDraggingEnabled: true,
-        showDropzoneAreas: true,
-        onDrop: function(event) {},
-        onDragstart: function(event) {},
-        onDragend: function(event) {}
-      },
+      isSubProjectManager: false, //为管理者
+      isSubProjectMember: false, //为成员
       // 关于邀请的模态框
       inviteModal: false,
+      quitModal:false,
       sidebarHeight: "",
-      datalist: ["1", "2", "3"],
-      datalist2: [
-        {
-          name: "Water resource collection",
-          participants: [
-            { name: "lyc", work: "collect data", area: "gis" },
-            { name: "xdw", work: "collect data", area: "gis" },
-            { name: "mzy", work: "collect data", area: "gis" },
-            { name: "zbc", work: "collect data", area: "gis" }
-          ]
-        },
-        {
-          name: "Water data analysement",
-          participants: [
-            { name: "lyc", work: "collect data", area: "gis" },
-            { name: "xdw", work: "collect data", area: "gis" }
-          ]
-        },
-        {
-          name: "water models building",
-          participants: [
-            { name: "xdw", work: "collect data", area: "gis" },
-            { name: "zbc", work: "collect data", area: "gis" }
-          ]
-        },
-        {
-          name: "water models simulation",
-          participants: [
-            { name: "lyc", work: "collect data", area: "gis" },
-            { name: "zbc", work: "collect data", area: "gis" }
-          ]
-        }
-      ],
       participants: [],
-      memberlist: [],
-      order: 0,
-      current: 0,
+      candidates: [],
+      inviteList: [],
+      // current: 0,
       addModal: false,
       delModal: false,
       //编辑的模态框
@@ -499,13 +480,8 @@ export default {
       drawerOpen: false,
       //后台获取的module下的task列表
       taskList: [],
-      //后台获取的单个task的内容
-      singleTask: [],
       //后台拿到的Module集合，渲染成一条轴用的
-      moduleList: [
-      ],
-      //Step是否展示
-      stepShow: false,
+      moduleList: [],
       //当前模块的索引
       currentModuleIndex: 0,
       //创建任务的模态框
@@ -520,13 +496,7 @@ export default {
         endTime: "set the time of the task's end time"
       },
       //task相关
-      taskInfo: {
-        taskName: "",
-        description: "",
-        startTime: "",
-        endTime: "",
-        state: ""
-      },
+      taskInfo: {},
       taskTodo: [],
       taskDoing: [],
       taskDone: []
@@ -534,7 +504,6 @@ export default {
   },
   created() {
     this.init();
-    this.stepShow = false;
     this.getAllModules();
     // this.inquiryTask();
   },
@@ -553,14 +522,13 @@ export default {
           "http://localhost:8081/subProject/inquiry" +
             "?key=subProjectId" +
             "&value=" +
-            localStorage.getItem("subProjectId")
+            this.$route.params.id
         )
         .then(res => {
           if (res.data != "None") {
-            let subProjectInfo=res.data[0];
-            if(subProjectInfo.managerId==this.$store.state.userId){
-              this.isManager=true;
-            }
+            let subProjectInfo = res.data[0];
+            this.managerIdentity(subProjectInfo.managerId);
+            this.memberIdentity(subProjectInfo["members"]);
             let membersList = subProjectInfo["members"];
             let manager = { userId: subProjectInfo["managerId"] };
             membersList.unshift(manager);
@@ -585,6 +553,19 @@ export default {
         })
         .catch(err => {});
     },
+    managerIdentity(managerId) {
+      if (managerId === this.$store.state.userId) {
+        this.isSubProjectManager = true;
+      }
+    },
+    memberIdentity(members) {
+      for (let i = 0; i < members.length; i++) {
+        if (members[i].userId === this.$store.state.userId) {
+          this.isSubProjectMember = true;
+          break;
+        }
+      }
+    },
     showDetail(item, title, id) {
       this.currentModuleIndex = item;
       this.currentModule = this.moduleList[item];
@@ -606,17 +587,14 @@ export default {
             subProjectId
         )
         .then(res => {
-          // console.log(res.data);
           if (res.data != "None") {
             this.moduleList = res.data;
             this.currentModule = this.moduleList[0];
             if (this.currentModule != "") {
               this.inquiryTask();
             }
-            this.stepShow = true;
           } else if (res.data == "None") {
-            this.stepShow = false;
-            // this.$Message.info("There are no moduldes in this sub project,click create button to cerate one")
+            // this.$Message.info("There are no moduldes in this sub project,click create button to create one")
           }
         })
         .catch(err => {});
@@ -624,8 +602,7 @@ export default {
     addModule() {
       // 更换格式写成json字符串的形式提交到后台
       let Module = {};
-      Module["projectId"] = localStorage.getItem("projectId");
-      Module["subProjectId"] = localStorage.getItem("subProjectId");
+      Module["subProjectId"] = this.$route.params.id;
       Module["title"] = this.moduleTitle;
       Module["description"] = this.moduleDescription;
       Module["creator"] = this.$store.state.userId;
@@ -649,7 +626,11 @@ export default {
     },
     delModule() {
       this.axios
-        .get("http://localhost:8081/module/delete"+"?moduleId="+this.moduleList[this.currentModuleIndex].moduleId)
+        .get(
+          "http://localhost:8081/module/delete" +
+            "?moduleId=" +
+            this.moduleList[this.currentModuleIndex].moduleId
+        )
         .then(res => {
           if (res.data === "Success") {
             this.deleteModuleSuccess();
@@ -728,10 +709,92 @@ export default {
         desc: "The module has been deleted successfully"
       });
     },
-    //获取项目下的所有成员
-    getModuleMembers() {
-      this.inviteModal = true;
-      projectId = localStorage.getItem("projectId");
+    //加载并打开成员邀请Modal
+    inviteMembersModalShow() {
+      let that=this;
+      this.candidates=[];
+      this.inviteList=[];
+      this.axios
+        .get(
+          "http://localhost:8081/project/inquiry" +
+            "?key=projectId" +
+            "&value=" +
+            localStorage.getItem("projectId")
+        )
+        .then(res => {
+          if (res.data != "None" && res.data != "Fail") {
+            let allMembers = res.data[0].members;
+            $.ajax({
+                url:
+                  "http://localhost:8081/user/inquiry" +
+                  "?key=" +
+                  "userId" +
+                  "&value=" +
+                  res.data[0].managerId,
+                type: "GET",
+                async: false,
+                success: function(data) {
+                  let manager={"userName":data.userName,"userId":data.userId};
+                  allMembers.unshift(manager);
+                }
+              });
+            for (let i = 0; i < allMembers.length; i++) {
+              let exist = false;
+              for (let j = 0; j < that.participants.length; j++) {
+                if (allMembers[i].userId === that.participants[j].userId) {
+                  exist = true;
+                }
+              }
+              if (!exist) {
+                that.candidates.push(allMembers[i]);
+              }
+            }
+            this.inviteModal = true;
+          } else {
+            console.log(res.data);
+          }
+        })
+        .catch(err => {
+          console.log(err.data);
+        });
+    },
+    inviteMembers(){
+      for(let i=0;i<this.inviteList.length;i++){
+        $.ajax({
+          url:
+            "http://localhost:8081/subProject/join"+"?subProjectId="+this.$route.params.id+"&userId="+this.inviteList[i],
+          type: "GET",
+          async: false,
+          success: data=> {
+            if(data=="Exist"){
+              this.$Message.error("Exist!");
+            }
+            else if(data=="None"){
+              this.$Message.error("None!");
+            }
+            else if(data=="Fail"){
+              this.$Message.error("Fail!");
+            }
+          }
+        });
+      }
+      this.init();
+    },
+    quitSubProject(){
+      this.axios
+      .get("http://localhost:8081/subProject/quit"+"?subProjectId="+this.$route.params.id+"&userId="+this.$store.state.userId)
+      .then(res=>{
+        if(res.data=="Success"){
+          let projectId=localStorage.getItem("projectId");
+          this.$router.push({ name:'ProjectDetail',params:{id:projectId} });
+        }
+        else{
+          this.$Message.error("Fail!");
+        }
+      })
+      .catch(err => {
+          console.log(err.data);
+        });
     },
     //创建任务
     createTaskModalShow() {
@@ -896,4 +959,3 @@ export default {
   }
 };
 </script>
-
