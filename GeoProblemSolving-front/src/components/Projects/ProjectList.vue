@@ -307,9 +307,10 @@ export default {
     //进入项目详情页面的函数
     goSingleProject(id) {
       let isManager,isMember;
+
       for (let i = 0; i<this.currentProjectList.length;i++){
         if(this.currentProjectList[i]["projectId"] === id){
-          isManager = this.currentProjectList[i]["isMember"];
+          isManager = this.currentProjectList[i]["isManager"];
           isMember = this.currentProjectList[i]["isMember"];
         }
       }

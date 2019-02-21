@@ -75,7 +75,6 @@ export default {
     Userstate() {
       return this.$store.getters.userState;
     },
-    //?????
     Username() {
       console.log(this.$store.getters.userName);
       return this.$store.getters.userName;

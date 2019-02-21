@@ -284,7 +284,7 @@
             <div style="height:100px;background:azure">
               <RadioGroup v-model="newManagerId">
                 <Radio
-                  v-for="(member,index) in subjectMembers"
+                  v-for="(member,index) in subProjectMembers"
                   :key="member.index"
                   :label="member.userId"
                 >
@@ -450,7 +450,7 @@ export default {
       //移交权限给新的管理者
       handOverSubProjectModal: false,
       newManagerId: "",
-      subjectMembers: [],
+      subProjectMembers: [],
       //编辑项目的按钮
       editinfoModal: false,
       //子项目的列表
@@ -462,7 +462,9 @@ export default {
       subProjectTitleEdit: "",
       subProjectDescriptionEdit: "",
       //判断subProject是否具有可编辑的权限
-      isManager: true,
+      isSubManager: false,
+      //by mzy
+      isSubMember: false,
       //编辑子项目按钮的模态框
       editSubProjectModal: false,
       //删除子项目按钮的模态框
@@ -524,15 +526,13 @@ export default {
   beforeRouteEnter: (to, from, next) => {
     // alert(this.isProjectManager);
     next(vm => {
-      
-      console.log(vm.$store.getters.userState);
       if (!vm.$store.getters.userState) {
         next("/login");
       } else {
-        if (!vm.isProjectManager || !vm.isProjectMember) {
+        if (!(vm.isProjectManager || vm.isProjectMember)) {
           alert("No access");
-          // next('/project');
-          vm.$router.go(-1);
+          next("/project");
+          // vm.$router.go(-1);
         }
       }
     });
@@ -542,67 +542,84 @@ export default {
       let pid = this.$route.params.id;
       let queryObject = { key: "projectId", value: pid };
       var that = this;
-      this.axios
-        .get(
-          "http://localhost:8081/project/inquiry" +
+      try {
+        $.ajax({
+          url:
+            "http://localhost:8081/project/inquiry" +
             "?key=" +
             queryObject["key"] +
             "&value=" +
-            queryObject["value"]
-        )
-        .then(res => {
-          if (res.data === "None") {
-            that.currentProjectDetail = {
-              members: [],
-              introduction: "",
-              projectId: ""
-            };
-          } else {
-            let obj = res.data;
-            that.currentProjectDetail = obj[0];
-            that.projectManager.userId = that.currentProjectDetail["managerId"];
-            $.ajax({
-              url:
-                "http://localhost:8081/user/inquiry" +
-                "?key=" +
-                "userId" +
-                "&value=" +
-                that.projectManager.userId,
-              type: "GET",
-              async: false,
-              success: function(data) {
-                that.projectManager.userName = data.userName;
-              },
-              error: function(err) {
-                console.log("Get manager name fail.");
-              }
-            });
-            localStorage.setItem(
-              "projectId",
-              that.currentProjectDetail.projectId
-            );
-            //将tag进行分割
-            that.currentProjectDetail.tag = that.currentProjectDetail.tag.split(
-              ","
-            );
-            that.managerIdentity(that.currentProjectDetail.managerId);
-            that.memberIdentity(that.currentProjectDetail.members);
-            // this.getAllSubProject(queryObject);
+            queryObject["value"],
+          type: "GET",
+          async: false,
+          success: function(data) {
+            if (data === "None") {
+              that.currentProjectDetail = {
+                members: [],
+                introduction: "",
+                projectId: ""
+              };
+            } else {
+              let obj = data;
+              that.currentProjectDetail = obj[0];
+              that.projectManager.userId =
+                that.currentProjectDetail["managerId"];
+              $.ajax({
+                url:
+                  "http://localhost:8081/user/inquiry" +
+                  "?key=" +
+                  "userId" +
+                  "&value=" +
+                  that.projectManager.userId,
+                type: "GET",
+                async: false,
+                success: function(data) {
+                  that.projectManager.userName = data.userName;
+                },
+                error: function(err) {
+                  console.log("Get manager name fail.");
+                }
+              });
+              localStorage.setItem(
+                "projectId",
+                that.currentProjectDetail.projectId
+              );
+              //将tag进行分割
+              that.currentProjectDetail.tag = that.currentProjectDetail.tag.split(
+                ","
+              );
+              that.isProjectManager = that.managerIdentity(that.currentProjectDetail.managerId);
+              that.isProjectMember = that.memberIdentity(that.currentProjectDetail.members);
+              // this.getAllSubProject(queryObject);
+            }
+          },
+          error: function(err) {
+            console.log("Get manager name fail.");
           }
-        })
-        .catch(err => {});
+        });
+      } catch (err) {
+        console.log(err);
+      }
     },
     managerIdentity(managerId) {
       if (managerId === this.$store.state.userId) {
-        this.isProjectManager = true;
+        return true;
+      } else {
+        return false;
       }
     },
     memberIdentity(members) {
+      let isMember;
       for (let i = 0; i < members.length; i++) {
         if (members[i].userId === this.$store.state.userId) {
-          this.isProjectMember = true;
+          isMember = true;
           break;
         }
+      }
+      if (isMember) {
+        return true;
+      } else {
+        return false;
       }
     },
     // 修改项目的按钮
@@ -615,7 +632,22 @@ export default {
     },
     //前往工作空间
     goWorkspace(data) {
-      this.$router.push({ path: `${data}/workspace` });
+      let isManager, isMember;
+      for (let i = 0; i < this.subProjectList.length; i++) {
+        if (this.subProjectList[i]["subProjectId"] === data) {
+          isManager = this.isSubManager;
+          isMember = this.isSubMember;
+        }
+      }
+      if (this.$store.getters.userState) {
+        if (isManager || isMember) {
+          this.$router.push({ path: `${data}/workspace` });
+        } else {
+          alert("No access.");
+        }
+      } else {
+        this.$router.push({ path: "/login" });
+      }
     },
     //创建子项目
     createSubProject() {
@@ -645,7 +677,9 @@ export default {
     },
     handOverSubProjectShow(index) {
       this.editSubProjectindex = index;
-      this.subjectMembers = this.subProjectList[index].members;
+      this.subProjectMembers = this.subProjectList[index].members;
+      // if it is the member of the sub-project
+      this.isSubMember = memberIdentity(this.subProjectMembers);
       this.handOverSubProjectModal = true;
     },
     handOverSubProject() {
@@ -758,9 +792,9 @@ export default {
       for (var i = 0; i < list.length; i++) {
         if (list[i]["managerId"] === this.$store.state.userId) {
           list[i]["editable"] = true;
-          this.isManager = true;
+          this.isSubManager = true;
         } else {
-          this.isManager = false;
+          this.isSubManager = false;
           list[i]["editable"] = false;
         }
       }

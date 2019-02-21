@@ -17,7 +17,7 @@ export default new Vuex.Store({
             return state.userState;
         },
         userName: state => {
-            return state.username;
+            return state.userName;
         },
         userId: state =>{
             return state.userId;
