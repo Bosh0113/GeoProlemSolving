@@ -76,7 +76,6 @@ export default {
       return this.$store.getters.userState;
     },
     Username() {
-      console.log(this.$store.getters.userName);
       return this.$store.getters.userName;
     }
   },
@@ -148,6 +147,7 @@ export default {
                     userId: res.data.userId,
                   });
                   this.$router.go(-1);
+                  // this.$router.push({name:"notice"});
                 }
               },
               // function(res) {

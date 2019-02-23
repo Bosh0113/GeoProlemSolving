@@ -24,6 +24,8 @@ import 'leaflet/dist/leaflet.css'
 import VueDraggable from 'vue-draggable'
 // this part resolve an issue where the markers would not appear
 delete L.Icon.Default.prototype._getIconUrl;
+//请求带上cookie以防session丢失
+axios.defaults.withCredentials=true;
 
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),

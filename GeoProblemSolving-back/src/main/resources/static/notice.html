@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Notice</title>
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+</head>
+<body>
+<p>Input recipient's Id to notice him/her</p>
+<input type="text" id="recipientId" style="width: 250px"/>
+<button onclick="sendMessage()">Send notice</button>
+</body>
+<script>
+    var webSocket=null;
+    if(WebSocket){
+        webSocket=new WebSocket("ws://localhost:8081/NoticeSocket");
+    }
+    webSocket.onopen=function(){
+        var connected = document.createElement("p");
+        connected.innerHTML = "WebSocket connected！";
+        $("body").append(connected);
+    };
+    webSocket.onmessage=function(e){
+        if (e.data === "Notice") {
+            var connected = document.createElement("p");
+            connected.innerHTML = "You get a new notice!";
+            $("body").append(connected);
+        } else {
+            console.log(e.data);
+        }
+    };
+    webSocket.onerror=function (ev) {
+        var connected = document.createElement("p");
+        connected.innerHTML = "WebSocket connect wrong！";
+        $("body").append(connected);
+    };
+    webSocket.onclose=function (ev) {
+        var connected = document.createElement("p");
+        connected.innerHTML = "WebSocket unconnected！";
+        $("body").append(connected);
+    };
+    function sendMessage() {
+        webSocket.send($("#recipientId").val());
+    }
+</script>
+</html>

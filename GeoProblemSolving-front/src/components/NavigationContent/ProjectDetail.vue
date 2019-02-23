@@ -116,7 +116,7 @@
           @click="goWorkspace(subProjectList[0].subProjectId)"
           icon="md-home"
           title="workspace"
-        ></Button>-->
+        ></Button> -->
         <div class="projectTitle">
           <h1
             style="text-align:center"
@@ -126,7 +126,9 @@
         <div class="whitespace"></div>
         <div class="detail">
           <div class="detail_image">
-            <img :src="currentProjectDetail.picture">
+            <img
+              :src="currentProjectDetail.picture"
+            >
           </div>
           <div class="detail_description">
             <p
@@ -157,8 +159,9 @@
           <div style="width:80%">
             <Tag
               color="success"
-              style="height:40px;line-height:40px;font-size:20px;margin-left:0.5%;margin-right:0.5%"
-            >{{this.projectManager.userName}}</Tag>
+              style="height:40px;line-height:40px;font-size:20px;margin-left:0.5%;margin-right:0.5%">
+            {{this.projectManager.userName}}
+            </Tag>
             <Tag
               v-for="member in currentProjectDetail.members"
               color="primary"
@@ -215,7 +218,10 @@
         <div class="subprojectPanel">
           <div class="subProjectListStyle">
             <div class="whitespace"></div>
-            <div v-for="(subProject,index) in subProjectList" :key="subProject.index">
+            <div
+              v-for="(subProject,index) in subProjectList"
+              :key="subProject.index"
+            >
               <Col span="6" offset="1">
                 <Card class="subProjectStyle">
                   <Button
@@ -283,12 +289,10 @@
           >
             <div style="height:100px;background:azure">
               <RadioGroup v-model="newManagerId">
-                <Radio
-                  v-for="(member,index) in subProjectMembers"
-                  :key="member.index"
-                  :label="member.userId"
-                >
-                  <span>{{member.userName}}</span>
+                <Radio v-for="(member,index) in subjectMembers" :key="member.index" :label="member.userId">
+                  <span>
+                    {{member.userName}}
+                  </span>
                 </Radio>
               </RadioGroup>
             </div>
@@ -336,11 +340,7 @@
             <p>Once the deletion is confirmed, all module and resource information under the subsystem will be deleted. Please choose carefully.</p>
           </Modal>
           <div class="subProjectCreate">
-            <Button
-              type="success"
-              @click="subProjectModal = true"
-              v-show="this.isProjectManager||this.isProjectMember"
-            >Create</Button>
+            <Button type="success" @click="subProjectModal = true" v-show="this.isProjectManager||this.isProjectMember">Create</Button>
             <Modal
               v-model="subProjectModal"
               ok-text="create"
@@ -379,12 +379,7 @@
         <div class="resourceCard"></div>
         <div class="resourcePanel" style="min-height:200px;background-color:lightblue">
           <!-- <input id="uploadFile" type="file" class="model file" data-show-preview="false" data-show-upload="false"> -->
-          <Button
-            id="upload"
-            type="primary"
-            @click="uploadFileModalShow()"
-            v-show="this.isProjectManager||this.isProjectMember"
-          >Upload</Button>
+          <Button id="upload" type="primary" @click="uploadFileModalShow()" v-show="this.isProjectManager||this.isProjectMember">Upload</Button>
           <Modal
             v-model="uploadFileModal"
             title="upload file"
@@ -413,11 +408,7 @@
           <!-- </form> -->
         </div>
         <Col span="20" offset="2">
-          <Table
-            :columns="projectTableColName"
-            :data="this.projectResourceList"
-            v-show="this.projectResourceList!=[]&&this.projectResourceList!='None'"
-          >
+          <Table :columns="projectTableColName" :data="this.projectResourceList" v-show="this.projectResourceList!=[]&&this.projectResourceList!='None'">
             <template slot-scope="{ row }" slot="name">
               <strong>{{ row.name }}</strong>
             </template>
@@ -443,14 +434,14 @@ export default {
   data() {
     return {
       currentProjectDetail: {},
-      projectManager: {},
+      projectManager:{},
       //确定用户是否有更新项目的权限，控制是否显示编辑的按钮，只有创建者才有权对项目进行编辑
       isProjectManager: false,
-      isProjectMember: false,
+      isProjectMember:false,
       //移交权限给新的管理者
-      handOverSubProjectModal: false,
-      newManagerId: "",
-      subProjectMembers: [],
+      handOverSubProjectModal:false,
+      newManagerId:"",
+      subjectMembers:[],
       //编辑项目的按钮
       editinfoModal: false,
       //子项目的列表

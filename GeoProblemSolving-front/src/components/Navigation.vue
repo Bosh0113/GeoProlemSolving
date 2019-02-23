@@ -106,10 +106,8 @@ export default {
         this.$router.push({ name: "PersonalPage" });
       } else if (name == "userLogout") {
         this.$store.commit("userLogout");
+        this.$router.replace({ name: "Home" });
       }
-    },
-    userLogout(){
-
     }
   }
 };

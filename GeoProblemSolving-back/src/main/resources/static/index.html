@@ -9,7 +9,7 @@
 <label for="email">Email: </label><input id="email" type="text" style="width: 150px;height: 20px">
 <label for="password">Password: </label><input id="password" type="text" style="width: 150px;height: 20px">
 <br>
-<button id="submit">Login</button>
+<button id="login">Login</button>
 <br>
 <label for="uploadFile">file</label><input id="uploadFile" type="file" class="model file" data-show-preview="false"
                                            data-show-upload="false">
@@ -17,9 +17,9 @@
 <br>
 <button id="sendEmail">Send Email</button>
 <script>
-    $("#submit").click(function () {
+    $("#login").click(function () {
         $.ajax({
-            type: "post",
+            type: "get",
             url: "/user/login" + "?email=" + $("#email").val() + "&password=" + $("#password").val(),
             success: function (data) {
                 if (data !== "Fail") {
@@ -28,6 +28,7 @@
                     // window.location.href="http://localhost:8081/Collaborative/ConceptualModel/index.html?groupID=111";
                     // window.location.href="http://localhost:8081/Collaborative/LogicalModel/index.html?groupID=111";
                     // window.location.href="http://localhost:8081/Collaborative/ComputationalModel/index.html?groupID=111";
+                    window.location.href="http://localhost:8081/notice.html";
                 }
                 else {
                     confirm("Fail");

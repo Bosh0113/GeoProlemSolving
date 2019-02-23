@@ -73,8 +73,8 @@ public class TaskEntity {
         this.taskId = taskId;
     }
 
-    public void setEndTime(Date endTime) {
-        this.endTime = endTime;
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
     }
 
     public void setCreatorId(String creatorId) {
@@ -85,8 +85,8 @@ public class TaskEntity {
         this.moduleId = moduleId;
     }
 
-    public void setStartTime(Date startTime) {
-        this.startTime = startTime;
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
     }
 
     public void setState(String state) {
