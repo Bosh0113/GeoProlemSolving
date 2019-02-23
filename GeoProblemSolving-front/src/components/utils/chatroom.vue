@@ -388,11 +388,7 @@
 <script>
 import * as socketApi from "./../../api/socket.js";
 export default {
-  mounted() {
-    this.getFriendlist();
-  },
   methods: {
-    getSocketConnect() {},
     getFriendlist() {
       // this.axios.post("http://localhost:8081/TeamModeling/FriendServlet", {
       // params: {
@@ -438,11 +434,11 @@ export default {
         this.my_msglist.push(this.send_msg);
         this.msglist.push(this.send_msg);
 
-        this.socketApi.sendSock(this.send_msg, this.socketCallback);
+        this.socketApi.sendSock(this.send_msg, this.getSocketConnect);
       }
       this.message = "";
     },
-    socketCallback(data) {
+    getSocketConnect(data) {
       var chatMsg = JSON.parse(data);
       if (chatMsg.from === "Test") {
         console.log(chatMsg.content);
@@ -459,25 +455,41 @@ export default {
         }
       }
     },
+    startWebSocket(data) {
+      let roomId = localStorage.getItem("subProjectId");
+      this.socketApi.initWebSocket("ChatServer/" + roomId);
+
+      this.send_msg = {
+        from: "Test",
+        fromid: this.$store.state.userId,
+        content: "TestChat"
+      };
+      this.socketApi.sendSock(this.send_msg, this.getSocketConnect);
+    },
     find(date) {
       let q_date = date.toLocaleDateString();
       alert(q_date);
-    }
+    },
+    sortMsglist() {}
   },
-  sortMsglist() {},
+  // add by mzy for navigation guards
+  beforeRouteEnter: (to, from, next) => {
+    next(vm => {
+      if (!vm.$store.getters.userState) {
+        next("/login");
+      } else {
+        // 判断条件还需要考虑
+        // alert("No access");
+        // vm.$router.go(-1);
+        next();
+      }
+    });
+  },
   created() {
-    let roomId = localStorage.getItem("subProjectId");
-    this.socketApi.initWebSocket("ChatServer/" + roomId);
-
-    this.send_msg = {
-      from: "Test",
-      fromid: this.$store.state.userId,
-      content: "TestChat"
-    };
-    this.socketApi.sendSock(this.send_msg, this.socketCallback);
+    this.startWebSocket();
   },
-  mounted(){
-    console.log(this.msglist);
+  mounted() {
+    this.getFriendlist();
   },
   destroyed() {
     this.socketApi.close();

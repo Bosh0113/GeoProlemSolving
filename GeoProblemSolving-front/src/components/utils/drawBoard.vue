@@ -645,9 +645,9 @@ export default {
       this.lines.push(this.send_line);
 
       // console.log(JSON.stringify(this.send_line));
-      this.socketApi.sendSock(this.send_line, this.socketCallback);
+      this.socketApi.sendSock(this.send_line, this.getSocketConnect);
     },
-    socketCallback(data) {
+    getSocketConnect(data) {
       let lineData = JSON.parse(data);
 
       if (lineData.from === "Test") {
@@ -695,22 +695,37 @@ export default {
       let eX = line.Points[pointsLength - 1].X;
       let eY = line.Points[pointsLength - 1].Y;
       this.drawOnMouseup(eX, eY, collaGraphType);
-    }
+    },
+    startWebSocket(data) {
+      let roomId = localStorage.getItem("subProjectId");
+      this.socketApi.initWebSocket("ChatServer/" + roomId);
+
+      this.send_msg = {
+        from: "Test",
+        fromid: this.$store.state.userId,
+        content: "TestChat"
+      };
+      this.socketApi.sendSock(this.send_msg, this.getSocketConnect);
+    },
   },
   components: {
     PhotoshopPicker: Photoshop
   },
+  // add by mzy for navigation guards
+  beforeRouteEnter: (to, from, next) => {
+    next(vm => {
+      if (!vm.$store.getters.userState) {
+        next("/login");
+      } else {
+        // 判断条件还需要考虑
+        // alert("No access");
+        // vm.$router.go(-1);
+        next();
+      }
+    });
+  },
   created() {
-    let roomId = localStorage.getItem("subProjectId");
-    roomId = roomId.slice(0, -4);
-    this.socketApi.initWebSocket("DrawServer/" + roomId);
-
-    this.send_line = {
-      from: "Test",
-      fromid: this.$store.state.userId,
-      content: "TestDraw"
-    };
-    this.socketApi.sendSock(this.send_line, this.socketCallback);
+    this.startWebSocket();
   },
   destroyed() {
     this.socketApi.close();
