@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.*;
 
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:8080",allowCredentials = "true")
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -73,6 +73,7 @@ public class UserController {
                 UserEntity user=(UserEntity)object;
                 HttpSession session=request.getSession();
                 session.setMaxInactiveInterval(30*60);
+                session.setAttribute("userId",user.getUserId());
                 session.setAttribute("userName",user.getUserName());
                 session.setAttribute("email",user.getEmail());
                 System.out.println("User login. UserName: "+user.getUserName());

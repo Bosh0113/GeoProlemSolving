@@ -22,6 +22,8 @@ import projectList from '@/components/Projects/ProjectList.vue'
 Vue.use(Router)
 Vue.use(mavonEditor)
 
+import Notice from '@/components/utils/notice.vue'
+
 const routes = [{
   path: '/', name: 'Navigation', component: Navigation, children: [
     { path: '', redirect: 'home', component: Home },
@@ -42,6 +44,7 @@ const routes = [{
     { path: '/chat' ,name :'chatUtil',component: chatUtil},
     { path: '/draw', name: 'drawUtil', component:drawUtil},
     { path: '/map', name: 'mapTool', component:mapTool},
+    { path: '/notice', name: 'notice', component:Notice},
 ]
 export default new Router({
   routes,
