@@ -210,9 +210,24 @@
               <br>
               <div style="display:flex" class="emailOperate">
                 <Button @click="copyDefault()" type="success">Use default</Button>
-                <Button type="primary">Project ID</Button>
-                <Button type="error">Project Name</Button>
+                <!-- <Button type="primary" v-clipboard="copydata">Copy Project ID</Button> -->
+                <Button type="primary" v-clipboard="copyProjectId" @success="handleSuccess('id')" @error="handleError('id')">Copy Project ID</Button>
+                <Button type="default" v-clipboard="copyProjectTitle" @success="handleSuccess('title')" @error="handleError('title')">Copy Project Name</Button>
               </div>
+              <!-- <div>
+                <span style="width:80%;margin-left:20%;color:lightgreen" v-show="copyProjectIdStatus==true">
+                  Copy project id success
+                </span>
+                <span style="width:80%;margin-left:20%;color:lightgreen" v-show="copyProjectTitleStatus == true">
+                  Copy project name success
+                </span>
+                <span style="width:80%;margin-left:20%;color:red" v-show="copyProjectIdStatus == false">
+                  Copy project id fail
+                </span>
+                <span style="width:80%;margin-left:20%;color:red" v-show="copyProjectTitleStatus == false">
+                  Copy project name fail
+                </span>
+              </div> -->
             </Modal>
           </div>
         </div>
@@ -380,9 +395,9 @@
         <div class="whitespace"></div>
         <h1 style="text-align:center">Resource</h1>
         <div class="resourceCard"></div>
-        <div class="resourcePanel" style="min-height:200px;background-color:lightblue">
+        <div class="resourcePanel" style="height:50px;float:right">
           <!-- <input id="uploadFile" type="file" class="model file" data-show-preview="false" data-show-upload="false"> -->
-          <Button id="upload" type="primary" @click="uploadFileModalShow()">Upload</Button>
+          <Button id="upload" type="primary" @click="uploadFileModalShow()"style="height:60px"><Icon type="md-cloud-upload" size="40"/></Button>
           <Modal
             v-model="uploadFileModal"
             title="upload file"
@@ -404,11 +419,6 @@
             <br>
             <input type="file" @change="getFile($event)" style="margin-left:20%">
           </Modal>
-          <!-- <form name="form名称" action="http://localhost:8081/resource/upload"  method="post" enctype ="multipart/form-data"> -->
-          <!-- <input type="file" name="">
-            <input type="text" name="">
-          <input type="submit" value="提交">-->
-          <!-- </form> -->
         </div>
         <Col span="20" offset="2">
           <Table :columns="projectTableColName" :data="this.projectResourceList" v-show="this.projectResourceList!=[]&&this.projectResourceList!='None'">
@@ -422,8 +432,9 @@
                 style="margin-right: 5px"
                 :href="projectResourceList[index].pathURL"
                 @click="show(index)"
-              >DownLoad</Button>
-              <!-- <Button type="error" size="small" @click="remove(index)">Delete</Button> -->
+              >
+                <Icon type="md-download"/>
+              </Button>
             </template>
           </Table>
           <!-- 需要两部分的值，一个是表头，一个是列表项 -->
@@ -436,6 +447,10 @@
 export default {
   data() {
     return {
+      copyProjectId:"",
+      copyProjectTitle:"",
+      copyProjectIdStatus:false,
+      copyProjectTitleStatus:false,
       currentProjectDetail: {
         members: [],
         introduction: "",
@@ -483,25 +498,30 @@ export default {
       projectTableColName: [
         {
           title: "Name",
-          key: "name"
+          key: "name",
+          width:250,
         },
         {
           title: "Description",
-          key: "description"
+          key: "description",
+          width:300,
         },
         {
           title: "type",
           key: "type",
-          sortable: true
+          sortable: true,
+          width:100
         },
         {
           title: "uploadTime",
           key: "uploadTime",
-          sortable: true
+          sortable: true,
+          width:200
         },
         {
           title: "uploaderId",
-          key: "uploaderId"
+          key: "uploaderId",
+          width:200
         },
         {
           title: "Action",
@@ -515,6 +535,8 @@ export default {
   },
   created: function() {
     // alert(111);
+    this.getProjectDeatil();
+    this.getAllSubProject();
     this.getAllResource();
   },
   methods: {
@@ -540,6 +562,9 @@ export default {
           } else {
             let obj = res.data;
             that.currentProjectDetail = obj[0];
+            // 给copy按钮的初始值进行赋值
+            that.copyProjectId = that.currentProjectDetail.projectId;
+            that.copyProjectTitle = that.currentProjectDetail.title;
             localStorage.setItem(
               "projectId",
               that.currentProjectDetail.projectId
@@ -620,11 +645,6 @@ export default {
       .catch(err=> {
         console.log(err.data);
       })
-      // console.log("inviteEmailList的类型是:" + typeof(this.inviteEmailList).toString());
-      // console.log(this.inviteEmailList.toString());
-      // emailFormBody[recipient] = ""
-      // let emailFormBody=n,
-      // emailFormBody[]
     },
     handOverSubProjectShow(index){
       this.editSubProjectindex = index;
@@ -791,6 +811,8 @@ export default {
               desc: "File uploaded successfully",
               duration: 2
             });
+            //这里重新获取一次该项目下的全部资源
+            this.getAllResource();
             // 创建一个函数根据pid去后台查询该项目下的资源
           }
           // console.log(res.data);
@@ -837,11 +859,36 @@ export default {
       //   this.data6[index].age
       // }<br>Address：${this.data6[index].address}`
       // });
-    }
+    },
+    handleSuccess(data){
+      if(data == "id"){
+        this.copyProjectIdStatus = true;
+        // alert("success");
+      }else if(data == "title"){
+        this.copyProjectTitleStatus = true;
+      }
+      this.$Notice.success({
+                    title: 'Notification title',
+                    desc: `Copy project ${data} success`,
+                    duration: 1
+                });
+    },
+    handleError(data){
+      if(data == "id"){
+        this.copyProjectIdStatus = false;
+      }else if(data == "title"){
+        this.copyProjectTitleStatus = false;
+      }
+      this.$Notice.error({
+                    title: 'Notification title',
+                    desc: `Copy project ${data} fail`,
+                    duration: 1
+                });
+    },
   },
-  mounted: function() {
-    this.getProjectDeatil();
-    this.getAllSubProject();
-  }
+  // mounted: function() {
+    // this.getProjectDeatil();
+    // this.getAllSubProject();
+  // }
 };
 </script>

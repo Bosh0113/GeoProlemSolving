@@ -17,6 +17,8 @@ import VCharts from 'v-charts'
 import * as socketApi from './api/socket'
 import MuseUI from 'muse-ui'
 import 'muse-ui/dist/muse-ui.css'
+//引入vue-clipboards组件
+import VueClipboards from 'vue-clipboards'
 
 //leaflet
 import L from 'leaflet'
@@ -37,7 +39,8 @@ Vue.use(iView)
 Vue.use(Vuex)
 Vue.use(VCharts)
 Vue.use(MuseUI)
-
+// 使用vue-clipboards
+Vue.use(VueClipboards);
 
 Vue.use(VueDraggable)
 

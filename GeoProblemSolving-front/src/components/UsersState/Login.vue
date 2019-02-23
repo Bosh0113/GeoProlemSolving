@@ -40,7 +40,7 @@
                   >Sign In</Button>
                   <Button
                     type="success"
-                    @click="handleWithoutAccount()"
+                    @click="register()"
                     style="float:right"
                   >Register</Button>
                 </FormItem>
@@ -122,17 +122,9 @@ export default {
     handleSubmit(name) {
       this.$refs[name].validate(valid => {
         if (valid) {
-          // 方法1
-          // var params = new URLSearchParams();
-          // params.append("email", this.formInline.user);
-          // params.append("password", this.formInline.password);
-          // 方法2，字符串拼接类型
-
           this.axios
             .get(
               "http://localhost:8081/user/login"+"?email=" + this.formInline.user +"&password=" + this.formInline.password,
-              // "http://localhost:8081/TeamModeling/LoginServlet",
-              // params,
             )
             .then(
               res => {
@@ -146,12 +138,11 @@ export default {
                     avatar: res.data.avatar,
                     userId: res.data.userId,
                   });
+                  // 这里利用userId发送请求去获取所有的通知
+
                   this.$router.go(-1);
                 }
               },
-              // function(res) {
-              //   console.log(res.status);
-              // }
             );
         } else {
           this.$Message.error(
@@ -160,9 +151,10 @@ export default {
         }
       });
     },
-    handleWithoutAccount: function() {
+    register: function() {
       this.$router.push({ name: "Register" });
-    }
+    },
+
   }
 };
 </script>

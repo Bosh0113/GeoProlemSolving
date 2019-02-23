@@ -7,11 +7,11 @@
         <div style="display:flex" class="inline_style">
           <div class="hintTitle">Category</div>
           <RadioGroup v-model="formInline.category" style="width:80%">
-            <Radio label="Society"></Radio>
-            <Radio label="Atmosphere"></Radio>
-            <Radio label="Ecology"></Radio>
-            <Radio label="Soil"></Radio>
             <Radio label="Water"></Radio>
+            <Radio label="Soil"></Radio>
+            <Radio label="Ecology"></Radio>
+            <Radio label="Atmosphere"></Radio>
+            <Radio label="Society"></Radio>
             <Radio label="Others"></Radio>
           </RadioGroup>
         </div>

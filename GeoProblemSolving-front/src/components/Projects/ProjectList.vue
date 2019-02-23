@@ -4,15 +4,21 @@
   <div>
     <Row>
       <Col span="22" offset="1">
-        <div class="topPanel" style="margin-top:50px;float:right;display:flex">
-          <Button
+
+        <div class="topPanel" style="margin-top:50px;display:flex">
+          <div style="width:80%">
+            <Input v-model="search" placeholder="Enter something to find project quickly" style="width: 100%" />
+          </div>
+          <!-- <div class="topPanel" style="margin-top:50px;float:right;display:flex"> -->
+
+            <div style="float:right;width:20%;magrin-left:80%;display:flex;justify-content:center">
+              <Button
             router-link
             :to="{path:'newproject'}"
             type="success"
             style="margin-right:2.5%"
             title="create"
             icon="md-add"
-
           >Create</Button>
            <Button
             type="primary"
@@ -21,12 +27,13 @@
             icon="md-person-add"
             @click="joinModal=true"
           >Join</Button>
-        </div>
-        <div class="topPanel" style="margin-top:50px;">
+            </div>
+
+        <!-- </div> -->
         </div>
         <br>
-        <div class="Tabpane">
-          <Tabs v-model="currentTab" @click.native="chooseCurrentType(currentTab)">
+        <div class="Tabpane" >
+          <Tabs v-model="currentTab" @click.native="chooseCurrentType(currentTab)" >
             <TabPane label="Water" name="Water" icon="ios-water"></TabPane>
             <TabPane label="Soil" name="Soil" icon="md-grid"></TabPane>
             <TabPane label="Ecology" name="Ecology" icon="md-leaf"></TabPane>
@@ -37,11 +44,14 @@
         </div>
       </Col>
       <div class="ProjectList">
-        <div v-for="(item,index) in currentProjectList" :data="currentProjectList" :key="item.index">
+        <div v-for="(item,index) in filteredBlogs" :data="currentProjectList" :key="item.index">
           <!-- Card卡片用来承载工程的信息，包含title，img，以及一些基本信息 -->
-          <Col span="6" offset="1" v-if="item.privacy=='Public'">
-            <Card style="height:620px;margin:20px 0 20px 0">
-              <h1 style="text-align:center" @click="goSingleProject(item.projectId)">{{item.title}}</h1>
+          <!-- <Col span="6" offset="1" v-if="item.privacy=='Public'"> -->
+          <Col :xs="{ span: 21, offset: 1 }" :md="{ span: 11, offset: 1 }" :lg="{ span: 6, offset: 1 }" v-if="item.privacy=='Public'">
+            <Card style="height:auto;margin:20px 0 20px 0">
+              <div>
+                <h1 style="text-align:center;margin: 0 auto" @click="goSingleProject(item.projectId)" class="projectTitle">{{item.title}}</h1>
+              </div>
               <p style="height:auto;padding:0 40px 0 40px">{{item.description}}</p>
               <div style="height:300px;display:flex;justify-content:center">
                 <img :src="item.picture" v-if="item.picture!=''&&item.picture!='undefined'">
@@ -62,8 +72,8 @@
               </div>
               <div class="whitespace"></div>
               <div class="operateProject" style="display:flex;justify-content:center">
-                <Button type="success" v-show="item.isMember===false&&item.isManager===false" @click="joinModal=true">Join</Button>
-                <!-- <Button type="success" v-show="item.isManager===false" @click="joinModal=true">Join</Button> -->
+                <Button type="success" v-show="item.isMember===false&&item.isManager===false" @click="submitJoin(item)">Join</Button>
+                <!-- <Button type="success" v-show="item.isMember===false&&item.isManager===false" @click="joinModal=true">Join</Button> -->
                 <br>
                 <Button type="error" v-show="item.isMember===true||item.isManager===true" @click="quitModalShow(item.projectId)" :id="item.projectId">Quit</Button>
                 <Modal
@@ -112,6 +122,12 @@ img {
 .whitespace {
   height: 20px;
 }
+/* title标题悬浮时出现下划线且变色 */
+.projectTitle:hover{
+  text-decoration:underline;
+  color: #C20C0C;
+  cursor: pointer;
+}
 </style>
 <script>
 import Avatar from "vue-avatar";
@@ -120,6 +136,18 @@ export default {
     // 作用是在一开始就到后台获取water资源类型的项目，作为默认值
     let initObject = { key: "category", value: "Water" };
     this.getSpecificTypeProjects(initObject);
+  },
+  computed:{
+  //   filteredBlogs:function(){
+  //   return this.blogs.filter((blog)=>{
+  //     return blog.title.match(this.search);
+  //   })
+  // },
+  filteredBlogs:function(){
+    return this.currentProjectList.filter((item)=>{
+      return item.title.match(this.search);
+    })
+  }
   },
   mounted() {},
   components: {
@@ -147,7 +175,9 @@ export default {
       //加入项目的Id号
       joinProjectId: "",
       currentProject: {},
-      quitSubProjectId: ""
+      quitSubProjectId: "",
+      //搜索的输入框
+      search:"",
     };
   },
   methods: {
@@ -200,7 +230,7 @@ export default {
             let list = res.data;
             this.judgeMember(list);
             let projectsInfo=this.currentProjectList;
-            console.log(projectsInfo);
+            // console.log(projectsInfo);
           }
         })
         .catch(err => {
@@ -256,7 +286,7 @@ export default {
             this.$store.state.userId
         )
         .then(res => {
-          console.log(res.data);
+          // console.log(res.data);
           if (res.data === "Success") {
             this.$Message.info("Quit successfully");
           } else {
@@ -323,6 +353,22 @@ export default {
     goSingleProject(id) {
       this.$router.push({ path: `project/${id}` });
       // console.log(id);
+    },
+    submitJoin(data){
+      // console.log("点击的项目id是："+ data.projectId);
+      let joinForm = {};
+      joinForm["recipientId"] = data.managerId;
+      joinForm["type"] = "Join application";
+      joinForm["content"] = {"userName":this.$store.state.userName,"title":data.title,"userId":this.$store.state.userId,"projectId":data.projectId};
+      // console.log(joinForm);
+      this.axios.post("http://localhost:8081/notice/save", joinForm)
+      .then(res=> {
+        console.log("申请加入的结果是:"+ res.data);
+      })
+      .catch(err=> {
+        console.log("申请失败的原因是："+ err.data);
+
+      })
     }
   }
 };
