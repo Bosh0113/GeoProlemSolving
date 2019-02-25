@@ -52,7 +52,11 @@
               <div>
                 <h1 style="text-align:center;margin: 0 auto" @click="goSingleProject(item.projectId)" class="projectTitle">{{item.title}}</h1>
               </div>
-              <p style="height:auto;padding:0 40px 0 40px">{{item.description}}</p>
+              <div>
+                <textarea type="textarea" :rows="3" readonly style="width:100%;text-indent: -2em;">
+                  {{item.description}}
+                </textarea>
+              </div>
               <div style="height:300px;display:flex;justify-content:center">
                 <img :src="item.picture" v-if="item.picture!=''&&item.picture!='undefined'">
                 <avatar :username="item.title" :size="300" :title="item.title" :rounded="false" v-else></avatar>
