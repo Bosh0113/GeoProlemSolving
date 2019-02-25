@@ -220,20 +220,6 @@
                 <Button type="primary" v-clipboard="copyProjectId" @success="handleSuccess('id')" @error="handleError('id')">Copy Project ID</Button>
                 <Button type="default" v-clipboard="copyProjectTitle" @success="handleSuccess('title')" @error="handleError('title')">Copy Project Name</Button>
               </div>
-              <!-- <div>
-                <span style="width:80%;margin-left:20%;color:lightgreen" v-show="copyProjectIdStatus==true">
-                  Copy project id success
-                </span>
-                <span style="width:80%;margin-left:20%;color:lightgreen" v-show="copyProjectTitleStatus == true">
-                  Copy project name success
-                </span>
-                <span style="width:80%;margin-left:20%;color:red" v-show="copyProjectIdStatus == false">
-                  Copy project id fail
-                </span>
-                <span style="width:80%;margin-left:20%;color:red" v-show="copyProjectTitleStatus == false">
-                  Copy project name fail
-                </span>
-              </div> -->
             </Modal>
           </div>
         </div>
@@ -252,8 +238,8 @@
                     type="primary"
                     slot="extra"
                     style="margin:-5px 5px 0 5px"
-                    v-show="subProject.editable===true"
                     @click="handOverSubProjectShow(index)"
+                    v-show="subProject.isManager"
                     icon="md-happy"
                     title="Authorize"
                   ></Button>
@@ -261,8 +247,8 @@
                     type="success"
                     slot="extra"
                     style="margin:-5px 5px 0 5px"
-                    v-show="subProject.editable===true"
                     @click="editSubProjectShow(index)"
+                    v-show="subProject.isManager"
                     icon="ios-brush"
                     title="edit"
                   ></Button>
@@ -270,8 +256,8 @@
                     type="error"
                     slot="extra"
                     style="margin:-5px 5px 0 5px"
-                    v-show="subProject.editable===true"
                     @click="deleteSubProjectShow(index)"
+                    v-show="subProject.isManager"
                     icon="md-close"
                     title="remove"
                   ></Button>
@@ -482,10 +468,6 @@ export default {
       subProjectDescription: "",
       subProjectTitleEdit: "",
       subProjectDescriptionEdit: "",
-      //判断subProject是否具有可编辑的权限
-      isSubManager: false,
-      //by mzy
-      isSubMember: false,
       //编辑子项目按钮的模态框
       editSubProjectModal: false,
       //删除子项目按钮的模态框
@@ -550,8 +532,6 @@ export default {
     this.getProjectDetail();
     this.getAllSubProject();
     this.getAllResource();
-    this.getProjectDetail();
-    this.getAllSubProject();
   },
   // add by mzy for navigation guards
   beforeRouteEnter: (to, from, next) => {
@@ -668,8 +648,8 @@ export default {
       let isManager, isMember;
       for (let i = 0; i < this.subProjectList.length; i++) {
         if (this.subProjectList[i]["subProjectId"] === data) {
-          isManager = this.isSubManager;
-          isMember = this.isSubMember;
+          isManager = this.subProjectList[i]["isManager"];
+          isMember = this.subProjectList[i]["isMembers"];
         }
       }
       if (this.$store.getters.userState) {
@@ -820,7 +800,7 @@ export default {
           } else {
             //改变this的指向，此时this需要赋值给其他变量
             that.subProjectList = res.data;
-            that.subProjectList = that.judgeEditProperty(that.subProjectList);
+            that.subProjectList = that.identity(that.subProjectList);
             for (let i = 0, n = 0; i < that.subProjectList.length; i++) {
               $.ajax({
                 url:
@@ -843,15 +823,12 @@ export default {
           console.log(err.data);
         });
     },
-    judgeEditProperty(list) {
+    identity(list) {
       for (var i = 0; i < list.length; i++) {
-        if (list[i]["managerId"] === this.$store.state.userId) {
-          list[i]["editable"] = true;
-          this.isSubManager = true;
-        } else {
-          this.isSubManager = false;
-          list[i]["editable"] = false;
-        }
+        let isSubManager=this.managerIdentity(list[i]["managerId"]);
+        list[i]["isManager"]=isSubManager;
+        let isSubMember=this.memberIdentity(list[i]["members"]);
+        list[i]["isMember"]=isSubMember;
       }
       return list;
     },
@@ -972,9 +949,5 @@ export default {
                 });
     },
   },
-  // mounted: function() {
-    // this.getProjectDeatil();
-    // this.getAllSubProject();
-  // }
 };
 </script>
