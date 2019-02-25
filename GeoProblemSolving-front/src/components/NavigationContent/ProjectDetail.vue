@@ -682,7 +682,7 @@ export default {
         this.$router.push({ path: "/login" });
       }
     },
-    //创建子项目
+    //创建子项目的函数
     createSubProject() {
       let SubProject = {};
       SubProject["description"] = this.subProjectDescription;
