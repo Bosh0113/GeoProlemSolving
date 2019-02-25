@@ -58,9 +58,12 @@
                             <TabPane :label="reply" name="reply">Comment</TabPane>
                             <TabPane :label="personal" name="personal" :data="applicationList">
                               <div v-for="(single,index) in applicationList" :key="index" style="width:100%;height:40px;display:flex">
-                                <div style="line-height:40px;padding:0;width:80%">
-                                  <span @click="processNotificationModalShow(single)">{{single.content.userName}} applied join in the project {{single.content.title}}.
-                                </span>
+                                <div style="line-height:40px;padding:0;width:80%";display:flex>
+                                  <span>{{single.content.userName}} applied join in the project {{single.content.title}}.
+                                  </span>
+                                  <span>
+                                    111
+                                  </span>
                                 </div>
                                 <div style="width:20%">
                                   <!-- 绑定已阅的显示样式 -->
