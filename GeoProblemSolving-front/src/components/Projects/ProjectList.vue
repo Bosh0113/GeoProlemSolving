@@ -5,7 +5,7 @@
     <Row>
       <Col span="22" offset="1">
 
-        <div class="topPanel" style="margin-top:50px;display:flex">
+        <div class="topPanel" style="margin-top:50px">
           <div style="width:80%">
             <Input v-model="search" placeholder="Enter something to find project quickly" style="width: 100%" />
           </div>
@@ -228,6 +228,7 @@ export default {
             this.currentProjectList = [];
           } else {
             let list = res.data;
+            console.log("获取到的项目列表是" + list);
             this.judgeMember(list);
             let projectsInfo=this.currentProjectList;
             // console.log(projectsInfo);

@@ -547,7 +547,7 @@ export default {
   },
   created: function() {
     // alert(111);
-    this.getProjectDeatil();
+    this.getProjectDetail();
     this.getAllSubProject();
     this.getAllResource();
     this.getProjectDetail();
@@ -555,7 +555,6 @@ export default {
   },
   // add by mzy for navigation guards
   beforeRouteEnter: (to, from, next) => {
-    // alert(this.isProjectManager);
     next(vm => {
       if (!vm.$store.getters.userState) {
         next("/login");
