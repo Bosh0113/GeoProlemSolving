@@ -514,7 +514,7 @@ export default {
       if (!vm.$store.getters.userState) {
         next("/login");
       } else {
-        if (!(isSubProjectManager|| isSubProjectMember)) {
+        if (!(vm.isSubProjectManager||vm.isSubProjectMember)) {
           alert("No access");
           // next(`/project/${vm.$store.getters.currentProjectId}`);
           vm.$router.go(-1);
@@ -540,9 +540,9 @@ export default {
           this.$route.params.id,
         type: "GET",
         async: false,
-        success: function(data) {
-          if (res.data != "None") {
-            let subProjectInfo = res.data[0];
+        success: data=> {
+          if (data != "None") {
+            let subProjectInfo = data[0];
             this.managerIdentity(subProjectInfo.managerId);
             this.memberIdentity(subProjectInfo["members"]);
             let membersList = subProjectInfo["members"];
