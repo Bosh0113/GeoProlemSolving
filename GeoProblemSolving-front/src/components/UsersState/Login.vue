@@ -128,7 +128,6 @@ export default {
             )
             .then(
               res => {
-                 console.log(res.data);
                 if (res.data === "Fail") {
                   this.$Message.error("Invalid account or password.");
                 } else{

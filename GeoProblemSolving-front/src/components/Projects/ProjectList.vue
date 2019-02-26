@@ -228,10 +228,8 @@ export default {
             this.currentProjectList = [];
           } else {
             let list = res.data;
-            console.log("获取到的项目列表是" + list);
             this.judgeMember(list);
             let projectsInfo=this.currentProjectList;
-            // console.log(projectsInfo);
           }
         })
         .catch(err => {
@@ -381,7 +379,8 @@ export default {
       // console.log(joinForm);
       this.axios.post("http://localhost:8081/notice/save", joinForm)
       .then(res=> {
-        console.log("申请加入的结果是:"+ res.data);
+        this.$Message.info("Apply Successfully");
+        this.$emit('sendNotice',data.managerId)
       })
       .catch(err=> {
         console.log("申请失败的原因是："+ err.data);

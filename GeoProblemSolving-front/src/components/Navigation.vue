@@ -1,8 +1,50 @@
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style scoped>
+body{
+  min-width: 1200px;
+  overflow-x: auto;
+}
+#logo {
+  position: absolute;
+  width: 129px;
+  height: 40px;
+  z-index: 1;
+  margin-top: 5px;
+  /* margin-left: 2.5%; */
+  margin-left: 5%;
+}
+.header span {
+  font-size: 15px;
+}
+.header {
+  /* z-index: 2;
+  height: 60px; */
+  position: absolute;
+  width: 100%;
+  height: 60px;
+}
+.userState {
+  position: absolute;
+  margin-left: 85%;
+  top: 0px;
+  min-width: 300px;
+  z-index: 1;
+}
+.content {
+  /* padding-top: 5px; */
+  padding-top: 60px;
+  /* width: 95%;
+  margin-left: 2.5%;
+  margin-right: 2.5%; */
+  margin-left: 5%;
+  margin-right: 5%;
+}
+</style>
 <template>
   <div class="mainPart">
     <div class="header">
       <img src="@/assets/OGMS.png" id="logo" class="pic">
-      <div class="nav_part">
+      <div class="navPart">
         <Menu
           mode="horizontal"
           theme="dark"
@@ -40,49 +82,9 @@
           <template v-else>
             <Menu mode="horizontal" theme="dark" @on-select="logged" style="z-index:0">
               <MenuItem name="notification">
-                <div class="bottom">
-                  <Poptip
-                    placement="bottom-end"
-                    width="750"
-                  >
-                    <Badge :count="messageCount" v-if="avatar!=''&&avatar!='undefined'"></Badge>
-                    <div slot="content" style="margin:0 auto">
-                      <Tabs>
-                          <TabPane :label="invitation" name="invitation" :data="invicationList">
-                            <div v-for="(single,index) in invicationList" :key="index" style="width:100%;height:40px;border-bottom:1px dotted gray"><span style="float:left;line-height:40px">{{single.title}}</span><span style="float:right;line-height:40px">211</span>
-                            </div>
-                            </TabPane>
-                          <TabPane :label="notification" name="notification">Comment</TabPane>
-                          <TabPane :label="comment" name="comment">Comment</TabPane>
-                          <TabPane :label="reply" name="reply">Comment</TabPane>
-                          <TabPane :label="personal" name="personal" :data="applicationList">
-                            <div v-for="(single,index) in applicationList" :key="index" style="width:100%;height:40px;display:flex">
-                              <div style="line-height:40px;padding:0;width:80%;display:flex">
-                                <span>{{single.content.userName}} applied join in the project {{single.content.title}}.
-                                </span>
-                                <span>
-                                  111
-                                </span>
-                              </div>
-                              <div style="width:20%">
-                                <!-- 绑定已阅的显示样式 -->
-                                <Button type="success" @click="allowJoin(single)"><Icon type="md-checkmark" /></Button>
-                                <Button type="warning" @click="disallowJoin"><Icon type="md-hand"  /></Button>
-                                <Button type="error" @click=""><Icon type="md-close" /></Button>
-                              </div>
-                              <!-- <span style="float:right;line-height:40px">{{single.createTime}}</span> -->
-                            </div>
-                          </TabPane>
-                      </Tabs>
-                      <br>
-                      <Button>More</Button>
-                    </div>
-                    <!-- <div class="api" slot="content">
-                      111
-                    </div> -->
-                    <!-- <Badge :count="10" v-if="avatar!=''&&avatar!='undefined'"></Badge> -->
-                  </Poptip>
-                </div>
+                <Badge :count="unreadNoticeCount" id="noticeBadge">
+                  <Icon type="ios-notifications-outline" size="25"></Icon>
+                </Badge>
               </MenuItem>
               <MenuItem name="personalPage">
                 <img
@@ -108,7 +110,7 @@
       </div>
     </div>
     <div class="content">
-      <router-view></router-view>
+      <router-view @sendNotice="sendMessage"></router-view>
     </div>
   </div>
 </template>
@@ -119,99 +121,20 @@ export default {
   name: "HelloWorld",
   data() {
     return {
-      invitation: h => {
-        return h("div", [
-          h("span", "invitation"),
-          h("span", " "),
-          h("Badge", {
-            props: {
-              count: this.invitationCount
-            }
-          })
-        ]);
-      },
-      notification: h => {
-        return h("div", [
-          h("span", "notification"),
-          h("span", " "),
-          h("Badge", {
-            props: {
-              count: this.notificationCount
-            }
-          })
-        ]);
-      },
-      reply: h => {
-        return h("div", [
-          h("span", "reply" + ""),
-          h("span", " "),
-          h("Badge", {
-            props: {
-              count: this.replyCount
-            }
-          })
-        ]);
-      },
-      personal: h => {
-        return h("div", [
-          h("span", "personal"),
-          h("span", " "),
-          h("Badge", {
-            props: {
-              count: this.applicationList.length
-            }
-          })
-        ]);
-      },
-      comment: h => {
-        return h("div", [
-          h("span", "comment"),
-          h("span", " "),
-          h("Badge", {
-            props: {
-              count: this.commentCount
-            }
-          })
-        ]);
-      },
-      // information:[1,2,3,4,5],
-      //关于所有类型信息的数目统计
-      notificationCount: 0,
-      invitationCount: 0,
-      replyCount: 0,
-      commentCount: 0,
-      personalCount: 0,
-      //信息列表类型变量
-      invicationList: [],
-      applicationList: [],
-      //消息列表
-      messageList: [],
-      //消息统计值
-      messageCount: 0,
-      //控制申请的模态框
-      processNotificationModal: false,
-      //当亲处理的通知
-      currentProcessNotification: {},
-      ProcessNotificationTemplate: "",
-      //通知的状态
-      messageStatus: false
+      //消息机制
+      noticeSocket: null,
+      unreadNoticeCount:0,
     };
   },
   created() {
-    // this.invicationList = [
-    //   {title:'一路走来，感谢有你'},{title:'新年快乐，龙马精神'},{title:'家庭和睦，事业有成'},{title:'健康美丽，开心久久'}
-    // ];
     if (this.$store.state.userId != "") {
+      this.initWebSocket();
       //获取到通知的总数并存储为vuex的变量
-      this.getNotification();
+      this.getUnreadNoticeCount();
     }
   },
-  mounted() {
-    // let headerWidth = window.innerWidth+'px';
-    // console.log("浏览器窗口的宽度是："+ headerWidth);
-    // $(".header").css("width",headerWidth);
-    // $(".ivu-menu-item").css("margin-left", "1.5%");
-    // $(".ivu-menu ivu-menu-dark ivu-menu-horizontal").css("z-index", "0");
+  updated(){
+    $('sup').css("margin-top","20px");
   },
   components: {
     Avatar
@@ -226,9 +149,6 @@ export default {
     avatar() {
       return this.$store.state.avatar;
     }
-    // judgeShow(){
-    //   return messageStatus;
-    // }
   },
   methods: {
     turnContent(name) {
@@ -255,13 +175,17 @@ export default {
       if (name === "personalPage") {
         this.$router.push({ name: "PersonalPage" });
       } else if (name == "userLogout") {
+        this.onClose();
         this.$store.commit("userLogout");
         this.$router.replace({ name: "Home" });
       }
+      else if(name==="notification"){
+        this.$router.push({ name: "Notice" });
+      }
     },
-    userLogout() {},
     // 获取到通知的数量
-    getNotification() {
+    getUnreadNoticeCount() {
+      this.unreadNoticeCount=0;
       //get请求发送的是用户id
       this.axios
         .get(
@@ -271,131 +195,49 @@ export default {
             this.$store.state.userId
         )
         .then(res => {
-          this.messageList = res.data;
-          let data = [];
-          // 这里需要后台过滤一下未读的消息，显示总数要做一个变化
-          this.messageCount = this.messageList.length;
-          if (this.messageCount != "") {
-            this.processNotification(this.messageList);
+          let noticeList=res.data;
+          let unreadCount=0;
+          for(let i=0;i<noticeList.length;i++){
+            if(noticeList[i].state==="unread"){
+              unreadCount++;
+              continue;
+            }
           }
-          // console.log(this.messageList);
+          this.$set(this,"unreadNoticeCount",unreadCount);
         })
         .catch(err => {
           console.log("失败的原因是" + err.data);
         });
     },
-    processNotification(note) {
-      for (var i = 0; i < note.length; i++) {
-        if (note[i].type == "Join application" && note[i].state == "unread") {
-          this.applicationList.push(note[i]);
-          this.messageCount = this.applicationList.length;
-        }
+    initWebSocket() {
+      var noticeSocketURL = "ws://localhost:8081/NoticeSocket";
+      this.noticeSocket = new WebSocket(noticeSocketURL);
+      this.noticeSocket.onopen = this.onOpen;
+      this.noticeSocket.onmessage = this.onMessage;
+      this.noticeSocket.onclose = this.onClose;
+      this.noticeSocket.onerror = this.onError;
+    },
+    onOpen() {
+      console.log("NoticeSocket连接成功！");
+    },
+    onMessage(e) {
+      if (e.data == "Notice") {
+        let newCount = this.unreadNoticeCount + 1;
+        this.$set(this, "unreadNoticeCount", newCount);
+        this.$Message.info("You have a new notice!");
+      } else {
+        console.log(e.data);
       }
-      // console.log("结果是："+ note[0]);
     },
-    processNotificationModalShow(note) {
-      this.currentProcessNotification = note;
-      this.processNotificationModal = true;
-      (this.ProcessNotificationTemplate =
-        note.content.userName +
-        " applied to join in the project called " +
-        note.content.title +
-        " at " +
-        note.createTime),
-        "do you allow he/her join in this project?";
-      console.log(
-        "点击的项目名是:" + this.currentProcessNotification.content.title
-      );
+    onClose(e) {
+      console.log("NoticeSocket连接断开！");
     },
-    allowJoin(data) {
-      this.axios
-        .get(
-          "http://localhost:8081/project/join?" +
-            "projectId=" +
-            data.content.projectId +
-            "&userId=" +
-            data.content.userId
-        )
-        .then(res => {
-          if (res.data === "Success") {
-            this.$Message.info("Join success");
-            // 注册成功了以后马上到后台进行更新，将通知的状态由未读变为已读
-            this.axios
-              .get(
-                "http://localhost:8081/notice/read?" +
-                  "noticeId=" +
-                  data.noticeId
-              )
-              .then(res => {
-                console.log("更新的结果是" + res.data);
-                this.messageCount = this.messageCount - 1;
-                this.messageStatus = true;
-                console.log("此时信息总数是：" + this.messageCount);
-              })
-              .catch(err => {
-                console.log(err.data);
-              });
-            // data.state = "read"
-          } else if (res.data === "Exist") {
-            this.$Message.info("you have already be a member in project");
-            this.messageCount = this.messageCount - 1;
-          }
-        })
-        .catch(err => {});
-      // alert(data.createTime);
+    onError(e) {
+      console.log("NoticeSocket连接错误！");
     },
-    disallowJoin() {
-      alert("disallow");
+    sendMessage(recipientId) {
+      this.noticeSocket.send(recipientId);
     }
-    // judgeShow(state){
-    //   if(state=="read"){
-    //     return false
-    //   }else if(state=="unread"){
-    //     return true
-    //   }
-    // }
   }
 };
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-#logo {
-  position: absolute;
-  width: 129px;
-  height: 40px;
-  z-index: 1;
-  margin-top: 5px;
-  margin-left: 2.5%;
-}
-.header span {
-  font-size: 15px;
-}
-.header {
-  /* position: fixed; */
-  z-index: 2;
-  /* top:0; */
-  /* width: 98%; */
-  height: 60px;
-}
-.userState {
-  position: absolute;
-  margin-left: 85%;
-  top: 0px;
-  min-width: 300px;
-  z-index: 1;
-}
-.content {
-  padding-top: 5px;
-  width: 95%;
-  margin-left: 2.5%;
-  margin-right: 2.5%;
-}
-/* 关于通知的徽标面板显示 */
-.bottom {
-  text-align: center;
-}
-.readCss {
-  background-color: grey;
-}
-</style>
