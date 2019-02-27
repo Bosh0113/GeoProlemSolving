@@ -110,13 +110,6 @@
     <Row>
       <Col span="22" offset="1">
         <div class="whitespace"></div>
-        <!-- <Button
-          type="primary"
-          style="float:right;height:60px;margin-right:40px;line-height:30px;font-size:30px;"
-          @click="goWorkspace(subProjectList[0].subProjectId)"
-          icon="md-home"
-          title="workspace"
-        ></Button> -->
         <div class="projectTitle">
           <h1
             style="text-align:center"
