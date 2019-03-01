@@ -4,36 +4,41 @@
   <div>
     <Row>
       <Col span="22" offset="1">
-
         <div class="topPanel" style="margin-top:50px">
           <div style="width:80%">
-            <Input v-model="search" placeholder="Enter something to find project quickly" style="width: 100%" />
+            <Input
+              v-model="search"
+              placeholder="Enter something to find project quickly"
+              style="width: 100%"
+            />
           </div>
           <!-- <div class="topPanel" style="margin-top:50px;float:right;display:flex"> -->
+          <div
+            style="float:right;width:20%;magrin-left:80%;display:flex;justify-content:center"
+            class="operateBtnGroup"
+          >
+            <Button
+              router-link
+              :to="{path:'newproject'}"
+              type="default"
+              class="btnCreate"
+              style="margin-right:2.5%;font-size:15px"
+              icon="md-add"
+            >Create</Button>
+            <Button
+              type="default"
+              style="margin-right:2.5%;font-size:15px"
+              icon="md-person-add"
+              class="btnJoin"
+              @click="joinModal=true"
+            >Join</Button>
+          </div>
 
-            <div style="float:right;width:20%;magrin-left:80%;display:flex;justify-content:center">
-              <Button
-            router-link
-            :to="{path:'newproject'}"
-            type="success"
-            style="margin-right:2.5%"
-            title="create"
-            icon="md-add"
-          >Create</Button>
-           <Button
-            type="primary"
-            style="margin-right:2.5%"
-            title="join"
-            icon="md-person-add"
-            @click="joinModal=true"
-          >Join</Button>
-            </div>
-
-        <!-- </div> -->
+          <!-- </div> -->
         </div>
         <br>
-        <div class="Tabpane" >
-          <Tabs v-model="currentTab" @click.native="chooseCurrentType(currentTab)" >
+        <div class="Tabpane">
+          <Tabs v-model="currentTab" @click.native="chooseCurrentType(currentTab)">
             <TabPane label="Water" name="Water" icon="ios-water"></TabPane>
             <TabPane label="Soil" name="Soil" icon="md-grid"></TabPane>
             <TabPane label="Ecology" name="Ecology" icon="md-leaf"></TabPane>
@@ -44,68 +49,132 @@
         </div>
       </Col>
       <div class="ProjectList">
+        <div v-show="currentProjectList==''&&currentProjectsStatus==2">
+          <Col class="demo-spin-col" span="22" offset="1">
+            <Spin fix>
+              <Icon type="ios-loading" size="100" class="demo-spin-icon-load" color="lightblue"></Icon>
+              <div>Loading</div>
+            </Spin>
+          </Col>
+        </div>
+        <div v-show="currentProjectsStatus==0">
+          <Col span="22" offset="1">
+            <Card :bordered="false">
+              <!-- <p slot="title">No Projects in this category</p> -->
+              <div style="display:flex;justify-content:center">
+                <Icon type="md-alert" size="40" color="gray"/>
+              </div>
+              <br>
+              <div style="display:flex;justify-content:center">
+                <h2 style="text-align:center;width:50%">No projects in this category.</h2>
+              </div>
+              <br>
+              <div style="display:flex;justify-content:center">
+                <h4
+                  style="text-align:center;width:50%;color:lightblue"
+                >you can click the button right top called create to add a new project. Enrich your description about the project to attract more people join in.</h4>
+              </div>
+            </Card>
+          </Col>
+        </div>
         <div v-for="(item,index) in filteredBlogs" :data="currentProjectList" :key="item.index">
           <!-- Card卡片用来承载工程的信息，包含title，img，以及一些基本信息 -->
           <!-- <Col span="6" offset="1" v-if="item.privacy=='Public'"> -->
-          <Col :xs="{ span: 21, offset: 1 }" :md="{ span: 11, offset: 1 }" :lg="{ span: 6, offset: 1 }" v-if="item.privacy=='Public'">
+          <Col
+            :xs="{ span: 21, offset: 1 }"
+            :md="{ span: 11, offset: 1 }"
+            :lg="{ span: 7, offset: 1 }"
+            v-if="item.privacy=='Public'"
+          >
             <Card style="height:auto;margin:20px 0 20px 0">
-              <div>
+              <p
+                slot="title"
+                @click="goSingleProject(item.projectId)"
+                class="projectTitle"
+              >{{item.title}}</p>
+              <!-- <a href="#" slot="extra" @click.prevent="changeLimit">
+                  <Icon type="md-heart" />
+              </a>-->
+              <!-- <div>
                 <h1 style="text-align:center;margin: 0 auto" @click="goSingleProject(item.projectId)" class="projectTitle">{{item.title}}</h1>
+              </div>-->
+              <div style="display:flex;align-items:center;height:60px">
+                <Tag color="primary">Description</Tag>
+                <p style="padding: 0 10px">{{item.description}}</p>
               </div>
-              <p style="height:auto;padding:0 40px 0 40px">{{item.description}}</p>
               <div style="height:300px;display:flex;justify-content:center">
                 <img :src="item.picture" v-if="item.picture!=''&&item.picture!='undefined'">
-                <avatar :username="item.title" :size="300" :title="item.title" :rounded="false" v-else></avatar>
+                <avatar
+                  :username="item.title"
+                  :size="300"
+                  :title="item.title"
+                  :rounded="false"
+                  v-else
+                ></avatar>
               </div>
               <div class="whitespace"></div>
               <div style="height:40px;align-items:center;display:flex;padding:0 20px 0 20px">
-                <span
-                  style="height:20px;width:45%;color:white;text-align:center;"
-                ><Tag color="primary">Creater</Tag></span>
+                <span style="height:20px;width:45%;color:white;text-align:center;">
+                  <Tag color="primary">Creater</Tag>
+                </span>
                 <span style="height:20px;margin-left:5%">{{item.creator}}</span>
               </div>
               <div style="height:40px;align-items:center;display:flex;padding:0 20px 0 20px">
-                <span
-                  style="height:20px;width:45%;color:white;text-align:center;"
-                ><Tag color="primary">Create time</Tag></span>
+                <span style="height:20px;width:45%;color:white;text-align:center;">
+                  <Tag color="primary">Create time</Tag>
+                </span>
                 <span style="height:20px;margin-left:5%">{{item.createTime}}</span>
               </div>
               <div class="whitespace"></div>
               <div class="operateProject" style="display:flex;justify-content:center">
-                <Button type="success" v-show="item.isMember===false&&item.isManager===false" @click="submitJoin(item)">Join</Button>
-                <!-- <Button type="success" v-show="item.isMember===false&&item.isManager===false" @click="joinModal=true">Join</Button> -->
+                <Button
+                  type="success"
+                  v-show="item.isMember===false&&item.isManager===false"
+                  @click="joinApply(item)"
+                >Join</Button>
                 <br>
-                <Button type="error" v-show="item.isMember===true||item.isManager===true" @click="quitModalShow(item.projectId)" :id="item.projectId">Quit</Button>
-                <Modal
+                <Button
+                  type="error"
+                  v-show="item.isMember===true||item.isManager===true"
+                  @click="quitModalShow(item)"
+                  :id="item.projectId"
+                >Quit</Button>
+              </div>
+              <Modal
                 v-model="joinModal"
                 title="Join in project"
                 ok-text="Submit"
                 cancel-text="Cancel"
-                @on-ok="join(currentTab)"
+                @on-ok="joinProject(currentTab)"
                 @on-cancel="cancel"
               >
-              <div style="display:flex;align-items:center">
-                <span style="margin-right:5%">ProjectId:</span>
-                <input
-                  v-model="joinProjectId"
-                  placeholder="Enter ProjectId you want to participate ..."
-                  style="width: 400px"
-                >
-              </div>
-
+                <div style="display:flex;align-items:center">
+                  <span style="margin-right:5%">ProjectId:</span>
+                  <input
+                    v-model="joinProjectId"
+                    placeholder="Enter ProjectId you want to participate ..."
+                    style="width: 400px"
+                  >
+                  <div style="display:flex;align-items:center">
+                    <span style="margin-right:5%">ProjectId:</span>
+                    <input
+                      v-model="joinProjectId"
+                      placeholder="Enter ProjectId you want to participate ..."
+                      style="width: 400px"
+                    >
+                  </div>
+                </div>
               </Modal>
               <Modal
                 v-model="quitModal"
                 title="Quit Project"
                 ok-text="Assure"
                 cancel-text="cancel"
-                @on-ok="quit(currentTab,index)"
+                @on-ok="quitProject()"
                 @on-cancel="cancel"
               >
                 <p>Once you exit the project, you will not be able to participate in the collaborative process, confirm the exit?</p>
               </Modal>
-              </div>
-
             </Card>
           </Col>
         </div>
@@ -123,10 +192,32 @@ img {
   height: 20px;
 }
 /* title标题悬浮时出现下划线且变色 */
-.projectTitle:hover{
-  text-decoration:underline;
-  color: #C20C0C;
+.projectTitle:hover {
+  text-decoration: underline;
+  color: #c20c0c;
   cursor: pointer;
+}
+operateBtnGroup {
+  --btnSize: 15px;
+}
+.operateBtnGroup button {
+  font-size: 15px;
+  margin-left: 2.5%;
+}
+.operateBtnGroup button:hover {
+  font-size: var(--btnSize);
+}
+.btnCreate:hover {
+  background-color: #19be6b;
+  color: white;
+}
+.btnJoin:hover {
+  background-color: #57a3f3;
+  color: white;
+}
+/* Loading动画的特效 */
+.demo-spin-icon-load {
+  animation: ani-demo-spin 1s linear infinite;
 }
 </style>
 <script>
@@ -137,17 +228,17 @@ export default {
     let initObject = { key: "category", value: "Water" };
     this.getSpecificTypeProjects(initObject);
   },
-  computed:{
-  //   filteredBlogs:function(){
-  //   return this.blogs.filter((blog)=>{
-  //     return blog.title.match(this.search);
-  //   })
-  // },
-  filteredBlogs:function(){
-    return this.currentProjectList.filter((item)=>{
-      return item.title.match(this.search);
-    })
-  }
+  computed: {
+    //   filteredBlogs:function(){
+    //   return this.blogs.filter((blog)=>{
+    //     return blog.title.match(this.search);
+    //   })
+    // },
+    filteredBlogs: function() {
+      return this.currentProjectList.filter(item => {
+        return item.title.match(this.search);
+      });
+    }
   },
   mounted() {},
   components: {
@@ -166,8 +257,6 @@ export default {
       joinShow: false,
       isMember: false,
       isManager: false,
-      // 输入id的input框是否显示
-      inputIdShow: false,
       // join按钮点击后模态框
       joinModal: false,
       //quit按钮点击后弹出的模态框
@@ -175,15 +264,15 @@ export default {
       //加入项目的Id号
       joinProjectId: "",
       currentProject: {},
-      quitSubProjectId: "",
+      quitSubProject: {},
       //搜索的输入框
-      search:"",
+      search: "",
+      currentProjectsStatus: 2
     };
   },
   methods: {
     //该方法负责将选中的类别传递给显示的div
     chooseCurrentType(data) {
-      // console.log(data);
       switch (data) {
         case "Water":
           let waterObject = { key: "category", value: "Water" };
@@ -211,9 +300,6 @@ export default {
           break;
       }
     },
-    joinProject(projectId) {
-      this.inputIdShow = true;
-    },
     getSpecificTypeProjects(data) {
       this.axios
         .get(
@@ -226,12 +312,12 @@ export default {
         .then(res => {
           if (res.data === "None") {
             this.currentProjectList = [];
+            this.currentProjectsStatus = 0;
+            // this.$Message.info("There are no projects in this category");
           } else {
             let list = res.data;
-            console.log("获取到的项目列表是" + list);
             this.judgeMember(list);
-            let projectsInfo=this.currentProjectList;
-            // console.log(projectsInfo);
+            this.currentProjectsStatus = 1;
           }
         })
         .catch(err => {
@@ -240,8 +326,7 @@ export default {
       return this.currentProjectList;
     },
     //项目成员的id和name都要加进去
-    join(tab) {
-      console.log(tab);
+    joinProject(tab) {
       this.axios
         .get(
           "http://localhost:8081/project/join?" +
@@ -251,7 +336,6 @@ export default {
             this.$store.state.userId
         )
         .then(res => {
-          // console.log("结果是："+res.data);
           if (res.data === "Success") {
             this.$Message.info("Join success");
             let initObject = { key: "category", value: "Water" };
@@ -271,25 +355,50 @@ export default {
             }
           }
         })
-        .catch(err => {});
+        .catch(err => {
+          this.$Message.danger("Join fail");
+        });
     },
-    quitModalShow(data) {
+    quitModalShow(project) {
       this.quitModal = true;
-      this.quitSubProjectId = data;
+      this.quitSubProject = project;
     },
-    quit(tab, index) {
+    quitProject() {
       this.axios
         .get(
           "http://localhost:8081/project/quit?" +
             "projectId=" +
-            this.quitSubProjectId +
+            this.quitSubProject.projectId +
             "&userId=" +
             this.$store.state.userId
         )
         .then(res => {
-          // console.log(res.data);
           if (res.data === "Success") {
             this.$Message.info("Quit successfully");
+            let replyNotice = {};
+            replyNotice["recipientId"] = this.quitSubProject.managerId;
+            replyNotice["type"] = "notice";
+            replyNotice["content"] = {
+              title: "Quit your project",
+              description:
+                "user " +
+                this.$store.state.userName +
+                " quit from your project: " +
+                this.quitSubProject.title +
+                " ."
+            };
+            this.axios
+              .post("http://localhost:8081/notice/save", replyNotice)
+              .then(result => {
+                if (result.data == "Success") {
+                  this.$emit("sendNotice", this.quitSubProject.managerId);
+                } else {
+                  this.$Message.danger("reply fail.");
+                }
+              })
+              .catch(err => {
+                this.$Message.danger("reply fail.");
+              });
           } else {
             this.$Message.danger("Fail");
           }
@@ -302,8 +411,6 @@ export default {
       this.$Message.info("Clicked cancel");
     },
     joinRequest(data) {
-      // console.log(data.length);
-      // console.log(this.currentProject);
       for (var i = 0; i < data.length; i++) {
         if (data[i].userId === this.$store.state.userId) {
           this.currentProject["isMember"] = true;
@@ -311,82 +418,93 @@ export default {
       }
     },
     // 判断是不是成员
-    judgeMember(data) {
+    judgeMember(list) {
       //这样的话拿到了用户的id与name
-      var that = this;
-      if (data.length != 0) {
-        that.currentProjectList = data;
-        for (var i = 0, n = 0; i < that.currentProjectList.length; i++) {
-            $.ajax({
-              url:"http://localhost:8081/user/inquiry" +
-                "?key=" +
-                "userId" +
-                "&value=" +
-                that.currentProjectList[i]["managerId"],
-                type:"GET",
-                async:false,
-                success:function(data){
-                  that.currentProjectList[n++]["creator"] =data.userName;
-                }
-            })
-          let _creater = that.currentProjectList[i].managerId;
-          let _member = that.currentProjectList[i].members;
-          if (_creater == this.$store.state.userId) {
-            that.currentProjectList[i]["isManager"] = true;
+      let projectList = list;
+      if (projectList.length != 0) {
+        for (var i = 0, n = 0; i < projectList.length; i++) {
+          $.ajax({
+            url:
+              "http://localhost:8081/user/inquiry" +
+              "?key=" +
+              "userId" +
+              "&value=" +
+              projectList[i]["managerId"],
+            type: "GET",
+            async: false,
+            success: data => {
+              projectList[n++]["creator"] = data.userName;
+            }
+          });
+          let managerId = projectList[i].managerId;
+          let members = projectList[i].members;
+          if (managerId == this.$store.state.userId) {
+            projectList[i]["isManager"] = true;
           } else {
-            that.currentProjectList[i]["isManager"] = false;
+            projectList[i]["isManager"] = false;
           }
-          if (_member.length != 0) {
-            for (var j = 0; j < _member.length; j++) {
-              if (_member[j].userId == this.$store.state.userId) {
-                that.currentProjectList[i]["isMember"] = true;
+          if (members.length != 0) {
+            for (var j = 0; j < members.length; j++) {
+              if (members[j].userId == this.$store.state.userId) {
+                projectList[i]["isMember"] = true;
+                break;
               } else {
-                that.currentProjectList[i]["isMember"] = false;
+                projectList[i]["isMember"] = false;
               }
             }
           } else {
-            that.currentProjectList[i]["isMember"] = false;
+            projectList[i]["isMember"] = false;
           }
         }
+        this.$set(this, "currentProjectList", projectList);
       }
     },
     //进入项目详情页面的函数
     goSingleProject(id) {
-      let isManager,isMember;
-
-      for (let i = 0; i<this.currentProjectList.length;i++){
-        if(this.currentProjectList[i]["projectId"] === id){
+      let isManager, isMember;
+      for (let i = 0; i < this.currentProjectList.length; i++) {
+        if (this.currentProjectList[i]["projectId"] === id) {
           isManager = this.currentProjectList[i]["isManager"];
           isMember = this.currentProjectList[i]["isMember"];
         }
       }
-      if (this.$store.getters.userState){
-        if ( isManager || isMember){
+      if (this.$store.getters.userState) {
+        if (isManager || isMember) {
           this.$router.push({ path: `project/${id}` });
-        }
-        else{
+        } else {
           alert("No access.");
         }
-      }
-      else{
-        this.$router.push({path:'/login'});
+      } else {
+        this.$router.push({ path: "/login" });
       }
     },
-    submitJoin(data){
-      // console.log("点击的项目id是："+ data.projectId);
+    joinApply(data) {
       let joinForm = {};
       joinForm["recipientId"] = data.managerId;
-      joinForm["type"] = "Join application";
-      joinForm["content"] = {"userName":this.$store.state.userName,"title":data.title,"userId":this.$store.state.userId,"projectId":data.projectId};
-      // console.log(joinForm);
-      this.axios.post("http://localhost:8081/notice/save", joinForm)
-      .then(res=> {
-        console.log("申请加入的结果是:"+ res.data);
-      })
-      .catch(err=> {
-        console.log("申请失败的原因是："+ err.data);
-
-      })
+      joinForm["type"] = "apply";
+      joinForm["content"] = {
+        userName: this.$store.state.userName,
+        userId: this.$store.state.userId,
+        title: "Group application",
+        description:
+          "User " +
+          this.$store.state.userName +
+          " apply to join in your project: " +
+          data.title +
+          " .",
+        projectId: data.projectId,
+        projectTitle: data.title,
+        approve: "unknow"
+      };
+      this.axios
+        .post("http://localhost:8081/notice/save", joinForm)
+        .then(res => {
+          this.$Message.info("Apply Successfully");
+          this.$emit("sendNotice", data.managerId);
+        })
+        .catch(err => {
+          console.log("申请失败的原因是：" + err.data);
+        });
     }
   }
 };

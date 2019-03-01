@@ -522,6 +522,10 @@ export default {
   },
   created: function() {
     // alert(111);
+    this.$Message.config({
+    top: 150,
+    duration: 3
+    });
     this.getProjectDetail();
     this.getAllSubProject();
     this.getAllResource();
@@ -649,9 +653,11 @@ export default {
         if (isManager || isMember) {
           this.$router.push({ path: `${data}/workspace` });
         } else {
-          alert("No access.");
+          this.$Message.error('You have no property to access it');
+          // alert("No access.");
         }
       } else {
+        // showMessage();
         this.$router.push({ path: "/login" });
       }
     },
@@ -736,7 +742,6 @@ export default {
     },
     editSubProject() {
       this.editSubProjectModal = false;
-      let editSubProjectObject = {};
       let obj = new URLSearchParams();
       obj.append(
         "subProjectId",

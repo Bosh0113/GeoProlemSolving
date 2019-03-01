@@ -1,7 +1,18 @@
 <style scoped>
 .Content {
-  background: url("./../../assets/back.png") no-repeat;
+  /* background: url("./../../assets/back.png") no-repeat; */
   background-size: cover;
+}
+.header {
+  height: 60px;
+}
+#logo {
+  position: absolute;
+  width: 129px;
+  height: 40px;
+  z-index: 1;
+  margin-top: 5px;
+  margin-left: 2.5%;
 }
 .InputStyle {
   width: 300px;
@@ -11,14 +22,14 @@
   /* margin: 125px 0 50px 0; */
   min-width: 900px;
 }
-.register_title{
-  background-color:rgb(34, 167, 240);
-  text-align:center;
-  vertical-align:middle;
-  line-height:60px;
-  color:white;
-  font-size:30px;
-  font-weight:bold;
+.register_title {
+  background-color: rgb(34, 167, 240);
+  text-align: center;
+  vertical-align: middle;
+  line-height: 60px;
+  color: white;
+  font-size: 30px;
+  font-weight: bold;
 }
 .demo-upload-list {
   display: inline-block;
@@ -78,87 +89,146 @@
 }
 </style>
 <template>
-    <div>
-        <!-- <app-header></app-header> -->
+  <div>
+    <Layout>
+      <Header class="header">
+        <img src="@/assets/OGMS.png" id="logo" class="pic" @click="goHome">
+      </Header>
+      <Content>
         <Row class="Content" id="register">
-            <Col :xs="{ span: 12, offset: 6 }" :lg="{ span: 12, offset: 6 }">
+          <Col :xs="{ span: 12, offset: 6 }" :lg="{ span: 12, offset: 6 }">
             <div class="registerForm">
-                <Card>
-                    <h2 slot="title" class="register_title">Register</h2>
-                    <!-- 实现注册的样式 -->
-                    <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="300" inline>
-                        <FormItem label="Name" prop="userName">
-                            <Input v-model="formValidate.userName" placeholder="Plase enter username" :class="{InputStyle: inputstyle}"></Input>
-                        </FormItem>
-                        <FormItem label="Password" prop="password">
-                            <Input v-model="formValidate.password" placeholder="Plase enter password" :class="{InputStyle: inputstyle}"></Input>
-                        </FormItem>
-                        <FormItem label="Job Title" prop="jobTitle">
-                            <Input v-model="formValidate.jobTitle" placeholder="Plase enter your job title" :class="{InputStyle: inputstyle}"></Input>
-                        </FormItem>
-                        <FormItem label="E-mail" prop="email">
-                            <Input v-model="formValidate.email" placeholder="Plase enter your e-mail" :class="{InputStyle: inputstyle}"></Input>
-                        </FormItem>
-                        <FormItem label="MobilePhone" prop="mobilePhone">
-                            <Input v-model="formValidate.mobilePhone" placeholder="Plase enter your mobilePhone" :class="{InputStyle: inputstyle}"></Input>
-                        </FormItem>
-                        <FormItem label="Country" prop="country">
-                            <Input v-model="formValidate.country" placeholder="Plase enter your country" :class="{InputStyle: inputstyle}"></Input>
-                        </FormItem>
-                        <FormItem label="CityName" prop="city">
-                            <Input v-model="formValidate.city" placeholder="Plase enter your city" :class="{InputStyle: inputstyle}"></Input>
-                        </FormItem>
-                        <FormItem label="Organization" prop="organization">
-                            <Input v-model="formValidate.organization" placeholder="Plase enter your organization" :class="{InputStyle: inputstyle}"></Input>
-                        </FormItem>
-                        <FormItem label="Direction" prop="direction">
-                            <Input v-model="formValidate.direction" placeholder="Plase enter your research direction" :class="{InputStyle: inputstyle}"></Input>
-                        </FormItem>
-                        <FormItem label="HomePage" prop="homePage">
-                            <Input v-model="formValidate.homePage" placeholder="Plase enter your homepage url" :class="{InputStyle: inputstyle}"></Input>
-                        </FormItem>
-                        <br />
-                        <FormItem label="Gender" prop="gender">
-                            <RadioGroup v-model="formValidate.gender">
-                                <Radio label="male">Male</Radio>
-                                <Radio label="female">Female</Radio>
-                            </RadioGroup>
-                        </FormItem>
-                        <br />
-                        <FormItem label="Avatar" prop="avatar">
-                            <div>
-                                <div class="demo-upload-list" v-if="avatar!=''">
-                                    <template>
-                                        <img v-bind:src="avatar">
-                                        <div class="demo-upload-list-cover">
-                                            <Icon type="ios-eye-outline" @click.native="handleView()"></Icon>
-                                            <Icon type="ios-trash-outline" @click.native="handleRemove()"></Icon>
-                                        </div>
-                                    </template>
-                                </div>
-                                <div class="uploadBox">
-                                    <Icon type="ios-camera" size="20" style="position:absolute;margin:18px;"></Icon>
-                                    <input @change="uploadPhoto($event)" type="file" class="uploadAvatar">
-                                </div>
-                                <Modal title="View Image" v-model="visible">
-                                    <img :src="avatar" v-if="visible" style="width: 100%">
-                                </Modal>
-                            </div>
-                        </FormItem>
-                        <FormItem label="Introduce" prop="introduction" style="width:80%">
-                            <Input v-model="formValidate.introduction" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="Plase introduce yourself"></Input>
-                        </FormItem>
-                        <FormItem>
-                            <Button type="primary" @click="handleSubmit('formValidate')">Submit</Button>
-                            <Button @click="handleReset('formValidate')" style="margin-left: 8px">Reset</Button>
-                        </FormItem>
-                    </Form>
-                    <!-- 注册样式结束 -->
-                </Card>
+              <Card>
+                <h2 slot="title" class="register_title">Register</h2>
+                <!-- 实现注册的样式 -->
+                <Form
+                  ref="formValidate"
+                  :model="formValidate"
+                  :rules="ruleValidate"
+                  :label-width="300"
+                  inline
+                >
+                  <FormItem label="Name" prop="userName">
+                    <Input
+                      v-model="formValidate.userName"
+                      placeholder="Plase enter username"
+                      :class="{InputStyle: inputstyle}"
+                    ></Input>
+                  </FormItem>
+                  <FormItem label="Password" prop="password">
+                    <Input
+                      v-model="formValidate.password"
+                      placeholder="Plase enter password"
+                      :class="{InputStyle: inputstyle}"
+                    ></Input>
+                  </FormItem>
+                  <FormItem label="Job Title" prop="jobTitle">
+                    <Input
+                      v-model="formValidate.jobTitle"
+                      placeholder="Plase enter your job title"
+                      :class="{InputStyle: inputstyle}"
+                    ></Input>
+                  </FormItem>
+                  <FormItem label="E-mail" prop="email">
+                    <Input
+                      v-model="formValidate.email"
+                      placeholder="Plase enter your e-mail"
+                      :class="{InputStyle: inputstyle}"
+                    ></Input>
+                  </FormItem>
+                  <FormItem label="MobilePhone" prop="mobilePhone">
+                    <Input
+                      v-model="formValidate.mobilePhone"
+                      placeholder="Plase enter your mobilePhone"
+                      :class="{InputStyle: inputstyle}"
+                    ></Input>
+                  </FormItem>
+                  <FormItem label="Country" prop="country">
+                    <Input
+                      v-model="formValidate.country"
+                      placeholder="Plase enter your country"
+                      :class="{InputStyle: inputstyle}"
+                    ></Input>
+                  </FormItem>
+                  <FormItem label="CityName" prop="city">
+                    <Input
+                      v-model="formValidate.city"
+                      placeholder="Plase enter your city"
+                      :class="{InputStyle: inputstyle}"
+                    ></Input>
+                  </FormItem>
+                  <FormItem label="Organization" prop="organization">
+                    <Input
+                      v-model="formValidate.organization"
+                      placeholder="Plase enter your organization"
+                      :class="{InputStyle: inputstyle}"
+                    ></Input>
+                  </FormItem>
+                  <FormItem label="Direction" prop="direction">
+                    <Input
+                      v-model="formValidate.direction"
+                      placeholder="Plase enter your research direction"
+                      :class="{InputStyle: inputstyle}"
+                    ></Input>
+                  </FormItem>
+                  <FormItem label="HomePage" prop="homePage">
+                    <Input
+                      v-model="formValidate.homePage"
+                      placeholder="Plase enter your homepage url"
+                      :class="{InputStyle: inputstyle}"
+                    ></Input>
+                  </FormItem>
+                  <br>
+                  <FormItem label="Gender" prop="gender">
+                    <RadioGroup v-model="formValidate.gender">
+                      <Radio label="male">Male</Radio>
+                      <Radio label="female">Female</Radio>
+                    </RadioGroup>
+                  </FormItem>
+                  <br>
+                  <FormItem label="Avatar" prop="avatar">
+                    <div>
+                      <div class="demo-upload-list" v-if="avatar!=''">
+                        <template>
+                          <img v-bind:src="avatar">
+                          <div class="demo-upload-list-cover">
+                            <Icon type="ios-eye-outline" @click.native="handleView()"></Icon>
+                            <Icon type="ios-trash-outline" @click.native="handleRemove()"></Icon>
+                          </div>
+                        </template>
+                      </div>
+                      <div class="uploadBox">
+                        <Icon type="ios-camera" size="20" style="position:absolute;margin:18px;"></Icon>
+                        <input @change="uploadPhoto($event)" type="file" class="uploadAvatar">
+                      </div>
+                      <Modal title="View Image" v-model="visible">
+                        <img :src="avatar" v-if="visible" style="width: 100%">
+                      </Modal>
+                    </div>
+                  </FormItem>
+                  <FormItem label="Introduce" prop="introduction" style="width:80%">
+                    <Input
+                      v-model="formValidate.introduction"
+                      type="textarea"
+                      :autosize="{minRows: 2,maxRows: 5}"
+                      placeholder="Plase introduce yourself"
+                    ></Input>
+                  </FormItem>
+                  <FormItem>
+                    <Button type="primary" @click="handleSubmit('formValidate')">Submit</Button>
+                    <Button @click="handleReset('formValidate')" style="margin-left: 8px">Reset</Button>
+                  </FormItem>
+                </Form>
+                <!-- 注册样式结束 -->
+              </Card>
             </div>
-            </Col>
+          </Col>
         </Row>
-    </div>
+      </Content>
+      <Footer>Footer</Footer>
+    </Layout>
+    <!-- <app-header></app-header> -->
+  </div>
 </template>
 <script>
 export default {
@@ -192,7 +262,7 @@ export default {
         introduction: "",
         direction: "",
         homePage: "",
-        avatar:"",
+        avatar: ""
       },
       ruleValidate: {
         userName: [
@@ -314,20 +384,20 @@ export default {
           // params.append("direction", this.formValidate.direction);
           // params.append("homePage", this.formValidate.homePage);
           // params.append("avatar", this.formValidate.avatar);
-          var userJson={};
-          userJson["userName"]=this.formValidate.userName;
-          userJson["email"]=this.formValidate.email;
-          userJson["password"]=this.formValidate.password;
-          userJson["mobilePhone"]=this.formValidate.mobilePhone;
-          userJson["gender"]=this.formValidate.gender;
-          userJson["jobTitle"]=this.formValidate.jobTitle;
-          userJson["country"]=this.formValidate.country;
-          userJson["city"]=this.formValidate.city;
-          userJson["organization"]=this.formValidate.organization;
-          userJson["introduction"]=this.formValidate.introduction;
-          userJson["direction"]=this.formValidate.direction;
-          userJson["homePage"]=this.formValidate.homePage;
-          userJson["avatar"]=this.formValidate.avatar;
+          var userJson = {};
+          userJson["userName"] = this.formValidate.userName;
+          userJson["email"] = this.formValidate.email;
+          userJson["password"] = this.formValidate.password;
+          userJson["mobilePhone"] = this.formValidate.mobilePhone;
+          userJson["gender"] = this.formValidate.gender;
+          userJson["jobTitle"] = this.formValidate.jobTitle;
+          userJson["country"] = this.formValidate.country;
+          userJson["city"] = this.formValidate.city;
+          userJson["organization"] = this.formValidate.organization;
+          userJson["introduction"] = this.formValidate.introduction;
+          userJson["direction"] = this.formValidate.direction;
+          userJson["homePage"] = this.formValidate.homePage;
+          userJson["avatar"] = this.formValidate.avatar;
           this.axios
             .post(
               "http://localhost:8081/user/register",
@@ -339,8 +409,7 @@ export default {
                 this.$Message.success("Email has been used!");
               } else if (res.data == "MobilePhone") {
                 this.$Message.success("Phone number has been used!");
-              }
-              else{
+              } else {
                 this.$Message.success("Success!");
                 this.$router.push({ path: "/" });
               }
@@ -381,6 +450,10 @@ export default {
     },
     handleRemove() {
       this.$store.commit("uploadAvatar", "");
+    },
+    //点击图标片跳转到主页
+    goHome() {
+      this.$router.push({ name: "Home" });
     }
   }
 };

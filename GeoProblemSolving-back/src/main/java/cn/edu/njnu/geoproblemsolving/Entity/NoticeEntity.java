@@ -9,7 +9,7 @@ public class NoticeEntity {
 
     private String noticeId;
     private String recipientId;
-    private String type;
+    private String type;    //notice|reply|apply
     private JSONObject content;
     private String state;   //read|unread
     private String createTime;

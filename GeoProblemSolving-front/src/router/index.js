@@ -12,6 +12,7 @@ import Help from '@/components/NavigationContent/Help.vue'
 import Login from '@/components/UsersState/Login.vue'
 import Register from '@/components/UsersState/Register.vue'
 import PersonalPage from '@/components/UsersState/PersonalPage.vue'
+import Notifications from '@/components/UsersState/Notifications.vue'
 import chatUtil from '@/components/utils/chatroom.vue'
 import drawUtil from '@/components/utils/drawBoard.vue'
 import mapTool from '@/components/utils/mapTool.vue'
@@ -22,7 +23,6 @@ import projectList from '@/components/Projects/ProjectList.vue'
 Vue.use(Router)
 Vue.use(mavonEditor)
 
-import Notice from '@/components/utils/notice.vue'
 
 const routes = [{
   path: '/', name: 'Navigation', component: Navigation, children: [
@@ -37,6 +37,7 @@ const routes = [{
     { path: 'community/:id', name: 'Communityreply', component:Communityreply},
     { path: 'help', name: 'Help', component: Help },
     { path: 'personalPage', name: 'PersonalPage', component: PersonalPage },
+    { path: 'notifications', name: 'Notifications', component:Notifications},
   ]
 },
     { path: '/login', name: 'Login', component: Login },
@@ -44,7 +45,6 @@ const routes = [{
     { path: '/chat' ,name :'chatUtil',component: chatUtil},
     { path: '/draw', name: 'drawUtil', component:drawUtil},
     { path: '/map', name: 'mapTool', component:mapTool},
-    { path: '/notice', name: 'notice', component:Notice},
 ]
 export default new Router({
   routes,

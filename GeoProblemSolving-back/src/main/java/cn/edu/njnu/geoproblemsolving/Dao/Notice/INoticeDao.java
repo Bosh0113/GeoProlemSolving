@@ -2,6 +2,8 @@ package cn.edu.njnu.geoproblemsolving.Dao.Notice;
 
 import cn.edu.njnu.geoproblemsolving.Entity.NoticeEntity;
 
+import javax.servlet.http.HttpServletRequest;
+
 public interface INoticeDao {
 
     String saveNotice(NoticeEntity notice);
@@ -11,4 +13,6 @@ public interface INoticeDao {
     String deleteNotice(String noticeId);
 
     String updateRead(String noticeId);
+
+    String updateNotice(HttpServletRequest request);
 }

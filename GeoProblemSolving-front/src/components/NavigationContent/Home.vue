@@ -34,19 +34,21 @@ h1 {
   margin-top: 100px;
   margin-bottom: 100px;
   min-height: 200px;
-  background-color: aqua;
+  border: solid 0.5px aqua;
+  padding: 5px;
 }
 .single_feature_image {
   margin: 1%;
   width: 48%;
-
-  background-color: chartreuse;
+  border: solid 0.5px green;
+  padding: 5px;
 }
 .function_card {
-  height: 200px;
+  height: 215px;
   /* background-color: lightcoral; */
   border: 1px solid black;
   margin-top: 10%;
+  min-width: 300px;
 }
 .card_title {
   text-align: center;
@@ -78,14 +80,13 @@ img {
   font-size: 15px;
   font-weight: bold;
 }
-.panel{
-  width:100%;
-  height:500px;
-  display:inline-block;
-
+.panel {
+  width: 100%;
+  height: 500px;
+  display: inline-block;
 }
-.image{
-  background-image:"./../../assets/images/1.jpg"
+.image {
+  background-image: "./../../assets/images/1.jpg";
 }
 </style>
 <template>
@@ -203,7 +204,7 @@ export default {
   data() {
     return {
       // msg: "Welcome to Home",
-      imagelist:0,
+      imagelist: 0,
       image_index: 0,
       example_show_lists: [
         {

@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 @CrossOrigin(origins = "*",allowCredentials = "true")
 @RestController
@@ -28,9 +29,15 @@ public class NoticeController {
     }
 
     @RequestMapping(value = "/read",method = RequestMethod.GET)
-    public String updateNotice(@RequestParam("noticeId") String noticeId){
+    public String readNotice(@RequestParam("noticeId") String noticeId){
         NoticeDaoImpl noticeDao=new NoticeDaoImpl(mongoTemplate);
         return noticeDao.updateRead(noticeId);
+    }
+
+    @RequestMapping(value = "/update", produces = {"application/json;charset=UTF-8"}, method = RequestMethod.POST)
+    public String updateNotice(HttpServletRequest request){
+        NoticeDaoImpl noticeDao=new NoticeDaoImpl(mongoTemplate);
+        return noticeDao.updateNotice(request);
     }
 
     @RequestMapping(value = "/delete",method = RequestMethod.GET)

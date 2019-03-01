@@ -1,4 +1,4 @@
-<style>
+<style scoped>
 .detail {
   display: flex;
 }
@@ -22,6 +22,21 @@
   align-items: center;
   margin-bottom: 2.5%;
 }
+.addBtn,.removeBtn,.editBtn{
+  font-size:10px;
+}
+.addBtn:hover{
+  color:white;
+  background:#47cb89
+}
+.removeBtn:hover{
+  color:white;
+  background:#f16643;
+}
+.editBtn:hover{
+  color:white;
+  background:#2d8cf0
+}
 .title {
   height: 40px;
   line-height: 40px;
@@ -31,10 +46,9 @@
   border-bottom: 1px solid lightgray
 }
 .member-desc {
-  height: 80px;
-  /* width:100%; */
+  height: 60px;
+  margin:0 20px 0 10px;
   display: flex;
-  border: 1px dotted lightgray;
 }
 .manager-desc{
   height: 80px;
@@ -44,24 +58,25 @@
   border: 1px dotted lightgray;
 }
 .member-image {
-  width: 25%;
-  margin: 10px;
-  border: 1px dotted black;
+  max-width: 20%;
+  padding:5px;
 }
 .memebr-work {
-  width: 75%;
-  margin: 10px;
-  border: 1px dotted black;
-}
-.member-work {
-  padding: 10px;
-}
-.task {
-  height: 40px;
+  width: 70%;
+  margin: 0 20px;
 }
 .area {
-  height: 20px;
+  height: 30px;
+  display:flex;
+  align-items:center;
+
 }
+.task {
+  height: 30px;
+  display:flex;
+  align-items:center;
+}
+
 .util-panel {
   height: 200px;
   box-shadow: 5px 5px 3px 2px rgba(0, 0, 0, 0.3);
@@ -162,7 +177,7 @@
         </Steps>
       </Col>
       <Col span="4" offset="1" v-show="isSubProjectManager" style="margin-top:10px">
-        <Button type="info" @click="addModal = true">Add</Button>
+        <Button type="default" @click="addModal = true" icon="md-add" class="addBtn">Add</Button>
         <Modal
           width="600px"
           v-model="addModal"
@@ -185,11 +200,11 @@
             <textarea v-model="moduleDescription" style="width:400px" :rows="6"></textarea>
           </div>
         </Modal>
-        <Button type="error" @click="delModal = true">Delete</Button>
+        <Button type="default" @click="delModal = true" icon="md-remove" class="removeBtn">Remove</Button>
         <Modal v-model="delModal" title="delete task" @on-ok="delModule()" @on-cancel="cancel()">
           <p>Do you really want to delete this step?</p>
         </Modal>
-        <Button type="success" @click="editModalShow()">Edit</Button>
+        <Button type="default" @click="editModalShow()" icon="md-brush" class="editBtn">Edit</Button>
         <Modal
           v-model="editModal"
           title="update task"
@@ -234,19 +249,40 @@
         <Col :xs="8" :sm="7" :md="6" :lg="5" v-bind="this.participants">
           <div class="member_panel" :style="{height:sidebarHeight+'px'}">
             <div class="title">Participants</div>
-            <div class="manager-desc">
-              <div class="member-image">{{managerInfo.userName}}</div>
-              <div class="memebr-work">
-                <div class="area">{{managerInfo.organization}}</div>
-                <div class="task">{{managerInfo.jobTitle}}</div>
-              </div>
+            <div :style="{height:sidebarHeight-100+'px'}">
+
+            <div class="member-desc" v-for="(member,index) in participants" :key="member.index">
+              <template v-if="index==0">
+                <div class="member-image">
+                <img :src="member.avatar" style="width:auto;height:100%" @click="gotoWorkSpace(member.userId)"/>
+                </div>
+                <div class="memebr-work">
+                  <div class="area">
+                    <!-- <Tag>name</Tag> -->
+                    <span style="padding:0 5px;float:right">{{member.userName}}</span>
+                    </div>
+                  <div class="task">
+                      <!-- <Tag>organization</Tag> -->
+                      <span style="padding:0 5px">{{member.organization}}</span>
+                    </div>
+                </div>
+              </template>
+              <template v-else>
+                <div class="member-image">
+                <img :src="member.avatar" style="width:auto;height:100%" @click="gotoWorkSpace(member.userId)"/>
+                </div>
+                <div class="memebr-work">
+                  <div class="area">
+                    <!-- <Tag>name</Tag> -->
+                    <span style="padding:0 5px;float:right">{{member.userName}}</span>
+                    </div>
+                  <div class="task">
+                      <!-- <Tag>organization</Tag> -->
+                      <span style="padding:0 5px">{{member.organization}}</span>
+                    </div>
+                </div>
+              </template>
             </div>
-            <div class="member-desc" v-for="member in participants" :key="member.index">
-              <div class="member-image">{{member.userName}}</div>
-              <div class="memebr-work">
-                <div class="area">{{member.organization}}</div>
-                <div class="task">{{member.jobTitle}}</div>
-              </div>
             </div>
             <div
               class="member-invite"
@@ -305,7 +341,7 @@
           <div style>
             <h2 style="margin-bottom:5px">Description</h2>
             <hr style="margin-bottom:10px">
-            <div :style="{height:sidebarHeight-90+'px'}">{{subProjectInfo.description}}</div>
+            <div :style="{height:sidebarHeight-80+'px'}">{{subProjectInfo.description}}</div>
           </div>
           <div style="display:flex;align-items:center;justify-content:center;height:60px">
             <Button type="error" style="margin:auto">Quit this sub-project ?</Button>
@@ -736,28 +772,14 @@ export default {
           this.$route.params.id,
         type: "GET",
         async: false,
-        success: function(data) {
+        success: data => {
           if (data != "None") {
-            that.subProjectInfo = data[0];
-            
-            that.managerIdentity(that.subProjectInfo.managerId);
-            $.ajax({
-                url:
-                  "http://localhost:8081/user/inquiry" +
-                  "?key=" +
-                  "userId" +
-                  "&value=" +
-                  that.subProjectInfo.managerId,
-                type: "GET",
-                async: false,
-                success: function(data) {
-                  that.managerInfo = data;
-                }
-              });
-
-            that.memberIdentity(that.subProjectInfo["members"]);
-            let membersList = that.subProjectInfo["members"];
-            let manager = { userId: that.subProjectInfo["managerId"] };
+            let subProjectInfo = data[0];
+            this.$set(this,"subProjectInfo",subProjectInfo);
+            this.managerIdentity(subProjectInfo.managerId);
+            this.memberIdentity(subProjectInfo["members"]);
+            let membersList = subProjectInfo["members"];
+            let manager = { userId: subProjectInfo["managerId"] };
             membersList.unshift(manager);
             let participantsTemp = [];
             for (let i = 0; i < membersList.length; i++) {
@@ -1202,6 +1224,9 @@ export default {
         .catch(err => {
           this.$Message.error("Fail!");
         });
+    },
+    gotoWorkSpace(data){
+      this.$router.push({ name: "PersonalPage" });
     }
   }
 };

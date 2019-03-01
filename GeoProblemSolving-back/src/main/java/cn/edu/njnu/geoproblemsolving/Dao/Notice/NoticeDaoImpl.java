@@ -1,5 +1,6 @@
 package cn.edu.njnu.geoproblemsolving.Dao.Notice;
 
+import cn.edu.njnu.geoproblemsolving.Dao.Method.CommonMethod;
 import cn.edu.njnu.geoproblemsolving.Entity.NoticeEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -8,6 +9,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
@@ -62,6 +64,19 @@ public class NoticeDaoImpl implements INoticeDao{
             Query query=new Query(Criteria.where("noticeId").is(noticeId));
             Update update=new Update();
             update.set("state","read");
+            mongoTemplate.updateFirst(query,update,NoticeEntity.class);
+            return "Success";
+        }catch (Exception e){
+            return "Fail";
+        }
+    }
+
+    @Override
+    public String updateNotice(HttpServletRequest request){
+        try {
+            Query query=new Query(Criteria.where("noticeId").is(request.getParameter("noticeId")));
+            CommonMethod method=new CommonMethod();
+            Update update=method.setUpdate(request);
             mongoTemplate.updateFirst(query,update,NoticeEntity.class);
             return "Success";
         }catch (Exception e){
