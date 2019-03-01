@@ -30,21 +30,19 @@
           <template v-if="state=== false">
             <Menu mode="horizontal" theme="dark" @on-select="unlogin" style="z-index:0">
               <MenuItem name="login">
-                <span>Login</span>
+                <Icon type="md-log-in" size="25" title="Log in"></Icon>
               </MenuItem>
               <MenuItem name="register">
-                 <span>Sign up</span>
-                <!-- <Icon type="md-create" size="25" title="Register">Sign up</Icon> -->
+                <Icon type="md-create" size="25" title="Register"></Icon>
               </MenuItem>
             </Menu>
           </template>
           <template v-else>
-            <!-- <Menu mode="horizontal" theme="dark" @on-select="logged" style="z-index:0"> -->
-            <Menu mode="horizontal" theme="dark" style="z-index:0">
+            <Menu mode="horizontal" theme="dark" @on-select="logged" style="z-index:0">
               <MenuItem name="personalPage">
-                <!-- <MenuItem name="notification"> -->
-                  <!-- <div class="bottom"> -->
-                    <!-- <Poptip
+                <MenuItem name="notification">
+                  <div class="bottom">
+                    <Poptip
                       placement="bottom-end"
                       width="750"
                     >
@@ -68,39 +66,41 @@
                                   </span>
                                 </div>
                                 <div style="width:20%">
+                                  <!-- 绑定已阅的显示样式 -->
                                   <Button type="success" @click="allowJoin(single)"><Icon type="md-checkmark" /></Button>
                                   <Button type="warning" @click="disallowJoin"><Icon type="md-hand"  /></Button>
                                   <Button type="error" @click=""><Icon type="md-close" /></Button>
                                 </div>
+                                <!-- <span style="float:right;line-height:40px">{{single.createTime}}</span> -->
                               </div>
                             </TabPane>
                         </Tabs>
                         <br>
                         <Button>More</Button>
                       </div>
-                      </Poptip> -->
-                  <!-- </div> -->
-                <!-- </MenuItem> -->
-                <Dropdown @on-click="changeSelect" placement="bottom-start">
-                      <img
-                      v-bind:src="avatar"
-                      v-if="avatar!=''&&avatar!='undefined'"
-                      :title="userName"
-                      style="width:40px;height:40px;vertical-align:middle;"
-                    >
-                    <avatar
-                      :username="userName"
-                      :size="40"
-                      style="margin-top:10px"
-                      :title="userName"
-                      v-else
-                    ></avatar>
-                      <Icon type="md-arrow-dropdown" />
-                    <DropdownMenu slot="list" >
-                        <DropdownItem name="personalPage">User Space</DropdownItem>
-                        <DropdownItem name="userLogout">Log out</DropdownItem>
-                    </DropdownMenu>
-                </Dropdown>
+                      <!-- <div class="api" slot="content">
+                        111
+                      </div> -->
+                      <!-- <Badge :count="10" v-if="avatar!=''&&avatar!='undefined'"></Badge> -->
+                    </Poptip>
+                  </div>
+                </MenuItem>
+                <img
+                  v-bind:src="avatar"
+                  v-if="avatar!=''&&avatar!='undefined'"
+                  :title="userName"
+                  style="width:40px;height:40px;vertical-align:middle;"
+                >
+                <avatar
+                  :username="userName"
+                  :size="40"
+                  style="margin-top:10px"
+                  :title="userName"
+                  v-else
+                ></avatar>
+              </MenuItem>
+              <MenuItem name="userLogout">
+                <Icon type="md-log-out" size="25" title="Log out"></Icon>
               </MenuItem>
             </Menu>
           </template>
@@ -198,6 +198,9 @@ export default {
     };
   },
   created(){
+    // this.invicationList = [
+    //   {title:'一路走来，感谢有你'},{title:'新年快乐，龙马精神'},{title:'家庭和睦，事业有成'},{title:'健康美丽，开心久久'}
+    // ];
     if(this.$store.state.userId!=""){
       //获取到通知的总数并存储为vuex的变量
     this.getNotification();
@@ -223,6 +226,9 @@ export default {
     avatar() {
       return this.$store.state.avatar;
     },
+    // judgeShow(){
+    //   return messageStatus;
+    // }
   },
   methods: {
     turnContent(name) {
@@ -245,14 +251,14 @@ export default {
         this.$router.push({ name: "Register" });
       }
     },
-    // logged(name) {
-    //   if (name === "personalPage") {
-    //     this.$router.push({ name: "PersonalPage" });
-    //   } else if (name == "userLogout") {
-    //     this.$store.commit("userLogout");
-    //     this.$router.replace({ name: "Home" });
-    //   }
-    // },
+    logged(name) {
+      if (name === "personalPage") {
+        this.$router.push({ name: "PersonalPage" });
+      } else if (name == "userLogout") {
+        this.$store.commit("userLogout");
+        this.$router.replace({ name: "Home" });
+      }
+    },
     userLogout() {},
     // 获取到通知的数量
     getNotification(){
@@ -322,14 +328,13 @@ export default {
     disallowJoin(){
       alert("disallow")
     },
-    changeSelect(name){
-      if(name =="userLogout"){
-        this.$store.commit("userLogout");
-        this.$router.replace({ name: "Home" });
-      }else if (name =="personalPage") {
-        this.$router.push({ name: "PersonalPage" });
-      }
-    }
+    // judgeShow(state){
+    //   if(state=="read"){
+    //     return false
+    //   }else if(state=="unread"){
+    //     return true
+    //   }
+    // }
   }
 };
 </script>

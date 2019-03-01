@@ -22,39 +22,59 @@
   align-items: center;
   margin-bottom: 2.5%;
 }
+.addBtn,.removeBtn,.editBtn{
+  font-size:10px;
+}
+.addBtn:hover{
+  color:white;
+  background:#47cb89
+}
+.removeBtn:hover{
+  color:white;
+  background:#f16643;
+}
+.editBtn:hover{
+  color:white;
+  background:#2d8cf0
+}
 .title {
   height: 40px;
   line-height: 40px;
   text-align: center;
   font-size: 20px;
   font-weight: bold;
-  background-color: #2db7f5;
+  border-bottom: 1px solid lightgray
 }
 .member-desc {
-  height: 80px;
-  /* width:100%; */
+  height: 60px;
   display: flex;
-  border: 1px dotted lightgray;
+}
+.manager-desc{
+  height: 60px;
+  display: flex;
+  margin-top:10px;
 }
 .member-image {
-  width: 25%;
-  margin: 10px;
-  border: 1px dotted black;
+  max-width: 20%;
+  padding:5px;
 }
 .memebr-work {
-  width: 75%;
-  margin: 10px;
-  border: 1px dotted black;
-}
-.member-work {
-  padding: 10px;
-}
-.task {
-  height: 40px;
+  width: 70%;
+  margin-left:5px;
+  margin-right:5px;
 }
 .area {
-  height: 20px;
+  height: 30px;
+  display:flex;
+  align-items:center;
+
 }
+.task {
+  height: 30px;
+  display:flex;
+  align-items:center;
+}
+
 .util-panel {
   height: 200px;
   box-shadow: 5px 5px 3px 2px rgba(0, 0, 0, 0.3);
@@ -86,12 +106,12 @@
   border: 1px solid lightgray;
   transition: all 1s;
 }
-.member_panel:hover,
+/* .member_panel:hover,
 .resource:hover {
   box-shadow: 1px 1px 2px 2px rgba(0, 0, 0, 0.2);
   transform: scale(1.05);
   transition: all 1s;
-}
+} */
 .resource {
   transition: all 1s;
 }
@@ -105,7 +125,6 @@
 .singl_tool_style {
   padding: 10px;
 }
-/*  */
 .singl_tool_style span {
   display: flex;
   text-align: center;
@@ -132,23 +151,31 @@
   padding: 1px;
   margin: 1px;
 }
+.workspaceContent {
+  margin-left: 60px;
+}
 </style>
 <template>
   <div>
     <Row>
-      <Col span="18" offset="1">
-        <Steps :current="order" size="small">
+      <Col
+        span="18"
+        offset="1"
+        style="margin-top:10px;background-color:white;padding-top:20px;padding-bottom:20px"
+      >
+        <Steps :current="order">
+          <Step title="start" icon="ios-home" @click.native="showDetail(0)" :order="0"></Step>
           <Step
             v-for="(list,index) in moduleList"
-            :key="index"
-            @click.native="showDetail(index,list.Title,list.ModuleID)"
+            :key="index+1"
+            @click.native="showDetail(index+1)"
             :title="list.title"
-            :order="index"
+            :order="index+1"
           ></Step>
         </Steps>
       </Col>
-      <Col span="4" offset="1" v-show="isSubProjectManager">
-        <Button type="info" @click="addModal = true">Add</Button>
+      <Col span="4" offset="1" v-show="isSubProjectManager" style="margin-top:10px">
+        <Button type="default" @click="addModal = true" icon="md-add" class="addBtn">Add</Button>
         <Modal
           width="600px"
           v-model="addModal"
@@ -171,11 +198,11 @@
             <textarea v-model="moduleDescription" style="width:400px" :rows="6"></textarea>
           </div>
         </Modal>
-        <Button type="error" @click="delModal = true">Delete</Button>
+        <Button type="default" @click="delModal = true" icon="md-remove" class="removeBtn">Remove</Button>
         <Modal v-model="delModal" title="delete task" @on-ok="delModule()" @on-cancel="cancel()">
           <p>Do you really want to delete this step?</p>
         </Modal>
-        <Button type="success" @click="editModalShow()">Edit</Button>
+        <Button type="default" @click="editModalShow()" icon="md-brush" class="editBtn">Edit</Button>
         <Modal
           v-model="editModal"
           title="update task"
@@ -194,11 +221,7 @@
           <div class="editNodeStyle">
             <span style="width:10%">Type</span>
             <Select v-model="updateModuleType" style="width:400px" placeholder="please select type">
-              <Option
-                v-for="(item,index) in typeList"
-                :key="item.index"
-                :value="item"
-              >{{ item }}</Option>
+              <Option v-for="(item,index) in typeList" :key="item.index" :value="item">{{ item }}</Option>
             </Select>
           </div>
           <div class="editNodeStyle">
@@ -213,213 +236,397 @@
         </Modal>
       </Col>
     </Row>
-    <br>
-    <div v-if="moduleList.length>0">
-    <p style="margin:10px 5%;text-indent:25px">{{currentModule.description}}</p>
-    <Row>
-      <Col span="4" offset="1" v-bind="this.participants">
-        <div class="member_panel" :style="{maxHeight:sidebarHeight}">
-          <div class="title">Participants</div>
-          <div class="member-desc" v-for="member in participants" :key="member.index">
-            <div class="member-image">{{member.userName}}</div>
-            <div class="memebr-work">
-              <div class="area">{{member.organization}}</div>
-              <div class="task">{{member.jobTitle}}</div>
+    <div
+      v-if="moduleList.length <= 0 || currentModuleIndex == -1 || order == 0"
+      class="workspaceContent"
+    >
+      <!-- <h1>No module have been created!</h1> -->
+      <h1 style="margin-top: 0px;margin-bottom: 0px;">{{subProjectInfo.title}}</h1>
+      <hr>
+      <Row style="margin-top:20px">
+        <Col :xs="8" :sm="7" :md="6" :lg="5" v-bind="this.participants">
+          <div class="member_panel" :style="{height:sidebarHeight+'px'}">
+            <div class="title">Participants</div>
+            <div :style="{height:sidebarHeight-100+'px'}">
+            <div class="manager-desc" >
+              <!-- 如何调节图片自适应大小，晚上回来写 -->
+              <div class="member-image">
+                <img :src="managerInfo.avatar" style="width:auto;height:100%" @click="gotoWorkSpace(managerInfo.userId)"/>
+              </div>
+              <div class="memebr-work">
+                <div class="area">
+                  <Tag>username</Tag>
+                  <span style="padding:0 5px;float:right">{{managerInfo.userName}}</span>
+                  </div>
+                <div class="task">
+                    <Tag>organization</Tag>
+                    <span style="padding:0 5px">{{managerInfo.organization}}</span>
+                  </div>
+              </div>
+            </div>
+            <div class="member-desc" v-for="member in participants" :key="member.index">
+              <div class="member-image">{{managerInfo.avatar}}</div>
+              <div class="memebr-work">
+                <div class="area">{{managerInfo.userName}}</div>
+                <div class="task">{{managerInfo.organization}}</div>
+              </div>
+            </div>
+            </div>
+            <div
+              class="member-invite"
+              style="display:flex;justify-content:center;height:60px;align-items:center"
+            >
+              <Button
+                type="success"
+                style="text-align:center;width:100px"
+                @click="inviteMembersModalShow()"
+                v-if="isSubProjectManager"
+              >Invite</Button>
+              <Button
+                type="warning"
+                style="text-align:center;width:100px"
+                @click="quitModal=true"
+                v-else-if="isSubProjectMember"
+              >Quit</Button>
+              <Modal
+                v-model="quitModal"
+                width="400px"
+                title="Quit subProject"
+                @on-ok="quitSubProject()"
+                @on-cancel="cancel"
+              >
+                <h2>Are you sure to quit this subproject?</h2>
+              </Modal>
+              <Modal
+                v-model="inviteModal"
+                width="400px"
+                title="Invite group member join in the subProject"
+                @on-ok="inviteMembers"
+                @on-cancel="cancel"
+              >
+                <div>
+                  <p>Members:</p>
+                  <Tag
+                    v-for="participant in participants"
+                    :key="participant.index"
+                  >{{participant.userName}}</Tag>
+                  <p>Candidates:</p>
+                  <CheckboxGroup v-model="inviteList">
+                    <Checkbox
+                      v-for="candidate in this.candidates"
+                      :key="candidate.index"
+                      :label="candidate.userId"
+                    >
+                      <span>{{candidate.userName}}</span>
+                    </Checkbox>
+                  </CheckboxGroup>
+                </div>
+              </Modal>
             </div>
           </div>
-          <div
-            class="member-invite"
-            style="display:flex;justify-content:center;height:60px;align-items:center"
-          >
-            <Button
-              type="success"
-              style="text-align:center;width:100px"
-              @click="inviteMembersModalShow()"
-              v-if="isSubProjectManager"
-            >Invite</Button>
-            <Button
-              type="warning"
-              style="text-align:center;width:100px"
-              @click="quitModal=true"
-              v-else-if="isSubProjectMember"
-            >Quit</Button>
-            <Modal
-              v-model="quitModal"
-              width="400px"
-              title="Quit subProject"
-              @on-ok="quitSubProject()"
-              @on-cancel="cancel"
-            >
-            <h2>Are you sure to quit this subproject?</h2>
-            </Modal>
-            <Modal
-              v-model="inviteModal"
-              width="400px"
-              title="Invite group member join in the subProject"
-              @on-ok="inviteMembers"
-              @on-cancel="cancel"
-            >
-              <div>
-                <p>Members:</p>
-                <Tag v-for="participant in participants" :key="participant.index">{{participant.userName}}</Tag>
-                <p>Candidates:</p>
-                <CheckboxGroup v-model="inviteList">
-                  <Checkbox v-for="candidate in this.candidates" :key="candidate.index" :label="candidate.userId">
-                    <span>{{candidate.userName}}</span>
-                  </Checkbox>
-                </CheckboxGroup>
-              </div>
-            </Modal>
+        </Col>
+        <Col :xs="15" :sm="16" :md="17" :lg="18"  offset="1">
+          <div style>
+            <h2 style="margin-bottom:5px">Description</h2>
+            <hr style="margin-bottom:10px">
+            <div :style="{height:sidebarHeight-80+'px'}">{{subProjectInfo.description}}</div>
           </div>
-        </div>
-      </Col>
-      <Button type="success" @click="createTaskModalShow()" v-show="isSubProjectManager||isSubProjectMember">Create Task</Button>
-      <Col span="3" offset="1">
-      <template>
-        <h3>Todo</h3>
-        <draggable class="taskList" element="ul" :options="{group:'task'}" v-model="taskTodo"
-        @update="taskOrderUpdate(taskTodo,'todo')"
-        @add="taskOrderUpdate(taskTodo,'todo')"
-        @remove="taskOrderUpdate(taskTodo,'todo')">
-          <li v-for="(item,index) in taskTodo" class="taskItem">
-            <strong @click="editOneTask(index,taskTodo)" style="cursor: pointer;">{{item.taskName}}</strong>
-            <span style="float:right;margin-right:3px;cursor: pointer;" @click="taskRemove(index,taskTodo)">X</span>
-            <p>{{item.description}}</p>
-            </li>
-        </draggable>
-      </template>
-      </Col>
-      <Col span="3" offset="1">
-        <template>
-        <h3>Doing</h3>
-        <draggable class="taskList" element="ul" :options="{group:'task'}" v-model="taskDoing"
-        @update="taskOrderUpdate(taskDoing,'doing')"
-        @add="taskOrderUpdate(taskDoing,'doing')"
-        @remove="taskOrderUpdate(taskDoing,'doing')">
-          <li v-for="(item,index)  in taskDoing" class="taskItem">
-            <strong @click="editOneTask(index,taskDoing)" style="cursor: pointer;">{{item.taskName}}</strong>
-            <span style="float:right;margin-right:3px;cursor: pointer;" @click="taskRemove(index,taskDoing)">X</span>
-            <p>{{item.description}}</p>
-            </li>
-        </draggable>
-      </template>
-      </Col>
-      <Col span="3" offset="1">
-      <template>
-        <h3>Done</h3>
-        <draggable class="taskList" element="ul" :options="{group:'task'}" v-model="taskDone"
-        @update="taskOrderUpdate(taskDone,'done')"
-        @add="taskOrderUpdate(taskDone,'done')"
-        @remove="taskOrderUpdate(taskDone,'done')">
-          <li v-for="(item,index)  in taskDone" class="taskItem">
-            <strong @click="editOneTask(index,taskDone)" style="cursor: pointer;">{{item.taskName}}</strong>
-            <span style="float:right;margin-right:3px;cursor: pointer;" @click="taskRemove(index,taskDone)">X</span>
-            <p>{{item.description}}</p>
-            </li>
-        </draggable>
-      </template>
-      </Col>
-      <Col span="1" class="util-panel">
-        <div class="util-btn-group">
-          <Button type="info" class="util-btn" shape="circle">
-            <Icon type="md-contacts" size="20" class="util-btn-icon"/>
-          </Button>
-          <Button type="info" class="util-btn" shape="circle" @click="drawerOpen = true">
-            <Icon type="ios-albums" size="20" class="util-btn-icon"/>
-          </Button>
-          <Drawer :closable="false" v-model="drawerOpen" width="640" style="font-size:30px">
-            <h1>General Tools</h1>
-            <div class="tool-panel">
-              <div class="singl_tool_style">
-                <Icon type="md-analytics" size="60" @click.native="show" title="Modeling Tools"/>
-                <br>
-                <span style="display:flex;justify-content:center">11</span>
+          <div style="display:flex;align-items:center;justify-content:center;height:60px">
+            <Button type="error" style="margin:auto">Quit this sub-project ?</Button>
+          </div>
+        </Col>
+      </Row>
+    </div>
+    <div v-else class="workspaceContent">
+      <h2 style="margin-bottom: 0px;">{{currentModule.description}}</h2>
+      <hr>
+      <Row style="margin-top:20px">
+        <Col :xs="8" :sm="7" :md="6" :lg="5" v-bind="this.participants">
+          <div class="member_panel" :style="{height:sidebarHeight}">
+            <div class="title">Online Participants</div>
+            <div class="member-desc" v-for="member in participants" :key="member.index">
+              <div class="member-image">{{member.userName}}</div>
+              <div class="memebr-work">
+                <div class="area">{{member.organization}}</div>
+                <div class="task">{{member.jobTitle}}</div>
               </div>
+            </div>
+            <div
+              class="member-invite"
+              style="display:flex;justify-content:center;height:60px;align-items:center"
+            >
+              <Button
+                type="success"
+                style="text-align:center;width:100px"
+                @click="inviteMembersModalShow()"
+                v-if="isSubProjectManager"
+              >Invite</Button>
+              <Button
+                type="warning"
+                style="text-align:center;width:100px"
+                @click="quitModal=true"
+                v-else-if="isSubProjectMember"
+              >Quit</Button>
+              <Modal
+                v-model="quitModal"
+                width="400px"
+                title="Quit subProject"
+                @on-ok="quitSubProject()"
+                @on-cancel="cancel"
+              >
+                <h2>Are you sure to quit this subproject?</h2>
+              </Modal>
+              <Modal
+                v-model="inviteModal"
+                width="400px"
+                title="Invite group member join in the subProject"
+                @on-ok="inviteMembers"
+                @on-cancel="cancel"
+              >
+                <div>
+                  <p>Members:</p>
+                  <Tag
+                    v-for="participant in participants"
+                    :key="participant.index"
+                  >{{participant.userName}}</Tag>
+                  <p>Candidates:</p>
+                  <CheckboxGroup v-model="inviteList">
+                    <Checkbox
+                      v-for="candidate in this.candidates"
+                      :key="candidate.index"
+                      :label="candidate.userId"
+                    >
+                      <span>{{candidate.userName}}</span>
+                    </Checkbox>
+                  </CheckboxGroup>
+                </div>
+              </Modal>
+            </div>
+          </div>
+        </Col>
+        <Button
+          type="success"
+          @click="createTaskModalShow()"
+          v-show="isSubProjectManager||isSubProjectMember"
+        >Create Task</Button>
+        <Col span="3" offset="1">
+          <template>
+            <h3>Todo</h3>
+            <draggable
+              class="taskList"
+              element="ul"
+              :options="{group:'task'}"
+              v-model="taskTodo"
+              @update="taskOrderUpdate(taskTodo,'todo')"
+              @add="taskOrderUpdate(taskTodo,'todo')"
+              @remove="taskOrderUpdate(taskTodo,'todo')"
+            >
+              <li v-for="(item,index) in taskTodo" class="taskItem">
+                <strong
+                  @click="editOneTask(index,taskTodo)"
+                  style="cursor: pointer;"
+                >{{item.taskName}}</strong>
+                <span
+                  style="float:right;margin-right:3px;cursor: pointer;"
+                  @click="taskRemove(index,taskTodo)"
+                >X</span>
+                <p>{{item.description}}</p>
+              </li>
+            </draggable>
+          </template>
+        </Col>
+        <Col span="3" offset="1">
+          <template>
+            <h3>Doing</h3>
+            <draggable
+              class="taskList"
+              element="ul"
+              :options="{group:'task'}"
+              v-model="taskDoing"
+              @update="taskOrderUpdate(taskDoing,'doing')"
+              @add="taskOrderUpdate(taskDoing,'doing')"
+              @remove="taskOrderUpdate(taskDoing,'doing')"
+            >
+              <li v-for="(item,index)  in taskDoing" class="taskItem">
+                <strong
+                  @click="editOneTask(index,taskDoing)"
+                  style="cursor: pointer;"
+                >{{item.taskName}}</strong>
+                <span
+                  style="float:right;margin-right:3px;cursor: pointer;"
+                  @click="taskRemove(index,taskDoing)"
+                >X</span>
+                <p>{{item.description}}</p>
+              </li>
+            </draggable>
+          </template>
+        </Col>
+        <Col span="3" offset="1">
+          <template>
+            <h3>Done</h3>
+            <draggable
+              class="taskList"
+              element="ul"
+              :options="{group:'task'}"
+              v-model="taskDone"
+              @update="taskOrderUpdate(taskDone,'done')"
+              @add="taskOrderUpdate(taskDone,'done')"
+              @remove="taskOrderUpdate(taskDone,'done')"
+            >
+              <li v-for="(item,index)  in taskDone" class="taskItem">
+                <strong
+                  @click="editOneTask(index,taskDone)"
+                  style="cursor: pointer;"
+                >{{item.taskName}}</strong>
+                <span
+                  style="float:right;margin-right:3px;cursor: pointer;"
+                  @click="taskRemove(index,taskDone)"
+                >X</span>
+                <p>{{item.description}}</p>
+              </li>
+            </draggable>
+          </template>
+        </Col>
+        <Col span="1" class="util-panel">
+          <div class="util-btn-group">
+            <Button type="info" class="util-btn" shape="circle">
+              <Icon type="md-contacts" size="20" class="util-btn-icon"/>
+            </Button>
+            <Button type="info" class="util-btn" shape="circle" @click="drawerOpen = true">
+              <Icon type="ios-albums" size="20" class="util-btn-icon"/>
+            </Button>
+            <Drawer :closable="false" v-model="drawerOpen" width="640" style="font-size:30px">
+              <h1>General Tools</h1>
+              <div class="tool-panel">
+                <div class="singl_tool_style">
+                  <Icon type="md-analytics" size="60" @click.native="show" title="Modeling Tools"/>
+                  <br>
+                  <span style="display:flex;justify-content:center">11</span>
+                </div>
 
-              <Icon type="md-analytics" size="60" @click.native="show" title="Modeling Tools"/>
-              <Icon type="md-analytics" size="60" @click.native="show" title="Modeling Tools"/>
-            </div>
-            <hr>
-            <h1>Special Tools</h1>
-          </Drawer>
-        </div>
-      </Col>
-    </Row>
+                <Icon type="md-analytics" size="60" @click.native="show" title="Modeling Tools"/>
+                <Icon type="md-analytics" size="60" @click.native="show" title="Modeling Tools"/>
+              </div>
+              <hr>
+              <h1>Special Tools</h1>
+            </Drawer>
+          </div>
+        </Col>
+      </Row>
     </div>
-    <div v-else>
-      <h1>No module had been created!</h1>
-    </div>
-      <!-- createTaskModal -->
-      <Modal
-        v-model="createTaskModal"
-        title="Create task panel"
-        @on-ok="createTask()"
-        @on-cancel="cancel()"
-        width="800px">
-        <div class="taskFormItem">
-          <span style="width:30%">taskName</span>
-          <Input style="width: 300px" :placeholder="this.taskPlaceHolder.name" v-model="taskInfo.taskName"/>
-        </div>
-        <div class="whiteSpace"></div>
-        <div class="taskFormItem">
-          <span style="width:30%">description</span>
-          <Input style="width: 300px" :placeholder="this.taskPlaceHolder.description" type="textarea" :rows="4" v-model="taskInfo.description"/>
-        </div>
-        <div class="whiteSpace"></div>
-        <div class="taskFormItem">
-          <span style="width:30%">start Time</span>
-          <DatePicker type="datetime" :placeholder="this.taskPlaceHolder.startTime" style="width: 300px" v-model="taskInfo.startTime"></DatePicker>
-        </div>
-        <div class="whiteSpace"></div>
-        <div class="taskFormItem">
-          <span style="width:30%">end Time</span>
-          <DatePicker type="datetime" :placeholder="this.taskPlaceHolder.endTime"style="width: 300px" v-model="taskInfo.endTime"></DatePicker>
-        </div>
-        <div class="whiteSpace"></div>
-        <div class="taskFormItem">
-          <span style="width:30%">state</span>
-          <RadioGroup v-model="taskInfo.state" disabled>
-              <Radio label="todo"></Radio>
-              <Radio label="doing"></Radio>
-              <Radio label="done"></Radio>
-          </RadioGroup>
-        </div>
-      </Modal>
-      <Modal
-        v-model="editTaskModal"
-        title="Edit task panel"
-        @on-ok="updateTask()"
-        @on-cancel="cancel()"
-        width="800px">
-        <div class="taskFormItem">
-          <span style="width:30%">taskName</span>
-          <Input style="width: 300px" :placeholder="this.taskPlaceHolder.name" v-model="taskInfo.taskName"/>
-        </div>
-        <div class="whiteSpace"></div>
-        <div class="taskFormItem">
-          <span style="width:30%">description</span>
-          <Input style="width: 300px" :placeholder="this.taskPlaceHolder.description" type="textarea" :rows="4" v-model="taskInfo.description"/>
-        </div>
-        <div class="whiteSpace"></div>
-        <div class="taskFormItem">
-          <span style="width:30%">start Time</span>
-          <DatePicker type="datetime" :placeholder="this.taskPlaceHolder.startTime" style="width: 300px" v-model="taskInfo.startTime"></DatePicker>
-        </div>
-        <div class="whiteSpace"></div>
-        <div class="taskFormItem">
-          <span style="width:30%">end Time</span>
-          <DatePicker type="datetime" :placeholder="this.taskPlaceHolder.endTime"style="width: 300px" v-model="taskInfo.endTime"></DatePicker>
-        </div>
-        <div class="whiteSpace"></div>
-        <div class="taskFormItem">
-          <span style="width:30%">state</span>
-          <RadioGroup v-model="taskInfo.state" disabled>
-              <Radio label="todo"></Radio>
-              <Radio label="doing"></Radio>
-              <Radio label="done"></Radio>
-          </RadioGroup>
-        </div>
-      </Modal>
+    <!-- createTaskModal -->
+    <Modal
+      v-model="createTaskModal"
+      title="Create task panel"
+      @on-ok="createTask()"
+      @on-cancel="cancel()"
+      width="800px"
+    >
+      <div class="taskFormItem">
+        <span style="width:30%">taskName</span>
+        <Input
+          style="width: 300px"
+          :placeholder="this.taskPlaceHolder.name"
+          v-model="taskInfo.taskName"
+        />
+      </div>
+      <div class="whiteSpace"></div>
+      <div class="taskFormItem">
+        <span style="width:30%">description</span>
+        <Input
+          style="width: 300px"
+          :placeholder="this.taskPlaceHolder.description"
+          type="textarea"
+          :rows="4"
+          v-model="taskInfo.description"
+        />
+      </div>
+      <div class="whiteSpace"></div>
+      <div class="taskFormItem">
+        <span style="width:30%">start Time</span>
+        <DatePicker
+          type="datetime"
+          :placeholder="this.taskPlaceHolder.startTime"
+          style="width: 300px"
+          v-model="taskInfo.startTime"
+        ></DatePicker>
+      </div>
+      <div class="whiteSpace"></div>
+      <div class="taskFormItem">
+        <span style="width:30%">end Time</span>
+        <DatePicker
+          type="datetime"
+          :placeholder="this.taskPlaceHolder.endTime"
+          style="width: 300px"
+          v-model="taskInfo.endTime"
+        ></DatePicker>
+      </div>
+      <div class="whiteSpace"></div>
+      <div class="taskFormItem">
+        <span style="width:30%">state</span>
+        <RadioGroup v-model="taskInfo.state" disabled>
+          <Radio label="todo"></Radio>
+          <Radio label="doing"></Radio>
+          <Radio label="done"></Radio>
+        </RadioGroup>
+      </div>
+    </Modal>
+    <Modal
+      v-model="editTaskModal"
+      title="Edit task panel"
+      @on-ok="updateTask()"
+      @on-cancel="cancel()"
+      width="800px"
+    >
+      <div class="taskFormItem">
+        <span style="width:30%">taskName</span>
+        <Input
+          style="width: 300px"
+          :placeholder="this.taskPlaceHolder.name"
+          v-model="taskInfo.taskName"
+        />
+      </div>
+      <div class="whiteSpace"></div>
+      <div class="taskFormItem">
+        <span style="width:30%">description</span>
+        <Input
+          style="width: 300px"
+          :placeholder="this.taskPlaceHolder.description"
+          type="textarea"
+          :rows="4"
+          v-model="taskInfo.description"
+        />
+      </div>
+      <div class="whiteSpace"></div>
+      <div class="taskFormItem">
+        <span style="width:30%">start Time</span>
+        <DatePicker
+          type="datetime"
+          :placeholder="this.taskPlaceHolder.startTime"
+          style="width: 300px"
+          v-model="taskInfo.startTime"
+        ></DatePicker>
+      </div>
+      <div class="whiteSpace"></div>
+      <div class="taskFormItem">
+        <span style="width:30%">end Time</span>
+        <DatePicker
+          type="datetime"
+          :placeholder="this.taskPlaceHolder.endTime"
+          style="width: 300px"
+          v-model="taskInfo.endTime"
+        ></DatePicker>
+      </div>
+      <div class="whiteSpace"></div>
+      <div class="taskFormItem">
+        <span style="width:30%">state</span>
+        <RadioGroup v-model="taskInfo.state" disabled>
+          <Radio label="todo"></Radio>
+          <Radio label="doing"></Radio>
+          <Radio label="done"></Radio>
+        </RadioGroup>
+      </div>
+    </Modal>
   </div>
 </template>
 <script>
@@ -437,13 +644,16 @@ export default {
   },
   data() {
     return {
+      // info of subproject --by mzy
+      subProjectInfo: [],
       //登陆者身份
       isSubProjectManager: false, //为管理者
       isSubProjectMember: false, //为成员
       // 关于邀请的模态框
       inviteModal: false,
-      quitModal:false,
+      quitModal: false,
       sidebarHeight: "",
+      managerInfo:[],
       participants: [],
       candidates: [],
       inviteList: [],
@@ -460,7 +670,7 @@ export default {
       currentModule: {},
       //typeList是选择模块种类的列表，select从这里渲染
       typeList: [
-        "Preparatory",
+        "Preparation",
         "Analysis",
         "Modeling",
         "Simulation",
@@ -514,7 +724,7 @@ export default {
       if (!vm.$store.getters.userState) {
         next("/login");
       } else {
-        if (!(vm.isSubProjectManager|| vm.isSubProjectMember)) {
+        if (!(vm.isSubProjectManager || vm.isSubProjectMember)) {
           alert("No access");
           // next(`/project/${vm.$store.getters.currentProjectId}`);
           vm.$router.go(-1);
@@ -522,16 +732,26 @@ export default {
       }
     });
   },
+  mounted: function() {
+    window.addEventListener("resize", this.initSize);
+  },
+  beforeDestroy: function() {
+    window.removeEventListener("resize", this.initSize);
+  },
   methods: {
-    //初始化函数，作用是控制侧边栏的高度，设置右边通知栏弹出时候的距顶高度以及延迟的时间
-    init() {
+    initSize(){
       //侧边栏的高度随着屏幕的高度自适应
-      this.sidebarHeight = window.innerHeight - 60 + "px";
+      this.sidebarHeight = window.innerHeight - 250;
       //通知栏的属性设置，top表示距离顶部的距离，duration表示持续的时间
       this.$Notice.config({
         top: 50,
         duration: 2
       });
+    },
+    //初始化函数，作用是控制侧边栏的高度，设置右边通知栏弹出时候的距顶高度以及延迟的时间
+    init() {
+      this.initSize();
+      var that = this;
       $.ajax({
         url:
           "http://localhost:8081/subProject/inquiry" +
@@ -540,13 +760,28 @@ export default {
           this.$route.params.id,
         type: "GET",
         async: false,
-        success: data=> {
+        success: function(data) {
           if (data != "None") {
-            let subProjectInfo = data[0];
-            this.managerIdentity(subProjectInfo.managerId);
-            this.memberIdentity(subProjectInfo["members"]);
-            let membersList = subProjectInfo["members"];
-            let manager = { userId: subProjectInfo["managerId"] };
+            that.subProjectInfo = data[0];
+
+            that.managerIdentity(that.subProjectInfo.managerId);
+            $.ajax({
+                url:
+                  "http://localhost:8081/user/inquiry" +
+                  "?key=" +
+                  "userId" +
+                  "&value=" +
+                  that.subProjectInfo.managerId,
+                type: "GET",
+                async: false,
+                success: function(data) {
+                  that.managerInfo = data;
+                }
+              });
+
+            that.memberIdentity(that.subProjectInfo["members"]);
+            let membersList = that.subProjectInfo["members"];
+            let manager = { userId: that.subProjectInfo["managerId"] };
             membersList.unshift(manager);
             let participantsTemp = [];
             for (let i = 0; i < membersList.length; i++) {
@@ -564,7 +799,7 @@ export default {
                 }
               });
             }
-            this.$set(this, "participants", participantsTemp);
+            that.$set(this, "participants", participantsTemp);
           }
         },
         error: function(err) {
@@ -585,14 +820,21 @@ export default {
         }
       }
     },
-    showDetail(item, title, id) {
-      this.currentModuleIndex = item;
-      this.currentModule = this.moduleList[item];
-      // console.log(this.currentModule);
-      this.inquiryTask();
-      this.order = item;
-      let change = String(item);
-      this.taborder = change;
+    showDetail(item) {
+      if (item <= 0) {
+        this.order = item;
+        this.currentModuleIndex = item - 1;
+        let change = String(item);
+        this.taborder = change;
+      } else {
+        this.currentModuleIndex = item - 1;
+        this.currentModule = this.moduleList[this.currentModuleIndex];
+        // console.log(this.currentModule);
+        this.inquiryTask();
+        this.order = item;
+        let change = String(item);
+        this.taborder = change;
+      }
     },
     getAllModules() {
       //这里重写以下获取module
@@ -730,9 +972,9 @@ export default {
     },
     //加载并打开成员邀请Modal
     inviteMembersModalShow() {
-      let that=this;
-      this.candidates=[];
-      this.inviteList=[];
+      let that = this;
+      this.candidates = [];
+      this.inviteList = [];
       this.axios
         .get(
           "http://localhost:8081/project/inquiry" +
@@ -744,19 +986,19 @@ export default {
           if (res.data != "None" && res.data != "Fail") {
             let allMembers = res.data[0].members;
             $.ajax({
-                url:
-                  "http://localhost:8081/user/inquiry" +
-                  "?key=" +
-                  "userId" +
-                  "&value=" +
-                  res.data[0].managerId,
-                type: "GET",
-                async: false,
-                success: function(data) {
-                  let manager={"userName":data.userName,"userId":data.userId};
-                  allMembers.unshift(manager);
-                }
-              });
+              url:
+                "http://localhost:8081/user/inquiry" +
+                "?key=" +
+                "userId" +
+                "&value=" +
+                res.data[0].managerId,
+              type: "GET",
+              async: false,
+              success: function(data) {
+                let manager = { userName: data.userName, userId: data.userId };
+                allMembers.unshift(manager);
+              }
+            });
             for (let i = 0; i < allMembers.length; i++) {
               let exist = false;
               for (let j = 0; j < that.participants.length; j++) {
@@ -777,21 +1019,23 @@ export default {
           console.log(err.data);
         });
     },
-    inviteMembers(){
-      for(let i=0;i<this.inviteList.length;i++){
+    inviteMembers() {
+      for (let i = 0; i < this.inviteList.length; i++) {
         $.ajax({
           url:
-            "http://localhost:8081/subProject/join"+"?subProjectId="+this.$route.params.id+"&userId="+this.inviteList[i],
+            "http://localhost:8081/subProject/join" +
+            "?subProjectId=" +
+            this.$route.params.id +
+            "&userId=" +
+            this.inviteList[i],
           type: "GET",
           async: false,
-          success: data=> {
-            if(data=="Exist"){
+          success: data => {
+            if (data == "Exist") {
               this.$Message.error("Exist!");
-            }
-            else if(data=="None"){
+            } else if (data == "None") {
               this.$Message.error("None!");
-            }
-            else if(data=="Fail"){
+            } else if (data == "Fail") {
               this.$Message.error("Fail!");
             }
           }
@@ -799,19 +1043,27 @@ export default {
       }
       this.init();
     },
-    quitSubProject(){
+    quitSubProject() {
       this.axios
-      .get("http://localhost:8081/subProject/quit"+"?subProjectId="+this.$route.params.id+"&userId="+this.$store.state.userId)
-      .then(res=>{
-        if(res.data=="Success"){
-          let projectId=localStorage.getItem("projectId");
-          this.$router.push({ name:'ProjectDetail',params:{id:projectId} });
-        }
-        else{
-          this.$Message.error("Fail!");
-        }
-      })
-      .catch(err => {
+        .get(
+          "http://localhost:8081/subProject/quit" +
+            "?subProjectId=" +
+            this.$route.params.id +
+            "&userId=" +
+            this.$store.state.userId
+        )
+        .then(res => {
+          if (res.data == "Success") {
+            let projectId = localStorage.getItem("projectId");
+            this.$router.push({
+              name: "ProjectDetail",
+              params: { id: projectId }
+            });
+          } else {
+            this.$Message.error("Fail!");
+          }
+        })
+        .catch(err => {
           console.log(err.data);
         });
     },
@@ -974,6 +1226,9 @@ export default {
         .catch(err => {
           this.$Message.error("Fail!");
         });
+    },
+    gotoWorkSpace(data){
+      this.$router.push({ name: "PersonalPage" });
     }
   }
 };
