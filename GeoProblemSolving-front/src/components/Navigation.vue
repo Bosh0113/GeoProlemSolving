@@ -72,10 +72,11 @@ body{
           <template v-if="state=== false">
             <Menu mode="horizontal" theme="dark" @on-select="unlogin" style="z-index:0">
               <MenuItem name="login">
-                <Icon type="md-log-in" size="25" title="Log in"></Icon>
+                <span>Login</span>
               </MenuItem>
               <MenuItem name="register">
-                <Icon type="md-create" size="25" title="Register"></Icon>
+                 <span>Sign up</span>
+                <!-- <Icon type="md-create" size="25" title="Register">Sign up</Icon> -->
               </MenuItem>
             </Menu>
           </template>
@@ -87,22 +88,26 @@ body{
                 </Badge>
               </MenuItem>
               <MenuItem name="personalPage">
-                <img
-                  v-bind:src="avatar"
-                  v-if="avatar!=''&&avatar!='undefined'"
-                  :title="userName"
-                  style="width:40px;height:40px;vertical-align:middle;"
-                >
-                <avatar
-                  :username="userName"
-                  :size="40"
-                  style="margin-top:10px"
-                  :title="userName"
-                  v-else
-                ></avatar>
-              </MenuItem>
-              <MenuItem name="userLogout">
-                <Icon type="md-log-out" size="25" title="Log out"></Icon>
+                <Dropdown @on-click="changeSelect" placement="bottom-start">
+                      <img
+                      v-bind:src="avatar"
+                      v-if="avatar!=''&&avatar!='undefined'"
+                      :title="userName"
+                      style="width:40px;height:40px;vertical-align:middle;"
+                    >
+                    <avatar
+                      :username="userName"
+                      :size="40"
+                      style="margin-top:10px"
+                      :title="userName"
+                      v-else
+                    ></avatar>
+                      <Icon type="md-arrow-dropdown" />
+                    <DropdownMenu slot="list" >
+                        <DropdownItem name="personalPage">User Space</DropdownItem>
+                        <DropdownItem name="userLogout">Log out</DropdownItem>
+                    </DropdownMenu>
+                </Dropdown>
               </MenuItem>
             </Menu>
           </template>
@@ -171,18 +176,6 @@ export default {
         this.$router.push({ name: "Register" });
       }
     },
-    logged(name) {
-      if (name === "personalPage") {
-        this.$router.push({ name: "PersonalPage" });
-      } else if (name == "userLogout") {
-        this.onClose();
-        this.$store.commit("userLogout");
-        this.$router.replace({ name: "Home" });
-      }
-      else if(name==="notification"){
-        this.$router.push({ name: "Notifications" });
-      }
-    },
     // 获取到通知的数量
     getUnreadNoticeCount() {
       this.unreadNoticeCount=0;
@@ -242,6 +235,14 @@ export default {
       let newCount=this.unreadNoticeCount;
       if(newCount>0){
         this.unreadNoticeCount=newCount-1;
+      }
+    },
+    changeSelect(name){
+      if(name =="userLogout"){
+        this.$store.commit("userLogout");
+        this.$router.replace({ name: "Home" });
+      }else if (name =="personalPage") {
+        this.$router.push({ name: "PersonalPage" });
       }
     }
   }

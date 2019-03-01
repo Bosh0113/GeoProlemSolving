@@ -212,7 +212,7 @@
             >
               <Col span="11" offset="1">
                 <Card style="min-height:200px;">
-                  <p slot="title">{{mProject.title}}</p>
+                  <p slot="title" class="projectsTitle" @click="goSingleProject(mProject.projectId)">{{mProject.title}}</p>
                   <Button
                     type="primary"
                     slot="extra"
@@ -544,24 +544,6 @@ export default {
     };
   },
   methods: {
-    // 邀请他人加入的函数
-    // sendEmail() {
-    //   var emailData = new URLSearchParams();
-    //   emailData.append("email", "nnuxdw@163.com");
-    //   emailData.append("mailTitle", "opengms-invitation-card");
-    //   emailData.append(
-    //     "mailContent",
-    //     "this is my website , welcome to join us"
-    //   );
-    //   this.axios
-    //     .post("http://localhost:8082/Team/sendEmailServlet", emailData)
-    //     .then(res => {
-    //     })
-    //     .catch(err => {
-    //       console.log(err.data);
-    //     });
-    // },
-
     // 获取用户的详细信息
     getUserProfile() {
       this.axios
@@ -604,7 +586,6 @@ export default {
           // 打印用户所管理的项目
           // console.log(res.data);
           this.userManagerProjectList = res.data;
-          console.log("用户管理的项目列表:" + JSON.stringify(this.userManagerProjectList));
         })
         .catch(err => {});
     },
@@ -823,6 +804,14 @@ export default {
     //处理tag的测试函数
     deleteTag(index){
       this.editTags.splice(index, 1);
+    },
+    //点击跳转到指定项目的函数
+    goSingleProject(id) {
+      this.$router.push({name: 'ProjectDetail',params:{id:id} });
+    },
+    //获取个人上传的全部资源的函数
+    getUserFile(){
+
     }
   }
 };
@@ -842,11 +831,8 @@ body {
 }
 .sidebar {
   margin-top: 20px;
-  /* height: 650px; */
 }
 .username {
-  /* width: 20%; */
-  /* margin-left: 40%; */
   text-align: center;
   height: 30px;
   margin-bottom: 20px;
@@ -870,8 +856,6 @@ body {
 }
 .user-project {
   margin-top: 20px;
-  /* height: 650px; */
-  /* background-color:lightgray; */
 }
 .project-card {
   margin-top: 5%;
@@ -894,8 +878,6 @@ body {
 .editBtn {
   display: flex;
   align-items: center;
-  /* justify-content: center; */
-  /* text-align:center; */
   height: 40px;
 }
 /* 表示空格间距的 */
@@ -969,5 +951,10 @@ body {
   border-width: 0.75px;
   border-style: dashed;
   border-color: lightslategray;
+}
+/* 2-25 add 实现的效果是旋浮上去出现下划线且变红 */
+.projectsTitle:hover{
+  color:red;
+  cursor: pointer;
 }
 </style>

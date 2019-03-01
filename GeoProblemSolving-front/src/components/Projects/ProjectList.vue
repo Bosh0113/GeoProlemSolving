@@ -4,36 +4,41 @@
   <div>
     <Row>
       <Col span="22" offset="1">
-
         <div class="topPanel" style="margin-top:50px">
           <div style="width:80%">
-            <Input v-model="search" placeholder="Enter something to find project quickly" style="width: 100%" />
+            <Input
+              v-model="search"
+              placeholder="Enter something to find project quickly"
+              style="width: 100%"
+            />
           </div>
           <!-- <div class="topPanel" style="margin-top:50px;float:right;display:flex"> -->
+          <div
+            style="float:right;width:20%;magrin-left:80%;display:flex;justify-content:center"
+            class="operateBtnGroup"
+          >
+            <Button
+              router-link
+              :to="{path:'newproject'}"
+              type="default"
+              class="btnCreate"
+              style="margin-right:2.5%;font-size:15px"
+              icon="md-add"
+            >Create</Button>
+            <Button
+              type="default"
+              style="margin-right:2.5%;font-size:15px"
+              icon="md-person-add"
+              class="btnJoin"
+              @click="joinModal=true"
+            >Join</Button>
+          </div>
 
-            <div style="float:right;width:20%;magrin-left:80%;display:flex;justify-content:center">
-              <Button
-            router-link
-            :to="{path:'newproject'}"
-            type="success"
-            style="margin-right:2.5%"
-            title="create"
-            icon="md-add"
-          >Create</Button>
-           <Button
-            type="primary"
-            style="margin-right:2.5%"
-            title="join"
-            icon="md-person-add"
-            @click="joinModal=true"
-          >Join</Button>
-            </div>
-
-        <!-- </div> -->
+          <!-- </div> -->
         </div>
         <br>
-        <div class="Tabpane" >
-          <Tabs v-model="currentTab" @click.native="chooseCurrentType(currentTab)" >
+        <div class="Tabpane">
+          <Tabs v-model="currentTab" @click.native="chooseCurrentType(currentTab)">
             <TabPane label="Water" name="Water" icon="ios-water"></TabPane>
             <TabPane label="Soil" name="Soil" icon="md-grid"></TabPane>
             <TabPane label="Ecology" name="Ecology" icon="md-leaf"></TabPane>
@@ -44,30 +49,79 @@
         </div>
       </Col>
       <div class="ProjectList">
+        <div v-show="currentProjectList==''&&currentProjectsStatus==2">
+          <Col class="demo-spin-col" span="22" offset="1">
+            <Spin fix>
+                <Icon type="ios-loading" size = 100  class="demo-spin-icon-load" color="red"></Icon>
+                <div>Loading</div>
+            </Spin>
+          </Col>
+        </div>
+        <div v-show="currentProjectsStatus==0">
+          <Col span="22" offset="1">
+            <Card :bordered="false">
+            <!-- <p slot="title">No Projects in this category</p> -->
+            <div style="display:flex;justify-content:center">
+              <Icon type="md-alert" size=40  color="gray"/>
+            </div>
+            <br>
+            <div style="display:flex;justify-content:center">
+              <h2 style="text-align:center;width:50%">No projects in this category.</h2>
+            </div>
+            <br>
+            <div style="display:flex;justify-content:center">
+              <h4 style="text-align:center;width:50%;color:lightblue">you can click the button right top called create to add a new project. Enrich your description about the project to attract more people join in.</h4>
+            </div>
+
+            </Card>
+          </Col>
+        </div>
         <div v-for="(item,index) in filteredBlogs" :data="currentProjectList" :key="item.index">
           <!-- Card卡片用来承载工程的信息，包含title，img，以及一些基本信息 -->
           <!-- <Col span="6" offset="1" v-if="item.privacy=='Public'"> -->
-          <Col :xs="{ span: 21, offset: 1 }" :md="{ span: 11, offset: 1 }" :lg="{ span: 6, offset: 1 }" v-if="item.privacy=='Public'">
+          <Col
+            :xs="{ span: 21, offset: 1 }"
+            :md="{ span: 11, offset: 1 }"
+            :lg="{ span: 7, offset: 1 }"
+            v-if="item.privacy=='Public'"
+          >
             <Card style="height:auto;margin:20px 0 20px 0">
-              <div>
+              <p
+                slot="title"
+                @click="goSingleProject(item.projectId)"
+                class="projectTitle"
+              >{{item.title}}</p>
+              <!-- <a href="#" slot="extra" @click.prevent="changeLimit">
+                  <Icon type="md-heart" />
+              </a>-->
+              <!-- <div>
                 <h1 style="text-align:center;margin: 0 auto" @click="goSingleProject(item.projectId)" class="projectTitle">{{item.title}}</h1>
+              </div>-->
+              <div style="display:flex;align-items:center;height:60px">
+                <Tag color="primary">Description</Tag>
+                <p style="padding: 0 10px">{{item.description}}</p>
               </div>
-              <p style="height:auto;padding:0 40px 0 40px">{{item.description}}</p>
               <div style="height:300px;display:flex;justify-content:center">
                 <img :src="item.picture" v-if="item.picture!=''&&item.picture!='undefined'">
-                <avatar :username="item.title" :size="300" :title="item.title" :rounded="false" v-else></avatar>
+                <avatar
+                  :username="item.title"
+                  :size="300"
+                  :title="item.title"
+                  :rounded="false"
+                  v-else
+                ></avatar>
               </div>
               <div class="whitespace"></div>
               <div style="height:40px;align-items:center;display:flex;padding:0 20px 0 20px">
-                <span
-                  style="height:20px;width:45%;color:white;text-align:center;"
-                ><Tag color="primary">Creater</Tag></span>
+                <span style="height:20px;width:45%;color:white;text-align:center;">
+                  <Tag color="primary">Creater</Tag>
+                </span>
                 <span style="height:20px;margin-left:5%">{{item.creator}}</span>
               </div>
               <div style="height:40px;align-items:center;display:flex;padding:0 20px 0 20px">
-                <span
-                  style="height:20px;width:45%;color:white;text-align:center;"
-                ><Tag color="primary">Create time</Tag></span>
+                <span style="height:20px;width:45%;color:white;text-align:center;">
+                  <Tag color="primary">Create time</Tag>
+                </span>
                 <span style="height:20px;margin-left:5%">{{item.createTime}}</span>
               </div>
               <div class="whitespace"></div>
@@ -90,6 +144,25 @@
                   placeholder="Enter ProjectId you want to participate ..."
                   style="width: 400px"
                 >
+                  <div style="display:flex;align-items:center">
+                    <span style="margin-right:5%">ProjectId:</span>
+                    <input
+                      v-model="joinProjectId"
+                      placeholder="Enter ProjectId you want to participate ..."
+                      style="width: 400px"
+                    >
+                  </div>
+                </Modal>
+                <Modal
+                  v-model="quitModal"
+                  title="Quit Project"
+                  ok-text="Assure"
+                  cancel-text="cancel"
+                  @on-ok="quit(currentTab,index)"
+                  @on-cancel="cancel"
+                >
+                  <p>Once you exit the project, you will not be able to participate in the collaborative process, confirm the exit?</p>
+                </Modal>
               </div>
 
               </Modal>
@@ -126,6 +199,28 @@ img {
   text-decoration: underline;
   color: #c20c0c;
   cursor: pointer;
+}
+operateBtnGroup {
+  --btnSize: 15px;
+}
+.operateBtnGroup button {
+  font-size: 15px;
+  margin-left: 2.5%;
+}
+.operateBtnGroup button:hover {
+  font-size: var(--btnSize);
+}
+.btnCreate:hover {
+  background-color: #19be6b;
+  color: white;
+}
+.btnJoin:hover {
+  background-color: #57a3f3;
+  color: white;
+}
+/* Loading动画的特效 */
+.demo-spin-icon-load {
+  animation: ani-demo-spin 1s linear infinite;
 }
 </style>
 <script>
@@ -174,7 +269,8 @@ export default {
       currentProject: {},
       quitSubProject: {},
       //搜索的输入框
-      search: ""
+      search: "",
+      currentProjectsStatus: 2
     };
   },
   methods: {
@@ -219,9 +315,12 @@ export default {
         .then(res => {
           if (res.data === "None") {
             this.currentProjectList = [];
+            this.currentProjectsStatus = 0;
+            // this.$Message.info("There are no projects in this category");
           } else {
             let list = res.data;
             this.judgeMember(list);
+            this.currentProjectsStatus = 1;
           }
         })
         .catch(err => {
