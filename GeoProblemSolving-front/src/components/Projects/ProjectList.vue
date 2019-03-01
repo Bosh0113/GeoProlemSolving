@@ -52,27 +52,28 @@
         <div v-show="currentProjectList==''&&currentProjectsStatus==2">
           <Col class="demo-spin-col" span="22" offset="1">
             <Spin fix>
-                <Icon type="ios-loading" size = 100  class="demo-spin-icon-load" color="red"></Icon>
-                <div>Loading</div>
+              <Icon type="ios-loading" size="100" class="demo-spin-icon-load" color="lightblue"></Icon>
+              <div>Loading</div>
             </Spin>
           </Col>
         </div>
         <div v-show="currentProjectsStatus==0">
           <Col span="22" offset="1">
             <Card :bordered="false">
-            <!-- <p slot="title">No Projects in this category</p> -->
-            <div style="display:flex;justify-content:center">
-              <Icon type="md-alert" size=40  color="gray"/>
-            </div>
-            <br>
-            <div style="display:flex;justify-content:center">
-              <h2 style="text-align:center;width:50%">No projects in this category.</h2>
-            </div>
-            <br>
-            <div style="display:flex;justify-content:center">
-              <h4 style="text-align:center;width:50%;color:lightblue">you can click the button right top called create to add a new project. Enrich your description about the project to attract more people join in.</h4>
-            </div>
-
+              <!-- <p slot="title">No Projects in this category</p> -->
+              <div style="display:flex;justify-content:center">
+                <Icon type="md-alert" size="40" color="gray"/>
+              </div>
+              <br>
+              <div style="display:flex;justify-content:center">
+                <h2 style="text-align:center;width:50%">No projects in this category.</h2>
+              </div>
+              <br>
+              <div style="display:flex;justify-content:center">
+                <h4
+                  style="text-align:center;width:50%;color:lightblue"
+                >you can click the button right top called create to add a new project. Enrich your description about the project to attract more people join in.</h4>
+              </div>
             </Card>
           </Col>
         </div>
@@ -126,10 +127,20 @@
               </div>
               <div class="whitespace"></div>
               <div class="operateProject" style="display:flex;justify-content:center">
-                <Button type="success" v-show="item.isMember===false&&item.isManager===false" @click="joinApply(item)">Join</Button>
+                <Button
+                  type="success"
+                  v-show="item.isMember===false&&item.isManager===false"
+                  @click="joinApply(item)"
+                >Join</Button>
                 <br>
-                <Button type="error" v-show="item.isMember===true||item.isManager===true" @click="quitModalShow(item)" :id="item.projectId">Quit</Button>
-                <Modal
+                <Button
+                  type="error"
+                  v-show="item.isMember===true||item.isManager===true"
+                  @click="quitModalShow(item)"
+                  :id="item.projectId"
+                >Quit</Button>
+              </div>
+              <Modal
                 v-model="joinModal"
                 title="Join in project"
                 ok-text="Submit"
@@ -137,13 +148,13 @@
                 @on-ok="joinProject(currentTab)"
                 @on-cancel="cancel"
               >
-              <div style="display:flex;align-items:center">
-                <span style="margin-right:5%">ProjectId:</span>
-                <input
-                  v-model="joinProjectId"
-                  placeholder="Enter ProjectId you want to participate ..."
-                  style="width: 400px"
-                >
+                <div style="display:flex;align-items:center">
+                  <span style="margin-right:5%">ProjectId:</span>
+                  <input
+                    v-model="joinProjectId"
+                    placeholder="Enter ProjectId you want to participate ..."
+                    style="width: 400px"
+                  >
                   <div style="display:flex;align-items:center">
                     <span style="margin-right:5%">ProjectId:</span>
                     <input
@@ -152,19 +163,7 @@
                       style="width: 400px"
                     >
                   </div>
-                </Modal>
-                <Modal
-                  v-model="quitModal"
-                  title="Quit Project"
-                  ok-text="Assure"
-                  cancel-text="cancel"
-                  @on-ok="quit(currentTab,index)"
-                  @on-cancel="cancel"
-                >
-                  <p>Once you exit the project, you will not be able to participate in the collaborative process, confirm the exit?</p>
-                </Modal>
-              </div>
-
+                </div>
               </Modal>
               <Modal
                 v-model="quitModal"
@@ -176,8 +175,6 @@
               >
                 <p>Once you exit the project, you will not be able to participate in the collaborative process, confirm the exit?</p>
               </Modal>
-              </div>
-
             </Card>
           </Col>
         </div>
@@ -358,7 +355,9 @@ export default {
             }
           }
         })
-        .catch(err => {this.$Message.danger("Join fail");});
+        .catch(err => {
+          this.$Message.danger("Join fail");
+        });
     },
     quitModalShow(project) {
       this.quitModal = true;
@@ -382,7 +381,9 @@ export default {
             replyNotice["content"] = {
               title: "Quit your project",
               description:
-                "user "+this.$store.state.userName+" quit from your project: " +
+                "user " +
+                this.$store.state.userName +
+                " quit from your project: " +
                 this.quitSubProject.title +
                 " ."
             };
@@ -419,7 +420,7 @@ export default {
     // 判断是不是成员
     judgeMember(list) {
       //这样的话拿到了用户的id与name
-      let projectList=list;
+      let projectList = list;
       if (projectList.length != 0) {
         for (var i = 0, n = 0; i < projectList.length; i++) {
           $.ajax({
@@ -431,7 +432,7 @@ export default {
               projectList[i]["managerId"],
             type: "GET",
             async: false,
-            success: data=> {
+            success: data => {
               projectList[n++]["creator"] = data.userName;
             }
           });
@@ -455,7 +456,7 @@ export default {
             projectList[i]["isMember"] = false;
           }
         }
-        this.$set(this,"currentProjectList",projectList);
+        this.$set(this, "currentProjectList", projectList);
       }
     },
     //进入项目详情页面的函数
@@ -492,7 +493,7 @@ export default {
           data.title +
           " .",
         projectId: data.projectId,
-        projectTitle:data.title,
+        projectTitle: data.title,
         approve: "unknow"
       };
       this.axios

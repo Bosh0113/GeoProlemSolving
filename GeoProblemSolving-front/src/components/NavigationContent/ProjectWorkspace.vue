@@ -47,12 +47,8 @@
 }
 .member-desc {
   height: 60px;
+  margin:0 20px 0 10px;
   display: flex;
-}
-.manager-desc{
-  height: 60px;
-  display: flex;
-  margin-top:10px;
 }
 .member-image {
   max-width: 20%;
@@ -60,8 +56,7 @@
 }
 .memebr-work {
   width: 70%;
-  margin-left:5px;
-  margin-right:5px;
+  margin: 0 20px;
 }
 .area {
   height: 30px;
@@ -248,28 +243,38 @@
           <div class="member_panel" :style="{height:sidebarHeight+'px'}">
             <div class="title">Participants</div>
             <div :style="{height:sidebarHeight-100+'px'}">
-            <div class="manager-desc" >
-              <!-- 如何调节图片自适应大小，晚上回来写 -->
-              <div class="member-image">
-                <img :src="managerInfo.avatar" style="width:auto;height:100%" @click="gotoWorkSpace(managerInfo.userId)"/>
-              </div>
-              <div class="memebr-work">
-                <div class="area">
-                  <Tag>username</Tag>
-                  <span style="padding:0 5px;float:right">{{managerInfo.userName}}</span>
-                  </div>
-                <div class="task">
-                    <Tag>organization</Tag>
-                    <span style="padding:0 5px">{{managerInfo.organization}}</span>
-                  </div>
-              </div>
-            </div>
-            <div class="member-desc" v-for="member in participants" :key="member.index">
-              <div class="member-image">{{managerInfo.avatar}}</div>
-              <div class="memebr-work">
-                <div class="area">{{managerInfo.userName}}</div>
-                <div class="task">{{managerInfo.organization}}</div>
-              </div>
+
+            <div class="member-desc" v-for="(member,index) in participants" :key="member.index">
+              <template v-if="index==0">
+                <div class="member-image">
+                <img :src="member.avatar" style="width:auto;height:100%" @click="gotoWorkSpace(member.userId)"/>
+                </div>
+                <div class="memebr-work">
+                  <div class="area">
+                    <!-- <Tag>name</Tag> -->
+                    <span style="padding:0 5px;float:right">{{member.userName}}</span>
+                    </div>
+                  <div class="task">
+                      <!-- <Tag>organization</Tag> -->
+                      <span style="padding:0 5px">{{member.organization}}</span>
+                    </div>
+                </div>
+              </template>
+              <template v-else>
+                <div class="member-image">
+                <img :src="member.avatar" style="width:auto;height:100%" @click="gotoWorkSpace(member.userId)"/>
+                </div>
+                <div class="memebr-work">
+                  <div class="area">
+                    <!-- <Tag>name</Tag> -->
+                    <span style="padding:0 5px;float:right">{{member.userName}}</span>
+                    </div>
+                  <div class="task">
+                      <!-- <Tag>organization</Tag> -->
+                      <span style="padding:0 5px">{{member.organization}}</span>
+                    </div>
+                </div>
+              </template>
             </div>
             </div>
             <div
@@ -653,7 +658,6 @@ export default {
       inviteModal: false,
       quitModal: false,
       sidebarHeight: "",
-      managerInfo:[],
       participants: [],
       candidates: [],
       inviteList: [],
@@ -763,6 +767,7 @@ export default {
         success: data => {
           if (data != "None") {
             let subProjectInfo = data[0];
+            this.$set(this,"subProjectInfo",subProjectInfo);
             this.managerIdentity(subProjectInfo.managerId);
             this.memberIdentity(subProjectInfo["members"]);
             let membersList = subProjectInfo["members"];

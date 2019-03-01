@@ -176,6 +176,11 @@ export default {
         this.$router.push({ name: "Register" });
       }
     },
+    logged(name) {
+      if(name==="notification"){
+        this.$router.push({ name: "Notifications" });
+      }
+    },
     // 获取到通知的数量
     getUnreadNoticeCount() {
       this.unreadNoticeCount=0;
