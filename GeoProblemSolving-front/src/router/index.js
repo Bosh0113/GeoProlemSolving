@@ -12,7 +12,7 @@ import Help from '@/components/NavigationContent/Help.vue'
 import Login from '@/components/UsersState/Login.vue'
 import Register from '@/components/UsersState/Register.vue'
 import PersonalPage from '@/components/UsersState/PersonalPage.vue'
-import Notice from '@/components/UsersState/Notice.vue'
+import Notifications from '@/components/UsersState/Notifications.vue'
 import chatUtil from '@/components/utils/chatroom.vue'
 import drawUtil from '@/components/utils/drawBoard.vue'
 import mapTool from '@/components/utils/mapTool.vue'
@@ -37,7 +37,7 @@ const routes = [{
     { path: 'community/:id', name: 'Communityreply', component:Communityreply},
     { path: 'help', name: 'Help', component: Help },
     { path: 'personalPage', name: 'PersonalPage', component: PersonalPage },
-    { path: 'notice', name: 'Notice', component:Notice},
+    { path: 'notifications', name: 'Notifications', component:Notifications},
   ]
 },
     { path: '/login', name: 'Login', component: Login },

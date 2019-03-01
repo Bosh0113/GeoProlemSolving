@@ -1,4 +1,4 @@
-<style>
+<style scoped>
 .detail {
   display: flex;
 }
@@ -442,7 +442,7 @@ export default {
       isSubProjectMember: false, //为成员
       // 关于邀请的模态框
       inviteModal: false,
-      quitModal:false,
+      quitModal: false,
       sidebarHeight: "",
       participants: [],
       candidates: [],
@@ -514,7 +514,7 @@ export default {
       if (!vm.$store.getters.userState) {
         next("/login");
       } else {
-        if (!(vm.isSubProjectManager||vm.isSubProjectMember)) {
+        if (!(vm.isSubProjectManager || vm.isSubProjectMember)) {
           alert("No access");
           // next(`/project/${vm.$store.getters.currentProjectId}`);
           vm.$router.go(-1);
@@ -540,7 +540,7 @@ export default {
           this.$route.params.id,
         type: "GET",
         async: false,
-        success: data=> {
+        success: data => {
           if (data != "None") {
             let subProjectInfo = data[0];
             this.managerIdentity(subProjectInfo.managerId);
@@ -730,9 +730,9 @@ export default {
     },
     //加载并打开成员邀请Modal
     inviteMembersModalShow() {
-      let that=this;
-      this.candidates=[];
-      this.inviteList=[];
+      let that = this;
+      this.candidates = [];
+      this.inviteList = [];
       this.axios
         .get(
           "http://localhost:8081/project/inquiry" +
@@ -744,19 +744,19 @@ export default {
           if (res.data != "None" && res.data != "Fail") {
             let allMembers = res.data[0].members;
             $.ajax({
-                url:
-                  "http://localhost:8081/user/inquiry" +
-                  "?key=" +
-                  "userId" +
-                  "&value=" +
-                  res.data[0].managerId,
-                type: "GET",
-                async: false,
-                success: function(data) {
-                  let manager={"userName":data.userName,"userId":data.userId};
-                  allMembers.unshift(manager);
-                }
-              });
+              url:
+                "http://localhost:8081/user/inquiry" +
+                "?key=" +
+                "userId" +
+                "&value=" +
+                res.data[0].managerId,
+              type: "GET",
+              async: false,
+              success: function(data) {
+                let manager = { userName: data.userName, userId: data.userId };
+                allMembers.unshift(manager);
+              }
+            });
             for (let i = 0; i < allMembers.length; i++) {
               let exist = false;
               for (let j = 0; j < that.participants.length; j++) {
@@ -777,21 +777,23 @@ export default {
           console.log(err.data);
         });
     },
-    inviteMembers(){
-      for(let i=0;i<this.inviteList.length;i++){
+    inviteMembers() {
+      for (let i = 0; i < this.inviteList.length; i++) {
         $.ajax({
           url:
-            "http://localhost:8081/subProject/join"+"?subProjectId="+this.$route.params.id+"&userId="+this.inviteList[i],
+            "http://localhost:8081/subProject/join" +
+            "?subProjectId=" +
+            this.$route.params.id +
+            "&userId=" +
+            this.inviteList[i],
           type: "GET",
           async: false,
-          success: data=> {
-            if(data=="Exist"){
+          success: data => {
+            if (data == "Exist") {
               this.$Message.error("Exist!");
-            }
-            else if(data=="None"){
+            } else if (data == "None") {
               this.$Message.error("None!");
-            }
-            else if(data=="Fail"){
+            } else if (data == "Fail") {
               this.$Message.error("Fail!");
             }
           }
@@ -799,19 +801,27 @@ export default {
       }
       this.init();
     },
-    quitSubProject(){
+    quitSubProject() {
       this.axios
-      .get("http://localhost:8081/subProject/quit"+"?subProjectId="+this.$route.params.id+"&userId="+this.$store.state.userId)
-      .then(res=>{
-        if(res.data=="Success"){
-          let projectId=localStorage.getItem("projectId");
-          this.$router.push({ name:'ProjectDetail',params:{id:projectId} });
-        }
-        else{
-          this.$Message.error("Fail!");
-        }
-      })
-      .catch(err => {
+        .get(
+          "http://localhost:8081/subProject/quit" +
+            "?subProjectId=" +
+            this.$route.params.id +
+            "&userId=" +
+            this.$store.state.userId
+        )
+        .then(res => {
+          if (res.data == "Success") {
+            let projectId = localStorage.getItem("projectId");
+            this.$router.push({
+              name: "ProjectDetail",
+              params: { id: projectId }
+            });
+          } else {
+            this.$Message.error("Fail!");
+          }
+        })
+        .catch(err => {
           console.log(err.data);
         });
     },

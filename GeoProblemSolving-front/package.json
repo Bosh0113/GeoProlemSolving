@@ -12,7 +12,7 @@
   "dependencies": {
     "axios": "^0.18.0",
     "echarts": "^4.2.0-rc.2",
-    "iview": "^3.1.5",
+    "iview": "^3.2.2",
     "jquery": "^2.2.3",
     "mavon-editor": "^2.6.17",
     "muse-ui": "^3.0.1",

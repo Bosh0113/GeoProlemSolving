@@ -72,16 +72,15 @@
               </div>
               <div class="whitespace"></div>
               <div class="operateProject" style="display:flex;justify-content:center">
-                <Button type="success" v-show="item.isMember===false&&item.isManager===false" @click="submitJoin(item)">Join</Button>
-                <!-- <Button type="success" v-show="item.isMember===false&&item.isManager===false" @click="joinModal=true">Join</Button> -->
+                <Button type="success" v-show="item.isMember===false&&item.isManager===false" @click="joinApply(item)">Join</Button>
                 <br>
-                <Button type="error" v-show="item.isMember===true||item.isManager===true" @click="quitModalShow(item.projectId)" :id="item.projectId">Quit</Button>
+                <Button type="error" v-show="item.isMember===true||item.isManager===true" @click="quitModalShow(item)" :id="item.projectId">Quit</Button>
                 <Modal
                 v-model="joinModal"
                 title="Join in project"
                 ok-text="Submit"
                 cancel-text="Cancel"
-                @on-ok="join(currentTab)"
+                @on-ok="joinProject(currentTab)"
                 @on-cancel="cancel"
               >
               <div style="display:flex;align-items:center">
@@ -99,7 +98,7 @@
                 title="Quit Project"
                 ok-text="Assure"
                 cancel-text="cancel"
-                @on-ok="quit(currentTab,index)"
+                @on-ok="quitProject()"
                 @on-cancel="cancel"
               >
                 <p>Once you exit the project, you will not be able to participate in the collaborative process, confirm the exit?</p>
@@ -123,9 +122,9 @@ img {
   height: 20px;
 }
 /* title标题悬浮时出现下划线且变色 */
-.projectTitle:hover{
-  text-decoration:underline;
-  color: #C20C0C;
+.projectTitle:hover {
+  text-decoration: underline;
+  color: #c20c0c;
   cursor: pointer;
 }
 </style>
@@ -137,17 +136,17 @@ export default {
     let initObject = { key: "category", value: "Water" };
     this.getSpecificTypeProjects(initObject);
   },
-  computed:{
-  //   filteredBlogs:function(){
-  //   return this.blogs.filter((blog)=>{
-  //     return blog.title.match(this.search);
-  //   })
-  // },
-  filteredBlogs:function(){
-    return this.currentProjectList.filter((item)=>{
-      return item.title.match(this.search);
-    })
-  }
+  computed: {
+    //   filteredBlogs:function(){
+    //   return this.blogs.filter((blog)=>{
+    //     return blog.title.match(this.search);
+    //   })
+    // },
+    filteredBlogs: function() {
+      return this.currentProjectList.filter(item => {
+        return item.title.match(this.search);
+      });
+    }
   },
   mounted() {},
   components: {
@@ -166,8 +165,6 @@ export default {
       joinShow: false,
       isMember: false,
       isManager: false,
-      // 输入id的input框是否显示
-      inputIdShow: false,
       // join按钮点击后模态框
       joinModal: false,
       //quit按钮点击后弹出的模态框
@@ -175,15 +172,14 @@ export default {
       //加入项目的Id号
       joinProjectId: "",
       currentProject: {},
-      quitSubProjectId: "",
+      quitSubProject: {},
       //搜索的输入框
-      search:"",
+      search: ""
     };
   },
   methods: {
     //该方法负责将选中的类别传递给显示的div
     chooseCurrentType(data) {
-      // console.log(data);
       switch (data) {
         case "Water":
           let waterObject = { key: "category", value: "Water" };
@@ -211,9 +207,6 @@ export default {
           break;
       }
     },
-    joinProject(projectId) {
-      this.inputIdShow = true;
-    },
     getSpecificTypeProjects(data) {
       this.axios
         .get(
@@ -229,7 +222,6 @@ export default {
           } else {
             let list = res.data;
             this.judgeMember(list);
-            let projectsInfo=this.currentProjectList;
           }
         })
         .catch(err => {
@@ -238,8 +230,7 @@ export default {
       return this.currentProjectList;
     },
     //项目成员的id和name都要加进去
-    join(tab) {
-      console.log(tab);
+    joinProject(tab) {
       this.axios
         .get(
           "http://localhost:8081/project/join?" +
@@ -249,7 +240,6 @@ export default {
             this.$store.state.userId
         )
         .then(res => {
-          // console.log("结果是："+res.data);
           if (res.data === "Success") {
             this.$Message.info("Join success");
             let initObject = { key: "category", value: "Water" };
@@ -269,25 +259,46 @@ export default {
             }
           }
         })
-        .catch(err => {});
+        .catch(err => {this.$Message.danger("Join fail");});
     },
-    quitModalShow(data) {
+    quitModalShow(project) {
       this.quitModal = true;
-      this.quitSubProjectId = data;
+      this.quitSubProject = project;
     },
-    quit(tab, index) {
+    quitProject() {
       this.axios
         .get(
           "http://localhost:8081/project/quit?" +
             "projectId=" +
-            this.quitSubProjectId +
+            this.quitSubProject.projectId +
             "&userId=" +
             this.$store.state.userId
         )
         .then(res => {
-          // console.log(res.data);
           if (res.data === "Success") {
             this.$Message.info("Quit successfully");
+            let replyNotice = {};
+            replyNotice["recipientId"] = this.quitSubProject.managerId;
+            replyNotice["type"] = "notice";
+            replyNotice["content"] = {
+              title: "Quit your project",
+              description:
+                "user "+this.$store.state.userName+" quit from your project: " +
+                this.quitSubProject.title +
+                " ."
+            };
+            this.axios
+              .post("http://localhost:8081/notice/save", replyNotice)
+              .then(result => {
+                if (result.data == "Success") {
+                  this.$emit("sendNotice", this.quitSubProject.managerId);
+                } else {
+                  this.$Message.danger("reply fail.");
+                }
+              })
+              .catch(err => {
+                this.$Message.danger("reply fail.");
+              });
           } else {
             this.$Message.danger("Fail");
           }
@@ -300,8 +311,6 @@ export default {
       this.$Message.info("Clicked cancel");
     },
     joinRequest(data) {
-      // console.log(data.length);
-      // console.log(this.currentProject);
       for (var i = 0; i < data.length; i++) {
         if (data[i].userId === this.$store.state.userId) {
           this.currentProject["isMember"] = true;
@@ -309,83 +318,93 @@ export default {
       }
     },
     // 判断是不是成员
-    judgeMember(data) {
+    judgeMember(list) {
       //这样的话拿到了用户的id与name
-      var that = this;
-      if (data.length != 0) {
-        that.currentProjectList = data;
-        for (var i = 0, n = 0; i < that.currentProjectList.length; i++) {
-            $.ajax({
-              url:"http://localhost:8081/user/inquiry" +
-                "?key=" +
-                "userId" +
-                "&value=" +
-                that.currentProjectList[i]["managerId"],
-                type:"GET",
-                async:false,
-                success:function(data){
-                  that.currentProjectList[n++]["creator"] =data.userName;
-                }
-            })
-          let _creater = that.currentProjectList[i].managerId;
-          let _member = that.currentProjectList[i].members;
-          if (_creater == this.$store.state.userId) {
-            that.currentProjectList[i]["isManager"] = true;
+      let projectList=list;
+      if (projectList.length != 0) {
+        for (var i = 0, n = 0; i < projectList.length; i++) {
+          $.ajax({
+            url:
+              "http://localhost:8081/user/inquiry" +
+              "?key=" +
+              "userId" +
+              "&value=" +
+              projectList[i]["managerId"],
+            type: "GET",
+            async: false,
+            success: data=> {
+              projectList[n++]["creator"] = data.userName;
+            }
+          });
+          let managerId = projectList[i].managerId;
+          let members = projectList[i].members;
+          if (managerId == this.$store.state.userId) {
+            projectList[i]["isManager"] = true;
           } else {
-            that.currentProjectList[i]["isManager"] = false;
+            projectList[i]["isManager"] = false;
           }
-          if (_member.length != 0) {
-            for (var j = 0; j < _member.length; j++) {
-              if (_member[j].userId == this.$store.state.userId) {
-                that.currentProjectList[i]["isMember"] = true;
+          if (members.length != 0) {
+            for (var j = 0; j < members.length; j++) {
+              if (members[j].userId == this.$store.state.userId) {
+                projectList[i]["isMember"] = true;
+                break;
               } else {
-                that.currentProjectList[i]["isMember"] = false;
+                projectList[i]["isMember"] = false;
               }
             }
           } else {
-            that.currentProjectList[i]["isMember"] = false;
+            projectList[i]["isMember"] = false;
           }
         }
+        this.$set(this,"currentProjectList",projectList);
       }
     },
     //进入项目详情页面的函数
     goSingleProject(id) {
-      let isManager,isMember;
-
-      for (let i = 0; i<this.currentProjectList.length;i++){
-        if(this.currentProjectList[i]["projectId"] === id){
+      let isManager, isMember;
+      for (let i = 0; i < this.currentProjectList.length; i++) {
+        if (this.currentProjectList[i]["projectId"] === id) {
           isManager = this.currentProjectList[i]["isManager"];
           isMember = this.currentProjectList[i]["isMember"];
         }
       }
-      if (this.$store.getters.userState){
-        if ( isManager || isMember){
+      if (this.$store.getters.userState) {
+        if (isManager || isMember) {
           this.$router.push({ path: `project/${id}` });
-        }
-        else{
+        } else {
           alert("No access.");
         }
-      }
-      else{
-        this.$router.push({path:'/login'});
+      } else {
+        this.$router.push({ path: "/login" });
       }
     },
-    submitJoin(data){
-      // console.log("点击的项目id是："+ data.projectId);
+    joinApply(data) {
       let joinForm = {};
       joinForm["recipientId"] = data.managerId;
-      joinForm["type"] = "Join application";
-      joinForm["content"] = {"userName":this.$store.state.userName,"title":data.title,"userId":this.$store.state.userId,"projectId":data.projectId};
-      // console.log(joinForm);
-      this.axios.post("http://localhost:8081/notice/save", joinForm)
-      .then(res=> {
-        this.$Message.info("Apply Successfully");
-        this.$emit('sendNotice',data.managerId)
-      })
-      .catch(err=> {
-        console.log("申请失败的原因是："+ err.data);
-
-      })
+      joinForm["type"] = "apply";
+      joinForm["content"] = {
+        userName: this.$store.state.userName,
+        userId: this.$store.state.userId,
+        title: "Group application",
+        description:
+          "User " +
+          this.$store.state.userName +
+          " apply to join in your project: " +
+          data.title +
+          " .",
+        projectId: data.projectId,
+        projectTitle:data.title,
+        approve: "unknow"
+      };
+      this.axios
+        .post("http://localhost:8081/notice/save", joinForm)
+        .then(res => {
+          this.$Message.info("Apply Successfully");
+          this.$emit("sendNotice", data.managerId);
+        })
+        .catch(err => {
+          console.log("申请失败的原因是：" + err.data);
+        });
     }
   }
 };

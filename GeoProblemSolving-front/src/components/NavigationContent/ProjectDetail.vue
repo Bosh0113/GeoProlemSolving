@@ -743,7 +743,6 @@ export default {
     },
     editSubProject() {
       this.editSubProjectModal = false;
-      let editSubProjectObject = {};
       let obj = new URLSearchParams();
       obj.append(
         "subProjectId",

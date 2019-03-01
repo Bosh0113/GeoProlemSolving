@@ -110,7 +110,7 @@ body{
       </div>
     </div>
     <div class="content">
-      <router-view @sendNotice="sendMessage"></router-view>
+      <router-view @sendNotice="sendMessage" @readNotification="readNotification"></router-view>
     </div>
   </div>
 </template>
@@ -134,7 +134,7 @@ export default {
     }
   },
   updated(){
-    $('sup').css("margin-top","20px");
+    $('.userState sup').css("margin-top","20px");
   },
   components: {
     Avatar
@@ -180,7 +180,7 @@ export default {
         this.$router.replace({ name: "Home" });
       }
       else if(name==="notification"){
-        this.$router.push({ name: "Notice" });
+        this.$router.push({ name: "Notifications" });
       }
     },
     // 获取到通知的数量
@@ -237,6 +237,12 @@ export default {
     },
     sendMessage(recipientId) {
       this.noticeSocket.send(recipientId);
+    },
+    readNotification(){
+      let newCount=this.unreadNoticeCount;
+      if(newCount>0){
+        this.unreadNoticeCount=newCount-1;
+      }
     }
   }
 };
