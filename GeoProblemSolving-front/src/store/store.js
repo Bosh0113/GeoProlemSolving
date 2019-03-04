@@ -8,9 +8,9 @@ export default new Vuex.Store({
         //data
         userState: false,
         userName: "visitor",
-        userId:"",
+        userId: "",
         avatar: '',
-        projectImg:''
+        projectImg: ''
     },
     getters: {
         userState: state => {
@@ -19,7 +19,7 @@ export default new Vuex.Store({
         userName: state => {
             return state.userName;
         },
-        userId: state =>{
+        userId: state => {
             return state.userId;
         }
     },
@@ -41,7 +41,6 @@ export default new Vuex.Store({
             localStorage.setItem('userName', data.userName);
             localStorage.setItem('avatar', data.avatar);
             localStorage.setItem('userId', data.userId);
-
         },
         userLogout: (state) => {
             state.userState = false;
