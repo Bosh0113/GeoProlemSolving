@@ -687,7 +687,6 @@ export default {
       //编辑的模态框
       editModal: false,
       order: 0,
-      taborder: 0,
       // chart适用
       chart: new FlowChart(),
       //现在点击的module
@@ -833,20 +832,25 @@ export default {
       }
     },
     showDetail(item) {
+      closeModuleSocket();
+
       if (item <= 0) {
         this.order = item;
         this.currentModuleIndex = item - 1;
-        let change = String(item);
-        this.taborder = change;
       } else {
         this.currentModuleIndex = item - 1;
         this.currentModule = this.moduleList[this.currentModuleIndex];
         // console.log(this.currentModule);
         this.inquiryTask();
         this.order = item;
-        let change = String(item);
-        this.taborder = change;
+        openModuleSocket(this.currentModule.moduleId);
       }
+    },
+    closeModuleSocket(){
+
+    },
+    openModuleSocket(id){
+
     },
     getAllModules() {
       //这里重写以下获取module
