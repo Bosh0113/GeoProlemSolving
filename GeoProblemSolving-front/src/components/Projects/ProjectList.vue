@@ -1,3 +1,41 @@
+<style>
+img {
+  /* padding:10px; */
+  max-width: 100%;
+  max-height: 100%;
+}
+.whitespace {
+  height: 20px;
+}
+/* title标题悬浮时出现下划线且变色 */
+.projectTitle:hover {
+  text-decoration: underline;
+  color: #c20c0c;
+  cursor: pointer;
+}
+operateBtnGroup {
+  --btnSize: 15px;
+}
+.operateBtnGroup button {
+  font-size: 15px;
+  margin-left: 2.5%;
+}
+.operateBtnGroup button:hover {
+  font-size: var(--btnSize);
+}
+.btnCreate:hover {
+  background-color: #19be6b;
+  color: white;
+}
+.btnJoin:hover {
+  background-color: #57a3f3;
+  color: white;
+}
+/* Loading动画的特效 */
+.demo-spin-icon-load {
+  animation: ani-demo-spin 1s linear infinite;
+}
+</style>
 <template>
   <!-- tab栏分页 -->
   <!-- 外层div -->
@@ -78,8 +116,6 @@
           </Col>
         </div>
         <div v-for="(item,index) in filteredBlogs" :data="currentProjectList" :key="item.index">
-          <!-- Card卡片用来承载工程的信息，包含title，img，以及一些基本信息 -->
-          <!-- <Col span="6" offset="1" v-if="item.privacy=='Public'"> -->
           <Col
             :xs="{ span: 21, offset: 1 }"
             :md="{ span: 11, offset: 1 }"
@@ -176,44 +212,6 @@
     </Row>
   </div>
 </template>
-<style>
-img {
-  /* padding:10px; */
-  max-width: 100%;
-  max-height: 100%;
-}
-.whitespace {
-  height: 20px;
-}
-/* title标题悬浮时出现下划线且变色 */
-.projectTitle:hover {
-  text-decoration: underline;
-  color: #c20c0c;
-  cursor: pointer;
-}
-operateBtnGroup {
-  --btnSize: 15px;
-}
-.operateBtnGroup button {
-  font-size: 15px;
-  margin-left: 2.5%;
-}
-.operateBtnGroup button:hover {
-  font-size: var(--btnSize);
-}
-.btnCreate:hover {
-  background-color: #19be6b;
-  color: white;
-}
-.btnJoin:hover {
-  background-color: #57a3f3;
-  color: white;
-}
-/* Loading动画的特效 */
-.demo-spin-icon-load {
-  animation: ani-demo-spin 1s linear infinite;
-}
-</style>
 <script>
 import Avatar from "vue-avatar";
 export default {
