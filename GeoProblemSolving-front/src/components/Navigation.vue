@@ -43,7 +43,7 @@ body{
 <template>
   <div class="mainPart">
     <div class="header">
-      <img src="@/assets/OGMS.png" id="logo" class="pic">
+      <img src="@/assets/images/OGMS.png" id="logo" class="pic">
       <div class="navPart">
         <Menu
           mode="horizontal"

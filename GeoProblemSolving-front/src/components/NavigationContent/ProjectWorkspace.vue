@@ -22,20 +22,26 @@
   align-items: center;
   margin-bottom: 2.5%;
 }
-.addBtn,.removeBtn,.editBtn{
-  font-size:10px;
+.addBtn,
+.removeBtn,
+.editBtn .createTaskBtn {
+  font-size: 10px;
 }
-.addBtn:hover{
-  color:white;
-  background:#47cb89
+.addBtn:hover {
+  color: white;
+  background: #47cb89;
 }
-.removeBtn:hover{
-  color:white;
-  background:#f16643;
+.removeBtn:hover {
+  color: white;
+  background: #f16643;
 }
-.editBtn:hover{
-  color:white;
-  background:#2d8cf0
+.editBtn:hover {
+  color: white;
+  background: #2d8cf0;
+}
+.createTaskBtn:hover {
+  color: white;
+  background: #47cb89;
 }
 .title {
   height: 40px;
@@ -43,38 +49,32 @@
   text-align: center;
   font-size: 20px;
   font-weight: bold;
-  border-bottom: 1px solid lightgray
+  border-bottom: 1px solid lightgray;
 }
 .member-desc {
   height: 60px;
-  margin:0 20px 0 10px;
+  margin: 0 20px 0 10px;
   display: flex;
-}
-.manager-desc{
-  height: 80px;
-  /* width:100%; */
-  background-color: lightblue;
-  display: flex;
-  border: 1px dotted lightgray;
 }
 .member-image {
-  max-width: 20%;
-  padding:5px;
+  width: 60px;
+  height: 60px;
+  padding: 5px;
 }
 .memebr-work {
   width: 70%;
+  height: 60px;
   margin: 0 20px;
 }
-.area {
+.userName {
   height: 30px;
-  display:flex;
-  align-items:center;
-
+  display: flex;
+  align-items: center;
 }
-.task {
+.organization {
   height: 30px;
-  display:flex;
-  align-items:center;
+  display: flex;
+  align-items: center;
 }
 
 .util-panel {
@@ -153,9 +153,6 @@
   padding: 1px;
   margin: 1px;
 }
-.workspaceContent {
-  margin-left: 60px;
-}
 </style>
 <template>
   <div>
@@ -192,7 +189,7 @@
           <div class="addNodeStyle">
             <span style="width:10%">Type</span>
             <Select v-model="moduleType" style="width:400px" placeholder="please select type">
-              <Option v-for="(item,index) in typeList" :key="item.index" :value="item">{{ item }}</Option>
+              <Option v-for="item in typeList" :key="item.index" :value="item">{{ item }}</Option>
             </Select>
           </div>
           <div class="addNodeStyle">
@@ -223,7 +220,7 @@
           <div class="editNodeStyle">
             <span style="width:10%">Type</span>
             <Select v-model="updateModuleType" style="width:400px" placeholder="please select type">
-              <Option v-for="(item,index) in typeList" :key="item.index" :value="item">{{ item }}</Option>
+              <Option v-for="item in typeList" :key="item.index" :value="item">{{ item }}</Option>
             </Select>
           </div>
           <div class="editNodeStyle">
@@ -243,124 +240,78 @@
       class="workspaceContent"
     >
       <!-- <h1>No module have been created!</h1> -->
-      <h1 style="margin-top: 0px;margin-bottom: 0px;">{{subProjectInfo.title}}</h1>
+      <h1 style="margin-top: 0px;margin-bottom: 0px;text-align:left">{{subProjectInfo.title}}</h1>
       <hr>
       <Row style="margin-top:20px">
         <Col :xs="8" :sm="7" :md="6" :lg="5" v-bind="this.participants">
-          <div class="member_panel" :style="{height:sidebarHeight+'px'}">
+          <div class="member_panel" :style="{height:sidebarHeight+'px'}" style="background-color:white">
             <div class="title">Participants</div>
             <div :style="{height:sidebarHeight-100+'px'}">
-
-            <div class="member-desc" v-for="(member,index) in participants" :key="member.index">
-              <template v-if="index==0">
-                <div class="member-image">
-                <img :src="member.avatar" style="width:auto;height:100%" @click="gotoWorkSpace(member.userId)"/>
-                </div>
-                <div class="memebr-work">
-                  <div class="area">
-                    <!-- <Tag>name</Tag> -->
-                    <span style="padding:0 5px;float:right">{{member.userName}}</span>
-                    </div>
-                  <div class="task">
-                      <!-- <Tag>organization</Tag> -->
-                      <span style="padding:0 5px">{{member.organization}}</span>
-                    </div>
-                </div>
-              </template>
-              <template v-else>
-                <div class="member-image">
-                <img :src="member.avatar" style="width:auto;height:100%" @click="gotoWorkSpace(member.userId)"/>
-                </div>
-                <div class="memebr-work">
-                  <div class="area">
-                    <!-- <Tag>name</Tag> -->
-                    <span style="padding:0 5px;float:right">{{member.userName}}</span>
-                    </div>
-                  <div class="task">
-                      <!-- <Tag>organization</Tag> -->
-                      <span style="padding:0 5px">{{member.organization}}</span>
-                    </div>
-                </div>
-              </template>
-            </div>
-            </div>
-            <div
-              class="member-invite"
-              style="display:flex;justify-content:center;height:60px;align-items:center"
-            >
-              <Button
-                type="success"
-                style="text-align:center;width:100px"
-                @click="inviteMembersModalShow()"
-                v-if="isSubProjectManager"
-              >Invite</Button>
-              <Button
-                type="warning"
-                style="text-align:center;width:100px"
-                @click="quitModal=true"
-                v-else-if="isSubProjectMember"
-              >Quit</Button>
-              <Modal
-                v-model="quitModal"
-                width="400px"
-                title="Quit subProject"
-                @on-ok="quitSubProject()"
-                @on-cancel="cancel"
-              >
-                <h2>Are you sure to quit this subproject?</h2>
-              </Modal>
-              <Modal
-                v-model="inviteModal"
-                width="400px"
-                title="Invite group member join in the subProject"
-                @on-ok="inviteMembers"
-                @on-cancel="cancel"
-              >
-                <div>
-                  <p>Members:</p>
-                  <Tag
-                    v-for="participant in participants"
-                    :key="participant.index"
-                  >{{participant.userName}}</Tag>
-                  <p>Candidates:</p>
-                  <CheckboxGroup v-model="inviteList">
-                    <Checkbox
-                      v-for="candidate in this.candidates"
-                      :key="candidate.index"
-                      :label="candidate.userId"
+              <div class="member-desc" v-for="(member,index) in participants" :key="member.index">
+                <template v-if="index==0">
+                  <div class="member-image">
+                    <img
+                      v-if="member.avatar != ''"
+                      :src="member.avatar"
+                      style="width:auto;height:100%"
+                      @click="gotoWorkSpace(member.userId)"
                     >
-                      <span>{{candidate.userName}}</span>
-                    </Checkbox>
-                  </CheckboxGroup>
-                </div>
-              </Modal>
-            </div>
-          </div>
-        </Col>
-        <Col :xs="15" :sm="16" :md="17" :lg="18"  offset="1">
-          <div style>
-            <h2 style="margin-bottom:5px">Description</h2>
-            <hr style="margin-bottom:10px">
-            <div :style="{height:sidebarHeight-80+'px'}">{{subProjectInfo.description}}</div>
-          </div>
-          <div style="display:flex;align-items:center;justify-content:center;height:60px">
-            <Button type="error" style="margin:auto">Quit this sub-project ?</Button>
-          </div>
-        </Col>
-      </Row>
-    </div>
-    <div v-else class="workspaceContent">
-      <h2 style="margin-bottom: 0px;">{{currentModule.description}}</h2>
-      <hr>
-      <Row style="margin-top:20px">
-        <Col :xs="8" :sm="7" :md="6" :lg="5" v-bind="this.participants">
-          <div class="member_panel" :style="{height:sidebarHeight}">
-            <div class="title">Online Participants</div>
-            <div class="member-desc" v-for="member in participants" :key="member.index">
-              <div class="member-image">{{member.userName}}</div>
-              <div class="memebr-work">
-                <div class="area">{{member.organization}}</div>
-                <div class="task">{{member.jobTitle}}</div>
+                    <img
+                      v-else-if="member.gender == 'female'"
+                      src="@/assets/images/female.png"
+                      style="width:auto;height:100%"
+                      @click="gotoWorkSpace(member.userId)"
+                    >
+                    <img
+                      v-else
+                      src="@/assets/images/male.png"
+                      style="width:auto;height:100%"
+                      @click="gotoWorkSpace(member.userId)"
+                    >
+                  </div>
+                  <div class="memebr-work">
+                    <div class="userName">
+                      <!-- <Tag>name</Tag> -->
+                      <span style="padding:0 5px;float:right">{{member.userName}}</span>
+                    </div>
+                    <div class="organization">
+                      <!-- <Tag>organization</Tag> -->
+                      <span style="padding:0 5px">{{member.organization}}</span>
+                    </div>
+                  </div>
+                </template>
+                <template v-else style="margin-top:5px">
+                  <div class="member-image">
+                    <img
+                      v-if="member.avatar != ''"
+                      :src="member.avatar"
+                      style="width:auto;height:100%"
+                      @click="gotoWorkSpace(member.userId)"
+                    >
+                    <img
+                      v-else-if="member.gender == 'female'"
+                      src="@/assets/images/female.png"
+                      style="width:auto;height:100%"
+                      @click="gotoWorkSpace(member.userId)"
+                    >
+                    <img
+                      v-else
+                      src="@/assets/images/male.png"
+                      style="width:auto;height:100%"
+                      @click="gotoWorkSpace(member.userId)"
+                    >
+                  </div>
+                  <div class="memebr-work">
+                    <div class="userName">
+                      <!-- <Tag>name</Tag> -->
+                      <span style="padding:0 5px;float:right">{{member.userName}}</span>
+                    </div>
+                    <div class="organization">
+                      <!-- <Tag>organization</Tag> -->
+                      <span style="padding:0 5px">{{member.organization}}</span>
+                    </div>
+                  </div>
+                </template>
               </div>
             </div>
             <div
@@ -404,7 +355,7 @@
                   <p>Candidates:</p>
                   <CheckboxGroup v-model="inviteList">
                     <Checkbox
-                      v-for="candidate in this.candidates"
+                      v-for="candidate in candidates"
                       :key="candidate.index"
                       :label="candidate.userId"
                     >
@@ -416,89 +367,151 @@
             </div>
           </div>
         </Col>
-        <Button
-          type="success"
-          @click="createTaskModalShow()"
-          v-show="isSubProjectManager||isSubProjectMember"
-        >Create Task</Button>
-        <Col span="3" offset="1">
-          <template>
-            <h3>Todo</h3>
-            <draggable
-              class="taskList"
-              element="ul"
-              :options="{group:'task'}"
-              v-model="taskTodo"
-              @update="taskOrderUpdate(taskTodo,'todo')"
-              @add="taskOrderUpdate(taskTodo,'todo')"
-              @remove="taskOrderUpdate(taskTodo,'todo')"
-            >
-              <li v-for="(item,index) in taskTodo" class="taskItem">
-                <strong
-                  @click="editOneTask(index,taskTodo)"
-                  style="cursor: pointer;"
-                >{{item.taskName}}</strong>
-                <span
-                  style="float:right;margin-right:3px;cursor: pointer;"
-                  @click="taskRemove(index,taskTodo)"
-                >X</span>
-                <p>{{item.description}}</p>
-              </li>
-            </draggable>
-          </template>
+        <Col :xs="15" :sm="16" :md="17" :lg="18" offset="1">
+          <div style>
+            <h2 style="margin-bottom:5px">Description</h2>
+            <hr style="margin-bottom:10px">
+            <div :style="{height:sidebarHeight-80+'px'}">{{subProjectInfo.description}}</div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:center;height:60px">
+            <Button type="error" style="margin:auto">Quit this sub-project ?</Button>
+          </div>
         </Col>
-        <Col span="3" offset="1">
-          <template>
-            <h3>Doing</h3>
-            <draggable
-              class="taskList"
-              element="ul"
-              :options="{group:'task'}"
-              v-model="taskDoing"
-              @update="taskOrderUpdate(taskDoing,'doing')"
-              @add="taskOrderUpdate(taskDoing,'doing')"
-              @remove="taskOrderUpdate(taskDoing,'doing')"
-            >
-              <li v-for="(item,index)  in taskDoing" class="taskItem">
-                <strong
-                  @click="editOneTask(index,taskDoing)"
-                  style="cursor: pointer;"
-                >{{item.taskName}}</strong>
-                <span
-                  style="float:right;margin-right:3px;cursor: pointer;"
-                  @click="taskRemove(index,taskDoing)"
-                >X</span>
-                <p>{{item.description}}</p>
-              </li>
-            </draggable>
-          </template>
+      </Row>
+    </div>
+    <div v-else class="workspaceContent">
+      <h1 style="margin-top: 0px;margin-bottom: 0px;text-align:left">{{subProjectInfo.title}}</h1>
+      <hr>
+      <Row style="margin-top:20px">
+        <Col :xs="8" :sm="7" :md="6" :lg="5" v-bind="this.participants">
+          <div class="member_panel" :style="{height:sidebarHeight+'px'}">
+            <div class="title">Online participants</div>
+            <div :style="{height:sidebarHeight-100+'px'}"></div>
+          </div>
         </Col>
-        <Col span="3" offset="1">
-          <template>
-            <h3>Done</h3>
-            <draggable
-              class="taskList"
-              element="ul"
-              :options="{group:'task'}"
-              v-model="taskDone"
-              @update="taskOrderUpdate(taskDone,'done')"
-              @add="taskOrderUpdate(taskDone,'done')"
-              @remove="taskOrderUpdate(taskDone,'done')"
-            >
-              <li v-for="(item,index)  in taskDone" class="taskItem">
-                <strong
-                  @click="editOneTask(index,taskDone)"
-                  style="cursor: pointer;"
-                >{{item.taskName}}</strong>
-                <span
-                  style="float:right;margin-right:3px;cursor: pointer;"
-                  @click="taskRemove(index,taskDone)"
-                >X</span>
-                <p>{{item.description}}</p>
-              </li>
-            </draggable>
-          </template>
-        </Col>
+        <template>
+          <Col
+            :xs="15" :sm="16" :md="17" :lg="18"
+            offset="1"
+            style="height:300px;margin-bottom:20px"
+          >
+            <div style="width:45%;height:100%;float:left;background-color:white">
+              <h2 style="width:100%;padding:10px 10px 0 10px">{{currentModule.title}}</h2>
+              <hr>
+              <div style="width:100%;padding:10px">{{currentModule.description}}</div>
+            </div>
+            <div style="width:50%;height:100%;float:right;border:1px solid lightgray">
+              <Timeline>
+                <!-- <TimelineItem v-if="records.length > 3"><a href="#">More</a></TimelineItem> -->
+                <TimelineItem v-for="(item,index) in records" :key="index">
+                  <template v-if="item.type == 'participants'">
+                    <span class="time" style="color:lightblue">{{item.time}}</span>
+                    <span class="time" style="color:lightblue">{{item.from}}</span>
+                    <span class="content" style="color:lightblue">{{item.content}}</span>
+                  </template>
+                  <template v-if="item.type == 'resources'">
+                    <span class="time">{{item.time}}</span>
+                    <span class="time">{{item.from}}</span>
+                    <span class="content">{{item.content}}</span>
+                  </template>
+                  <template v-if="item.type == 'tasks'">
+                    <span class="time" style="color:gray">{{item.time}}</span>
+                    <span class="time" style="color:gray">{{item.from}}</span>
+                    <span class="content" style="color:gray">{{item.content}}</span>
+                  </template>
+                </TimelineItem>
+              </Timeline>
+            </div>
+          </Col>
+        </template>
+        <template>
+          <Col span="3" offset="1">
+            <template>
+              <h3>Todo</h3>
+              <draggable
+                class="taskList"
+                element="ul"
+                :options="{group:'task'}"
+                v-model="taskTodo"
+                @update="taskOrderUpdate(taskTodo,'todo')"
+                @add="taskOrderUpdate(taskTodo,'todo')"
+                @remove="taskOrderUpdate(taskTodo,'todo')"
+              >
+                <li v-for="(item,index) in taskTodo" class="taskItem" :key="index">
+                  <strong
+                    @click="editOneTask(index,taskTodo)"
+                    style="cursor: pointer;"
+                  >{{item.taskName}}</strong>
+                  <span
+                    style="float:right;margin-right:3px;cursor: pointer;"
+                    @click="taskRemove(index,taskTodo)"
+                  >X</span>
+                  <p>{{item.description}}</p>
+                </li>
+              </draggable>
+            </template>
+          </Col>
+          <Col span="3" offset="1">
+            <template>
+              <h3>Doing</h3>
+              <draggable
+                class="taskList"
+                element="ul"
+                :options="{group:'task'}"
+                v-model="taskDoing"
+                @update="taskOrderUpdate(taskDoing,'doing')"
+                @add="taskOrderUpdate(taskDoing,'doing')"
+                @remove="taskOrderUpdate(taskDoing,'doing')"
+              >
+                <li v-for="(item,index)  in taskDoing" class="taskItem" :key="index">
+                  <strong
+                    @click="editOneTask(index,taskDoing)"
+                    style="cursor: pointer;"
+                  >{{item.taskName}}</strong>
+                  <span
+                    style="float:right;margin-right:3px;cursor: pointer;"
+                    @click="taskRemove(index,taskDoing)"
+                  >X</span>
+                  <p>{{item.description}}</p>
+                </li>
+              </draggable>
+            </template>
+          </Col>
+          <Col span="3" offset="1">
+            <template>
+              <h3>Done</h3>
+              <draggable
+                class="taskList"
+                element="ul"
+                :options="{group:'task'}"
+                v-model="taskDone"
+                @update="taskOrderUpdate(taskDone,'done')"
+                @add="taskOrderUpdate(taskDone,'done')"
+                @remove="taskOrderUpdate(taskDone,'done')"
+              >
+                <li v-for="(item,index) in taskDone" class="taskItem" :key="index">
+                  <strong
+                    @click="editOneTask(index,taskDone)"
+                    style="cursor: pointer;"
+                  >{{item.taskName}}</strong>
+                  <span
+                    style="float:right;margin-right:3px;cursor: pointer;"
+                    @click="taskRemove(index,taskDone)"
+                  >X</span>
+                  <p>{{item.description}}</p>
+                </li>
+              </draggable>
+            </template>
+          </Col>
+          <Col span="1" offset="1">
+            <Button
+              type="default"
+              class="createTaskBtn"
+              @click="createTaskModalShow()"
+              v-show="isSubProjectManager||isSubProjectMember"
+            >Create Task</Button>
+          </Col>
+        </template>
         <Col span="1" class="util-panel">
           <div class="util-btn-group">
             <Button type="info" class="util-btn" shape="circle">
@@ -665,7 +678,6 @@ export default {
       inviteModal: false,
       quitModal: false,
       sidebarHeight: "",
-      managerInfo:[],
       participants: [],
       candidates: [],
       inviteList: [],
@@ -721,7 +733,9 @@ export default {
       taskInfo: {},
       taskTodo: [],
       taskDoing: [],
-      taskDone: []
+      taskDone: [],
+      // 动态记录相关
+      records:[]
     };
   },
   created() {
@@ -751,7 +765,7 @@ export default {
     window.removeEventListener("resize", this.initSize);
   },
   methods: {
-    initSize(){
+    initSize() {
       //侧边栏的高度随着屏幕的高度自适应
       this.sidebarHeight = window.innerHeight - 250;
       //通知栏的属性设置，top表示距离顶部的距离，duration表示持续的时间
@@ -775,7 +789,7 @@ export default {
         success: data => {
           if (data != "None") {
             let subProjectInfo = data[0];
-            this.$set(this,"subProjectInfo",subProjectInfo);
+            this.$set(this, "subProjectInfo", subProjectInfo);
             this.managerIdentity(subProjectInfo.managerId);
             this.memberIdentity(subProjectInfo["members"]);
             let membersList = subProjectInfo["members"];
@@ -1225,7 +1239,7 @@ export default {
           this.$Message.error("Fail!");
         });
     },
-    gotoWorkSpace(data){
+    gotoWorkSpace(data) {
       this.$router.push({ name: "PersonalPage" });
     }
   }

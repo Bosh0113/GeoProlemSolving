@@ -72,7 +72,7 @@
               <div style="display:flex;justify-content:center">
                 <h4
                   style="text-align:center;width:50%;color:lightblue"
-                >you can click the button right top called create to add a new project. Enrich your description about the project to attract more people join in.</h4>
+                >You can click the button right top called create to add a new project. Enriching your description of the project and attracting more people to join in.</h4>
               </div>
             </Card>
           </Col>
@@ -87,18 +87,12 @@
             v-if="item.privacy=='Public'"
           >
             <Card style="height:auto;margin:20px 0 20px 0">
-              <p
+              <h2
                 slot="title"
                 @click="goSingleProject(item.projectId)"
                 class="projectTitle"
-              >{{item.title}}</p>
-              <!-- <a href="#" slot="extra" @click.prevent="changeLimit">
-                  <Icon type="md-heart" />
-              </a>-->
-              <!-- <div>
-                <h1 style="text-align:center;margin: 0 auto" @click="goSingleProject(item.projectId)" class="projectTitle">{{item.title}}</h1>
-              </div>-->
-              <div style="display:flex;align-items:center;height:60px">
+              >{{item.title}}</h2>
+              <div style="display:flex;align-items:center;height:60px;padding:0 20px 0 20px">
                 <Tag color="primary">Description</Tag>
                 <p style="padding: 0 10px">{{item.description}}</p>
               </div>
@@ -114,13 +108,13 @@
               </div>
               <div class="whitespace"></div>
               <div style="height:40px;align-items:center;display:flex;padding:0 20px 0 20px">
-                <span style="height:20px;width:45%;color:white;text-align:center;">
-                  <Tag color="primary">Creater</Tag>
+                <span style="height:20px;width:45%;color:white;text-align:left;">
+                  <Tag color="primary" style="width:78.2px;text-align:center">Creator</Tag>
                 </span>
                 <span style="height:20px;margin-left:5%">{{item.creator}}</span>
               </div>
               <div style="height:40px;align-items:center;display:flex;padding:0 20px 0 20px">
-                <span style="height:20px;width:45%;color:white;text-align:center;">
+                <span style="height:20px;width:45%;color:white;text-align:left;">
                   <Tag color="primary">Create time</Tag>
                 </span>
                 <span style="height:20px;margin-left:5%">{{item.createTime}}</span>

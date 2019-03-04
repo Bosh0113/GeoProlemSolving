@@ -92,7 +92,7 @@
   <div>
     <Layout>
       <Header class="header">
-        <img src="@/assets/OGMS.png" id="logo" class="pic" @click="goHome">
+        <img src="@/assets/images/OGMS.png" id="logo" class="pic" @click="goHome">
       </Header>
       <Content>
         <Row class="Content" id="register">
