@@ -10,7 +10,8 @@ export default {
   },
   data() {
     return {
-      moduleSocket: null
+      moduleSocket: null,
+      timer: null
     };
   },
   methods: {
@@ -21,6 +22,7 @@ export default {
       this.moduleSocket.onmessage = this.onMessage;
       this.moduleSocket.onclose = this.onClose;
       this.moduleSocket.onerror = this.onError;
+      this.setTimer();
     },
     onOpen() {
       console.log("ModuleSocket连接成功！");
@@ -35,10 +37,14 @@ export default {
           .replace("]", "")
           .replace(/\s/g, "")
           .split(",");
-          console.log("online members: ");
+        console.log("online members: ");
         for (let i = 0; i < members.length; i++) {
           console.log(members[i]);
         }
+      } else if(messageJson.type == "online"){
+        console.log(messageJson.userId+messageJson.createTime);
+      } else if(messageJson.type == "offline"){
+        console.log(messageJson.userId+messageJson.createTime);
       }
     },
     onClose(e) {
@@ -54,6 +60,17 @@ export default {
       messageJson["type"] = "message";
       messageJson["message"] = message;
       this.moduleSocket.send(JSON.stringify(messageJson));
+    },
+    setTimer() {
+      this.timer = setInterval(() => {
+        var messageJson = {};
+        messageJson["type"] = "ping";
+        messageJson["message"] = "ping";
+        this.moduleSocket.send(JSON.stringify(messageJson));
+      }, 20000);
+    },
+    removeTimer() {
+      clearInterval(this.timer);
     }
   }
 };

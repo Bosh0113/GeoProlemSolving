@@ -249,26 +249,23 @@
             <div :style="{height:sidebarHeight-100+'px'}">
               <div class="member-desc" v-for="(member,index) in participants" :key="member.index">
                 <template v-if="index==0">
-                  <div class="member-image">
+                  <Badge text="♔" type="warning" class="userAvatar">
+                    <div class="member-image" @click="gotoWorkSpace(member.userId)" style="cursor:pointer">
                     <img
-                      v-if="member.avatar != ''"
+                      v-if="member.avatar != '' && member.avatar!='undefined'"
                       :src="member.avatar"
                       style="width:auto;height:100%"
-                      @click="gotoWorkSpace(member.userId)"
+                    />
+                    <avatar
+                    :username="member.userName"
+                    :size="40"
+                    style="margin-top:10px"
+                    :title="member.userName"
+                    v-else
                     >
-                    <img
-                      v-else-if="member.gender == 'female'"
-                      src="@/assets/images/female.png"
-                      style="width:auto;height:100%"
-                      @click="gotoWorkSpace(member.userId)"
-                    >
-                    <img
-                      v-else
-                      src="@/assets/images/male.png"
-                      style="width:auto;height:100%"
-                      @click="gotoWorkSpace(member.userId)"
-                    >
-                  </div>
+                    </avatar>
+                    </div>
+                  </Badge>
                   <div class="memebr-work">
                     <div class="userName">
                       <!-- <Tag>name</Tag> -->
@@ -281,25 +278,19 @@
                   </div>
                 </template>
                 <template v-else style="margin-top:5px">
-                  <div class="member-image">
+                  <div class="member-image" @click="gotoWorkSpace(member.userId)" style="cursor:pointer">
                     <img
                       v-if="member.avatar != ''"
                       :src="member.avatar"
                       style="width:auto;height:100%"
-                      @click="gotoWorkSpace(member.userId)"
-                    >
-                    <img
-                      v-else-if="member.gender == 'female'"
-                      src="@/assets/images/female.png"
-                      style="width:auto;height:100%"
-                      @click="gotoWorkSpace(member.userId)"
-                    >
-                    <img
-                      v-else
-                      src="@/assets/images/male.png"
-                      style="width:auto;height:100%"
-                      @click="gotoWorkSpace(member.userId)"
-                    >
+                    />
+                    <avatar
+                    :username="member.userName"
+                    :size="40"
+                    style="margin-top:10px"
+                    :title="member.userName"
+                    v-else
+                  ></avatar>
                   </div>
                   <div class="memebr-work">
                     <div class="userName">
@@ -660,12 +651,17 @@ import taskParticipateModule from "./.././sharedModule/taskParticipateModule";
 import resourceModule from "./.././sharedModule/resourceModule";
 import * as socketApi from "./../../api/socket";
 import draggable from "vuedraggable";
+import Avatar from "vue-avatar";
 export default {
+  updated() {
+    $(".userAvatar sup").css("margin", "15px 15px 0 0");
+  },
   components: {
     VueFlowy,
     memberPart: taskParticipateModule,
     resource: resourceModule,
-    draggable
+    draggable,
+    Avatar
   },
   data() {
     return {
@@ -735,7 +731,7 @@ export default {
       taskDoing: [],
       taskDone: [],
       // 动态记录相关
-      records:[]
+      records: []
     };
   },
   created() {
