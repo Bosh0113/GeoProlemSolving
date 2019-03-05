@@ -295,7 +295,7 @@ export default {
     getSpecificTypeProjects(data) {
       this.axios
         .get(
-          "http://localhost:8081/project/inquiry" +
+          "/api/project/inquiry" +
             "?key=" +
             data["key"] +
             "&value=" +
@@ -321,7 +321,7 @@ export default {
     joinProject(tab) {
       this.axios
         .get(
-          "http://localhost:8081/project/join?" +
+          "/api/project/join?" +
             "projectId=" +
             this.joinProjectId +
             "&userId=" +
@@ -358,7 +358,7 @@ export default {
     quitProject() {
       this.axios
         .get(
-          "http://localhost:8081/project/quit?" +
+          "/api/project/quit?" +
             "projectId=" +
             this.quitSubProject.projectId +
             "&userId=" +
@@ -380,7 +380,7 @@ export default {
                 " ."
             };
             this.axios
-              .post("http://localhost:8081/notice/save", replyNotice)
+              .post("/api/notice/save", replyNotice)
               .then(result => {
                 if (result.data == "Success") {
                   this.$emit("sendNotice", this.quitSubProject.managerId);
@@ -417,7 +417,7 @@ export default {
         for (var i = 0, n = 0; i < projectList.length; i++) {
           $.ajax({
             url:
-              "http://localhost:8081/user/inquiry" +
+              "/api/user/inquiry" +
               "?key=" +
               "userId" +
               "&value=" +
@@ -489,7 +489,7 @@ export default {
         approve: "unknow"
       };
       this.axios
-        .post("http://localhost:8081/notice/save", joinForm)
+        .post("/api/notice/save", joinForm)
         .then(res => {
           this.$Message.info("Apply Successfully");
           this.$emit("sendNotice", data.managerId);

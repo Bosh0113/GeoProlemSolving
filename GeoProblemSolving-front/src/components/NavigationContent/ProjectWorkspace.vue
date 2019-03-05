@@ -776,7 +776,7 @@ export default {
       var that = this;
       $.ajax({
         url:
-          "http://localhost:8081/subProject/inquiry" +
+          "/api/subProject/inquiry" +
           "?key=subProjectId" +
           "&value=" +
           this.$route.params.id,
@@ -795,7 +795,7 @@ export default {
             for (let i = 0; i < membersList.length; i++) {
               $.ajax({
                 url:
-                  "http://localhost:8081/user/inquiry" +
+                  "/api/user/inquiry" +
                   "?key=" +
                   "userId" +
                   "&value=" +
@@ -847,10 +847,10 @@ export default {
     getAllModules() {
       //这里重写以下获取module
       let subProjectId = this.$route.params.id;
-      localStorage.setItem("subProjectId", this.$route.params.id);
+      sessionStorage.setItem("subProjectId", this.$route.params.id);
       this.axios
         .get(
-          "http://localhost:8081/module/inquiry" +
+          "/api/module/inquiry" +
             "?key=subProjectId" +
             "&value=" +
             subProjectId
@@ -877,7 +877,7 @@ export default {
       Module["creator"] = this.$store.state.userId;
       Module["type"] = this.moduleType;
       this.axios
-        .post("http://localhost:8081/module/create", Module)
+        .post("/api/module/create", Module)
         .then(res => {
           if (res.data === "Fail") {
             this.$Message.info("Fail");
@@ -896,7 +896,7 @@ export default {
     delModule() {
       this.axios
         .get(
-          "http://localhost:8081/module/delete" +
+          "/api/module/delete" +
             "?moduleId=" +
             this.moduleList[this.currentModuleIndex].moduleId
         )
@@ -931,7 +931,7 @@ export default {
       updateObject.append("type", this.updateModuleType);
       updateObject.append("creater", this.$store.state.userId);
       this.axios
-        .post("http://localhost:8081/module/update", updateObject)
+        .post("/api/module/update", updateObject)
         .then(res => {
           console.log(res.data);
           this.getAllModules();
@@ -953,7 +953,7 @@ export default {
       this.editModuleType = "";
     },
     show() {
-      let mId = localStorage.getItem("moduleId");
+      let mId = sessionStorage.getItem("moduleId");
       window.location.href =
         "http://202.195.237.252:8088/TeamWorking/Collaborative/ConceptualModel/index.html?groupID=" +
         mId +
@@ -985,17 +985,17 @@ export default {
       this.inviteList = [];
       this.axios
         .get(
-          "http://localhost:8081/project/inquiry" +
+          "/api/project/inquiry" +
             "?key=projectId" +
             "&value=" +
-            localStorage.getItem("projectId")
+            sessionStorage.getItem("projectId")
         )
         .then(res => {
           if (res.data != "None" && res.data != "Fail") {
             let allMembers = res.data[0].members;
             $.ajax({
               url:
-                "http://localhost:8081/user/inquiry" +
+                "/api/user/inquiry" +
                 "?key=" +
                 "userId" +
                 "&value=" +
@@ -1031,7 +1031,7 @@ export default {
       for (let i = 0; i < this.inviteList.length; i++) {
         $.ajax({
           url:
-            "http://localhost:8081/subProject/join" +
+            "/api/subProject/join" +
             "?subProjectId=" +
             this.$route.params.id +
             "&userId=" +
@@ -1054,7 +1054,7 @@ export default {
     quitSubProject() {
       this.axios
         .get(
-          "http://localhost:8081/subProject/quit" +
+          "/api/subProject/quit" +
             "?subProjectId=" +
             this.$route.params.id +
             "&userId=" +
@@ -1062,7 +1062,7 @@ export default {
         )
         .then(res => {
           if (res.data == "Success") {
-            let projectId = localStorage.getItem("projectId");
+            let projectId = sessionStorage.getItem("projectId");
             this.$router.push({
               name: "ProjectDetail",
               params: { id: projectId }
@@ -1102,7 +1102,7 @@ export default {
       taskForm["order"] = "";
       console.log(taskForm);
       this.axios
-        .post("http://localhost:8081/task/save", taskForm)
+        .post("/api/task/save", taskForm)
         .then(res => {
           this.inquiryTask();
         })
@@ -1112,7 +1112,7 @@ export default {
     editOneTask(index, taskList) {
       this.axios
         .get(
-          "http://localhost:8081/task/inquiry?" +
+          "/api/task/inquiry?" +
             "key=taskId" +
             "&value=" +
             taskList[index]["taskId"]
@@ -1137,7 +1137,7 @@ export default {
       taskForm.append("endTime", this.taskInfo.endTime);
       taskForm.append("state", this.taskInfo.state);
       this.axios
-        .post("http://localhost:8081/task/update", taskForm)
+        .post("/api/task/update", taskForm)
         .then(res => {
           if (res.data != "None" && res.data != "Fail") {
             this.inquiryTask();
@@ -1154,7 +1154,7 @@ export default {
       // /task/inquiry
       this.axios
         .get(
-          "http://localhost:8081/task/inquiryTodo?" +
+          "/api/task/inquiryTodo?" +
             "moduleId=" +
             this.currentModule.moduleId
         )
@@ -1168,7 +1168,7 @@ export default {
         });
       this.axios
         .get(
-          "http://localhost:8081/task/inquiryDoing?" +
+          "/api/task/inquiryDoing?" +
             "moduleId=" +
             this.currentModule.moduleId
         )
@@ -1182,7 +1182,7 @@ export default {
         });
       this.axios
         .get(
-          "http://localhost:8081/task/inquiryDone?" +
+          "/api/task/inquiryDone?" +
             "moduleId=" +
             this.currentModule.moduleId
         )
@@ -1205,7 +1205,7 @@ export default {
         taskUpdateObj.append("order", i);
         taskUpdateObj.append("state", type);
         this.axios
-          .post("http://localhost:8081/task/update", taskUpdateObj)
+          .post("/api/task/update", taskUpdateObj)
           .then(res => {
             // console.log("---force---");
             // console.log(thisTask);
@@ -1220,7 +1220,7 @@ export default {
     taskRemove(index, taskList) {
       this.axios
         .get(
-          "http://localhost:8081/task/delete" +
+          "/api/task/delete" +
             "?taskId=" +
             taskList[index]["taskId"]
         )

@@ -552,7 +552,7 @@ export default {
       try {
         $.ajax({
           url:
-            "http://localhost:8081/project/inquiry" +
+            "/api/project/inquiry" +
             "?key=" +
             queryObject["key"] +
             "&value=" +
@@ -576,7 +576,7 @@ export default {
                 that.currentProjectDetail["managerId"];
               $.ajax({
                 url:
-                  "http://localhost:8081/user/inquiry" +
+                  "/api/user/inquiry" +
                   "?key=" +
                   "userId" +
                   "&value=" +
@@ -590,7 +590,7 @@ export default {
                   console.log("Get manager name fail.");
                 }
               });
-              localStorage.setItem(
+              sessionStorage.setItem(
                 "projectId",
                 that.currentProjectDetail.projectId
               );
@@ -670,7 +670,7 @@ export default {
       SubProject["managerId"] = this.$store.state.userId;
       console.log(SubProject);
       this.axios
-        .post("http://localhost:8081/subProject/create", SubProject)
+        .post("/api/subProject/create", SubProject)
         .then(res => {
           if (res.data != "Fail") {
             this.$Message.info("create success");
@@ -708,7 +708,7 @@ export default {
       emailFormBody["mailTitle"] = this.emailTitle;
       emailFormBody["mailContent"] = this.emailContent;
       console.log(emailFormBody);
-      this.axios.post("http://localhost:8081//email/send", emailFormBody)
+      this.axios.post("/api//email/send", emailFormBody)
       .then(res=> {
         console.log(res.data);
       })
@@ -719,7 +719,7 @@ export default {
     handOverSubProject(){
       this.axios
         .get(
-          "http://localhost:8081/subProject/manager?" +
+          "/api/subProject/manager?" +
             "subProjectId=" +
             this.subProjectList[this.editSubProjectindex].subProjectId +
             "&userId=" +
@@ -751,7 +751,7 @@ export default {
       obj.append("description", this.subProjectDescriptionEdit);
       // console.log(obj.get("title"));
       this.axios
-        .post("http://localhost:8081/subProject/update", obj)
+        .post("/api/subProject/update", obj)
         .then(res => {
           console.log(res.data);
           this.getAllSubProject();
@@ -767,7 +767,7 @@ export default {
     deleteSubProject() {
       this.axios
         .get(
-          "http://localhost:8081/subProject/delete?" +
+          "/api/subProject/delete?" +
             "subProjectId=" +
             this.subProjectList[this.editSubProjectindex].subProjectId
         )
@@ -786,7 +786,7 @@ export default {
       var that = this;
       this.axios
         .get(
-          "http://localhost:8081/subProject/inquiry" +
+          "/api/subProject/inquiry" +
             "?key=" +
             queryObject["key"] +
             "&value=" +
@@ -802,7 +802,7 @@ export default {
             for (let i = 0, n = 0; i < that.subProjectList.length; i++) {
               $.ajax({
                 url:
-                  "http://localhost:8081/user/inquiry" +
+                  "/api/user/inquiry" +
                   "?key=" +
                   "userId" +
                   "&value=" +
@@ -864,7 +864,7 @@ export default {
       //这里还要添加其他的字段
       console.log(formData.get("file"));
       this.axios
-        .post("http://localhost:8081/resource/upload", formData)
+        .post("/api/resource/upload", formData)
         .then(res => {
           if (res != "None") {
             this.$Notice.open({
@@ -884,10 +884,10 @@ export default {
     getAllResource() {
       // url是请求的网址
       //查询的形式是key-value格式
-      // this.axios.get("http://localhost:8081/resource/inquiry",obj)
+      // this.axios.get("/api/resource/inquiry",obj)
       this.axios
         .get(
-          "http://localhost:8081/resource/inquiry" +
+          "/api/resource/inquiry" +
             "?key=scopeId" +
             "&value=" +
             this.$route.params.id

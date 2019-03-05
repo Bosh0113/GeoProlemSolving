@@ -400,7 +400,7 @@ export default {
           userJson["avatar"] = this.formValidate.avatar;
           this.axios
             .post(
-              "http://localhost:8081/user/register",
+              "/api/user/register",
               // params
               userJson
             )

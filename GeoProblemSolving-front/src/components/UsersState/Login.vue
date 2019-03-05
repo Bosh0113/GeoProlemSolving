@@ -121,7 +121,6 @@ export default {
     }
   },
   created() {
-    this.$store.commit("getStorage");
   },
   data() {
     return {
@@ -171,7 +170,7 @@ export default {
         if (valid) {
           this.axios
             .get(
-              "http://localhost:8081/user/login" +
+              "/api/user/login" +
                 "?email=" +
                 this.formInline.user +
                 "&password=" +

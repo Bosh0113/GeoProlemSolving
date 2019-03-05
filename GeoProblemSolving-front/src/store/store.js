@@ -24,31 +24,34 @@ export default new Vuex.Store({
         }
     },
     mutations: {
-        getStorage: state => {
-            if (localStorage.getItem('userState')) {
-                state.userState = true;
-                state.userName = localStorage.getItem('userName');
-                state.avatar = localStorage.getItem('avatar');
-                state.userId = localStorage.getItem('userId');
-            }
+        getUserInfo: state => {
+            $.ajax({
+                url: "/api/user/state",
+                type: "GET",
+                async: false,
+                success: function (data) {
+                    if (data) {
+                        var userInfo = data;
+                        state.userName = userInfo.userName;
+                        state.avatar = userInfo.avatar;
+                        state.userId = userInfo.userId;
+                        state.userState = true;
+                    }
+                },
+                error: function (err) {
+                    console.log("Get user info fail.");
+                }
+            });
         },
         userLogin: (state, data) => {
             state.userState = true;
             state.userName = data.userName;
             state.avatar = data.avatar;
             state.userId = data.userId;
-            localStorage.setItem('userState', 'true');
-            localStorage.setItem('userName', data.userName);
-            localStorage.setItem('avatar', data.avatar);
-            localStorage.setItem('userId', data.userId);
         },
         userLogout: (state) => {
             state.userState = false;
             state.userName = 'visitor';
-            localStorage.removeItem('userState');
-            localStorage.removeItem('userName');
-            localStorage.removeItem('avatar');
-            localStorage.removeItem('userId');
         },
         uploadAvatar: (state, avatar) => {
             state.avatar = avatar;

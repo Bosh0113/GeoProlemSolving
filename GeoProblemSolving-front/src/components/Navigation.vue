@@ -122,7 +122,7 @@ export default {
       //消息机制
       noticeSocket: null,
       unreadNoticeCount: 0,
-      timer:null
+      timer: null
     };
   },
   created() {
@@ -173,8 +173,8 @@ export default {
     logged(name) {
       if (name === "notification") {
         this.$router.push({ name: "Notifications" });
+      } else if (name === "personal") {
       }
-      else if(name === "personal"){}
     },
     // 获取到通知的数量
     getUnreadNoticeCount() {
@@ -182,8 +182,8 @@ export default {
       //get请求发送的是用户id
       this.axios
         .get(
-          "http://localhost:8081/notice/inquiry?" +
-            "key=recipientId" +
+          "/api/notice/inquiry" +
+            "?key=recipientId" +
             "&value=" +
             this.$store.state.userId
         )
@@ -233,12 +233,12 @@ export default {
     sendMessage(recipientId) {
       this.noticeSocket.send(recipientId);
     },
-    setTimer(){
-      this.timer=setInterval(()=>{
+    setTimer() {
+      this.timer = setInterval(() => {
         this.noticeSocket.send("ping");
-      },20000);
+      }, 20000);
     },
-    removeTimer(){
+    removeTimer() {
       clearInterval(this.timer);
     },
     readNotification() {
@@ -249,9 +249,16 @@ export default {
     },
     changeSelect(name) {
       if (name == "logout") {
-        this.$store.commit("userLogout");
-        this.noticeSocket.close();
-        this.$router.replace({ name: "Home" });
+        this.axios
+          .get("/api/user/logout")
+          .then(res => {
+            this.$store.commit("userLogout");
+            this.noticeSocket.close();
+            this.$router.replace({ name: "Home" });
+          })
+          .catch(err => {
+            confirm("logout fail!");
+          });
       } else if (name == "personalPage") {
         this.$router.push({ name: "PersonalPage" });
       }

@@ -9,7 +9,7 @@
 <label for="email">Email: </label><input id="email" type="text" style="width: 150px;height: 20px">
 <label for="password">Password: </label><input id="password" type="text" style="width: 150px;height: 20px">
 <br>
-<button id="login">Login</button>
+<button id="login">Login</button><button id="loadState">load state</button>
 <br>
 <label for="uploadFile">file</label><input id="uploadFile" type="file" class="model file" data-show-preview="false"
                                            data-show-upload="false">
@@ -28,7 +28,7 @@
                     // window.location.href="http://localhost:8081/Collaborative/ConceptualModel/index.html?groupID=111";
                     // window.location.href="http://localhost:8081/Collaborative/LogicalModel/index.html?groupID=111";
                     // window.location.href="http://localhost:8081/Collaborative/ComputationalModel/index.html?groupID=111";
-                    window.location.href="http://localhost:8081/notice.html";
+                    // window.location.href="http://localhost:8081/notice.html";
                 }
                 else {
                     confirm("Fail");
@@ -36,7 +36,20 @@
             }
         })
     });
-
+    $("#loadState").click(function () {
+        $.ajax({
+            type: "get",
+            url: "/user/state",
+            success: function (data) {
+                if (data !== "Fail") {
+                    console.log(data);
+                }
+                else {
+                    confirm("Fail");
+                }
+            }
+        })
+    });
     $("#upload").click(function () {
         var file = document.getElementById("uploadFile").files[0];
         var formData = new FormData();
