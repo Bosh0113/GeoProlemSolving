@@ -81,7 +81,7 @@
   height: 200px;
   box-shadow: 5px 5px 3px 2px rgba(0, 0, 0, 0.3);
   position: fixed;
-  right: 5%;
+  right: 2%;
   bottom: 5%;
 }
 .util-panel:hover {
@@ -144,14 +144,16 @@
   height: 10px;
 }
 .taskList {
-  min-height: 100px;
-  background: azure;
+  min-height: 50px;
+  background: #f7f7f7;
 }
-.taskItem {
-  list-style: none;
-  border: solid 0.5px green;
-  padding: 1px;
-  margin: 1px;
+.taskName {
+  display: inline-block;
+  cursor: pointer;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 120px;
 }
 </style>
 <template>
@@ -198,41 +200,7 @@
           </div>
         </Modal>
         <Button type="default" @click="delModal = true" icon="md-remove" class="removeBtn">Remove</Button>
-        <Modal v-model="delModal" title="delete task" @on-ok="delModule()" @on-cancel="cancel()">
-          <p>Do you really want to delete this step?</p>
-        </Modal>
         <Button type="default" @click="editModalShow()" icon="md-brush" class="editBtn">Edit</Button>
-        <Modal
-          v-model="editModal"
-          title="update task"
-          @on-ok="updateModule()"
-          @on-cancel="cancel()"
-        >
-          <div class="editNodeStyle">
-            <span style="width:10%">Name</span>
-            <Input
-              v-model="updateModuleTitle"
-              placeholder="Enter something..."
-              style="width: 400px"
-              :placeholder="moduleTitle"
-            />
-          </div>
-          <div class="editNodeStyle">
-            <span style="width:10%">Type</span>
-            <Select v-model="updateModuleType" style="width:400px" placeholder="please select type">
-              <Option v-for="item in typeList" :key="item.index" :value="item">{{ item }}</Option>
-            </Select>
-          </div>
-          <div class="editNodeStyle">
-            <span style="width:10%">Detail</span>
-            <textarea
-              v-model="updateModuleDescription"
-              style="width:400px"
-              :rows="6"
-              :placeholder="moduleDescription"
-            ></textarea>
-          </div>
-        </Modal>
       </Col>
     </Row>
     <div
@@ -386,7 +354,7 @@
             offset="1"
             style="height:300px;margin-bottom:20px"
           >
-            <div style="width:45%;height:100%;float:left;background-color:white">
+            <div style="width:45%;height:100%;float:left;background-color:white;border:solid 1px #c5c8ce;">
               <h2 style="width:100%;padding:10px 10px 0 10px">{{currentModule.title}}</h2>
               <hr>
               <div style="width:100%;padding:10px">{{currentModule.description}}</div>
@@ -416,91 +384,110 @@
           </Col>
         </template>
         <template>
-          <Col span="3" offset="1">
-            <template>
-              <h3>Todo</h3>
-              <draggable
-                class="taskList"
-                element="ul"
-                :options="{group:'task'}"
-                v-model="taskTodo"
-                @update="taskOrderUpdate(taskTodo,'todo')"
-                @add="taskOrderUpdate(taskTodo,'todo')"
-                @remove="taskOrderUpdate(taskTodo,'todo')"
-              >
-                <li v-for="(item,index) in taskTodo" class="taskItem" :key="index">
-                  <strong
-                    @click="editOneTask(index,taskTodo)"
-                    style="cursor: pointer;"
-                  >{{item.taskName}}</strong>
-                  <span
-                    style="float:right;margin-right:3px;cursor: pointer;"
-                    @click="taskRemove(index,taskTodo)"
-                  >X</span>
-                  <p>{{item.description}}</p>
-                </li>
-              </draggable>
-            </template>
-          </Col>
-          <Col span="3" offset="1">
-            <template>
-              <h3>Doing</h3>
-              <draggable
-                class="taskList"
-                element="ul"
-                :options="{group:'task'}"
-                v-model="taskDoing"
-                @update="taskOrderUpdate(taskDoing,'doing')"
-                @add="taskOrderUpdate(taskDoing,'doing')"
-                @remove="taskOrderUpdate(taskDoing,'doing')"
-              >
-                <li v-for="(item,index)  in taskDoing" class="taskItem" :key="index">
-                  <strong
-                    @click="editOneTask(index,taskDoing)"
-                    style="cursor: pointer;"
-                  >{{item.taskName}}</strong>
-                  <span
-                    style="float:right;margin-right:3px;cursor: pointer;"
-                    @click="taskRemove(index,taskDoing)"
-                  >X</span>
-                  <p>{{item.description}}</p>
-                </li>
-              </draggable>
-            </template>
-          </Col>
-          <Col span="3" offset="1">
-            <template>
-              <h3>Done</h3>
-              <draggable
-                class="taskList"
-                element="ul"
-                :options="{group:'task'}"
-                v-model="taskDone"
-                @update="taskOrderUpdate(taskDone,'done')"
-                @add="taskOrderUpdate(taskDone,'done')"
-                @remove="taskOrderUpdate(taskDone,'done')"
-              >
-                <li v-for="(item,index) in taskDone" class="taskItem" :key="index">
-                  <strong
-                    @click="editOneTask(index,taskDone)"
-                    style="cursor: pointer;"
-                  >{{item.taskName}}</strong>
-                  <span
-                    style="float:right;margin-right:3px;cursor: pointer;"
-                    @click="taskRemove(index,taskDone)"
-                  >X</span>
-                  <p>{{item.description}}</p>
-                </li>
-              </draggable>
-            </template>
-          </Col>
-          <Col span="1" offset="1">
-            <Button
-              type="default"
-              class="createTaskBtn"
-              @click="createTaskModalShow()"
-              v-show="isSubProjectManager||isSubProjectMember"
-            >Create Task</Button>
+          <Col
+            :xs="15" :sm="16" :md="17" :lg="18"
+            offset="1">
+          <Row>
+            <Col span="23"
+            style="border:solid 1px #c5c8ce;padding: 5px 0;">
+            <Row type="flex" justify="center">
+            <Col span="7">
+              <Card :padding="0" :border="false">
+                <h3 slot="title">Todo</h3>
+              <Button
+              slot="extra"
+                type="default"
+                class="createTaskBtn"
+                style="margin-top:-10px"
+                @click="createTaskModalShow()"
+                v-show="isSubProjectManager||isSubProjectMember"
+              >Add</Button>
+                <draggable
+                  class="taskList"
+                  element="ul"
+                  :options="{group:'task'}"
+                  v-model="taskTodo"
+                  @update="taskOrderUpdate(taskTodo,'todo')"
+                  @add="taskOrderUpdate(taskTodo,'todo')"
+                  @remove="taskOrderUpdate(taskTodo,'todo')"
+                >
+                  <Card v-for="(item,index) in taskTodo" :key="index" :padding="3">
+                    <div>
+                    <strong
+                      @click="editOneTask(index,taskTodo)"
+                      class="taskName"
+                    >{{item.taskName}}</strong>
+                    <span
+                      style="float:right;margin-right:3px;cursor: pointer;color:red;"
+                      @click="taskRemove(index,taskTodo)"
+                    >×</span>
+                    </div>
+                  <span style="word-break:break-word;">{{item.description}}</span>
+                  </Card>
+                </draggable>
+              </Card>
+            </Col>
+            <Col span="7" offset="1">
+              <Card :padding="0" :border="false">
+                <h3 slot="title">Doing</h3>
+                <draggable
+                  class="taskList"
+                  element="ul"
+                  :options="{group:'task'}"
+                  v-model="taskDoing"
+                  @update="taskOrderUpdate(taskDoing,'doing')"
+                  @add="taskOrderUpdate(taskDoing,'doing')"
+                  @remove="taskOrderUpdate(taskDoing,'doing')"
+                >
+                  <Card v-for="(item,index)  in taskDoing" :key="index" :padding="3">
+                    <div>
+                    <strong
+                      @click="editOneTask(index,taskDoing)"
+                      class="taskName"
+                    >{{item.taskName}}</strong>
+                    <span
+                      style="float:right;margin-right:3px;cursor: pointer;color:red;"
+                      @click="taskRemove(index,taskDoing)"
+                    >×</span>
+                    </div>
+                    <span style="word-break:break-word;">{{item.description}}</span>
+                  </Card>
+                </draggable>
+              </Card>
+            </Col>
+            <Col span="7" offset="1">
+              <Card :padding="0" :border="false">
+                <h3 slot="title">Done</h3>
+                <draggable
+                  class="taskList"
+                  element="ul"
+                  :options="{group:'task'}"
+                  v-model="taskDone"
+                  @update="taskOrderUpdate(taskDone,'done')"
+                  @add="taskOrderUpdate(taskDone,'done')"
+                  @remove="taskOrderUpdate(taskDone,'done')"
+                >
+                  <Card v-for="(item,index) in taskDone" :key="index" :padding="3">
+                    <div>
+                    <strong
+                      @click="editOneTask(index,taskDone)"
+                      class="taskName"
+                    >{{item.taskName}}</strong>
+                    <span
+                      style="float:right;margin-right:3px;cursor: pointer;color:red;"
+                      @click="taskRemove(index,taskDone)"
+                    >×</span>
+                    </div>
+                    <span style="word-break:break-word;">{{item.description}}</span>
+                  </Card>
+                </draggable>
+              </Card>
+            </Col>
+            </Row>
+            </Col>
+            <Col span="1">
+            </Col>
+            </Row>
           </Col>
         </template>
         <Col span="1" class="util-panel">
@@ -530,6 +517,40 @@
         </Col>
       </Row>
     </div>
+    <Modal v-model="delModal" title="delete module" @on-ok="delModule()" @on-cancel="cancel()">
+      <p>Do you really want to delete this step?</p>
+    </Modal>
+    <Modal
+      v-model="editModal"
+      title="update task"
+      @on-ok="updateModule()"
+      @on-cancel="cancel()"
+    >
+      <div class="editNodeStyle">
+        <span style="width:10%">Name</span>
+        <Input
+          v-model="updateModuleTitle"
+          placeholder="Enter something..."
+          style="width: 400px"
+          :placeholder="moduleTitle"
+        />
+      </div>
+      <div class="editNodeStyle">
+        <span style="width:10%">Type</span>
+        <Select v-model="updateModuleType" style="width:400px" placeholder="please select type">
+          <Option v-for="item in typeList" :key="item.index" :value="item">{{ item }}</Option>
+        </Select>
+      </div>
+      <div class="editNodeStyle">
+        <span style="width:10%">Detail</span>
+        <textarea
+          v-model="updateModuleDescription"
+          style="width:400px"
+          :rows="6"
+          :placeholder="moduleDescription"
+        ></textarea>
+      </div>
+    </Modal>
     <!-- createTaskModal -->
     <Modal
       v-model="createTaskModal"
@@ -539,7 +560,7 @@
       width="800px"
     >
       <div class="taskFormItem">
-        <span style="width:30%">taskName</span>
+        <span style="width:30%">Name</span>
         <Input
           style="width: 300px"
           :placeholder="this.taskPlaceHolder.name"
@@ -548,7 +569,7 @@
       </div>
       <div class="whiteSpace"></div>
       <div class="taskFormItem">
-        <span style="width:30%">description</span>
+        <span style="width:30%">Description</span>
         <Input
           style="width: 300px"
           :placeholder="this.taskPlaceHolder.description"
@@ -559,9 +580,10 @@
       </div>
       <div class="whiteSpace"></div>
       <div class="taskFormItem">
-        <span style="width:30%">start Time</span>
+        <span style="width:30%">Start Time</span>
         <DatePicker
           type="datetime"
+          format="yyyy-MM-dd HH:mm:ss"
           :placeholder="this.taskPlaceHolder.startTime"
           style="width: 300px"
           v-model="taskInfo.startTime"
@@ -569,23 +591,16 @@
       </div>
       <div class="whiteSpace"></div>
       <div class="taskFormItem">
-        <span style="width:30%">end Time</span>
+        <span style="width:30%">End Time</span>
         <DatePicker
           type="datetime"
+          format="yyyy-MM-dd HH:mm:ss"
           :placeholder="this.taskPlaceHolder.endTime"
           style="width: 300px"
           v-model="taskInfo.endTime"
         ></DatePicker>
       </div>
       <div class="whiteSpace"></div>
-      <div class="taskFormItem">
-        <span style="width:30%">state</span>
-        <RadioGroup v-model="taskInfo.state" disabled>
-          <Radio label="todo"></Radio>
-          <Radio label="doing"></Radio>
-          <Radio label="done"></Radio>
-        </RadioGroup>
-      </div>
     </Modal>
     <Modal
       v-model="editTaskModal"
@@ -618,6 +633,7 @@
         <span style="width:30%">start Time</span>
         <DatePicker
           type="datetime"
+          format="yyyy-MM-dd HH:mm:ss"
           :placeholder="this.taskPlaceHolder.startTime"
           style="width: 300px"
           v-model="taskInfo.startTime"
@@ -628,6 +644,7 @@
         <span style="width:30%">end Time</span>
         <DatePicker
           type="datetime"
+          format="yyyy-MM-dd HH:mm:ss"
           :placeholder="this.taskPlaceHolder.endTime"
           style="width: 300px"
           v-model="taskInfo.endTime"
@@ -850,10 +867,7 @@ export default {
       sessionStorage.setItem("subProjectId", this.$route.params.id);
       this.axios
         .get(
-          "/api/module/inquiry" +
-            "?key=subProjectId" +
-            "&value=" +
-            subProjectId
+          "/api/module/inquiry" + "?key=subProjectId" + "&value=" + subProjectId
         )
         .then(res => {
           if (res.data != "None") {
@@ -912,9 +926,9 @@ export default {
     },
     editModalShow() {
       this.editModal = true;
-      console.log(this.currentModuleIndex);
+      // console.log(this.currentModuleIndex);
       let order = this.currentModuleIndex;
-      console.log(this.moduleList[order].title);
+      // console.log(this.moduleList[order].title);
       this.updateModuleTitle = this.moduleList[order].title;
       this.updateModuleType = this.moduleList[order].type;
       this.updateModuleDescription = this.moduleList[order].description;
@@ -933,7 +947,7 @@ export default {
       this.axios
         .post("/api/module/update", updateObject)
         .then(res => {
-          console.log(res.data);
+          // console.log(res.data);
           this.getAllModules();
         })
         .catch(err => {
@@ -1081,26 +1095,25 @@ export default {
       let taskDefult = {
         taskName: "",
         description: "",
-        startTime: "",
-        endTime: "",
+        startTime: '',
+        endTime: '',
         state: ""
       };
-      this.taskInfo = taskDefult;
+      this.$set(this,"taskInfo",taskDefult);
       this.createTaskModal = true;
     },
     createTask() {
       //RequestBody，所以是json格式
       let taskForm = {};
-      console.log("当前模块是：" + this.currentModule.moduleId);
+      // console.log("当前模块是：" + this.currentModule.moduleId);
       taskForm["taskName"] = this.taskInfo.taskName;
       taskForm["description"] = this.taskInfo.description;
-      taskForm["startTime"] = this.taskInfo.startTime;
-      taskForm["endTime"] = this.taskInfo.endTime;
+      taskForm["startTime"] = new Date(this.taskInfo.startTime);
+      taskForm["endTime"] = new Date(this.taskInfo.endTime);
       taskForm["creatorId"] = this.$store.state.userId;
       taskForm["moduleId"] = this.currentModule.moduleId;
-      taskForm["state"] = this.taskInfo.state;
+      taskForm["state"] = "todo";
       taskForm["order"] = "";
-      console.log(taskForm);
       this.axios
         .post("/api/task/save", taskForm)
         .then(res => {
@@ -1118,13 +1131,19 @@ export default {
             taskList[index]["taskId"]
         )
         .then(res => {
-          let result = res.data;
-          this.$set(this, "taskInfo", result[0]);
-          console.log(this.taskInfo);
-          this.editTaskModal = true;
+          if(res.data!="Fail"){
+            let taskInfoRes = res.data[0];
+            taskInfoRes.startTime=new Date(taskInfoRes.startTime);
+            taskInfoRes.endTime=new Date(taskInfoRes.endTime);
+            this.$set(this, "taskInfo", taskInfoRes);
+            this.editTaskModal = true;
+          }
+          else{
+            this.$Message.error("Fail!");
+          }
         })
         .catch(err => {
-          console.log(err.data);
+            this.$Message.error("Fail!");
         });
     },
     //更新某个task
@@ -1133,8 +1152,8 @@ export default {
       taskForm.append("taskId", this.taskInfo.taskId);
       taskForm.append("taskName", this.taskInfo.taskName);
       taskForm.append("description", this.taskInfo.description);
-      taskForm.append("startTime", this.taskInfo.startTime);
-      taskForm.append("endTime", this.taskInfo.endTime);
+      taskForm.append("startTime", new Date(this.taskInfo.startTime));
+      taskForm.append("endTime", new Date(this.taskInfo.endTime));
       taskForm.append("state", this.taskInfo.state);
       this.axios
         .post("/api/task/update", taskForm)
@@ -1154,42 +1173,42 @@ export default {
       // /task/inquiry
       this.axios
         .get(
-          "/api/task/inquiryTodo?" +
-            "moduleId=" +
-            this.currentModule.moduleId
+          "/api/task/inquiryTodo?" + "moduleId=" + this.currentModule.moduleId
         )
         .then(res => {
-          // console.log("---load todo list---");
-          // console.log(res.data);
-          this.$set(this, "taskTodo", res.data);
+          if(res.data != "None" && res.data != "Fail"){
+            this.$set(this, "taskTodo", res.data);
+          }else {
+            this.$Message.error("Fail!");
+          }
         })
         .catch(err => {
           console.log(err.data);
         });
       this.axios
         .get(
-          "/api/task/inquiryDoing?" +
-            "moduleId=" +
-            this.currentModule.moduleId
+          "/api/task/inquiryDoing?" + "moduleId=" + this.currentModule.moduleId
         )
         .then(res => {
-          // console.log("---load doing list---");
-          // console.log(res.data);
-          this.$set(this, "taskDoing", res.data);
+          if(res.data != "None" && res.data != "Fail"){
+           this.$set(this, "taskDoing", res.data);
+          }else {
+            this.$Message.error("Fail!");
+          }
         })
         .catch(err => {
           console.log(err.data);
         });
       this.axios
         .get(
-          "/api/task/inquiryDone?" +
-            "moduleId=" +
-            this.currentModule.moduleId
+          "/api/task/inquiryDone?" + "moduleId=" + this.currentModule.moduleId
         )
         .then(res => {
-          // console.log("---load done list---");
-          // console.log(res.data);
-          this.$set(this, "taskDone", res.data);
+          if(res.data != "None" && res.data != "Fail"){
+            this.$set(this, "taskDone", res.data);
+          }else {
+            this.$Message.error("Fail!");
+          }
         })
         .catch(err => {
           console.log(err.data);
@@ -1219,11 +1238,7 @@ export default {
     },
     taskRemove(index, taskList) {
       this.axios
-        .get(
-          "/api/task/delete" +
-            "?taskId=" +
-            taskList[index]["taskId"]
-        )
+        .get("/api/task/delete" + "?taskId=" + taskList[index]["taskId"])
         .then(res => {
           if (res.data == "Success") {
             taskList.splice(index, 1);
