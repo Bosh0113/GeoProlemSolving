@@ -500,6 +500,9 @@
             <Button type="info" class="util-btn" shape="circle" @click="drawerOpen = true">
               <Icon type="ios-albums" size="20" class="util-btn-icon"/>
             </Button>
+            <!-- <Button type="info" class="util-btn" shape="circle" @click="resourcedrawerOpen = true">
+              <Icon type="md-cloud-upload" size="20" class="util-btn-icon"/>
+            </Button> -->
             <Drawer :closable="false" v-model="drawerOpen" width="640" style="font-size:30px">
               <h1>General Tools</h1>
               <div class="tool-panel">
@@ -829,7 +832,7 @@ export default {
     getAllModules() {
       //这里重写以下获取module
       let subProjectId = this.$route.params.id;
-      localStorage.setItem("subProjectId", this.$route.params.id);
+      sessionStorage.setItem("subProjectId", this.$route.params.id);
       this.axios
         .get(
           "http://localhost:8081/module/inquiry" +
@@ -935,7 +938,7 @@ export default {
       this.editModuleType = "";
     },
     show() {
-      let mId = localStorage.getItem("moduleId");
+      let mId = sessionStorage.getItem("moduleId");
       window.location.href =
         "http://202.195.237.252:8088/TeamWorking/Collaborative/ConceptualModel/index.html?groupID=" +
         mId +
@@ -970,7 +973,7 @@ export default {
           "http://localhost:8081/project/inquiry" +
             "?key=projectId" +
             "&value=" +
-            localStorage.getItem("projectId")
+            sessionStorage.getItem("projectId")
         )
         .then(res => {
           if (res.data != "None" && res.data != "Fail") {
@@ -1044,7 +1047,7 @@ export default {
         )
         .then(res => {
           if (res.data == "Success") {
-            let projectId = localStorage.getItem("projectId");
+            let projectId = sessionStorage.getItem("projectId");
             this.$router.push({
               name: "ProjectDetail",
               params: { id: projectId }
@@ -1217,8 +1220,15 @@ export default {
           this.$Message.error("Fail!");
         });
     },
-    gotoWorkSpace(data){
-      this.$router.push({ name: "PersonalPage" });
+    gotoWorkSpace(id){
+      // sessionStorage.setItem("memberId",data);
+      // this.$router.push({name: 'ProjectDetail',params:{id:id} });
+      if(id==sessionStorage.getItem("userId")){
+        this.$router.push({name: 'PersonalPage'});
+      }else{
+        this.$router.push({ name: "MemberDetailPage" ,params:{id:id}});
+      }
+      // console.log("挡墙登陆的账户是:"+ sessionStorage.getItem("userId"));
     }
   }
 };

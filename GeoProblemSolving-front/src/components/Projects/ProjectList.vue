@@ -91,13 +91,30 @@
                 slot="title"
                 @click="goSingleProject(item.projectId)"
                 class="projectTitle"
+                style="height:40px;line-height:40px;font-size:20px;width:80%"
               >{{item.title}}</p>
-              <!-- <a href="#" slot="extra" @click.prevent="changeLimit">
-                  <Icon type="md-heart" />
-              </a>-->
-              <!-- <div>
-                <h1 style="text-align:center;margin: 0 auto" @click="goSingleProject(item.projectId)" class="projectTitle">{{item.title}}</h1>
-              </div>-->
+              <div
+                class="operate"
+                slot="extra"
+                style="height:40px;display:flex;align-items:center"
+              >
+                <Button
+                  type="success"
+                  v-show="item.isMember===false&&item.isManager===false"
+                  @click="joinApply(item)"
+                >
+                  <Icon type="md-add"/>
+                </Button>
+                <br>
+                <Button
+                  type="default"
+                  v-show="item.isMember===true||item.isManager===true"
+                  :id="item.projectId"
+                >
+                <Icon type="md-person" />
+                </Button>
+              </div>
+
               <div style="display:flex;align-items:center;height:60px">
                 <Tag color="primary">Description</Tag>
                 <p style="padding: 0 10px">{{item.description}}</p>
@@ -123,23 +140,9 @@
                 <span style="height:20px;width:45%;color:white;text-align:center;">
                   <Tag color="primary">Create time</Tag>
                 </span>
-                <span style="height:20px;margin-left:5%">{{item.createTime}}</span>
+                <span style="height:20px;margin-left:5%">{{item.createTime.split(' ')[0]}}</span>
               </div>
               <div class="whitespace"></div>
-              <div class="operateProject" style="display:flex;justify-content:center">
-                <Button
-                  type="success"
-                  v-show="item.isMember===false&&item.isManager===false"
-                  @click="joinApply(item)"
-                >Join</Button>
-                <br>
-                <Button
-                  type="error"
-                  v-show="item.isMember===true||item.isManager===true"
-                  @click="quitModalShow(item)"
-                  :id="item.projectId"
-                >Quit</Button>
-              </div>
               <Modal
                 v-model="joinModal"
                 title="Join in project"
@@ -155,14 +158,6 @@
                     placeholder="Enter ProjectId you want to participate ..."
                     style="width: 400px"
                   >
-                  <div style="display:flex;align-items:center">
-                    <span style="margin-right:5%">ProjectId:</span>
-                    <input
-                      v-model="joinProjectId"
-                      placeholder="Enter ProjectId you want to participate ..."
-                      style="width: 400px"
-                    >
-                  </div>
                 </div>
               </Modal>
               <Modal
@@ -193,9 +188,12 @@ img {
 }
 /* title标题悬浮时出现下划线且变色 */
 .projectTitle:hover {
-  text-decoration: underline;
-  color: #c20c0c;
+  /* text-decoration: underline; */
+  /* color: #c20c0c; */
   cursor: pointer;
+}
+.operate button:hover{
+  cursor:default;
 }
 operateBtnGroup {
   --btnSize: 15px;
@@ -359,54 +357,54 @@ export default {
           this.$Message.danger("Join fail");
         });
     },
-    quitModalShow(project) {
-      this.quitModal = true;
-      this.quitSubProject = project;
-    },
-    quitProject() {
-      this.axios
-        .get(
-          "http://localhost:8081/project/quit?" +
-            "projectId=" +
-            this.quitSubProject.projectId +
-            "&userId=" +
-            this.$store.state.userId
-        )
-        .then(res => {
-          if (res.data === "Success") {
-            this.$Message.info("Quit successfully");
-            let replyNotice = {};
-            replyNotice["recipientId"] = this.quitSubProject.managerId;
-            replyNotice["type"] = "notice";
-            replyNotice["content"] = {
-              title: "Quit your project",
-              description:
-                "user " +
-                this.$store.state.userName +
-                " quit from your project: " +
-                this.quitSubProject.title +
-                " ."
-            };
-            this.axios
-              .post("http://localhost:8081/notice/save", replyNotice)
-              .then(result => {
-                if (result.data == "Success") {
-                  this.$emit("sendNotice", this.quitSubProject.managerId);
-                } else {
-                  this.$Message.danger("reply fail.");
-                }
-              })
-              .catch(err => {
-                this.$Message.danger("reply fail.");
-              });
-          } else {
-            this.$Message.danger("Fail");
-          }
-          let initObject = { key: "category", value: "Water" };
-          this.getSpecificTypeProjects(initObject);
-        })
-        .catch(err => {});
-    },
+    // quitModalShow(project) {
+    //   this.quitModal = true;
+    //   this.quitSubProject = project;
+    // },
+    // quitProject() {
+    //   this.axios
+    //     .get(
+    //       "http://localhost:8081/project/quit?" +
+    //         "projectId=" +
+    //         this.quitSubProject.projectId +
+    //         "&userId=" +
+    //         this.$store.state.userId
+    //     )
+    //     .then(res => {
+    //       if (res.data === "Success") {
+    //         this.$Message.info("Quit successfully");
+    //         let replyNotice = {};
+    //         replyNotice["recipientId"] = this.quitSubProject.managerId;
+    //         replyNotice["type"] = "notice";
+    //         replyNotice["content"] = {
+    //           title: "Quit your project",
+    //           description:
+    //             "user " +
+    //             this.$store.state.userName +
+    //             " quit from your project: " +
+    //             this.quitSubProject.title +
+    //             " ."
+    //         };
+    //         this.axios
+    //           .post("http://localhost:8081/notice/save", replyNotice)
+    //           .then(result => {
+    //             if (result.data == "Success") {
+    //               this.$emit("sendNotice", this.quitSubProject.managerId);
+    //             } else {
+    //               this.$Message.danger("reply fail.");
+    //             }
+    //           })
+    //           .catch(err => {
+    //             this.$Message.danger("reply fail.");
+    //           });
+    //       } else {
+    //         this.$Message.danger("Fail");
+    //       }
+    //       let initObject = { key: "category", value: "Water" };
+    //       this.getSpecificTypeProjects(initObject);
+    //     })
+    //     .catch(err => {});
+    // },
     cancel() {
       this.$Message.info("Clicked cancel");
     },

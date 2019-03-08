@@ -94,6 +94,7 @@ public class ProjectDaoImpl implements IProjectDao{
             Query query=new Query(Criteria.where("projectId").is(projectId));
             CommonMethod method=new CommonMethod();
             Update update=method.setUpdate(request);
+            update.set("projectId",projectId);
             mongoTemplate.updateFirst(query,update,ProjectEntity.class);
             return "Success";
         }

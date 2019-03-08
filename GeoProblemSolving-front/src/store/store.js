@@ -25,11 +25,11 @@ export default new Vuex.Store({
     },
     mutations: {
         getStorage: state => {
-            if (localStorage.getItem('userState')) {
+            if (sessionStorage.getItem('userState')) {
                 state.userState = true;
-                state.userName = localStorage.getItem('userName');
-                state.avatar = localStorage.getItem('avatar');
-                state.userId = localStorage.getItem('userId');
+                state.userName = sessionStorage.getItem('userName');
+                state.avatar = sessionStorage.getItem('avatar');
+                state.userId = sessionStorage.getItem('userId');
             }
         },
         userLogin: (state, data) => {
@@ -37,19 +37,19 @@ export default new Vuex.Store({
             state.userName = data.userName;
             state.avatar = data.avatar;
             state.userId = data.userId;
-            localStorage.setItem('userState', 'true');
-            localStorage.setItem('userName', data.userName);
-            localStorage.setItem('avatar', data.avatar);
-            localStorage.setItem('userId', data.userId);
+            sessionStorage.setItem('userState', 'true');
+            sessionStorage.setItem('userName', data.userName);
+            sessionStorage.setItem('avatar', data.avatar);
+            sessionStorage.setItem('userId', data.userId);
 
         },
         userLogout: (state) => {
             state.userState = false;
             state.userName = 'visitor';
-            localStorage.removeItem('userState');
-            localStorage.removeItem('userName');
-            localStorage.removeItem('avatar');
-            localStorage.removeItem('userId');
+            sessionStorage.removeItem('userState');
+            sessionStorage.removeItem('userName');
+            sessionStorage.removeItem('avatar');
+            sessionStorage.removeItem('userId');
         },
         uploadAvatar: (state, avatar) => {
             state.avatar = avatar;

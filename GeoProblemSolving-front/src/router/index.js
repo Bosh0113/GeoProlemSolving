@@ -20,6 +20,8 @@ import projectworkspace from '@/components/NavigationContent/ProjectWorkspace.vu
 import mavonEditor from 'mavon-editor'
 import 'mavon-editor/dist/css/index.css'
 import projectList from '@/components/Projects/ProjectList.vue'
+import MemberDetailPage from '@/components/UserPage/memberDetailPage.vue'
+import ResourceList from '@/components/Resource/ResourceList.vue'
 Vue.use(Router)
 Vue.use(mavonEditor)
 
@@ -38,6 +40,8 @@ const routes = [{
     { path: 'help', name: 'Help', component: Help },
     { path: 'personalPage', name: 'PersonalPage', component: PersonalPage },
     { path: 'notifications', name: 'Notifications', component:Notifications},
+    { path: 'memberPage/:id', name: 'MemberDetailPage', component:MemberDetailPage},
+    { path: 'resourceList', name:'resourceList', component:ResourceList},
   ]
 },
     { path: '/login', name: 'Login', component: Login },

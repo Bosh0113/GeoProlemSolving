@@ -1,25 +1,20 @@
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-body{
-  min-width: 1200px;
-  overflow-x: auto;
-}
 #logo {
   position: absolute;
   width: 129px;
   height: 40px;
   z-index: 1;
   margin-top: 5px;
-  /* margin-left: 2.5%; */
-  margin-left: 5%;
+  margin-left: 2.5%;
+  /* margin-left: 5%; */
 }
 .header span {
   font-size: 15px;
 }
 .header {
-  /* z-index: 2;
-  height: 60px; */
   position: absolute;
+  /* margin-left:0.5%; */
   width: 100%;
   height: 60px;
 }
@@ -27,17 +22,12 @@ body{
   position: absolute;
   margin-left: 85%;
   top: 0px;
-  min-width: 300px;
+  width:auto;
+  /* min-width: 300px; */
   z-index: 1;
 }
 .content {
-  /* padding-top: 5px; */
   padding-top: 60px;
-  /* width: 95%;
-  margin-left: 2.5%;
-  margin-right: 2.5%; */
-  margin-left: 5%;
-  margin-right: 5%;
 }
 </style>
 <template>
@@ -50,7 +40,7 @@ body{
           theme="dark"
           active-name="home"
           @on-select="turnContent"
-          style="min-width:900px;z-index:0"
+          style="width:100%;z-index:0"
         >
           <MenuItem name="home" class="menuItem" style="margin-left:30%">
             <span>Home</span>

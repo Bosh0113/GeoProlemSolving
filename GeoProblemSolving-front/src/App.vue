@@ -6,8 +6,8 @@
 </template>
 <style>
 body{
-  overflow: hidden;
-  overflow-y: scroll;
+  /* overflow: hidden; */
+  /* overflow-y: scroll; */
 }
 </style>
 <script>

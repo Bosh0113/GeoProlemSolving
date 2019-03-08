@@ -150,7 +150,12 @@ img {
           <div style="margin-top:20px">
              <div class="feature_title">Function Modules</div>
              <Row>
-               <Col span = "7" offset="1" v-for="module in module_lists" :key="module.index">
+               <Col
+                :lg="{ span: 7, offset: 1 }"
+                :md="{ span: 11, offset: 1}"
+                :sm="{ span: 22, offset: 1}"
+                :xs="{ span: 22, offset: 1}"
+                v-for="module in module_lists" :key="module.index">
                 <div class="function_card">
                 <div class="card_title">{{module.name}}</div>
                 <div class="card_body">
@@ -166,7 +171,6 @@ img {
                </Col>
             </Row>
           </div>
-
           </Col>
         </div>
 
@@ -176,7 +180,12 @@ img {
         <div class="function_part">
           <div class="function_title">Example lists</div>
           <Row>
-            <Col span="7" offset="1" v-for="list in example_show_lists" :key="list.index">
+            <Col
+               :lg="{ span: 7, offset: 1 }"
+               :md="{ span: 11, offset: 1}"
+               :sm="{ span: 22, offset: 1}"
+               :xs="{ span: 22, offset: 1}"
+                v-for="list in example_show_lists" :key="list.index">
               <div class="function_card">
                 <div class="card_title">{{list.name}}</div>
                 <div class="card_body">

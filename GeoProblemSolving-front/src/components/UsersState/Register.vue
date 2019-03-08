@@ -120,7 +120,23 @@
                       v-model="formValidate.password"
                       placeholder="Plase enter password"
                       :class="{InputStyle: inputstyle}"
-                    ></Input>
+                      :type="pwdType"
+                    >
+                      <Button slot="append" @click="changeType()">
+                        <Icon type="ios-eye" size="20" v-show="pwdType=='text'"/>
+                        <Icon type="ios-eye-off" size="20" v-show="pwdType=='password'"/>
+                      </Button>
+                    </Input>
+                  </FormItem>
+                  <!-- confimPassword -->
+                  <FormItem label="ConfimPassword" prop="confimPassword">
+                    <Input
+                      v-model="formValidate.confimPassword"
+                      placeholder="Plase enter password again"
+                      :class="{InputStyle: inputstyle}"
+                      :type="pwdType"
+                    >
+                    </Input>
                   </FormItem>
                   <FormItem label="Job Title" prop="jobTitle">
                     <Input
@@ -242,6 +258,15 @@ export default {
     this.$store.state.avatar = "";
   },
   data() {
+    var validatePass = (rule, value, callback) => {
+      if (value === "") {
+        callback(new Error("Please enter your password again"));
+      } else if (value !== this.formValidate.password) {
+        callback(new Error("The two passwords are inconsistent!"));
+      } else {
+        callback();
+      }
+    };
     return {
       //data预设
       country: "",
@@ -253,6 +278,7 @@ export default {
         userName: "",
         email: "",
         password: "",
+        confimPassword: "",
         jobTitle: "",
         mobilePhone: "",
         gender: "",
@@ -288,10 +314,11 @@ export default {
           {
             required: true,
             min: 6,
-            message: "Password cannot be empty",
+            message: "Password must more than 6 words",
             trigger: "blur"
           }
         ],
+        confimPassword: [{ validator: validatePass, trigger: "blur" }],
         jobTitle: [
           {
             required: true,
@@ -362,7 +389,9 @@ export default {
           }
         ]
       },
-      visible: false
+      visible: false,
+      // 隐藏密码图标样式
+      pwdType: "password" // 密码类型
     };
   },
   mounted() {},
@@ -370,20 +399,6 @@ export default {
     handleSubmit(name) {
       this.$refs[name].validate(valid => {
         if (valid) {
-          // var params = new URLSearchParams();
-          // params.append("userName", this.formValidate.userName);
-          // params.append("email", this.formValidate.email);
-          // params.append("password", this.formValidate.password);
-          // params.append("mobilePhone", this.formValidate.mobilePhone);
-          // params.append("gender", this.formValidate.gender);
-          // params.append("jobTitle", this.formValidate.jobTitle);
-          // params.append("country", this.formValidate.country);
-          // params.append("city", this.formValidate.city);
-          // params.append("organization", this.formValidate.organization);
-          // params.append("introduction", this.formValidate.introduction);
-          // params.append("direction", this.formValidate.direction);
-          // params.append("homePage", this.formValidate.homePage);
-          // params.append("avatar", this.formValidate.avatar);
           var userJson = {};
           userJson["userName"] = this.formValidate.userName;
           userJson["email"] = this.formValidate.email;
@@ -454,6 +469,11 @@ export default {
     //点击图标片跳转到主页
     goHome() {
       this.$router.push({ name: "Home" });
+    },
+    //输入密码时
+    changeType() {
+      this.pwdType = this.pwdType === "password" ? "text" : "password";
+      // this.eyeIconType = 'ios-eye-on';
     }
   }
 };

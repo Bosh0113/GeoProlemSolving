@@ -456,7 +456,7 @@ export default {
       }
     },
     startWebSocket(data) {
-      let roomId = localStorage.getItem("subProjectId");
+      let roomId = sessionStorage.getItem("subProjectId");
       this.socketApi.initWebSocket("ChatServer/" + roomId);
 
       this.send_msg = {

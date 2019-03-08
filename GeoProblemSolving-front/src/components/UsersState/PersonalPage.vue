@@ -183,27 +183,32 @@
         </div>
       </Col>
       <Col span="17" offset="1" class="user-project">
-        <Tabs value="name1">
+        <Tabs value="Participatory">
           <TabPane label="Participatory Project" name="Participatory">
-            <Row>
-              <Col span="23">
-                <div style="display:flex">
-                  <Row>
-                    <Col span="11" offset="1" v-for="i in 3" :key="i">
-                      <Card :bordered="false" class="project-card">
-                        <div style="display:flex">
-                          <p slot="title">111</p>
-                        </div>
-                        <p>Content of no border type. Content of no border type. Content of no border type. Content of no border type.</p>
-                        <div style="height:40px;display:flex;align-items:center;float:right">
-                          <Button type="primary" @click="quitProject">Quit</Button>
-                        </div>
-                      </Card>
-                    </Col>
-                  </Row>
-                </div>
+            <div
+              v-for="(item,index) in joinedProjectsList"
+              :key="index"
+              v-show="joinedProjectsList!='None'"
+            >
+              <Col span="11" offset="1">
+                <Card style="height:320px;margin-top:20px;">
+                  <p
+                    slot="title"
+                    style="height:40x"
+                    class="projectsTitle"
+                    @click="goSingleProject(item.projectId)"
+                  >{{item.title}}</p>
+                  <!-- <p>{{item.description}}</p> -->
+                  <p style="height:200px;text-indent:2em;overflow-y:scroll">{{item.introduction}}</p>
+                  <hr>
+                  <br>
+                  <div style="height:40px">
+                    <span style="float:left">CreateTime:</span>
+                    <span style="float:right">{{item.createTime}}</span>
+                  </div>
+                </Card>
               </Col>
-            </Row>
+            </div>
           </TabPane>
           <TabPane label="Management Project" name="Management">
             <div
@@ -211,7 +216,7 @@
               v-show="userManagerProjectList!='None'"
             >
               <Col span="11" offset="1">
-                <Card style="min-height:200px;">
+                <Card style="height:320px;margin-top:20px;height:40x">
                   <p slot="title" class="projectsTitle" @click="goSingleProject(mProject.projectId)">{{mProject.title}}</p>
                   <Button
                     type="primary"
@@ -336,7 +341,7 @@
                       </div>
                       <div class="editStyle">
                         <span>Privacy</span>
-                        <RadioGroup style="margin-left:0.5%">
+                        <RadioGroup style="margin-left:0.5%" v-model="editPrivacy">
                           <Radio
                             label="Public"
                             title="Other users can find the group and see who has membership."
@@ -350,8 +355,8 @@
                       </div>
                     </div>
                   </Modal>
-                  <p>{{mProject.description}}</p>
-                  <p>{{mProject.introduction}}</p>
+                  <!-- <p>{{mProject.description}}</p> -->
+                  <p style="height:200px;text-indent:2em;overflow-y:scroll">{{mProject.introduction}}</p>
                   <hr>
                   <br>
                   <div>
@@ -541,6 +546,10 @@ export default {
       visible:false,
       //抽屉开启状态控制
       // drawerClose:false,
+      //加入的项目的名字id数组
+      joinedProjectsNameArray: [],
+      //加入的项目详情数组列表
+      joinedProjectsList: []
     };
   },
   methods: {
@@ -557,21 +566,41 @@ export default {
           this.userDetail = res.data;
           //打印用户的具体信息
           // console.log(this.userDetail);
+          this.joinedProjectsNameArray = this.userDetail.joinedProjects;
+          this.getParticipatoryList(this.joinedProjectsNameArray);
+          // console.log("joinedProjectsList是" + this.joinedProjectsList);
         })
         .catch(err => {
           console.log(err.data);
         });
     },
     //获取用户参与的所有项目列表
-    getParticipatoryProjectList() {
-      this.axios
-        .post(url, {
-          params: {
-            id: paramId
-          }
-        })
-        .then(res => {})
-        .catch(err => {});
+    //获取用户参与的项目列表
+    getParticipatoryList(projectIds) {
+      var count = projectIds.length;
+      let participatoryProjectListTemp = [];
+      for (let i = 0; i < projectIds.length; i++) {
+        this.axios
+          .get(
+            "http://localhost:8081/project/inquiry" +
+              "?key=projectId" +
+              "&value=" +
+              projectIds[i].projectId
+          )
+          .then(res => {
+            participatoryProjectListTemp.push(res.data[0]);
+            if (--count == 0) {
+              this.$set(
+                this,
+                "joinedProjectsList",
+                participatoryProjectListTemp
+              );
+            }
+          })
+          .catch(err => {
+            console.log(err.data);
+          });
+      }
     },
     //获取用户可管理支配的全部项目列表
     getManagerProjectList() {
@@ -718,6 +747,7 @@ export default {
       this.axios.post("http://localhost:8081/project/update", projectEditForm)
       .then(res=>{
         console.log(res.data);
+        alert(res.data);
         this.getManagerProjectList();
       })
       .catch(err=> {
