@@ -123,7 +123,7 @@ operateBtnGroup {
             v-if="item.privacy=='Public'"
           >
             <Card style="height:auto;margin:20px 0 20px 0">
-              <h2
+              <p
                 slot="title"
                 @click="goSingleProject(item.projectId)"
                 class="projectTitle"
