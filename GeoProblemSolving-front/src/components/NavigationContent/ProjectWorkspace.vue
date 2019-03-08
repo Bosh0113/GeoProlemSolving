@@ -384,7 +384,7 @@
       <hr>
       <Row style="margin-top:20px">
         <Col :xs="8" :sm="7" :md="6" :lg="5" v-bind="this.olParticipants">
-          <div class="member_panel" :style="{height:sidebarHeight+'px'}">
+          <div class="member_panel" :style="{height:sidebarHeight+'px'}" style="background-color:white">
             <div class="title">Online participants</div>
             <div :style="{height:sidebarHeight-100+'px'}">
               <div class="member-desc" v-for="member in olParticipants" :key="member.id">                
@@ -425,30 +425,30 @@
           </div>
         </Col>
         <template>
-          <Col :xs="15" :sm="16" :md="17" :lg="18" offset="1" style="height:300px;margin-bottom:20px">
+          <Col :xs="15" :sm="16" :md="17" :lg="18" offset="1" :style="{height:sidebarHeight/5*3+'px'}" style="margin-bottom:20px">
             <div style="width:45%;height:100%;float:left;background-color:white">
               <h2 style="width:100%;padding:10px 10px 0 10px">{{currentModule.title}}</h2>
               <hr>
               <div style="width:100%;padding:10px">{{currentModule.description}}</div>
             </div>
-            <div style="width:50%;height:100%;float:right;border:1px solid lightgray">
-              <Timeline>
+            <div style="width:50%;height:100%;float:right;border:1px solid lightgray;background-color:white;overflow-y:scroll">
+              <Timeline style="padding:10px">
                 <!-- <TimelineItem v-if="records.length > 3"><a href="#">More</a></TimelineItem> -->
                 <TimelineItem v-for="(item,index) in records" :key="index">
                   <template v-if="item.type == 'participants'">
                     <span class="time" style="color:blue">{{item.time}}</span>
-                    <span class="time" style="color:blue">{{item.who}}</span>
-                    <span class="content" style="color:blue">{{item.content}}</span>
+                    <span class="time" style="color:blue; margin-left:10px">{{item.who}}</span>
+                    <span class="content" style="color:blue; margin-left:10px; word-break:break-word">{{item.content}}</span>
                   </template>
                   <template v-if="item.type == 'resources'">
                     <span class="time">{{item.time}}</span>
-                    <span class="time">{{item.who}}</span>
-                    <span class="content">{{item.content}}</span>
+                    <span class="time" style="margin-left:10px">{{item.who}}</span>
+                    <span class="content" style="margin-left:10px; word-break:break-word">{{item.content}}</span>
                   </template>
                   <template v-if="item.type == 'tasks'">
                     <span class="time" style="color:gray">{{item.time}}</span>
-                    <span class="time" style="color:gray">{{item.who}}</span>
-                    <span class="content" style="color:gray">{{item.content}}</span>
+                    <span class="time" style="color:gray; margin-left:10px">{{item.who}}</span>
+                    <span class="content" style="color:gray; margin-left:10px; word-break:break-word">{{item.content}}</span>
                   </template>
                 </TimelineItem>
               </Timeline>
@@ -464,6 +464,7 @@
                 element="ul"
                 :options="{group:'task'}"
                 v-model="taskTodo"
+                @start="startMove(taskTodo,'todo')"
                 @update="taskOrderUpdate(taskTodo,'todo')"
                 @add="taskOrderUpdate(taskTodo,'todo')"
                 @remove="taskOrderUpdate(taskTodo,'todo')"
@@ -490,6 +491,7 @@
                 element="ul"
                 :options="{group:'task'}"
                 v-model="taskDoing"
+                @start="startMove(taskTodo,'todo')"
                 @update="taskOrderUpdate(taskDoing,'doing')"
                 @add="taskOrderUpdate(taskDoing,'doing')"
                 @remove="taskOrderUpdate(taskDoing,'doing')"
@@ -516,6 +518,7 @@
                 element="ul"
                 :options="{group:'task'}"
                 v-model="taskDone"
+                @start="startMove(taskTodo,'todo')"
                 @update="taskOrderUpdate(taskDone,'done')"
                 @add="taskOrderUpdate(taskDone,'done')"
                 @remove="taskOrderUpdate(taskDone,'done')"
@@ -559,7 +562,6 @@
                   <br>
                   <span style="display:flex;justify-content:center">11</span>
                 </div>
-
                 <Icon type="md-analytics" size="60" @click.native="show" title="Modeling Tools"/>
                 <Icon type="md-analytics" size="60" @click.native="show" title="Modeling Tools"/>
               </div>
@@ -775,8 +777,15 @@ export default {
         content: ""
       },
       records: [],
-      // 现在参与者
-      olParticipants: []
+      // 当前参与者
+      olParticipants: [],
+      // 消息
+      socketMsg:{
+        type: "",
+        time: "",
+        who: "",
+        whoid:"",
+        content: ""}
     };
   },
   created() {
@@ -804,7 +813,9 @@ export default {
   },
   beforeDestroy: function() {
     window.removeEventListener("resize", this.initSize);
-    this.moduleSocket.close();
+    if(this.moduleSocket != null){
+      this.moduleSocket.close();    
+    }
   },
   methods: {
     initSize() {
@@ -861,6 +872,19 @@ export default {
         }
       });
     },
+    initHistory(){
+      this.records = [];
+      let that = this;
+      this.axios.get("http://localhost:8081/history/inquiry?scopeId="+this.currentModule.moduleId)
+        .then(res => {
+          if (res.data != "Fail") {
+            for(let i = 0; i<res.data.length;i++){
+              let tempRecords = JSON.parse(res.data[i].description);
+              that.records.push(tempRecords);
+            }
+          }
+        });
+    },
     managerIdentity(managerId) {
       if (managerId === this.$store.state.userId) {
         this.isSubProjectManager = true;
@@ -883,10 +907,10 @@ export default {
       } else {
         this.currentModuleIndex = item - 1;
         this.currentModule = this.moduleList[this.currentModuleIndex];
-        // console.log(this.currentModule);
         this.inquiryTask();
         this.order = item;
         this.openModuleSocket(this.currentModule.moduleId);
+        this.initHistory();
       }
     },
     closeModuleSocket() {
@@ -909,7 +933,7 @@ export default {
     // 更新人员，更新数据，更新records
     onMessage(e) {
       let messageJson = JSON.parse(e.data);
-      let userIndex = "";
+      var userIndex = -1;
 
       if (messageJson.type == "online") {
 
@@ -923,12 +947,32 @@ export default {
 
       } else if (messageJson.type == "message") {
 
-        console.log(messageJson.message);
+        let message = messageJson.message;
         // 更新数据 --by mzy
-
-        // 获取history记录 --by mzy
+        if(message.type == "tasks" && message.whoid != this.$store.state.userId){
+          this.inquiryTask();
+        }
+        if(message.type == "resources" && message.whoid != this.$store.state.userId){
+          
+        }
 
         // 更新records --by mzy
+        this.records.push(message);
+        // let History = {};
+        // History["scopeId"] = this.currentModule.moduleId;
+        // History["description"] = JSON.stringify(message);
+        this.axios
+          .post("http://localhost:8081/history/save", "description="+ JSON.stringify(message) + "&scopeId=" + this.currentModule.moduleId)
+          .then(res => {
+            if (res.data === "Fail") {
+              this.$Message.info("Fail");
+            } else if(res.data === "Success") {              
+              this.$Message.info("Success");
+            }
+          })
+          .catch(err => {
+            console.log(err.data);
+          });          
 
       } else if (messageJson.type == "members") {
         // 比较 判断人员动态 更新records --by mzy
@@ -965,28 +1009,30 @@ export default {
           }
         }
         // 人员渲染 --by mzy
-        let participantsTemp = [];
+        this.olParticipants = [];
+        var that = this;
         for (let i = 0; i < members.length; i++) {
-          $.ajax({
-            url:
-              "http://localhost:8081/user/inquiry" +
+          this.axios
+          .get(
+            "http://localhost:8081/user/inquiry" +
               "?key=" +
               "userId" +
               "&value=" +
-              members[i],
-            type: "GET",
-            async: false,
-            success: function(data) {
-              participantsTemp.push(data);
+              members[i]
+          )
+          .then(res => {
+            if (res.data != "None" && res.data != "Fail") {
+              that.olParticipants.push(res.data);
+              if(userIndex != -1){
+                that.record.who =  that.olParticipants[userIndex].userName;
+              }
+            } else if (res.data == "None") {            
             }
           });          
-        }
-        
+        }        
         //records 更新
         this.record.type = "participants";
-        this.record.who =  participantsTemp[userIndex].userName;
         this.records.push(this.record);
-        this.$set(this, "olParticipants", participantsTemp);
       }
     },
     onClose(e) {
@@ -1082,9 +1128,7 @@ export default {
     },
     editModalShow() {
       this.editModal = true;
-      console.log(this.currentModuleIndex);
       let order = this.currentModuleIndex;
-      console.log(this.moduleList[order].title);
       this.updateModuleTitle = this.moduleList[order].title;
       this.updateModuleType = this.moduleList[order].type;
       this.updateModuleDescription = this.moduleList[order].description;
@@ -1103,7 +1147,6 @@ export default {
       this.axios
         .post("http://localhost:8081/module/update", updateObject)
         .then(res => {
-          console.log(res.data);
           this.getAllModules();
         })
         .catch(err => {
@@ -1261,7 +1304,6 @@ export default {
     createTask() {
       //RequestBody，所以是json格式
       let taskForm = {};
-      console.log("当前模块是：" + this.currentModule.moduleId);
       taskForm["taskName"] = this.taskInfo.taskName;
       taskForm["description"] = this.taskInfo.description;
       taskForm["startTime"] = this.taskInfo.startTime;
@@ -1270,13 +1312,20 @@ export default {
       taskForm["moduleId"] = this.currentModule.moduleId;
       taskForm["state"] = this.taskInfo.state;
       taskForm["order"] = "";
-      console.log(taskForm);
       this.axios
         .post("http://localhost:8081/task/save", taskForm)
         .then(res => {
           this.inquiryTask();
         })
         .catch(err => {});
+
+      // 任务更新socket
+      this.socketMsg.whoid = this.$store.state.userId;
+      this.socketMsg.who = this.$store.state.userName;
+      this.socketMsg.type = "tasks";
+      this.socketMsg.content = "created a new task.";
+      this.socketMsg.time = new Date().toLocaleString();
+      this.sendMessage(this.socketMsg);
     },
     //打开task编辑器
     editOneTask(index, taskList) {
@@ -1290,12 +1339,11 @@ export default {
         .then(res => {
           let result = res.data;
           this.$set(this, "taskInfo", result[0]);
-          console.log(this.taskInfo);
           this.editTaskModal = true;
         })
         .catch(err => {
           console.log(err.data);
-        });
+        });      
     },
     //更新某个task
     updateTask() {
@@ -1318,6 +1366,14 @@ export default {
         .catch(err => {
           console.log(err.data);
         });
+      
+      // 任务更新socket
+      this.socketMsg.whoid = this.$store.state.userId;
+      this.socketMsg.who = this.$store.state.userName;
+      this.socketMsg.type = "tasks";
+      this.socketMsg.content = "edited a new task.";
+      this.socketMsg.time = new Date().toLocaleString();
+      this.sendMessage(this.socketMsg);
     },
     //查询task
     inquiryTask() {
@@ -1372,7 +1428,16 @@ export default {
           .catch(err => {
             console.log(err.data);
           });
-      }
+      }      
+    },
+    startMove(taskList, type){      
+      // 任务更新socket
+      this.socketMsg.whoid = this.$store.state.userId;
+      this.socketMsg.who = this.$store.state.userName;
+      this.socketMsg.type = "tasks";
+      this.socketMsg.content = "changed the task schedule.";
+      this.socketMsg.time = new Date().toLocaleString();
+      this.sendMessage(this.socketMsg);
     },
     taskRemove(index, taskList) {
       this.axios
@@ -1391,6 +1456,14 @@ export default {
         .catch(err => {
           this.$Message.error("Fail!");
         });
+            
+      // 任务更新socket
+      this.socketMsg.whoid = this.$store.state.userId;
+      this.socketMsg.who = this.$store.state.userName;
+      this.socketMsg.type = "tasks";
+      this.socketMsg.content = "removed a task.";
+      this.socketMsg.time = new Date().toLocaleString();
+      this.sendMessage(this.socketMsg);
     },
     gotoWorkSpace(data) {
       this.$router.push({ name: "PersonalPage" });
