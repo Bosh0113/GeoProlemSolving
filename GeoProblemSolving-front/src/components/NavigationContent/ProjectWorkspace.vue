@@ -418,7 +418,7 @@
                       class="taskName"
                     >{{item.taskName}}</strong>
                     <span
-                      style="float:right;margin-right:3px;cursor: pointer;color:red;"
+                      style="float:right;margin-right:3px;cursor: pointer;color:gray;"
                       @click="taskRemove(index,taskTodo)"
                     >×</span>
                     </div>
@@ -446,7 +446,7 @@
                       class="taskName"
                     >{{item.taskName}}</strong>
                     <span
-                      style="float:right;margin-right:3px;cursor: pointer;color:red;"
+                      style="float:right;margin-right:3px;cursor: pointer;color:gray;"
                       @click="taskRemove(index,taskDoing)"
                     >×</span>
                     </div>
@@ -474,7 +474,7 @@
                       class="taskName"
                     >{{item.taskName}}</strong>
                     <span
-                      style="float:right;margin-right:3px;cursor: pointer;color:red;"
+                      style="float:right;margin-right:3px;cursor: pointer;color:gray;"
                       @click="taskRemove(index,taskDone)"
                     >×</span>
                     </div>
