@@ -22,7 +22,7 @@
   height: 250px;
 }
 .detail_description {
-  padding: 0 20px;
+  padding: 20px;
   max-height: 350px;
 }
 .detail_description p {
@@ -57,6 +57,9 @@
   height: 100px;
   border: 1px solid gray;
   /* background-color: lightblue; */
+}
+.memberPanel{
+  padding:20px
 }
 .subprojectPanel {
   /* min-height: 200px; */
@@ -160,7 +163,7 @@
       <Col span="20" offset="2">
         <div class="whitespace"></div>
         <div class="whitespace"></div>
-        <div class="detail">
+        <div class="detail" style="padding: 0 0 20px 0">
           <div class="detail_description">
             <Card>
               <p
@@ -286,7 +289,8 @@
           </div>
         </div>
         <div class="whitespace"></div>
-        <div class="memberPanel" style="padding:0 20px">
+        <div class="whitespace"></div>
+        <div class="memberPanel">
           <Card :bordered="false">
             <p slot="title" style="font-size:25px;height:40px;line-height:40px;">Members</p>
             <div slot="extra" style="height:40px" class="popCenter">
@@ -562,7 +566,7 @@
           </Card>
         </div>
         <div class="whitespace"></div>
-        <div class="resourcePanel" style="padding:0 20px">
+        <div class="resourcePanel" style="padding:20px">
           <Card>
             <p slot="title" style="font-size:25px;height:40px;line-height:40px;">Resource</p>
             <div slot="extra" style="display:flex;align-items:center;height:40px" class="popCenter">
