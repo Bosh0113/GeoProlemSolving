@@ -14,7 +14,7 @@ body{
 export default {
   name: "App",
   created() {
-    this.$store.commit("getStorage");
+    this.$store.commit("getUserInfo");
   }
 };
 </script>

@@ -29,7 +29,14 @@ public class NoticeSocket {
     public void onMessage(String message)
     {
         try {
-            servers.get(message).session.getBasicRemote().sendText("Notice");
+            if(!message.equals("ping")){
+                for(Map.Entry<String,NoticeSocket> server:servers.entrySet()){
+                    if(server.getKey().equals(message)){
+                        servers.get(message).session.getBasicRemote().sendText("Notice");
+                        break;
+                    }
+                }
+            }
         }catch (IOException e){
             e.printStackTrace();
         }
@@ -39,7 +46,7 @@ public class NoticeSocket {
     {
         String unConnectId="";
         for(Map.Entry<String,NoticeSocket> server:servers.entrySet()){
-            if(server.getValue()==this){
+            if(server.getValue().equals(this)){
                 unConnectId=server.getKey();
                 servers.remove(server.getKey());
                 break;
@@ -48,11 +55,11 @@ public class NoticeSocket {
         System.out.println("有用户断开连接："+unConnectId);
     }
     @OnError
-    public void onError(Session session,Throwable error)
+    public void onError(Throwable error)
     {
         String unConnectId="";
         for(Map.Entry<String,NoticeSocket> server:servers.entrySet()){
-            if(server.getValue()==this){
+            if(server.getValue().equals(this)){
                 unConnectId=server.getKey();
                 servers.remove(server.getKey());
                 break;

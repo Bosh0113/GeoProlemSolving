@@ -126,7 +126,7 @@ export default {
       console.log(formData.get("introduction"));
       console.log(formData.get("privacy"));
       console.log(formData.get("participants"));
-      this.axios.post("http://localhost:8081/TeamModeling/newProjectServlet", formData)
+      this.axios.post("/api/TeamModeling/newProjectServlet", formData)
       .then(function (res) {
         if(res.data === "ok"){
           alert("成功");

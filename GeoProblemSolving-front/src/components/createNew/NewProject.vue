@@ -269,7 +269,7 @@ export default {
       createProjectForm["managerId"] = this.$store.state.userId;
       console.log(createProjectForm);
       this.axios
-        .post("http://localhost:8081/project/create", createProjectForm)
+        .post("/api/project/create", createProjectForm)
         .then(res => {
           if (res.data === "Fail") {
             this.$Message.success("Fail");
@@ -292,7 +292,7 @@ export default {
       let description = this.$store.state.userName + ' created a ' + this.formInline.category + ' project called ' + this.formInline.title;
       form["description"] = description;
       form["scopeId"] = scopeId;
-      this.axios.post("http://localhost:8081/history/save?", "description="+ description + "&scopeId=" + scopeId)
+      this.axios.post("/api/history/save?", "description="+ description + "&scopeId=" + scopeId)
           .then(res=> {
             console.log(res.data);
             if(res.data === 'Success'){

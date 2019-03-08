@@ -92,7 +92,7 @@
   <div>
     <Layout>
       <Header class="header">
-        <img src="@/assets/OGMS.png" id="logo" class="pic" @click="goHome">
+        <img src="@/assets/images/OGMS.png" id="logo" class="pic" @click="goHome">
       </Header>
       <Content>
         <Row class="Content" id="register">
@@ -415,7 +415,7 @@ export default {
           userJson["avatar"] = this.formValidate.avatar;
           this.axios
             .post(
-              "http://localhost:8081/user/register",
+              "/api/user/register",
               // params
               userJson
             )

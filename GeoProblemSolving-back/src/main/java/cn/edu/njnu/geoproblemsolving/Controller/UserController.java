@@ -75,6 +75,7 @@ public class UserController {
                 session.setMaxInactiveInterval(30*60);
                 session.setAttribute("userId",user.getUserId());
                 session.setAttribute("userName",user.getUserName());
+                session.setAttribute("avatar",user.getAvatar());
                 session.setAttribute("email",user.getEmail());
                 System.out.println("User login. UserName: "+user.getUserName());
             }
@@ -84,10 +85,28 @@ public class UserController {
         }
     }
 
-    @RequestMapping(value = "/logout", produces = {"application/json;charset=UTF-8"}, method = RequestMethod.POST)
+    @RequestMapping(value = "/logout", produces = {"application/json;charset=UTF-8"}, method = RequestMethod.GET)
     public void logout(HttpServletRequest request){
         HttpSession session=request.getSession();
         System.out.println("User logout. UserName: "+session.getAttribute("userName"));
         session.invalidate();
+    }
+
+    @RequestMapping(value = "/state", method = RequestMethod.GET)
+    public Object userState(HttpServletRequest request){
+        try {
+            HttpSession session=request.getSession();
+            if (session.getAttribute("userId")!=null){
+                UserDaoImpl userDao=new UserDaoImpl(mongoTemplate);
+                UserEntity userInfo=(UserEntity) userDao.readUser("userId",session.getAttribute("userId").toString());
+                userInfo.setPassword("");
+                return userInfo;
+            }
+            else {
+                return false;
+            }
+        }catch (Exception e){
+            return false;
+        }
     }
 }

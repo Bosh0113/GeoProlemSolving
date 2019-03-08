@@ -49,6 +49,7 @@ const routes = [{
     { path: '/chat' ,name :'chatUtil',component: chatUtil},
     { path: '/draw', name: 'drawUtil', component:drawUtil},
     { path: '/map', name: 'mapTool', component:mapTool},
+    { path: '/moduleDemo', name: 'ModuleDemo', component:ModuleDemo},
 ]
 export default new Router({
   routes,

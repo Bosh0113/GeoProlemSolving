@@ -409,17 +409,18 @@
 import Avatar from "vue-avatar";
 export default {
   created() {
-    this.$store.commit("getStorage");
-    // this.$store.state.avatar = "";
     this.getUserProfile();
     this.getManagerProjectList();
   },
   computed: {
     username() {
-      return this.$store.state.Username;
+      return this.$store.state.userName;
     },
     avatar() {
-      return this.$store.state.Avatar;
+      return this.$store.state.avatar;
+    },
+    userId() {
+      return this.$store.state.userId;
     }
   },
   mounted() {
@@ -557,10 +558,10 @@ export default {
     getUserProfile() {
       this.axios
         .get(
-          "http://localhost:8081/user/inquiry" +
+          "/api/user/inquiry" +
             "?key=userId" +
             "&value=" +
-            localStorage.getItem("userId")
+            this.userId
         )
         .then(res => {
           this.userDetail = res.data;
@@ -606,10 +607,10 @@ export default {
     getManagerProjectList() {
       this.axios
         .get(
-          "http://localhost:8081/project/inquiry" +
+          "/api/project/inquiry" +
             "?key=managerId" +
             "&value=" +
-            localStorage.getItem("userId")
+            this.userId
         )
         .then(res => {
           // 打印用户所管理的项目
@@ -625,7 +626,7 @@ export default {
       quitData.append("ProjectID", "");
       quitData.append("UserName", this.state.username);
       this.axios
-        .post("http://localhost:8081/TeamModeling/QuitProjectServlet", quitData)
+        .post("/api/TeamModeling/QuitProjectServlet", quitData)
         .then(res => {
           if (res.data === "Success") {
             this.$Message.success("Quit Success");
@@ -643,7 +644,7 @@ export default {
     logOutAccount() {
       this.axios
         .get(
-          "http://localhost:8081/user/remove?" +
+          "/api/user/remove?" +
             "userId=" +
             this.$store.state.userId
         )
@@ -679,7 +680,7 @@ export default {
       // }
       this.axios
         .get(
-          "http://localhost:8081/project/manager?" +
+          "/api/project/manager?" +
             "projectId=" +
             this.currentProjectId +
             "&newManagerId=" +
@@ -715,7 +716,7 @@ export default {
       ].projectId;
       this.axios
         .get(
-          "http://localhost:8081/project/delete?" +
+          "/api/project/delete?" +
             "projectId=" +
             selectProjectId
         )
@@ -744,7 +745,7 @@ export default {
       projectEditForm.append("tag",this.editTags);
       projectEditForm.append("privacy",this.editPrivacy);
       projectEditForm.append("projectId",this.editProjectId);
-      this.axios.post("http://localhost:8081/project/update", projectEditForm)
+      this.axios.post("/api/project/update", projectEditForm)
       .then(res=>{
         console.log(res.data);
         alert(res.data);
@@ -814,7 +815,7 @@ export default {
         }
       }
       this.axios
-          .post("http://localhost:8081/user/update", changedProfile)
+          .post("/api/user/update", changedProfile)
           .then(res => {
             if (res.data === "Success") {
               // this.drawerClose = true;

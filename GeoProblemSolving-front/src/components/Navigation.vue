@@ -33,7 +33,7 @@
 <template>
   <div class="mainPart">
     <div class="header">
-      <img src="@/assets/OGMS.png" id="logo" class="pic">
+      <img src="@/assets/images/OGMS.png" id="logo" class="pic">
       <div class="navPart">
         <Menu
           mode="horizontal"
@@ -59,48 +59,42 @@
           </MenuItem>
         </Menu>
         <div class="userState">
-          <template v-if="state=== false">
-            <Menu mode="horizontal" theme="dark" @on-select="unlogin" style="z-index:0">
+            <Menu mode="horizontal" theme="dark" @on-select="unlogin" style="z-index:0" v-show="!userState">
               <MenuItem name="login">
                 <span>Login</span>
               </MenuItem>
               <MenuItem name="register">
                  <span>Sign up</span>
-                <!-- <Icon type="md-create" size="25" title="Register">Sign up</Icon> -->
               </MenuItem>
             </Menu>
-          </template>
-          <template v-else>
-            <Menu mode="horizontal" theme="dark" @on-select="logged" style="z-index:0">
+            <Menu mode="horizontal" theme="dark" @on-select="logged" style="z-index:0"  v-show="userState">
               <MenuItem name="notification">
                 <Badge :count="unreadNoticeCount" id="noticeBadge">
                   <Icon type="ios-notifications-outline" size="25"></Icon>
                 </Badge>
               </MenuItem>
-              <MenuItem name="personalPage">
+              <MenuItem name="personal" style="width:30px">
                 <Dropdown @on-click="changeSelect" placement="bottom-start">
-                      <img
-                      v-bind:src="avatar"
-                      v-if="avatar!=''&&avatar!='undefined'"
-                      :title="userName"
-                      style="width:40px;height:40px;vertical-align:middle;"
-                    >
-                    <avatar
-                      :username="userName"
-                      :size="40"
-                      style="margin-top:10px"
-                      :title="userName"
-                      v-else
-                    ></avatar>
-                      <Icon type="md-arrow-dropdown" />
-                    <DropdownMenu slot="list" >
-                        <DropdownItem name="personalPage">User Space</DropdownItem>
-                        <DropdownItem name="userLogout">Log out</DropdownItem>
-                    </DropdownMenu>
+                  <img
+                    v-bind:src="avatar"
+                    v-if="avatar!=''&&avatar!='undefined'"
+                    :title="userName"
+                    style="width:40px;height:40px;vertical-align:middle;"
+                  >
+                  <avatar
+                    :username="userName"
+                    :size="40"
+                    style="margin-top:10px"
+                    :title="userName"
+                    v-else
+                  ></avatar>
+                  <DropdownMenu slot="list" >
+                      <DropdownItem name="personalPage">User Space</DropdownItem>
+                      <DropdownItem name="logout">Log out</DropdownItem>
+                  </DropdownMenu>
                 </Dropdown>
               </MenuItem>
             </Menu>
-          </template>
         </div>
       </div>
     </div>
@@ -109,7 +103,6 @@
     </div>
   </div>
 </template>
-
 <script>
 import Avatar from "vue-avatar";
 export default {
@@ -118,24 +111,25 @@ export default {
     return {
       //消息机制
       noticeSocket: null,
-      unreadNoticeCount:0,
+      unreadNoticeCount: 0,
+      timer: null
     };
   },
   created() {
-    if (this.$store.state.userId != "") {
+    if (this.$store.state.userState) {
+      this.setTimer();
       this.initWebSocket();
-      //获取到通知的总数并存储为vuex的变量
       this.getUnreadNoticeCount();
     }
   },
-  updated(){
-    $('.userState sup').css("margin-top","20px");
+  updated() {
+    $(".userState sup").css("margin-top", "20px");
   },
   components: {
     Avatar
   },
   computed: {
-    state() {
+    userState() {
       return this.$store.state.userState;
     },
     userName() {
@@ -167,31 +161,32 @@ export default {
       }
     },
     logged(name) {
-      if(name==="notification"){
+      if (name === "notification") {
         this.$router.push({ name: "Notifications" });
+      } else if (name === "personal") {
       }
     },
     // 获取到通知的数量
     getUnreadNoticeCount() {
-      this.unreadNoticeCount=0;
+      this.unreadNoticeCount = 0;
       //get请求发送的是用户id
       this.axios
         .get(
-          "http://localhost:8081/notice/inquiry?" +
-            "key=recipientId" +
+          "/api/notice/inquiry" +
+            "?key=recipientId" +
             "&value=" +
             this.$store.state.userId
         )
         .then(res => {
-          let noticeList=res.data;
-          let unreadCount=0;
-          for(let i=0;i<noticeList.length;i++){
-            if(noticeList[i].state==="unread"){
+          let noticeList = res.data;
+          let unreadCount = 0;
+          for (let i = 0; i < noticeList.length; i++) {
+            if (noticeList[i].state === "unread") {
               unreadCount++;
               continue;
             }
           }
-          this.$set(this,"unreadNoticeCount",unreadCount);
+          this.$set(this, "unreadNoticeCount", unreadCount);
         })
         .catch(err => {
           console.log("失败的原因是" + err.data);
@@ -218,25 +213,43 @@ export default {
       }
     },
     onClose(e) {
+      this.removeTimer();
       console.log("NoticeSocket连接断开！");
     },
     onError(e) {
+      this.removeTimer();
       console.log("NoticeSocket连接错误！");
     },
     sendMessage(recipientId) {
       this.noticeSocket.send(recipientId);
     },
-    readNotification(){
-      let newCount=this.unreadNoticeCount;
-      if(newCount>0){
-        this.unreadNoticeCount=newCount-1;
+    setTimer() {
+      this.timer = setInterval(() => {
+        this.noticeSocket.send("ping");
+      }, 20000);
+    },
+    removeTimer() {
+      clearInterval(this.timer);
+    },
+    readNotification() {
+      let newCount = this.unreadNoticeCount;
+      if (newCount > 0) {
+        this.unreadNoticeCount = newCount - 1;
       }
     },
-    changeSelect(name){
-      if(name =="userLogout"){
-        this.$store.commit("userLogout");
-        this.$router.replace({ name: "Home" });
-      }else if (name =="personalPage") {
+    changeSelect(name) {
+      if (name == "logout") {
+        this.axios
+          .get("/api/user/logout")
+          .then(res => {
+            this.$store.commit("userLogout");
+            this.noticeSocket.close();
+            this.$router.replace({ name: "Home" });
+          })
+          .catch(err => {
+            confirm("logout fail!");
+          });
+      } else if (name == "personalPage") {
         this.$router.push({ name: "PersonalPage" });
       }
     }

@@ -22,20 +22,26 @@
   align-items: center;
   margin-bottom: 2.5%;
 }
-.addBtn,.removeBtn,.editBtn{
-  font-size:10px;
+.addBtn,
+.removeBtn,
+.editBtn .createTaskBtn {
+  font-size: 10px;
 }
-.addBtn:hover{
-  color:white;
-  background:#47cb89
+.addBtn:hover {
+  color: white;
+  background: #47cb89;
 }
-.removeBtn:hover{
-  color:white;
-  background:#f16643;
+.removeBtn:hover {
+  color: white;
+  background: #f16643;
 }
-.editBtn:hover{
-  color:white;
-  background:#2d8cf0
+.editBtn:hover {
+  color: white;
+  background: #2d8cf0;
+}
+.createTaskBtn:hover {
+  color: white;
+  background: #47cb89;
 }
 .title {
   height: 40px;
@@ -43,38 +49,39 @@
   text-align: center;
   font-size: 20px;
   font-weight: bold;
-  border-bottom: 1px solid lightgray
+  border-bottom: 1px solid lightgray;
 }
 .member-desc {
   height: 60px;
-  margin:0 20px 0 10px;
+  margin: 0 20px 0 10px;
   display: flex;
 }
 .member-image {
-  max-width: 20%;
-  padding:5px;
+  width: 60px;
+  height: 60px;
+  padding: 5px;
 }
 .memebr-work {
   width: 70%;
+  height: 60px;
   margin: 0 20px;
 }
-.area {
+.userName {
   height: 30px;
-  display:flex;
-  align-items:center;
-
+  display: flex;
+  align-items: center;
 }
-.task {
+.organization {
   height: 30px;
-  display:flex;
-  align-items:center;
+  display: flex;
+  align-items: center;
 }
 
 .util-panel {
   height: 200px;
   box-shadow: 5px 5px 3px 2px rgba(0, 0, 0, 0.3);
   position: fixed;
-  right: 5%;
+  right: 2%;
   bottom: 5%;
 }
 .util-panel:hover {
@@ -137,17 +144,16 @@
   height: 10px;
 }
 .taskList {
-  min-height: 100px;
-  background: azure;
+  min-height: 50px;
+  background: #f7f7f7;
 }
-.taskItem {
-  list-style: none;
-  border: solid 0.5px green;
-  padding: 1px;
-  margin: 1px;
-}
-.workspaceContent {
-  margin-left: 60px;
+.taskName {
+  display: inline-block;
+  cursor: pointer;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 120px;
 }
 </style>
 <template>
@@ -185,7 +191,7 @@
           <div class="addNodeStyle">
             <span style="width:10%">Type</span>
             <Select v-model="moduleType" style="width:400px" placeholder="please select type">
-              <Option v-for="(item,index) in typeList" :key="item.index" :value="item">{{ item }}</Option>
+              <Option v-for="item in typeList" :key="item.index" :value="item">{{ item }}</Option>
             </Select>
           </div>
           <div class="addNodeStyle">
@@ -194,41 +200,7 @@
           </div>
         </Modal>
         <Button type="default" @click="delModal = true" icon="md-remove" class="removeBtn">Remove</Button>
-        <Modal v-model="delModal" title="delete task" @on-ok="delModule()" @on-cancel="cancel()">
-          <p>Do you really want to delete this step?</p>
-        </Modal>
         <Button type="default" @click="editModalShow()" icon="md-brush" class="editBtn">Edit</Button>
-        <Modal
-          v-model="editModal"
-          title="update task"
-          @on-ok="updateModule()"
-          @on-cancel="cancel()"
-        >
-          <div class="editNodeStyle">
-            <span style="width:10%">Name</span>
-            <Input
-              v-model="updateModuleTitle"
-              placeholder="Enter something..."
-              style="width: 400px"
-              :placeholder="moduleTitle"
-            />
-          </div>
-          <div class="editNodeStyle">
-            <span style="width:10%">Type</span>
-            <Select v-model="updateModuleType" style="width:400px" placeholder="please select type">
-              <Option v-for="(item,index) in typeList" :key="item.index" :value="item">{{ item }}</Option>
-            </Select>
-          </div>
-          <div class="editNodeStyle">
-            <span style="width:10%">Detail</span>
-            <textarea
-              v-model="updateModuleDescription"
-              style="width:400px"
-              :rows="6"
-              :placeholder="moduleDescription"
-            ></textarea>
-          </div>
-        </Modal>
       </Col>
     </Row>
     <div
@@ -236,124 +208,69 @@
       class="workspaceContent"
     >
       <!-- <h1>No module have been created!</h1> -->
-      <h1 style="margin-top: 0px;margin-bottom: 0px;">{{subProjectInfo.title}}</h1>
+      <h1 style="margin-top: 0px;margin-bottom: 0px;text-align:left">{{subProjectInfo.title}}</h1>
       <hr>
       <Row style="margin-top:20px">
         <Col :xs="8" :sm="7" :md="6" :lg="5" v-bind="this.participants">
-          <div class="member_panel" :style="{height:sidebarHeight+'px'}">
+          <div class="member_panel" :style="{height:sidebarHeight+'px'}" style="background-color:white">
             <div class="title">Participants</div>
             <div :style="{height:sidebarHeight-100+'px'}">
-
-            <div class="member-desc" v-for="(member,index) in participants" :key="member.index">
-              <template v-if="index==0">
-                <div class="member-image">
-                <img :src="member.avatar" style="width:auto;height:100%" @click="gotoWorkSpace(member.userId)"/>
-                </div>
-                <div class="memebr-work">
-                  <div class="area">
-                    <!-- <Tag>name</Tag> -->
-                    <span style="padding:0 5px;float:right">{{member.userName}}</span>
-                    </div>
-                  <div class="task">
-                      <!-- <Tag>organization</Tag> -->
-                      <span style="padding:0 5px">{{member.organization}}</span>
-                    </div>
-                </div>
-              </template>
-              <template v-else>
-                <div class="member-image">
-                <img :src="member.avatar" style="width:auto;height:100%" @click="gotoWorkSpace(member.userId)"/>
-                </div>
-                <div class="memebr-work">
-                  <div class="area">
-                    <!-- <Tag>name</Tag> -->
-                    <span style="padding:0 5px;float:right">{{member.userName}}</span>
-                    </div>
-                  <div class="task">
-                      <!-- <Tag>organization</Tag> -->
-                      <span style="padding:0 5px">{{member.organization}}</span>
-                    </div>
-                </div>
-              </template>
-            </div>
-            </div>
-            <div
-              class="member-invite"
-              style="display:flex;justify-content:center;height:60px;align-items:center"
-            >
-              <Button
-                type="success"
-                style="text-align:center;width:100px"
-                @click="inviteMembersModalShow()"
-                v-if="isSubProjectManager"
-              >Invite</Button>
-              <Button
-                type="warning"
-                style="text-align:center;width:100px"
-                @click="quitModal=true"
-                v-else-if="isSubProjectMember"
-              >Quit</Button>
-              <Modal
-                v-model="quitModal"
-                width="400px"
-                title="Quit subProject"
-                @on-ok="quitSubProject()"
-                @on-cancel="cancel"
-              >
-                <h2>Are you sure to quit this subproject?</h2>
-              </Modal>
-              <Modal
-                v-model="inviteModal"
-                width="400px"
-                title="Invite group member join in the subProject"
-                @on-ok="inviteMembers"
-                @on-cancel="cancel"
-              >
-                <div>
-                  <p>Members:</p>
-                  <Tag
-                    v-for="participant in participants"
-                    :key="participant.index"
-                  >{{participant.userName}}</Tag>
-                  <p>Candidates:</p>
-                  <CheckboxGroup v-model="inviteList">
-                    <Checkbox
-                      v-for="candidate in this.candidates"
-                      :key="candidate.index"
-                      :label="candidate.userId"
+              <div class="member-desc" v-for="(member,index) in participants" :key="member.index">
+                <template v-if="index==0">
+                  <Badge text="♔" type="warning" class="userAvatar">
+                    <div class="member-image" @click="gotoPersonalSpace(member.userId)" style="cursor:pointer">
+                    <img
+                      v-if="member.avatar != '' && member.avatar!='undefined'"
+                      :src="member.avatar"
+                      style="width:auto;height:100%"
+                    />
+                    <avatar
+                    :username="member.userName"
+                    :size="40"
+                    style="margin-top:10px"
+                    :title="member.userName"
+                    v-else
                     >
-                      <span>{{candidate.userName}}</span>
-                    </Checkbox>
-                  </CheckboxGroup>
-                </div>
-              </Modal>
-            </div>
-          </div>
-        </Col>
-        <Col :xs="15" :sm="16" :md="17" :lg="18"  offset="1">
-          <div style>
-            <h2 style="margin-bottom:5px">Description</h2>
-            <hr style="margin-bottom:10px">
-            <div :style="{height:sidebarHeight-80+'px'}">{{subProjectInfo.description}}</div>
-          </div>
-          <div style="display:flex;align-items:center;justify-content:center;height:60px">
-            <Button type="error" style="margin:auto">Quit this sub-project ?</Button>
-          </div>
-        </Col>
-      </Row>
-    </div>
-    <div v-else class="workspaceContent">
-      <h2 style="margin-bottom: 0px;">{{currentModule.description}}</h2>
-      <hr>
-      <Row style="margin-top:20px">
-        <Col :xs="8" :sm="7" :md="6" :lg="5" v-bind="this.participants">
-          <div class="member_panel" :style="{height:sidebarHeight}">
-            <div class="title">Online Participants</div>
-            <div class="member-desc" v-for="member in participants" :key="member.index">
-              <div class="member-image">{{member.userName}}</div>
-              <div class="memebr-work">
-                <div class="area">{{member.organization}}</div>
-                <div class="task">{{member.jobTitle}}</div>
+                    </avatar>
+                    </div>
+                  </Badge>
+                  <div class="memebr-work">
+                    <div class="userName">
+                      <!-- <Tag>name</Tag> -->
+                      <span style="padding:0 5px;float:right">{{member.userName}}</span>
+                    </div>
+                    <div class="organization">
+                      <!-- <Tag>organization</Tag> -->
+                      <span style="padding:0 5px">{{member.organization}}</span>
+                    </div>
+                  </div>
+                </template>
+                <template v-else style="margin-top:5px">
+                  <div class="member-image" @click="gotoPersonalSpace(member.userId)" style="cursor:pointer">
+                    <img
+                      v-if="member.avatar != ''"
+                      :src="member.avatar"
+                      style="width:auto;height:100%"
+                    />
+                    <avatar
+                    :username="member.userName"
+                    :size="40"
+                    style="margin-top:10px"
+                    :title="member.userName"
+                    v-else
+                  ></avatar>
+                  </div>
+                  <div class="memebr-work">
+                    <div class="userName">
+                      <!-- <Tag>name</Tag> -->
+                      <span style="padding:0 5px;float:right">{{member.userName}}</span>
+                    </div>
+                    <div class="organization">
+                      <!-- <Tag>organization</Tag> -->
+                      <span style="padding:0 5px">{{member.organization}}</span>
+                    </div>
+                  </div>
+                </template>
               </div>
             </div>
             <div
@@ -397,7 +314,7 @@
                   <p>Candidates:</p>
                   <CheckboxGroup v-model="inviteList">
                     <Checkbox
-                      v-for="candidate in this.candidates"
+                      v-for="candidate in candidates"
                       :key="candidate.index"
                       :label="candidate.userId"
                     >
@@ -409,89 +326,204 @@
             </div>
           </div>
         </Col>
-        <Button
-          type="success"
-          @click="createTaskModalShow()"
-          v-show="isSubProjectManager||isSubProjectMember"
-        >Create Task</Button>
-        <Col span="3" offset="1">
-          <template>
-            <h3>Todo</h3>
-            <draggable
-              class="taskList"
-              element="ul"
-              :options="{group:'task'}"
-              v-model="taskTodo"
-              @update="taskOrderUpdate(taskTodo,'todo')"
-              @add="taskOrderUpdate(taskTodo,'todo')"
-              @remove="taskOrderUpdate(taskTodo,'todo')"
-            >
-              <li v-for="(item,index) in taskTodo" class="taskItem">
-                <strong
-                  @click="editOneTask(index,taskTodo)"
-                  style="cursor: pointer;"
-                >{{item.taskName}}</strong>
-                <span
-                  style="float:right;margin-right:3px;cursor: pointer;"
-                  @click="taskRemove(index,taskTodo)"
-                >X</span>
-                <p>{{item.description}}</p>
-              </li>
-            </draggable>
-          </template>
+        <Col :xs="15" :sm="16" :md="17" :lg="18" offset="1">
+          <div style>
+            <h2 style="margin-bottom:5px">Description</h2>
+            <hr style="margin-bottom:10px">
+            <div :style="{height:sidebarHeight-80+'px'}">{{subProjectInfo.description}}</div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:center;height:60px">
+            <Button type="error" style="margin:auto">Quit this sub-project ?</Button>
+          </div>
         </Col>
-        <Col span="3" offset="1">
-          <template>
-            <h3>Doing</h3>
-            <draggable
-              class="taskList"
-              element="ul"
-              :options="{group:'task'}"
-              v-model="taskDoing"
-              @update="taskOrderUpdate(taskDoing,'doing')"
-              @add="taskOrderUpdate(taskDoing,'doing')"
-              @remove="taskOrderUpdate(taskDoing,'doing')"
-            >
-              <li v-for="(item,index)  in taskDoing" class="taskItem">
-                <strong
-                  @click="editOneTask(index,taskDoing)"
-                  style="cursor: pointer;"
-                >{{item.taskName}}</strong>
-                <span
-                  style="float:right;margin-right:3px;cursor: pointer;"
-                  @click="taskRemove(index,taskDoing)"
-                >X</span>
-                <p>{{item.description}}</p>
-              </li>
-            </draggable>
-          </template>
+      </Row>
+    </div>
+    <div v-else class="workspaceContent">
+      <h1 style="margin-top: 0px;margin-bottom: 0px;text-align:left">{{subProjectInfo.title}}</h1>
+      <hr>
+      <Row style="margin-top:20px">
+        <Col :xs="8" :sm="7" :md="6" :lg="5" v-bind="this.olParticipants">
+          <div class="member_panel" :style="{height:sidebarHeight+'px'}" style="background-color:white">
+            <div class="title">Online participants</div>
+            <div :style="{height:sidebarHeight-100+'px'}">
+              <div class="member-desc" v-for="member in olParticipants" :key="member.id">
+                <template style="margin-top:5px">
+                  <div class="member-image">
+                    <img
+                      v-if="member.avatar != ''"
+                      :src="member.avatar"
+                      style="width:auto;height:100%"
+                      @click="gotoPersonalSpace(member.userId)"
+                    >
+                    <img
+                      v-else-if="member.gender == 'female'"
+                      src="@/assets/images/female.png"
+                      style="width:auto;height:100%"
+                      @click="gotoPersonalSpace(member.userId)"
+                    >
+                    <img
+                      v-else
+                      src="@/assets/images/male.png"
+                      style="width:auto;height:100%"
+                      @click="gotoPersonalSpace(member.userId)"
+                    >
+                  </div>
+                  <div class="memebr-work">
+                    <div class="userName">
+                      <!-- <Tag>name</Tag> -->
+                      <span style="padding:0 5px;float:right">{{member.userName}}</span>
+                    </div>
+                    <div class="organization">
+                      <!-- <Tag>organization</Tag> -->
+                      <span style="padding:0 5px">{{member.organization}}</span>
+                    </div>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </div>
         </Col>
-        <Col span="3" offset="1">
-          <template>
-            <h3>Done</h3>
-            <draggable
-              class="taskList"
-              element="ul"
-              :options="{group:'task'}"
-              v-model="taskDone"
-              @update="taskOrderUpdate(taskDone,'done')"
-              @add="taskOrderUpdate(taskDone,'done')"
-              @remove="taskOrderUpdate(taskDone,'done')"
-            >
-              <li v-for="(item,index)  in taskDone" class="taskItem">
-                <strong
-                  @click="editOneTask(index,taskDone)"
-                  style="cursor: pointer;"
-                >{{item.taskName}}</strong>
-                <span
-                  style="float:right;margin-right:3px;cursor: pointer;"
-                  @click="taskRemove(index,taskDone)"
-                >X</span>
-                <p>{{item.description}}</p>
-              </li>
-            </draggable>
-          </template>
-        </Col>
+        <template>
+          <Col :xs="15" :sm="16" :md="17" :lg="18" offset="1" :style="{height:sidebarHeight/5*3+'px'}" style="margin-bottom:20px">
+            <div style="width:45%;height:100%;float:left;background-color:white">
+              <h2 style="width:100%;padding:10px 10px 0 10px">{{currentModule.title}}</h2>
+              <hr>
+              <div style="width:100%;padding:10px">{{currentModule.description}}</div>
+            </div>
+            <div style="width:50%;height:100%;float:right;border:1px solid lightgray;background-color:white;overflow-y:scroll">
+              <Timeline style="padding:10px">
+                <!-- <TimelineItem v-if="records.length > 3"><a href="#">More</a></TimelineItem> -->
+                <TimelineItem v-for="(item,index) in records" :key="index">
+                  <template v-if="item.type == 'participants'">
+                    <span class="time" style="color:blue">{{item.time}}</span>
+                    <span class="time" style="color:blue; margin-left:10px">{{item.who}}</span>
+                    <span class="content" style="color:blue; margin-left:10px; word-break:break-word">{{item.content}}</span>
+                  </template>
+                  <template v-if="item.type == 'resources'">
+                    <span class="time">{{item.time}}</span>
+                    <span class="time" style="margin-left:10px">{{item.who}}</span>
+                    <span class="content" style="margin-left:10px; word-break:break-word">{{item.content}}</span>
+                  </template>
+                  <template v-if="item.type == 'tasks'">
+                    <span class="time" style="color:gray">{{item.time}}</span>
+                    <span class="time" style="color:gray; margin-left:10px">{{item.who}}</span>
+                    <span class="content" style="color:gray; margin-left:10px; word-break:break-word">{{item.content}}</span>
+                  </template>
+                </TimelineItem>
+              </Timeline>
+            </div>
+          </Col>
+        </template>
+        <template>
+          <Col
+            :xs="15" :sm="16" :md="17" :lg="18"
+            offset="1">
+          <Row>
+            <Col span="23"
+            style="border:solid 1px #c5c8ce;padding: 5px 0;">
+            <Row type="flex" justify="center">
+            <Col span="7">
+              <Card :padding="0" :border="false">
+                <h3 slot="title">Todo</h3>
+              <Button
+              slot="extra"
+                type="default"
+                class="createTaskBtn"
+                style="margin-top:-10px"
+                @click="createTaskModalShow()"
+                v-show="isSubProjectManager||isSubProjectMember"
+              >Add</Button>
+                <draggable
+                  class="taskList"
+                  element="ul"
+                  :options="{group:'task'}"
+                  v-model="taskTodo"
+                  @start="startMove()"
+                  @update="taskOrderUpdate(taskTodo,'todo')"
+                  @add="taskOrderUpdate(taskTodo,'todo')"
+                  @remove="taskOrderUpdate(taskTodo,'todo')"
+                >
+                  <Card v-for="(item,index) in taskTodo" :key="index" :padding="3">
+                    <div>
+                    <strong
+                      @click="editOneTask(index,taskTodo)"
+                      class="taskName"
+                    >{{item.taskName}}</strong>
+                    <span
+                      style="float:right;margin-right:3px;cursor: pointer;color:gray;"
+                      @click="taskRemove(index,taskTodo)"
+                    >×</span>
+                    </div>
+                  <span style="word-break:break-word;">{{item.description}}</span>
+                  </Card>
+                </draggable>
+              </Card>
+            </Col>
+            <Col span="7" offset="1">
+              <Card :padding="0" :border="false">
+                <h3 slot="title">Doing</h3>
+                <draggable
+                  class="taskList"
+                  element="ul"
+                  :options="{group:'task'}"
+                  v-model="taskDoing"
+                  @start="startMove()"
+                  @update="taskOrderUpdate(taskDoing,'doing')"
+                  @add="taskOrderUpdate(taskDoing,'doing')"
+                  @remove="taskOrderUpdate(taskDoing,'doing')"
+                >
+                  <Card v-for="(item,index)  in taskDoing" :key="index" :padding="3">
+                    <div>
+                    <strong
+                      @click="editOneTask(index,taskDoing)"
+                      class="taskName"
+                    >{{item.taskName}}</strong>
+                    <span
+                      style="float:right;margin-right:3px;cursor: pointer;color:gray;"
+                      @click="taskRemove(index,taskDoing)"
+                    >×</span>
+                    </div>
+                    <span style="word-break:break-word;">{{item.description}}</span>
+                  </Card>
+                </draggable>
+              </Card>
+            </Col>
+            <Col span="7" offset="1">
+              <Card :padding="0" :border="false">
+                <h3 slot="title">Done</h3>
+                <draggable
+                  class="taskList"
+                  element="ul"
+                  :options="{group:'task'}"
+                  v-model="taskDone"
+                  @start="startMove()"
+                  @update="taskOrderUpdate(taskDone)"
+                  @add="taskOrderUpdate(taskDone,'done')"
+                  @remove="taskOrderUpdate(taskDone,'done')"
+                >
+                  <Card v-for="(item,index) in taskDone" :key="index" :padding="3">
+                    <div>
+                    <strong
+                      @click="editOneTask(index,taskDone)"
+                      class="taskName"
+                    >{{item.taskName}}</strong>
+                    <span
+                      style="float:right;margin-right:3px;cursor: pointer;color:gray;"
+                      @click="taskRemove(index,taskDone)"
+                    >×</span>
+                    </div>
+                    <span style="word-break:break-word;">{{item.description}}</span>
+                  </Card>
+                </draggable>
+              </Card>
+            </Col>
+            </Row>
+            </Col>
+            <Col span="1">
+            </Col>
+            </Row>
+          </Col>
+        </template>
         <Col span="1" class="util-panel">
           <div class="util-btn-group">
             <Button type="info" class="util-btn" shape="circle">
@@ -511,7 +543,6 @@
                   <br>
                   <span style="display:flex;justify-content:center">11</span>
                 </div>
-
                 <Icon type="md-analytics" size="60" @click.native="show" title="Modeling Tools"/>
                 <Icon type="md-analytics" size="60" @click.native="show" title="Modeling Tools"/>
               </div>
@@ -522,6 +553,40 @@
         </Col>
       </Row>
     </div>
+    <Modal v-model="delModal" title="delete module" @on-ok="delModule()" @on-cancel="cancel()">
+      <p>Do you really want to delete this step?</p>
+    </Modal>
+    <Modal
+      v-model="editModal"
+      title="update task"
+      @on-ok="updateModule()"
+      @on-cancel="cancel()"
+    >
+      <div class="editNodeStyle">
+        <span style="width:10%">Name</span>
+        <Input
+          v-model="updateModuleTitle"
+          placeholder="Enter something..."
+          style="width: 400px"
+          :placeholder="moduleTitle"
+        />
+      </div>
+      <div class="editNodeStyle">
+        <span style="width:10%">Type</span>
+        <Select v-model="updateModuleType" style="width:400px" placeholder="please select type">
+          <Option v-for="item in typeList" :key="item.index" :value="item">{{ item }}</Option>
+        </Select>
+      </div>
+      <div class="editNodeStyle">
+        <span style="width:10%">Detail</span>
+        <textarea
+          v-model="updateModuleDescription"
+          style="width:400px"
+          :rows="6"
+          :placeholder="moduleDescription"
+        ></textarea>
+      </div>
+    </Modal>
     <!-- createTaskModal -->
     <Modal
       v-model="createTaskModal"
@@ -531,7 +596,7 @@
       width="800px"
     >
       <div class="taskFormItem">
-        <span style="width:30%">taskName</span>
+        <span style="width:30%">Name</span>
         <Input
           style="width: 300px"
           :placeholder="this.taskPlaceHolder.name"
@@ -540,7 +605,7 @@
       </div>
       <div class="whiteSpace"></div>
       <div class="taskFormItem">
-        <span style="width:30%">description</span>
+        <span style="width:30%">Description</span>
         <Input
           style="width: 300px"
           :placeholder="this.taskPlaceHolder.description"
@@ -551,9 +616,10 @@
       </div>
       <div class="whiteSpace"></div>
       <div class="taskFormItem">
-        <span style="width:30%">start Time</span>
+        <span style="width:30%">Start Time</span>
         <DatePicker
           type="datetime"
+          format="yyyy-MM-dd HH:mm:ss"
           :placeholder="this.taskPlaceHolder.startTime"
           style="width: 300px"
           v-model="taskInfo.startTime"
@@ -561,23 +627,16 @@
       </div>
       <div class="whiteSpace"></div>
       <div class="taskFormItem">
-        <span style="width:30%">end Time</span>
+        <span style="width:30%">End Time</span>
         <DatePicker
           type="datetime"
+          format="yyyy-MM-dd HH:mm:ss"
           :placeholder="this.taskPlaceHolder.endTime"
           style="width: 300px"
           v-model="taskInfo.endTime"
         ></DatePicker>
       </div>
       <div class="whiteSpace"></div>
-      <div class="taskFormItem">
-        <span style="width:30%">state</span>
-        <RadioGroup v-model="taskInfo.state" disabled>
-          <Radio label="todo"></Radio>
-          <Radio label="doing"></Radio>
-          <Radio label="done"></Radio>
-        </RadioGroup>
-      </div>
     </Modal>
     <Modal
       v-model="editTaskModal"
@@ -610,6 +669,7 @@
         <span style="width:30%">start Time</span>
         <DatePicker
           type="datetime"
+          format="yyyy-MM-dd HH:mm:ss"
           :placeholder="this.taskPlaceHolder.startTime"
           style="width: 300px"
           v-model="taskInfo.startTime"
@@ -620,6 +680,7 @@
         <span style="width:30%">end Time</span>
         <DatePicker
           type="datetime"
+          format="yyyy-MM-dd HH:mm:ss"
           :placeholder="this.taskPlaceHolder.endTime"
           style="width: 300px"
           v-model="taskInfo.endTime"
@@ -643,12 +704,17 @@ import taskParticipateModule from "./.././sharedModule/taskParticipateModule";
 import resourceModule from "./.././sharedModule/resourceModule";
 import * as socketApi from "./../../api/socket";
 import draggable from "vuedraggable";
+import Avatar from "vue-avatar";
 export default {
+  updated() {
+    $(".userAvatar sup").css("margin", "15px 15px 0 0");
+  },
   components: {
     VueFlowy,
     memberPart: taskParticipateModule,
     resource: resourceModule,
-    draggable
+    draggable,
+    Avatar
   },
   data() {
     return {
@@ -670,7 +736,6 @@ export default {
       //编辑的模态框
       editModal: false,
       order: 0,
-      taborder: 0,
       // chart适用
       chart: new FlowChart(),
       //现在点击的module
@@ -687,25 +752,25 @@ export default {
       //
       moduleTitle: "",
       updateModuleTitle: "",
-      //type是指选中后的列表
+      // type是指选中后的列表
       moduleType: "",
       updateModuleType: "",
-      //moduleDescription指的是节点的详情信息
+      // moduleDescription指的是节点的详情信息
       moduleDescription: "",
       updateModuleDescription: "",
-      //抽屉的控制开关
+      // 抽屉的控制开关
       drawerOpen: false,
-      //后台获取的module下的task列表
+      // 后台获取的module下的task列表
       taskList: [],
-      //后台拿到的Module集合，渲染成一条轴用的
+      // 后台拿到的Module集合，渲染成一条轴用的
       moduleList: [],
-      //当前模块的索引
+      // 当前模块的索引
       currentModuleIndex: 0,
-      //创建任务的模态框
+      // 创建任务的模态框
       createTaskModal: false,
-      //编辑任务的模态框
+      // 编辑任务的模态框
       editTaskModal: false,
-      //task的placeHolder默认值
+      // task的placeHolder默认值
       taskPlaceHolder: {
         description: "please input the task description.",
         name: "please input task's name",
@@ -716,7 +781,27 @@ export default {
       taskInfo: {},
       taskTodo: [],
       taskDoing: [],
-      taskDone: []
+      taskDone: [],
+      // web socket for module
+      moduleSocket: null,
+      timer: null,
+      // 动态记录相关
+      record:{
+        type: "",
+        time: "",
+        who: "",
+        content: ""
+      },
+      records: [],
+      // 当前参与者
+      olParticipants: [],
+      // 消息
+      socketMsg:{
+        type: "",
+        time: "",
+        who: "",
+        whoid:"",
+        content: ""}
     };
   },
   created() {
@@ -744,9 +829,12 @@ export default {
   },
   beforeDestroy: function() {
     window.removeEventListener("resize", this.initSize);
+    if(this.moduleSocket != null){
+      this.moduleSocket.close();
+    }
   },
   methods: {
-    initSize(){
+    initSize() {
       //侧边栏的高度随着屏幕的高度自适应
       this.sidebarHeight = window.innerHeight - 250;
       //通知栏的属性设置，top表示距离顶部的距离，duration表示持续的时间
@@ -761,7 +849,7 @@ export default {
       var that = this;
       $.ajax({
         url:
-          "http://localhost:8081/subProject/inquiry" +
+          "/api/subProject/inquiry" +
           "?key=subProjectId" +
           "&value=" +
           this.$route.params.id,
@@ -770,7 +858,7 @@ export default {
         success: data => {
           if (data != "None") {
             let subProjectInfo = data[0];
-            this.$set(this,"subProjectInfo",subProjectInfo);
+            this.$set(this, "subProjectInfo", subProjectInfo);
             this.managerIdentity(subProjectInfo.managerId);
             this.memberIdentity(subProjectInfo["members"]);
             let membersList = subProjectInfo["members"];
@@ -780,7 +868,7 @@ export default {
             for (let i = 0; i < membersList.length; i++) {
               $.ajax({
                 url:
-                  "http://localhost:8081/user/inquiry" +
+                  "/api/user/inquiry" +
                   "?key=" +
                   "userId" +
                   "&value=" +
@@ -800,6 +888,19 @@ export default {
         }
       });
     },
+    initHistory(){
+      this.records = [];
+      let that = this;
+      this.axios.get("http://localhost:8081/history/inquiry?scopeId="+this.currentModule.moduleId)
+        .then(res => {
+          if (res.data != "Fail") {
+            for(let i = 0; i<res.data.length;i++){
+              let tempRecords = JSON.parse(res.data[i].description);
+              that.records.push(tempRecords);
+            }
+          }
+        });
+    },
     managerIdentity(managerId) {
       if (managerId === this.$store.state.userId) {
         this.isSubProjectManager = true;
@@ -814,20 +915,166 @@ export default {
       }
     },
     showDetail(item) {
+      this.closeModuleSocket();
+
       if (item <= 0) {
         this.order = item;
         this.currentModuleIndex = item - 1;
-        let change = String(item);
-        this.taborder = change;
       } else {
         this.currentModuleIndex = item - 1;
         this.currentModule = this.moduleList[this.currentModuleIndex];
-        // console.log(this.currentModule);
         this.inquiryTask();
         this.order = item;
-        let change = String(item);
-        this.taborder = change;
+        this.openModuleSocket(this.currentModule.moduleId);
+        this.initHistory();
       }
+    },
+    closeModuleSocket() {
+      if (this.moduleSocket != null) {
+        this.moduleSocket.close();
+      }
+    },
+    openModuleSocket(moduleId) {
+      var moduleSocketURL = "ws://localhost:8081/Module/" + moduleId;
+      this.moduleSocket = new WebSocket(moduleSocketURL);
+      this.moduleSocket.onopen = this.onOpen;
+      this.moduleSocket.onmessage = this.onMessage;
+      this.moduleSocket.onclose = this.onClose;
+      this.moduleSocket.onerror = this.onError;
+      this.setTimer();
+    },
+    onOpen() {
+      console.log("ModuleSocket连接成功！");
+    },
+    // 更新人员，更新数据，更新records
+    onMessage(e) {
+      let messageJson = JSON.parse(e.data);
+      var userIndex = -1;
+
+      if (messageJson.type == "online") {
+
+        this.record.time = messageJson.createTime;
+        this.record.content = "enter this module.";
+
+      } else if (messageJson.type == "offline") {
+
+        this.record.time = messageJson.createTime;
+        this.record.content = "leave this module.";
+
+      } else if (messageJson.type == "message") {
+
+        let message = messageJson.message;
+        // 更新数据 --by mzy
+        if(message.type == "tasks" && message.whoid != this.$store.state.userId){
+          this.inquiryTask();
+        }
+        if(message.type == "resources" && message.whoid != this.$store.state.userId){
+
+        }
+
+        // 更新records --by mzy
+        this.records.push(message);
+        // let History = {};
+        // History["scopeId"] = this.currentModule.moduleId;
+        // History["description"] = JSON.stringify(message);
+        this.axios
+          .post("http://localhost:8081/history/save", "description="+ JSON.stringify(message) + "&scopeId=" + this.currentModule.moduleId)
+          .then(res => {
+            if (res.data === "Fail") {
+              this.$Message.info("Fail");
+            } else if(res.data === "Success") {
+              this.$Message.info("Success");
+            }
+          })
+          .catch(err => {
+            console.log(err.data);
+          });
+
+      } else if (messageJson.type == "members") {
+        // 比较 判断人员动态 更新records --by mzy
+
+        let members = messageJson.message
+          .replace("[", "")
+          .replace("]", "")
+          .replace(/\s/g, "")
+          .split(",");
+
+        if (members.length > this.olParticipants.length) {
+          for (let i = 0; i < members.length; i++) {
+            for (var j = 0; j < this.olParticipants.length; j++) {
+              if (members[i] == this.olParticipants[j].userId) {
+                break;
+              }
+            }
+            if (j == this.olParticipants.length) {
+              userIndex = i;
+              break;
+            }
+          }
+        } else if (members.length < this.olParticipants.length) {
+          for (let i = 0; i < this.olParticipants.length; i++) {
+            for (var j = 0; j < members.length; j++) {
+              if (this.olParticipants[i].userId == members[j]) {
+                break;
+              }
+            }
+            if (j == members.length) {
+              userIndex = i;
+              break;
+            }
+          }
+        }
+        // 人员渲染 --by mzy
+        this.olParticipants = [];
+        var that = this;
+        for (let i = 0; i < members.length; i++) {
+          this.axios
+          .get(
+            "http://localhost:8081/user/inquiry" +
+              "?key=" +
+              "userId" +
+              "&value=" +
+              members[i]
+          )
+          .then(res => {
+            if (res.data != "None" && res.data != "Fail") {
+              that.olParticipants.push(res.data);
+              if(userIndex != -1){
+                that.record.who =  that.olParticipants[userIndex].userName;
+              }
+            } else if (res.data == "None") {
+            }
+          });
+        }
+        //records 更新
+        this.record.type = "participants";
+        this.records.push(this.record);
+      }
+    },
+    onClose(e) {
+      this.removeTimer();
+      console.log("ModuleSocket连接断开！");
+    },
+    onError(e) {
+      this.removeTimer();
+      console.log("ModuleSocket连接错误！");
+    },
+    setTimer() {
+      this.timer = setInterval(() => {
+        var messageJson = {};
+        messageJson["type"] = "ping";
+        messageJson["message"] = "ping";
+        this.moduleSocket.send(JSON.stringify(messageJson));
+      }, 20000);
+    },
+    removeTimer() {
+      clearInterval(this.timer);
+    },
+    sendMessage(message) {
+      var messageJson = {};
+      messageJson["type"] = "message";
+      messageJson["message"] = message;
+      this.moduleSocket.send(JSON.stringify(messageJson));
     },
     getAllModules() {
       //这里重写以下获取module
@@ -835,10 +1082,7 @@ export default {
       sessionStorage.setItem("subProjectId", this.$route.params.id);
       this.axios
         .get(
-          "http://localhost:8081/module/inquiry" +
-            "?key=subProjectId" +
-            "&value=" +
-            subProjectId
+          "/api/module/inquiry" + "?key=subProjectId" + "&value=" + subProjectId
         )
         .then(res => {
           if (res.data != "None") {
@@ -862,7 +1106,7 @@ export default {
       Module["creator"] = this.$store.state.userId;
       Module["type"] = this.moduleType;
       this.axios
-        .post("http://localhost:8081/module/create", Module)
+        .post("/api/module/create", Module)
         .then(res => {
           if (res.data === "Fail") {
             this.$Message.info("Fail");
@@ -881,7 +1125,7 @@ export default {
     delModule() {
       this.axios
         .get(
-          "http://localhost:8081/module/delete" +
+          "/api/module/delete" +
             "?moduleId=" +
             this.moduleList[this.currentModuleIndex].moduleId
         )
@@ -897,9 +1141,7 @@ export default {
     },
     editModalShow() {
       this.editModal = true;
-      console.log(this.currentModuleIndex);
       let order = this.currentModuleIndex;
-      console.log(this.moduleList[order].title);
       this.updateModuleTitle = this.moduleList[order].title;
       this.updateModuleType = this.moduleList[order].type;
       this.updateModuleDescription = this.moduleList[order].description;
@@ -916,9 +1158,8 @@ export default {
       updateObject.append("type", this.updateModuleType);
       updateObject.append("creater", this.$store.state.userId);
       this.axios
-        .post("http://localhost:8081/module/update", updateObject)
+        .post("/api/module/update", updateObject)
         .then(res => {
-          console.log(res.data);
           this.getAllModules();
         })
         .catch(err => {
@@ -970,7 +1211,7 @@ export default {
       this.inviteList = [];
       this.axios
         .get(
-          "http://localhost:8081/project/inquiry" +
+          "/api/project/inquiry" +
             "?key=projectId" +
             "&value=" +
             sessionStorage.getItem("projectId")
@@ -980,7 +1221,7 @@ export default {
             let allMembers = res.data[0].members;
             $.ajax({
               url:
-                "http://localhost:8081/user/inquiry" +
+                "/api/user/inquiry" +
                 "?key=" +
                 "userId" +
                 "&value=" +
@@ -1016,7 +1257,7 @@ export default {
       for (let i = 0; i < this.inviteList.length; i++) {
         $.ajax({
           url:
-            "http://localhost:8081/subProject/join" +
+            "/api/subProject/join" +
             "?subProjectId=" +
             this.$route.params.id +
             "&userId=" +
@@ -1039,7 +1280,7 @@ export default {
     quitSubProject() {
       this.axios
         .get(
-          "http://localhost:8081/subProject/quit" +
+          "/api/subProject/quit" +
             "?subProjectId=" +
             this.$route.params.id +
             "&userId=" +
@@ -1066,50 +1307,62 @@ export default {
       let taskDefult = {
         taskName: "",
         description: "",
-        startTime: "",
-        endTime: "",
+        startTime: '',
+        endTime: '',
         state: ""
       };
-      this.taskInfo = taskDefult;
+      this.$set(this,"taskInfo",taskDefult);
       this.createTaskModal = true;
     },
     createTask() {
       //RequestBody，所以是json格式
       let taskForm = {};
-      console.log("当前模块是：" + this.currentModule.moduleId);
       taskForm["taskName"] = this.taskInfo.taskName;
       taskForm["description"] = this.taskInfo.description;
-      taskForm["startTime"] = this.taskInfo.startTime;
-      taskForm["endTime"] = this.taskInfo.endTime;
+      taskForm["startTime"] = new Date(this.taskInfo.startTime);
+      taskForm["endTime"] = new Date(this.taskInfo.endTime);
       taskForm["creatorId"] = this.$store.state.userId;
       taskForm["moduleId"] = this.currentModule.moduleId;
-      taskForm["state"] = this.taskInfo.state;
+      taskForm["state"] = "todo";
       taskForm["order"] = "";
-      console.log(taskForm);
       this.axios
-        .post("http://localhost:8081/task/save", taskForm)
+        .post("/api/task/save", taskForm)
         .then(res => {
           this.inquiryTask();
         })
         .catch(err => {});
+
+      // 任务更新socket
+      this.socketMsg.whoid = this.$store.state.userId;
+      this.socketMsg.who = this.$store.state.userName;
+      this.socketMsg.type = "tasks";
+      this.socketMsg.content = "created a new task.";
+      this.socketMsg.time = new Date().toLocaleString();
+      this.sendMessage(this.socketMsg);
     },
     //打开task编辑器
     editOneTask(index, taskList) {
       this.axios
         .get(
-          "http://localhost:8081/task/inquiry?" +
+          "/api/task/inquiry?" +
             "key=taskId" +
             "&value=" +
             taskList[index]["taskId"]
         )
         .then(res => {
-          let result = res.data;
-          this.$set(this, "taskInfo", result[0]);
-          console.log(this.taskInfo);
-          this.editTaskModal = true;
+          if(res.data!="Fail"){
+            let taskInfoRes = res.data[0];
+            taskInfoRes.startTime=new Date(taskInfoRes.startTime);
+            taskInfoRes.endTime=new Date(taskInfoRes.endTime);
+            this.$set(this, "taskInfo", taskInfoRes);
+            this.editTaskModal = true;
+          }
+          else{
+            this.$Message.error("Fail!");
+          }
         })
         .catch(err => {
-          console.log(err.data);
+            this.$Message.error("Fail!");
         });
     },
     //更新某个task
@@ -1118,11 +1371,11 @@ export default {
       taskForm.append("taskId", this.taskInfo.taskId);
       taskForm.append("taskName", this.taskInfo.taskName);
       taskForm.append("description", this.taskInfo.description);
-      taskForm.append("startTime", this.taskInfo.startTime);
-      taskForm.append("endTime", this.taskInfo.endTime);
+      taskForm.append("startTime", new Date(this.taskInfo.startTime));
+      taskForm.append("endTime", new Date(this.taskInfo.endTime));
       taskForm.append("state", this.taskInfo.state);
       this.axios
-        .post("http://localhost:8081/task/update", taskForm)
+        .post("/api/task/update", taskForm)
         .then(res => {
           if (res.data != "None" && res.data != "Fail") {
             this.inquiryTask();
@@ -1133,56 +1386,62 @@ export default {
         .catch(err => {
           console.log(err.data);
         });
+
+      // 任务更新socket
+      this.socketMsg.whoid = this.$store.state.userId;
+      this.socketMsg.who = this.$store.state.userName;
+      this.socketMsg.type = "tasks";
+      this.socketMsg.content = "edited a new task.";
+      this.socketMsg.time = new Date().toLocaleString();
+      this.sendMessage(this.socketMsg);
     },
     //查询task
     inquiryTask() {
       // /task/inquiry
       this.axios
         .get(
-          "http://localhost:8081/task/inquiryTodo?" +
-            "moduleId=" +
-            this.currentModule.moduleId
+          "/api/task/inquiryTodo?" + "moduleId=" + this.currentModule.moduleId
         )
         .then(res => {
-          // console.log("---load todo list---");
-          // console.log(res.data);
-          this.$set(this, "taskTodo", res.data);
+          if(res.data != "None" && res.data != "Fail"){
+            this.$set(this, "taskTodo", res.data);
+          }else {
+            this.$Message.error("Fail!");
+          }
         })
         .catch(err => {
           console.log(err.data);
         });
       this.axios
         .get(
-          "http://localhost:8081/task/inquiryDoing?" +
-            "moduleId=" +
-            this.currentModule.moduleId
+          "/api/task/inquiryDoing?" + "moduleId=" + this.currentModule.moduleId
         )
         .then(res => {
-          // console.log("---load doing list---");
-          // console.log(res.data);
-          this.$set(this, "taskDoing", res.data);
+          if(res.data != "None" && res.data != "Fail"){
+           this.$set(this, "taskDoing", res.data);
+          }else {
+            this.$Message.error("Fail!");
+          }
         })
         .catch(err => {
           console.log(err.data);
         });
       this.axios
         .get(
-          "http://localhost:8081/task/inquiryDone?" +
-            "moduleId=" +
-            this.currentModule.moduleId
+          "/api/task/inquiryDone?" + "moduleId=" + this.currentModule.moduleId
         )
         .then(res => {
-          // console.log("---load done list---");
-          // console.log(res.data);
-          this.$set(this, "taskDone", res.data);
+          if(res.data != "None" && res.data != "Fail"){
+            this.$set(this, "taskDone", res.data);
+          }else {
+            this.$Message.error("Fail!");
+          }
         })
         .catch(err => {
           console.log(err.data);
         });
     },
     taskOrderUpdate(taskList, type) {
-      // console.log("------" + type + " task updated------");
-      // console.log(taskList);
       for (let i = 0; i < taskList.length; i++) {
         let thisTask = taskList[i];
         let taskUpdateObj = new URLSearchParams();
@@ -1190,7 +1449,7 @@ export default {
         taskUpdateObj.append("order", i);
         taskUpdateObj.append("state", type);
         this.axios
-          .post("http://localhost:8081/task/update", taskUpdateObj)
+          .post("/api/task/update", taskUpdateObj)
           .then(res => {
             // console.log("---force---");
             // console.log(thisTask);
@@ -1202,13 +1461,18 @@ export default {
           });
       }
     },
+    startMove(taskList, type){
+      // 任务更新socket
+      this.socketMsg.whoid = this.$store.state.userId;
+      this.socketMsg.who = this.$store.state.userName;
+      this.socketMsg.type = "tasks";
+      this.socketMsg.content = "changed the task schedule.";
+      this.socketMsg.time = new Date().toLocaleString();
+      this.sendMessage(this.socketMsg);
+    },
     taskRemove(index, taskList) {
       this.axios
-        .get(
-          "http://localhost:8081/task/delete" +
-            "?taskId=" +
-            taskList[index]["taskId"]
-        )
+        .get("/api/task/delete" + "?taskId=" + taskList[index]["taskId"])
         .then(res => {
           if (res.data == "Success") {
             taskList.splice(index, 1);
@@ -1219,8 +1483,16 @@ export default {
         .catch(err => {
           this.$Message.error("Fail!");
         });
+
+      // 任务更新socket
+      this.socketMsg.whoid = this.$store.state.userId;
+      this.socketMsg.who = this.$store.state.userName;
+      this.socketMsg.type = "tasks";
+      this.socketMsg.content = "removed a task.";
+      this.socketMsg.time = new Date().toLocaleString();
+      this.sendMessage(this.socketMsg);
     },
-    gotoWorkSpace(id){
+    gotoPersonalSpace(id){
       // sessionStorage.setItem("memberId",data);
       // this.$router.push({name: 'ProjectDetail',params:{id:id} });
       if(id==sessionStorage.getItem("userId")){

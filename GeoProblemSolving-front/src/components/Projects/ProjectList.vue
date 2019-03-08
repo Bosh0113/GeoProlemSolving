@@ -1,3 +1,41 @@
+<style>
+img {
+  /* padding:10px; */
+  max-width: 100%;
+  max-height: 100%;
+}
+.whitespace {
+  height: 20px;
+}
+/* title标题悬浮时出现下划线且变色 */
+.projectTitle:hover {
+  text-decoration: underline;
+  color: #c20c0c;
+  cursor: pointer;
+}
+operateBtnGroup {
+  --btnSize: 15px;
+}
+.operateBtnGroup button {
+  font-size: 15px;
+  margin-left: 2.5%;
+}
+.operateBtnGroup button:hover {
+  font-size: var(--btnSize);
+}
+.btnCreate:hover {
+  background-color: #19be6b;
+  color: white;
+}
+.btnJoin:hover {
+  background-color: #57a3f3;
+  color: white;
+}
+/* Loading动画的特效 */
+.demo-spin-icon-load {
+  animation: ani-demo-spin 1s linear infinite;
+}
+</style>
 <template>
   <!-- tab栏分页 -->
   <!-- 外层div -->
@@ -72,14 +110,12 @@
               <div style="display:flex;justify-content:center">
                 <h4
                   style="text-align:center;width:50%;color:lightblue"
-                >you can click the button right top called create to add a new project. Enrich your description about the project to attract more people join in.</h4>
+                >You can click the button right top called create to add a new project. Enriching your description of the project and attracting more people to join in.</h4>
               </div>
             </Card>
           </Col>
         </div>
         <div v-for="(item,index) in filteredBlogs" :data="currentProjectList" :key="item.index">
-          <!-- Card卡片用来承载工程的信息，包含title，img，以及一些基本信息 -->
-          <!-- <Col span="6" offset="1" v-if="item.privacy=='Public'"> -->
           <Col
             :xs="{ span: 21, offset: 1 }"
             :md="{ span: 11, offset: 1 }"
@@ -87,7 +123,7 @@
             v-if="item.privacy=='Public'"
           >
             <Card style="height:auto;margin:20px 0 20px 0">
-              <p
+              <h2
                 slot="title"
                 @click="goSingleProject(item.projectId)"
                 class="projectTitle"
@@ -131,13 +167,13 @@
               </div>
               <div class="whitespace"></div>
               <div style="height:40px;align-items:center;display:flex;padding:0 20px 0 20px">
-                <span style="height:20px;width:45%;color:white;text-align:center;">
-                  <Tag color="primary">Creater</Tag>
+                <span style="height:20px;width:45%;color:white;text-align:left;">
+                  <Tag color="primary" style="width:78.2px;text-align:center">Creator</Tag>
                 </span>
                 <span style="height:20px;margin-left:5%">{{item.creator}}</span>
               </div>
               <div style="height:40px;align-items:center;display:flex;padding:0 20px 0 20px">
-                <span style="height:20px;width:45%;color:white;text-align:center;">
+                <span style="height:20px;width:45%;color:white;text-align:left;">
                   <Tag color="primary">Create time</Tag>
                 </span>
                 <span style="height:20px;margin-left:5%">{{item.createTime.split(' ')[0]}}</span>
@@ -179,7 +215,6 @@
 </template>
 <style>
 img {
-  /* padding:10px; */
   max-width: 100%;
   max-height: 100%;
 }
@@ -188,8 +223,6 @@ img {
 }
 /* title标题悬浮时出现下划线且变色 */
 .projectTitle:hover {
-  /* text-decoration: underline; */
-  /* color: #c20c0c; */
   cursor: pointer;
 }
 .operate button:hover{
@@ -301,7 +334,7 @@ export default {
     getSpecificTypeProjects(data) {
       this.axios
         .get(
-          "http://localhost:8081/project/inquiry" +
+          "/api/project/inquiry" +
             "?key=" +
             data["key"] +
             "&value=" +
@@ -327,7 +360,7 @@ export default {
     joinProject(tab) {
       this.axios
         .get(
-          "http://localhost:8081/project/join?" +
+          "/api/project/join?" +
             "projectId=" +
             this.joinProjectId +
             "&userId=" +
@@ -357,54 +390,7 @@ export default {
           this.$Message.danger("Join fail");
         });
     },
-    // quitModalShow(project) {
-    //   this.quitModal = true;
-    //   this.quitSubProject = project;
-    // },
-    // quitProject() {
-    //   this.axios
-    //     .get(
-    //       "http://localhost:8081/project/quit?" +
-    //         "projectId=" +
-    //         this.quitSubProject.projectId +
-    //         "&userId=" +
-    //         this.$store.state.userId
-    //     )
-    //     .then(res => {
-    //       if (res.data === "Success") {
-    //         this.$Message.info("Quit successfully");
-    //         let replyNotice = {};
-    //         replyNotice["recipientId"] = this.quitSubProject.managerId;
-    //         replyNotice["type"] = "notice";
-    //         replyNotice["content"] = {
-    //           title: "Quit your project",
-    //           description:
-    //             "user " +
-    //             this.$store.state.userName +
-    //             " quit from your project: " +
-    //             this.quitSubProject.title +
-    //             " ."
-    //         };
-    //         this.axios
-    //           .post("http://localhost:8081/notice/save", replyNotice)
-    //           .then(result => {
-    //             if (result.data == "Success") {
-    //               this.$emit("sendNotice", this.quitSubProject.managerId);
-    //             } else {
-    //               this.$Message.danger("reply fail.");
-    //             }
-    //           })
-    //           .catch(err => {
-    //             this.$Message.danger("reply fail.");
-    //           });
-    //       } else {
-    //         this.$Message.danger("Fail");
-    //       }
-    //       let initObject = { key: "category", value: "Water" };
-    //       this.getSpecificTypeProjects(initObject);
-    //     })
-    //     .catch(err => {});
-    // },
+
     cancel() {
       this.$Message.info("Clicked cancel");
     },
@@ -423,7 +409,7 @@ export default {
         for (var i = 0, n = 0; i < projectList.length; i++) {
           $.ajax({
             url:
-              "http://localhost:8081/user/inquiry" +
+              "/api/user/inquiry" +
               "?key=" +
               "userId" +
               "&value=" +
@@ -495,7 +481,7 @@ export default {
         approve: "unknow"
       };
       this.axios
-        .post("http://localhost:8081/notice/save", joinForm)
+        .post("/api/notice/save", joinForm)
         .then(res => {
           this.$Message.info("Apply Successfully");
           this.$emit("sendNotice", data.managerId);

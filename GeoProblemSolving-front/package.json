@@ -15,6 +15,7 @@
     "echarts": "^4.2.0-rc.2",
     "iview": "^3.2.2",
     "jquery": "^2.2.3",
+    "leaflet": "^1.4.0",
     "mavon-editor": "^2.6.17",
     "muse-ui": "^3.0.1",
     "v-charts": "^1.19.0",

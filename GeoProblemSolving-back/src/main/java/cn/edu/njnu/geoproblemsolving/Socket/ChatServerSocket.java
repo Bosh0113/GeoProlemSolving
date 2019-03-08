@@ -26,7 +26,6 @@ public class ChatServerSocket {
     @OnMessage
     public void onMessage(String message)
     {
-
         try
         {
             //向客户端发送消息

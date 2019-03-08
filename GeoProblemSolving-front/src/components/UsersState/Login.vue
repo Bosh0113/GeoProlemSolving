@@ -63,7 +63,7 @@
   <div class="layout">
     <Layout>
       <div class="header">
-        <img src="@/assets/OGMS.png" id="logo" class="pic" @click="goHome">
+        <img src="@/assets/images/OGMS.png" id="logo" class="pic" @click="goHome">
       </div>
       <div class="content" ref="homePage" v-if="Userstate===false" v-bind:style="contentStyle">
         <div class="loginDiv" v-bind:style="loginStyle">
@@ -121,7 +121,6 @@ export default {
     }
   },
   created() {
-    this.$store.commit("getStorage");
   },
   data() {
     return {
@@ -171,7 +170,7 @@ export default {
         if (valid) {
           this.axios
             .get(
-              "http://localhost:8081/user/login" +
+              "/api/user/login" +
                 "?email=" +
                 this.formInline.user +
                 "&password=" +

@@ -8,9 +8,9 @@ export default new Vuex.Store({
         //data
         userState: false,
         userName: "visitor",
-        userId:"",
+        userId: "",
         avatar: '',
-        projectImg:''
+        projectImg: ''
     },
     getters: {
         userState: state => {
@@ -19,37 +19,39 @@ export default new Vuex.Store({
         userName: state => {
             return state.userName;
         },
-        userId: state =>{
+        userId: state => {
             return state.userId;
         }
     },
     mutations: {
-        getStorage: state => {
-            if (sessionStorage.getItem('userState')) {
-                state.userState = true;
-                state.userName = sessionStorage.getItem('userName');
-                state.avatar = sessionStorage.getItem('avatar');
-                state.userId = sessionStorage.getItem('userId');
-            }
+        getUserInfo: state => {
+            $.ajax({
+                url: "/api/user/state",
+                type: "GET",
+                async: false,
+                success: function (data) {
+                    if (data) {
+                        var userInfo = data;
+                        state.userName = userInfo.userName;
+                        state.avatar = userInfo.avatar;
+                        state.userId = userInfo.userId;
+                        state.userState = true;
+                    }
+                },
+                error: function (err) {
+                    console.log("Get user info fail.");
+                }
+            });
         },
         userLogin: (state, data) => {
             state.userState = true;
             state.userName = data.userName;
             state.avatar = data.avatar;
             state.userId = data.userId;
-            sessionStorage.setItem('userState', 'true');
-            sessionStorage.setItem('userName', data.userName);
-            sessionStorage.setItem('avatar', data.avatar);
-            sessionStorage.setItem('userId', data.userId);
-
         },
         userLogout: (state) => {
             state.userState = false;
             state.userName = 'visitor';
-            sessionStorage.removeItem('userState');
-            sessionStorage.removeItem('userName');
-            sessionStorage.removeItem('avatar');
-            sessionStorage.removeItem('userId');
         },
         uploadAvatar: (state, avatar) => {
             state.avatar = avatar;
