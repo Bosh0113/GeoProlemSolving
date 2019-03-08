@@ -24,7 +24,7 @@
   top: 0px;
   width:300px;
   /* min-width: 300px; */
-  z-index: 0;
+  z-index: 1;
 }
 .content {
   padding-top: 60px;
