@@ -22,9 +22,9 @@
   position: absolute;
   margin-left: 85%;
   top: 0px;
-  width:auto;
+  width:300px;
   /* min-width: 300px; */
-  z-index: 1;
+  z-index: 0;
 }
 .content {
   padding-top: 60px;
@@ -73,7 +73,7 @@
                   <Icon type="ios-notifications-outline" size="25"></Icon>
                 </Badge>
               </MenuItem>
-              <MenuItem name="personal" style="width:30px">
+              <MenuItem name="personal" style="width:100px">
                 <Dropdown @on-click="changeSelect" placement="bottom-start">
                   <img
                     v-bind:src="avatar"
