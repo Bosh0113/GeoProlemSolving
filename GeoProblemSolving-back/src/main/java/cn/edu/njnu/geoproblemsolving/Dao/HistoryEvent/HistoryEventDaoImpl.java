@@ -1,5 +1,6 @@
 package cn.edu.njnu.geoproblemsolving.Dao.HistoryEvent;
 
+import cn.edu.njnu.geoproblemsolving.Dao.Method.EncodeUtil;
 import cn.edu.njnu.geoproblemsolving.Entity.HistoryEventEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -37,6 +38,7 @@ public class HistoryEventDaoImpl implements IHistoryEventDao {
     @Override
     public Object inquiryHistoryEvent(String scopeId){
         try {
+
             Query query=new Query(Criteria.where("scopeId").is(scopeId));
 
             List<HistoryEventEntity> historyEventEntities = mongoTemplate.find(query,HistoryEventEntity.class);
