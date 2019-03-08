@@ -23,7 +23,6 @@ import projectList from '@/components/Projects/ProjectList.vue'
 Vue.use(Router)
 Vue.use(mavonEditor)
 
-import ModuleDemo from '@/components/utils/ModuleDemo.vue'  //module的WebSocket测试
 
 const routes = [{
   path: '/', name: 'Navigation', component: Navigation, children: [
