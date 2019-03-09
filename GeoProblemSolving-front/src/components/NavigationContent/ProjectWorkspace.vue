@@ -888,19 +888,19 @@ export default {
         }
       });
     },
-    initHistory(){
-      this.records = [];
-      let that = this;
-      this.axios.get("http://localhost:8081/history/inquiry?scopeId="+this.currentModule.moduleId)
-        .then(res => {
-          if (res.data != "Fail") {
-            for(let i = 0; i<res.data.length;i++){
-              let tempRecords = JSON.parse(res.data[i].description);
-              that.records.push(tempRecords);
-            }
-          }
-        });
-    },
+    // initHistory(){
+    //   this.records = [];
+    //   let that = this;
+    //   this.axios.get("http://localhost:8081/history/inquiry?scopeId="+this.currentModule.moduleId)
+    //     .then(res => {
+    //       if (res.data != "Fail") {
+    //         for(let i = 0; i<res.data.length;i++){
+    //           let tempRecords = JSON.parse(res.data[i].description);
+    //           that.records.push(tempRecords);
+    //         }
+    //       }
+    //     });
+    // },
     managerIdentity(managerId) {
       if (managerId === this.$store.state.userId) {
         this.isSubProjectManager = true;
@@ -925,8 +925,8 @@ export default {
         this.currentModule = this.moduleList[this.currentModuleIndex];
         this.inquiryTask();
         this.order = item;
+        // this.initHistory();
         this.openModuleSocket(this.currentModule.moduleId);
-        this.initHistory();
       }
     },
     closeModuleSocket() {
@@ -974,21 +974,18 @@ export default {
 
         // 更新records --by mzy
         this.records.push(message);
-        // let History = {};
-        // History["scopeId"] = this.currentModule.moduleId;
-        // History["description"] = JSON.stringify(message);
-        this.axios
-          .post("http://localhost:8081/history/save", "description="+ JSON.stringify(message) + "&scopeId=" + this.currentModule.moduleId)
-          .then(res => {
-            if (res.data === "Fail") {
-              this.$Message.info("Fail");
-            } else if(res.data === "Success") {
-              this.$Message.info("Success");
-            }
-          })
-          .catch(err => {
-            console.log(err.data);
-          });
+        // this.axios
+        //   .post("http://localhost:8081/history/save", "description=" + JSON.stringify(message) + "&scopeId=" + this.currentModule.moduleId)
+        //   .then(res => {
+        //     if (res.data === "Fail") {
+        //       this.$Message.info("Fail");
+        //     } else if(res.data === "Success") {
+        //       this.$Message.info("Success");
+        //     }
+        //   })
+        //   .catch(err => {
+        //     console.log(err.data);
+        //   });
 
       } else if (messageJson.type == "members") {
         // 比较 判断人员动态 更新records --by mzy
