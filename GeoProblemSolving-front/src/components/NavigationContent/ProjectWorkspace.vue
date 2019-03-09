@@ -155,83 +155,97 @@
   text-overflow: ellipsis;
   max-width: 120px;
 }
+.operatePanel button{
+  margin-right:2.5%
+}
 </style>
 <template>
-  <div>
+  <div style="background-color:#dcdee2">
     <Row>
-      <Col
-        span="18"
-        offset="1"
-        style="margin-top:10px;background-color:white;padding-top:20px;padding-bottom:20px"
-      >
-        <Steps :current="order">
-          <Step title="start" icon="ios-home" @click.native="showDetail(0)" :order="0"></Step>
-          <Step
-            v-for="(list,index) in moduleList"
-            :key="index+1"
-            @click.native="showDetail(index+1)"
-            :title="list.title"
-            :order="index+1"
-          ></Step>
-        </Steps>
-      </Col>
-      <Col span="4" offset="1" v-show="isSubProjectManager" style="margin-top:10px">
-        <Button type="default" @click="addModal = true" icon="md-add" class="addBtn">Add</Button>
-        <Modal
-          width="600px"
-          v-model="addModal"
-          title="add new task node"
-          @on-ok="addModule()"
-          @on-cancel="cancel()"
-        >
-          <div class="addNodeStyle">
-            <span style="width:10%">Name</span>
-            <Input v-model="moduleTitle" placeholder="Enter something..." style="width: 400px"/>
+      <Col span="22" offset="1">
+        <Card>
+          <p
+            slot="title"
+            style="height:40px;line-height:40px;font-size:20px"
+          >{{subProjectInfo.title}}</p>
+          <div slot="extra" style="height:40px;display:flex;align-items:center" class="operatePanel">
+              <Button type="default" @click="addModal = true" icon="md-add" class="addBtn">Add</Button>
+              <Button
+                type="default"
+                @click="delModal = true"
+                icon="md-remove"
+                class="removeBtn"
+              >Remove</Button>
+              <Button type="default" @click="editModalShow()" icon="md-brush" class="editBtn">Edit</Button>
           </div>
-          <div class="addNodeStyle">
-            <span style="width:10%">Type</span>
-            <Select v-model="moduleType" style="width:400px" placeholder="please select type">
-              <Option v-for="item in typeList" :key="item.index" :value="item">{{ item }}</Option>
-            </Select>
-          </div>
-          <div class="addNodeStyle">
-            <span style="width:10%">Detail</span>
-            <textarea v-model="moduleDescription" style="width:400px" :rows="6"></textarea>
-          </div>
-        </Modal>
-        <Button type="default" @click="delModal = true" icon="md-remove" class="removeBtn">Remove</Button>
-        <Button type="default" @click="editModalShow()" icon="md-brush" class="editBtn">Edit</Button>
+          <Row>
+            <Col
+              span="22"
+              offset="1"
+              style="margin-top:10px;background-color:white;padding-top:20px;padding-bottom:20px"
+            >
+              <Steps :current="order">
+                <Step title="start" icon="ios-home" @click.native="showDetail(0)" :order="0"></Step>
+                <Step
+                  v-for="(list,index) in moduleList"
+                  :key="index+1"
+                  @click.native="showDetail(index+1)"
+                  :title="list.title"
+                  :order="index+1"
+                ></Step>
+              </Steps>
+            </Col>
+            <!-- <Col span="4" offset="1" v-show="isSubProjectManager" style="margin-top:10px">
+              <Button type="default" @click="addModal = true" icon="md-add" class="addBtn">Add</Button>
+              <Button
+                type="default"
+                @click="delModal = true"
+                icon="md-remove"
+                class="removeBtn"
+              >Remove</Button>
+              <Button type="default" @click="editModalShow()" icon="md-brush" class="editBtn">Edit</Button>
+            </Col> -->
+          </Row>
+        </Card>
       </Col>
     </Row>
+
     <div
       v-if="moduleList.length <= 0 || currentModuleIndex == -1 || order == 0"
       class="workspaceContent"
     >
-      <!-- <h1>No module have been created!</h1> -->
-      <h1 style="margin-top: 0px;margin-bottom: 0px;text-align:left">{{subProjectInfo.title}}</h1>
-      <hr>
+
+
       <Row style="margin-top:20px">
-        <Col :xs="8" :sm="7" :md="6" :lg="5" v-bind="this.participants">
-          <div class="member_panel" :style="{height:sidebarHeight+'px'}" style="background-color:white">
+        <!-- <Col :xs="8" :sm="7" :md="6" :lg="5" v-bind="this.participants"> -->
+        <Col :xs="8" :sm="7" :md="7" :lg="5" v-bind="this.participants" offset="1">
+          <div
+            class="member_panel"
+            :style="{height:sidebarHeight+'px'}"
+            style="background-color:white"
+          >
             <div class="title">Participants</div>
             <div :style="{height:sidebarHeight-100+'px'}">
               <div class="member-desc" v-for="(member,index) in participants" :key="member.index">
                 <template v-if="index==0">
                   <Badge text="♔" type="warning" class="userAvatar">
-                    <div class="member-image" @click="gotoPersonalSpace(member.userId)" style="cursor:pointer">
-                    <img
-                      v-if="member.avatar != '' && member.avatar!='undefined'"
-                      :src="member.avatar"
-                      style="width:auto;height:100%"
-                    />
-                    <avatar
-                    :username="member.userName"
-                    :size="40"
-                    style="margin-top:10px"
-                    :title="member.userName"
-                    v-else
+                    <div
+                      class="member-image"
+                      @click="gotoPersonalSpace(member.userId)"
+                      style="cursor:pointer"
                     >
-                    </avatar>
+                      <img
+                        v-if="member.avatar != '' && member.avatar!='undefined'"
+                        :src="member.avatar"
+                        style="width:auto;height:100%"
+                      >
+                      <avatar
+                        :username="member.userName"
+                        :size="40"
+                        style="margin-top:10px"
+                        :title="member.userName"
+                        v-else
+                      ></avatar>
                     </div>
                   </Badge>
                   <div class="memebr-work">
@@ -246,19 +260,23 @@
                   </div>
                 </template>
                 <template v-else style="margin-top:5px">
-                  <div class="member-image" @click="gotoPersonalSpace(member.userId)" style="cursor:pointer">
+                  <div
+                    class="member-image"
+                    @click="gotoPersonalSpace(member.userId)"
+                    style="cursor:pointer"
+                  >
                     <img
                       v-if="member.avatar != ''"
                       :src="member.avatar"
                       style="width:auto;height:100%"
-                    />
+                    >
                     <avatar
-                    :username="member.userName"
-                    :size="40"
-                    style="margin-top:10px"
-                    :title="member.userName"
-                    v-else
-                  ></avatar>
+                      :username="member.userName"
+                      :size="40"
+                      style="margin-top:10px"
+                      :title="member.userName"
+                      v-else
+                    ></avatar>
                   </div>
                   <div class="memebr-work">
                     <div class="userName">
@@ -326,11 +344,11 @@
             </div>
           </div>
         </Col>
-        <Col :xs="15" :sm="16" :md="17" :lg="18" offset="1">
-          <div style>
+        <Col :xs="14" :sm="15" :md="16" :lg="16" offset="1">
+          <div style="background-color:white;padding:20px">
             <h2 style="margin-bottom:5px">Description</h2>
             <hr style="margin-bottom:10px">
-            <div :style="{height:sidebarHeight-80+'px'}">{{subProjectInfo.description}}</div>
+            <div :style="{height:sidebarHeight-140+'px'}">{{subProjectInfo.description}}</div>
           </div>
           <div style="display:flex;align-items:center;justify-content:center;height:60px">
             <Button type="error" style="margin:auto">Quit this sub-project ?</Button>
@@ -339,11 +357,13 @@
       </Row>
     </div>
     <div v-else class="workspaceContent">
-      <h1 style="margin-top: 0px;margin-bottom: 0px;text-align:left">{{subProjectInfo.title}}</h1>
-      <hr>
       <Row style="margin-top:20px">
-        <Col :xs="8" :sm="7" :md="6" :lg="5" v-bind="this.olParticipants">
-          <div class="member_panel" :style="{height:sidebarHeight+'px'}" style="background-color:white">
+        <Col :xs="8" :sm="7" :md="6" :lg="5" v-bind="this.olParticipants" offset="1">
+          <div
+            class="member_panel"
+            :style="{height:sidebarHeight+'px'}"
+            style="background-color:white"
+          >
             <div class="title">Online participants</div>
             <div :style="{height:sidebarHeight-100+'px'}">
               <div class="member-desc" v-for="member in olParticipants" :key="member.id">
@@ -384,30 +404,48 @@
           </div>
         </Col>
         <template>
-          <Col :xs="15" :sm="16" :md="17" :lg="18" offset="1" :style="{height:sidebarHeight/5*3+'px'}" style="margin-bottom:20px">
+          <Col
+            :xs="14"
+            :sm="15"
+            :md="16"
+            :lg="16"
+            :style="{height:sidebarHeight/5*3+'px'}"
+            style="margin-bottom:20px;margin-left:60px;"
+          >
             <div style="width:45%;height:100%;float:left;background-color:white">
               <h2 style="width:100%;padding:10px 10px 0 10px">{{currentModule.title}}</h2>
               <hr>
               <div style="width:100%;padding:10px">{{currentModule.description}}</div>
             </div>
-            <div style="width:50%;height:100%;float:right;border:1px solid lightgray;background-color:white;overflow-y:scroll">
+            <div
+              style="width:50%;height:100%;float:right;border:1px solid lightgray;background-color:white;overflow-y:scroll"
+            >
               <Timeline style="padding:10px">
                 <!-- <TimelineItem v-if="records.length > 3"><a href="#">More</a></TimelineItem> -->
                 <TimelineItem v-for="(item,index) in records" :key="index">
                   <template v-if="item.type == 'participants'">
                     <span class="time" style="color:blue">{{item.time}}</span>
                     <span class="time" style="color:blue; margin-left:10px">{{item.who}}</span>
-                    <span class="content" style="color:blue; margin-left:10px; word-break:break-word">{{item.content}}</span>
+                    <span
+                      class="content"
+                      style="color:blue; margin-left:10px; word-break:break-word"
+                    >{{item.content}}</span>
                   </template>
                   <template v-if="item.type == 'resources'">
                     <span class="time">{{item.time}}</span>
                     <span class="time" style="margin-left:10px">{{item.who}}</span>
-                    <span class="content" style="margin-left:10px; word-break:break-word">{{item.content}}</span>
+                    <span
+                      class="content"
+                      style="margin-left:10px; word-break:break-word"
+                    >{{item.content}}</span>
                   </template>
                   <template v-if="item.type == 'tasks'">
                     <span class="time" style="color:gray">{{item.time}}</span>
                     <span class="time" style="color:gray; margin-left:10px">{{item.who}}</span>
-                    <span class="content" style="color:gray; margin-left:10px; word-break:break-word">{{item.content}}</span>
+                    <span
+                      class="content"
+                      style="color:gray; margin-left:10px; word-break:break-word"
+                    >{{item.content}}</span>
                   </template>
                 </TimelineItem>
               </Timeline>
@@ -415,112 +453,108 @@
           </Col>
         </template>
         <template>
-          <Col
-            :xs="15" :sm="16" :md="17" :lg="18"
-            offset="1">
-          <Row>
-            <Col span="23"
-            style="border:solid 1px #c5c8ce;padding: 5px 0;">
-            <Row type="flex" justify="center">
-            <Col span="7">
-              <Card :padding="0" :border="false">
-                <h3 slot="title">Todo</h3>
-              <Button
-              slot="extra"
-                type="default"
-                class="createTaskBtn"
-                style="margin-top:-10px"
-                @click="createTaskModalShow()"
-                v-show="isSubProjectManager||isSubProjectMember"
-              >Add</Button>
-                <draggable
-                  class="taskList"
-                  element="ul"
-                  :options="{group:'task'}"
-                  v-model="taskTodo"
-                  @start="startMove()"
-                  @update="taskOrderUpdate(taskTodo,'todo')"
-                  @add="taskOrderUpdate(taskTodo,'todo')"
-                  @remove="taskOrderUpdate(taskTodo,'todo')"
-                >
-                  <Card v-for="(item,index) in taskTodo" :key="index" :padding="3">
-                    <div>
-                    <strong
-                      @click="editOneTask(index,taskTodo)"
-                      class="taskName"
-                    >{{item.taskName}}</strong>
-                    <span
-                      style="float:right;margin-right:3px;cursor: pointer;color:gray;"
-                      @click="taskRemove(index,taskTodo)"
-                    >×</span>
-                    </div>
-                  <span style="word-break:break-word;">{{item.description}}</span>
-                  </Card>
-                </draggable>
-              </Card>
-            </Col>
-            <Col span="7" offset="1">
-              <Card :padding="0" :border="false">
-                <h3 slot="title">Doing</h3>
-                <draggable
-                  class="taskList"
-                  element="ul"
-                  :options="{group:'task'}"
-                  v-model="taskDoing"
-                  @start="startMove()"
-                  @update="taskOrderUpdate(taskDoing,'doing')"
-                  @add="taskOrderUpdate(taskDoing,'doing')"
-                  @remove="taskOrderUpdate(taskDoing,'doing')"
-                >
-                  <Card v-for="(item,index)  in taskDoing" :key="index" :padding="3">
-                    <div>
-                    <strong
-                      @click="editOneTask(index,taskDoing)"
-                      class="taskName"
-                    >{{item.taskName}}</strong>
-                    <span
-                      style="float:right;margin-right:3px;cursor: pointer;color:gray;"
-                      @click="taskRemove(index,taskDoing)"
-                    >×</span>
-                    </div>
-                    <span style="word-break:break-word;">{{item.description}}</span>
-                  </Card>
-                </draggable>
-              </Card>
-            </Col>
-            <Col span="7" offset="1">
-              <Card :padding="0" :border="false">
-                <h3 slot="title">Done</h3>
-                <draggable
-                  class="taskList"
-                  element="ul"
-                  :options="{group:'task'}"
-                  v-model="taskDone"
-                  @start="startMove()"
-                  @update="taskOrderUpdate(taskDone)"
-                  @add="taskOrderUpdate(taskDone,'done')"
-                  @remove="taskOrderUpdate(taskDone,'done')"
-                >
-                  <Card v-for="(item,index) in taskDone" :key="index" :padding="3">
-                    <div>
-                    <strong
-                      @click="editOneTask(index,taskDone)"
-                      class="taskName"
-                    >{{item.taskName}}</strong>
-                    <span
-                      style="float:right;margin-right:3px;cursor: pointer;color:gray;"
-                      @click="taskRemove(index,taskDone)"
-                    >×</span>
-                    </div>
-                    <span style="word-break:break-word;">{{item.description}}</span>
-                  </Card>
-                </draggable>
-              </Card>
-            </Col>
-            </Row>
-            </Col>
-            <Col span="1">
-            </Col>
+          <Col :xs="14" :sm="15" :md="16" :lg="17">
+            <Row>
+              <Col span="22" offset="1" style="padding: 5px 0;background-color:white">
+                <Row type="flex" justify="center">
+                  <Col span="7">
+                    <Card :padding="0" :border="false">
+                      <h3 slot="title">Todo</h3>
+                      <Button
+                        slot="extra"
+                        type="default"
+                        class="createTaskBtn"
+                        style="margin-top:-10px"
+                        @click="createTaskModalShow()"
+                        v-show="isSubProjectManager||isSubProjectMember"
+                      >Add</Button>
+                      <draggable
+                        class="taskList"
+                        element="ul"
+                        :options="{group:'task'}"
+                        v-model="taskTodo"
+                        @start="startMove()"
+                        @update="taskOrderUpdate(taskTodo,'todo')"
+                        @add="taskOrderUpdate(taskTodo,'todo')"
+                        @remove="taskOrderUpdate(taskTodo,'todo')"
+                      >
+                        <Card v-for="(item,index) in taskTodo" :key="index" :padding="3">
+                          <div>
+                            <strong
+                              @click="editOneTask(index,taskTodo)"
+                              class="taskName"
+                            >{{item.taskName}}</strong>
+                            <span
+                              style="float:right;margin-right:3px;cursor: pointer;color:gray;"
+                              @click="taskRemove(index,taskTodo)"
+                            >×</span>
+                          </div>
+                          <span style="word-break:break-word;">{{item.description}}</span>
+                        </Card>
+                      </draggable>
+                    </Card>
+                  </Col>
+                  <Col span="7" style="margin-left:20px">
+                    <Card :padding="0" :border="false">
+                      <h3 slot="title">Doing</h3>
+                      <draggable
+                        class="taskList"
+                        element="ul"
+                        :options="{group:'task'}"
+                        v-model="taskDoing"
+                        @start="startMove()"
+                        @update="taskOrderUpdate(taskDoing,'doing')"
+                        @add="taskOrderUpdate(taskDoing,'doing')"
+                        @remove="taskOrderUpdate(taskDoing,'doing')"
+                      >
+                        <Card v-for="(item,index)  in taskDoing" :key="index" :padding="3">
+                          <div>
+                            <strong
+                              @click="editOneTask(index,taskDoing)"
+                              class="taskName"
+                            >{{item.taskName}}</strong>
+                            <span
+                              style="float:right;margin-right:3px;cursor: pointer;color:gray;"
+                              @click="taskRemove(index,taskDoing)"
+                            >×</span>
+                          </div>
+                          <span style="word-break:break-word;">{{item.description}}</span>
+                        </Card>
+                      </draggable>
+                    </Card>
+                  </Col>
+                  <Col span="7" style="margin-left:20px">
+                    <Card :padding="0" :border="false">
+                      <h3 slot="title">Done</h3>
+                      <draggable
+                        class="taskList"
+                        element="ul"
+                        :options="{group:'task'}"
+                        v-model="taskDone"
+                        @start="startMove()"
+                        @update="taskOrderUpdate(taskDone)"
+                        @add="taskOrderUpdate(taskDone,'done')"
+                        @remove="taskOrderUpdate(taskDone,'done')"
+                      >
+                        <Card v-for="(item,index) in taskDone" :key="index" :padding="3">
+                          <div>
+                            <strong
+                              @click="editOneTask(index,taskDone)"
+                              class="taskName"
+                            >{{item.taskName}}</strong>
+                            <span
+                              style="float:right;margin-right:3px;cursor: pointer;color:gray;"
+                              @click="taskRemove(index,taskDone)"
+                            >×</span>
+                          </div>
+                          <span style="word-break:break-word;">{{item.description}}</span>
+                        </Card>
+                      </draggable>
+                    </Card>
+                  </Col>
+                </Row>
+              </Col>
+              <Col span="1"></Col>
             </Row>
           </Col>
         </template>
@@ -534,7 +568,7 @@
             </Button>
             <!-- <Button type="info" class="util-btn" shape="circle" @click="resourcedrawerOpen = true">
               <Icon type="md-cloud-upload" size="20" class="util-btn-icon"/>
-            </Button> -->
+            </Button>-->
             <Drawer :closable="false" v-model="drawerOpen" width="640" style="font-size:30px">
               <h1>General Tools</h1>
               <div class="tool-panel">
@@ -556,12 +590,7 @@
     <Modal v-model="delModal" title="delete module" @on-ok="delModule()" @on-cancel="cancel()">
       <p>Do you really want to delete this step?</p>
     </Modal>
-    <Modal
-      v-model="editModal"
-      title="update task"
-      @on-ok="updateModule()"
-      @on-cancel="cancel()"
-    >
+    <Modal v-model="editModal" title="update task" @on-ok="updateModule()" @on-cancel="cancel()">
       <div class="editNodeStyle">
         <span style="width:10%">Name</span>
         <Input
@@ -696,6 +725,32 @@
         </RadioGroup>
       </div>
     </Modal>
+    <Modal
+                width="600px"
+                v-model="addModal"
+                title="add new task node"
+                @on-ok="addModule()"
+                @on-cancel="cancel()"
+              >
+                <div class="addNodeStyle">
+                  <span style="width:10%">Name</span>
+                  <Input
+                    v-model="moduleTitle"
+                    placeholder="Enter something..."
+                    style="width: 400px"
+                  />
+                </div>
+                <div class="addNodeStyle">
+                  <span style="width:10%">Type</span>
+                  <Select v-model="moduleType" style="width:400px" placeholder="please select type">
+                    <Option v-for="item in typeList" :key="item.index" :value="item">{{ item }}</Option>
+                  </Select>
+                </div>
+                <div class="addNodeStyle">
+                  <span style="width:10%">Detail</span>
+                  <textarea v-model="moduleDescription" style="width:400px" :rows="6"></textarea>
+                </div>
+              </Modal>
   </div>
 </template>
 <script>
@@ -786,7 +841,7 @@ export default {
       moduleSocket: null,
       timer: null,
       // 动态记录相关
-      record:{
+      record: {
         type: "",
         time: "",
         who: "",
@@ -796,12 +851,13 @@ export default {
       // 当前参与者
       olParticipants: [],
       // 消息
-      socketMsg:{
+      socketMsg: {
         type: "",
         time: "",
         who: "",
-        whoid:"",
-        content: ""}
+        whoid: "",
+        content: ""
+      }
     };
   },
   created() {
@@ -829,14 +885,14 @@ export default {
   },
   beforeDestroy: function() {
     window.removeEventListener("resize", this.initSize);
-    if(this.moduleSocket != null){
+    if (this.moduleSocket != null) {
       this.moduleSocket.close();
     }
   },
   methods: {
     initSize() {
       //侧边栏的高度随着屏幕的高度自适应
-      this.sidebarHeight = window.innerHeight - 250;
+      this.sidebarHeight = window.innerHeight - 280;
       //通知栏的属性设置，top表示距离顶部的距离，duration表示持续的时间
       this.$Notice.config({
         top: 50,
@@ -952,24 +1008,24 @@ export default {
       var userIndex = -1;
 
       if (messageJson.type == "online") {
-
         this.record.time = messageJson.createTime;
         this.record.content = "enter this module.";
-
       } else if (messageJson.type == "offline") {
-
         this.record.time = messageJson.createTime;
         this.record.content = "leave this module.";
-
       } else if (messageJson.type == "message") {
-
         let message = messageJson.message;
         // 更新数据 --by mzy
-        if(message.type == "tasks" && message.whoid != this.$store.state.userId){
+        if (
+          message.type == "tasks" &&
+          message.whoid != this.$store.state.userId
+        ) {
           this.inquiryTask();
         }
-        if(message.type == "resources" && message.whoid != this.$store.state.userId){
-
+        if (
+          message.type == "resources" &&
+          message.whoid != this.$store.state.userId
+        ) {
         }
 
         // 更新records --by mzy
@@ -1029,22 +1085,22 @@ export default {
         var that = this;
         for (let i = 0; i < members.length; i++) {
           this.axios
-          .get(
-            "http://localhost:8081/user/inquiry" +
-              "?key=" +
-              "userId" +
-              "&value=" +
-              members[i]
-          )
-          .then(res => {
-            if (res.data != "None" && res.data != "Fail") {
-              that.olParticipants.push(res.data);
-              if(userIndex != -1){
-                that.record.who =  that.olParticipants[userIndex].userName;
+            .get(
+              "http://localhost:8081/user/inquiry" +
+                "?key=" +
+                "userId" +
+                "&value=" +
+                members[i]
+            )
+            .then(res => {
+              if (res.data != "None" && res.data != "Fail") {
+                that.olParticipants.push(res.data);
+                if (userIndex != -1) {
+                  that.record.who = that.olParticipants[userIndex].userName;
+                }
+              } else if (res.data == "None") {
               }
-            } else if (res.data == "None") {
-            }
-          });
+            });
         }
         //records 更新
         this.record.type = "participants";
@@ -1307,11 +1363,11 @@ export default {
       let taskDefult = {
         taskName: "",
         description: "",
-        startTime: '',
-        endTime: '',
+        startTime: "",
+        endTime: "",
         state: ""
       };
-      this.$set(this,"taskInfo",taskDefult);
+      this.$set(this, "taskInfo", taskDefult);
       this.createTaskModal = true;
     },
     createTask() {
@@ -1350,19 +1406,18 @@ export default {
             taskList[index]["taskId"]
         )
         .then(res => {
-          if(res.data!="Fail"){
+          if (res.data != "Fail") {
             let taskInfoRes = res.data[0];
-            taskInfoRes.startTime=new Date(taskInfoRes.startTime);
-            taskInfoRes.endTime=new Date(taskInfoRes.endTime);
+            taskInfoRes.startTime = new Date(taskInfoRes.startTime);
+            taskInfoRes.endTime = new Date(taskInfoRes.endTime);
             this.$set(this, "taskInfo", taskInfoRes);
             this.editTaskModal = true;
-          }
-          else{
+          } else {
             this.$Message.error("Fail!");
           }
         })
         .catch(err => {
-            this.$Message.error("Fail!");
+          this.$Message.error("Fail!");
         });
     },
     //更新某个task
@@ -1403,9 +1458,9 @@ export default {
           "/api/task/inquiryTodo?" + "moduleId=" + this.currentModule.moduleId
         )
         .then(res => {
-          if(res.data != "None" && res.data != "Fail"){
+          if (res.data != "None" && res.data != "Fail") {
             this.$set(this, "taskTodo", res.data);
-          }else {
+          } else {
             this.$Message.error("Fail!");
           }
         })
@@ -1417,9 +1472,9 @@ export default {
           "/api/task/inquiryDoing?" + "moduleId=" + this.currentModule.moduleId
         )
         .then(res => {
-          if(res.data != "None" && res.data != "Fail"){
-           this.$set(this, "taskDoing", res.data);
-          }else {
+          if (res.data != "None" && res.data != "Fail") {
+            this.$set(this, "taskDoing", res.data);
+          } else {
             this.$Message.error("Fail!");
           }
         })
@@ -1431,9 +1486,9 @@ export default {
           "/api/task/inquiryDone?" + "moduleId=" + this.currentModule.moduleId
         )
         .then(res => {
-          if(res.data != "None" && res.data != "Fail"){
+          if (res.data != "None" && res.data != "Fail") {
             this.$set(this, "taskDone", res.data);
-          }else {
+          } else {
             this.$Message.error("Fail!");
           }
         })
@@ -1461,7 +1516,7 @@ export default {
           });
       }
     },
-    startMove(taskList, type){
+    startMove(taskList, type) {
       // 任务更新socket
       this.socketMsg.whoid = this.$store.state.userId;
       this.socketMsg.who = this.$store.state.userName;
@@ -1492,13 +1547,13 @@ export default {
       this.socketMsg.time = new Date().toLocaleString();
       this.sendMessage(this.socketMsg);
     },
-    gotoPersonalSpace(id){
+    gotoPersonalSpace(id) {
       // sessionStorage.setItem("memberId",data);
       // this.$router.push({name: 'ProjectDetail',params:{id:id} });
-      if(id==sessionStorage.getItem("userId")){
-        this.$router.push({name: 'PersonalPage'});
-      }else{
-        this.$router.push({ name: "MemberDetailPage" ,params:{id:id}});
+      if (id == sessionStorage.getItem("userId")) {
+        this.$router.push({ name: "PersonalPage" });
+      } else {
+        this.$router.push({ name: "MemberDetailPage", params: { id: id } });
       }
       // console.log("挡墙登陆的账户是:"+ sessionStorage.getItem("userId"));
     }
