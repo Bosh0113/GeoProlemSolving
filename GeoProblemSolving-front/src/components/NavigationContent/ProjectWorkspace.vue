@@ -345,10 +345,10 @@
           </div>
         </Col>
         <Col :xs="14" :sm="15" :md="16" :lg="16" offset="1">
-          <div style>
+          <div style="background-color:white;padding:20px">
             <h2 style="margin-bottom:5px">Description</h2>
             <hr style="margin-bottom:10px">
-            <div :style="{height:sidebarHeight-80+'px'}">{{subProjectInfo.description}}</div>
+            <div :style="{height:sidebarHeight-140+'px'}">{{subProjectInfo.description}}</div>
           </div>
           <div style="display:flex;align-items:center;justify-content:center;height:60px">
             <Button type="error" style="margin:auto">Quit this sub-project ?</Button>
@@ -892,7 +892,7 @@ export default {
   methods: {
     initSize() {
       //侧边栏的高度随着屏幕的高度自适应
-      this.sidebarHeight = window.innerHeight - 250;
+      this.sidebarHeight = window.innerHeight - 280;
       //通知栏的属性设置，top表示距离顶部的距离，duration表示持续的时间
       this.$Notice.config({
         top: 50,
