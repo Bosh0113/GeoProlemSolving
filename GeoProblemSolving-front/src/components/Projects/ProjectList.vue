@@ -42,20 +42,18 @@ operateBtnGroup {
   <div>
     <Row>
       <Col span="22" offset="1">
-        <div class="topPanel" style="margin-top:50px">
+      <div style="display:flex;height:60px;justify-content:center">
+        <div style="width:70%;display:flex;justify-content:center;align-items:center">
           <div style="width:80%">
             <Input
               v-model="search"
               placeholder="Enter something to find project quickly"
-              style="width: 100%"
+              style="width: 80%"
             />
           </div>
-          <!-- <div class="topPanel" style="margin-top:50px;float:right;display:flex"> -->
-          <div
-            style="float:right;width:20%;magrin-left:80%;display:flex;justify-content:center"
-            class="operateBtnGroup"
-          >
-            <Button
+        </div>
+        <div style="width:30%;display:flex;justify-content:center;align-items:center">
+          <Button
               router-link
               :to="{path:'newproject'}"
               type="default"
@@ -70,10 +68,9 @@ operateBtnGroup {
               class="btnJoin"
               @click="joinModal=true"
             >Join</Button>
-          </div>
-
-          <!-- </div> -->
         </div>
+      </div>
+
         <br>
         <div class="Tabpane">
           <Tabs v-model="currentTab" @click.native="chooseCurrentType(currentTab)">
@@ -115,11 +112,11 @@ operateBtnGroup {
             </Card>
           </Col>
         </div>
-        <div v-for="(item,index) in filteredBlogs" :data="currentProjectList" :key="item.index">
+        <div v-for="(item,index) in filteredBlogs" :data="currentProjectList" :key="item.index" style="width:95%;margin-right:5%">
           <Col
             :xs="{ span: 21, offset: 1 }"
             :md="{ span: 11, offset: 1 }"
-            :lg="{ span: 7, offset: 1 }"
+            :lg="{ span: 7,  offset: 1 }"
             v-if="item.privacy=='Public'"
           >
             <Card style="height:auto;margin:20px 0 20px 0">

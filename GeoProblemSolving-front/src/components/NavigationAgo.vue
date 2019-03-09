@@ -18,17 +18,18 @@
 .userState {
   position: absolute;
   margin-left: 80%;
-  width:20%;
   top: 0px;
+  width:250px;
   z-index: 1;
 }
-.navPart{
-  width:85%;
-}
+
 </style>
 <template>
   <div class="mainPart">
-    <div class="header">
+    <div class="header" :style="{width:headerWidth}">
+      <div class="imagePart">
+
+      </div>
       <img src="@/assets/images/OGMS.png" id="logo" class="pic">
       <div class="navPart">
         <Menu
@@ -120,7 +121,7 @@ export default {
       this.getUnreadNoticeCount();
     };
     this.headerWidth = window.innerWidth + 'px';
-    // alert(this.headerWidth);
+    alert(this.headerWidth);
   },
   updated() {
     $(".userState sup").css("margin-top", "20px");

@@ -11,14 +11,14 @@
 }
 .detail {
   height: auto;
-  display: flex;
 }
 .detail_image {
   display: flex;
   align-items: center;
+  justify-content:center;
 }
 .detail_image img {
-  width: 100%;
+  width: 330px;
   height: 250px;
 }
 .detail_description {
@@ -62,10 +62,7 @@
   padding:20px
 }
 .subprojectPanel {
-  /* min-height: 200px; */
   height: auto;
-  /* background-color:lightblue; */
-  /* border: 1px solid gray; */
   display: flex;
   align-items: center;
 }
@@ -81,12 +78,6 @@
   text-indent: 25px;
   min-height: 60px;
 }
-/* .subProjectCreate {
-  height: 100px;
-  display: flex;
-  align-items: center;
-  padding: 0 20px 0 20px;
-} */
 .subProjectCreate button {
   height: 40px;
   display: flex;
@@ -172,103 +163,8 @@
               >{{currentProjectDetail["title"]}}</p>
               <p slot="extra" style="height:40px;line-height:40px;">
                 <Button type="default" icon="md-brush" @click="editModalShow(currentProjectDetail['projectId'])" v-show="judgeIsManager(projectManager.userId)">
-
                 </Button>
-                <!-- currentProjectDetail['projectId']是当前项目的id -->
 
-
-                <!-- 项目编辑的modal模态框 -->
-                <Modal
-                    v-model="editProjectModal"
-                    title="Edit Project"
-                    @on-ok="editProjectSubmit()"
-                    @on-cancel="cancel"
-                    :mask-closable="false"
-                    width="900px"
-                    >
-                    <div style="flex">
-                      <!-- <span>Category</span> -->
-                      <div class="editStyle">
-                        <span>Category</span>
-                        <RadioGroup style="margin-left:5%;width:100%" v-model="editType">
-                          <Radio label="Society"></Radio>
-                          <Radio label="Atmosphere"></Radio>
-                          <Radio label="Ecology"></Radio>
-                          <Radio label="Soil"></Radio>
-                          <Radio label="Water"></Radio>
-                          <Radio label="Others"></Radio>
-                        </RadioGroup>
-                      </div>
-                      <div class="editStyle">
-                        <span>Title</span>
-                        <Input
-                          v-model="editTitle"
-                          placeholder="Enter something..."
-                          style="margin-left:5%;width:100%"
-                        />
-                      </div>
-                      <div class="editStyle">
-                        <span>Description</span>
-                        <Input
-                          v-model="editDescription"
-                          placeholder="Enter something..."
-                          style="margin-left:5%;width:100%"
-                        />
-                      </div>
-                      <div class="editStyle">
-                        <span>Introduction</span>
-                        <Input
-                          v-model="editIntroduction"
-                          type="textarea"
-                          placeholder="Enter something..."
-                          style="margin-left:5%;width:100%"
-                          :rows="4"
-                        />
-                      </div>
-                      <div class="editStyle">
-                        <span>Tag</span>
-                        <Input
-                          v-model="inputTag"
-                          placeholder="Enter some tag to introduce the project"
-                          style="margin-left:0.5%;width: 200px"
-                          @keyup.enter.native="addTag(inputTag)"
-                        />
-                        <Button
-                          icon="ios-add"
-                          type="dashed"
-                          size="small"
-                          style="margin-left:2.5%"
-                          @click="addTag(inputTag)"
-                        >Add Tag</Button>
-                        <!-- <div style="margin-left:5%">
-                          <Tag color="primary" @on-close="deleteTag(index)" v-show="editTags!=''">{{item}}</Tag>
-                        </div> -->
-                      </div>
-                      <div style="width:80%;margin-left:20%">
-                        <Tag
-                          color="primary"
-                          v-for="(tag,index) in editTags"
-                          :key="index"
-                          closable
-                          @on-close="deleteTag(index)"
-                        >{{tag}}</Tag>
-                      </div>
-                      <div class="editStyle">
-                        <span>Privacy</span>
-                        <RadioGroup style="margin-left:0.5%" v-model="editPrivacy">
-                          <Radio
-                            label="Public"
-                            title="Other users can find the group and see who has membership."
-                          ></Radio>
-                          <Radio
-                            label="Discover"
-                            title="Other users can find this group, but membership information is hidden."
-                          ></Radio>
-                          <Radio label="Private" title="Other users can not find this group."></Radio>
-                        </RadioGroup>
-                      </div>
-                    </div>
-                </Modal>
               </p>
               <Row>
                 <Col :xs="12" :sm="10" :md="9" :lg="8">
@@ -626,6 +522,97 @@
         <br>
       </Col>
     </Row>
+    <Modal
+                    v-model="editProjectModal"
+                    title="Edit Project"
+                    @on-ok="editProjectSubmit()"
+                    @on-cancel="cancel"
+                    :mask-closable="false"
+                    width="900px"
+                    >
+                    <div style="flex">
+                      <!-- <span>Category</span> -->
+                      <div class="editStyle">
+                        <span>Category</span>
+                        <RadioGroup style="margin-left:5%;width:100%" v-model="editType">
+                          <Radio label="Society"></Radio>
+                          <Radio label="Atmosphere"></Radio>
+                          <Radio label="Ecology"></Radio>
+                          <Radio label="Soil"></Radio>
+                          <Radio label="Water"></Radio>
+                          <Radio label="Others"></Radio>
+                        </RadioGroup>
+                      </div>
+                      <div class="editStyle">
+                        <span>Title</span>
+                        <Input
+                          v-model="editTitle"
+                          placeholder="Enter something..."
+                          style="margin-left:5%;width:100%"
+                        />
+                      </div>
+                      <div class="editStyle">
+                        <span>Description</span>
+                        <Input
+                          v-model="editDescription"
+                          placeholder="Enter something..."
+                          style="margin-left:5%;width:100%"
+                        />
+                      </div>
+                      <div class="editStyle">
+                        <span>Introduction</span>
+                        <Input
+                          v-model="editIntroduction"
+                          type="textarea"
+                          placeholder="Enter something..."
+                          style="margin-left:5%;width:100%"
+                          :rows="4"
+                        />
+                      </div>
+                      <div class="editStyle">
+                        <span>Tag</span>
+                        <Input
+                          v-model="inputTag"
+                          placeholder="Enter some tag to introduce the project"
+                          style="margin-left:0.5%;width: 200px"
+                          @keyup.enter.native="addTag(inputTag)"
+                        />
+                        <Button
+                          icon="ios-add"
+                          type="dashed"
+                          size="small"
+                          style="margin-left:2.5%"
+                          @click="addTag(inputTag)"
+                        >Add Tag</Button>
+                        <!-- <div style="margin-left:5%">
+                          <Tag color="primary" @on-close="deleteTag(index)" v-show="editTags!=''">{{item}}</Tag>
+                        </div> -->
+                      </div>
+                      <div style="width:80%;margin-left:20%">
+                        <Tag
+                          color="primary"
+                          v-for="(tag,index) in editTags"
+                          :key="index"
+                          closable
+                          @on-close="deleteTag(index)"
+                        >{{tag}}</Tag>
+                      </div>
+                      <div class="editStyle">
+                        <span>Privacy</span>
+                        <RadioGroup style="margin-left:0.5%" v-model="editPrivacy">
+                          <Radio
+                            label="Public"
+                            title="Other users can find the group and see who has membership."
+                          ></Radio>
+                          <Radio
+                            label="Discover"
+                            title="Other users can find this group, but membership information is hidden."
+                          ></Radio>
+                          <Radio label="Private" title="Other users can not find this group."></Radio>
+                        </RadioGroup>
+                      </div>
+                    </div>
+                </Modal>
   </div>
 </template>
 <script>
