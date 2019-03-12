@@ -7,7 +7,7 @@
     </div>
   </Card>
 </template>
-<style>
+<style scoped>
 .content{
   display:flex
 }
