@@ -415,7 +415,7 @@ export default {
           userJson["avatar"] = this.formValidate.avatar;
           this.axios
             .post(
-              "/api/user/register",
+              "/GeoProblemSolving/user/register",
               // params
               userJson
             )

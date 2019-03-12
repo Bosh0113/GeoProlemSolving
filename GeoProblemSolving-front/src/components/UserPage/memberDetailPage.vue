@@ -129,7 +129,7 @@ export default {
     getUserProfile() {
       this.axios
         .get(
-          "http://localhost:8081/user/inquiry" +
+          "http://localhost:8081/GeoProblemSolving/user/inquiry" +
             "?key=userId" +
             "&value=" +
             this.$route.params.id

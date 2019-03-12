@@ -390,7 +390,7 @@ import * as socketApi from "./../../api/socket.js";
 export default {
   methods: {
     getFriendlist() {
-      // this.axios.post("/api/TeamModeling/FriendServlet", {
+      // this.axios.post("/GeoProblemSolving/TeamModeling/FriendServlet", {
       // params: {
       //   // id:paramId
       // }
