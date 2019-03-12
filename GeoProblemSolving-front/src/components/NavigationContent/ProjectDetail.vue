@@ -766,7 +766,7 @@ export default {
       try {
         $.ajax({
           url:
-            "/api/project/inquiry" +
+            "/GeoProblemSolving/project/inquiry" +
             "?key=" +
             queryObject["key"] +
             "&value=" +
@@ -790,7 +790,7 @@ export default {
                 that.currentProjectDetail["managerId"];
               $.ajax({
                 url:
-                  "/api/user/inquiry" +
+                  "/GeoProblemSolving/user/inquiry" +
                   "?key=" +
                   "userId" +
                   "&value=" +
@@ -888,7 +888,7 @@ export default {
       SubProject["managerId"] = this.$store.state.userId;
       console.log(SubProject);
       this.axios
-        .post("/api/subProject/create", SubProject)
+        .post("/GeoProblemSolving/subProject/create", SubProject)
         .then(res => {
           if (res.data != "Fail") {
             this.$Message.info("create success");
@@ -927,7 +927,7 @@ export default {
       emailFormBody["mailContent"] = this.emailContent;
       console.log(emailFormBody);
       this.axios
-        .post("/api//email/send", emailFormBody)
+        .post("/GeoProblemSolving//email/send", emailFormBody)
         .then(res => {
           console.log(res.data);
         })
@@ -938,7 +938,7 @@ export default {
     handOverSubProject() {
       this.axios
         .get(
-          "/api/subProject/manager?" +
+          "/GeoProblemSolving/subProject/manager?" +
             "subProjectId=" +
             this.subProjectList[this.editSubProjectindex].subProjectId +
             "&userId=" +
@@ -970,7 +970,7 @@ export default {
       obj.append("description", this.subProjectDescriptionEdit);
       // console.log(obj.get("title"));
       this.axios
-        .post("/api/subProject/update", obj)
+        .post("/GeoProblemSolving/subProject/update", obj)
         .then(res => {
           console.log(res.data);
           this.getAllSubProject();
@@ -986,7 +986,7 @@ export default {
     deleteSubProject() {
       this.axios
         .get(
-          "/api/subProject/delete?" +
+          "/GeoProblemSolving/subProject/delete?" +
             "subProjectId=" +
             this.subProjectList[this.editSubProjectindex].subProjectId
         )
@@ -1005,7 +1005,7 @@ export default {
       var that = this;
       this.axios
         .get(
-          "/api/subProject/inquiry" +
+          "/GeoProblemSolving/subProject/inquiry" +
             "?key=" +
             queryObject["key"] +
             "&value=" +
@@ -1021,7 +1021,7 @@ export default {
             for (let i = 0, n = 0; i < that.subProjectList.length; i++) {
               $.ajax({
                 url:
-                  "/api/user/inquiry" +
+                  "/GeoProblemSolving/user/inquiry" +
                   "?key=" +
                   "userId" +
                   "&value=" +
@@ -1084,7 +1084,7 @@ export default {
       //这里还要添加其他的字段
       console.log(formData.get("file"));
       this.axios
-        .post("/api/resource/upload", formData)
+        .post("/GeoProblemSolving/resource/upload", formData)
         .then(res => {
           if (res != "None") {
             this.$Notice.open({
@@ -1104,10 +1104,10 @@ export default {
     getAllResource() {
       // url是请求的网址
       //查询的形式是key-value格式
-      // this.axios.get("/api/resource/inquiry",obj)
+      // this.axios.get("/GeoProblemSolving/resource/inquiry",obj)
       this.axios
         .get(
-          "/api/resource/inquiry" +
+          "/GeoProblemSolving/resource/inquiry" +
             "?key=scopeId" +
             "&value=" +
             this.$route.params.id
@@ -1200,7 +1200,7 @@ export default {
       projectEditForm.append("projectId", this.editProjectId);
       projectEditForm.append("managerId", this.$store.state.userId);
       this.axios
-        .post("http://localhost:8081/project/update ", projectEditForm)
+        .post("http://localhost:8081/GeoProblemSolving/project/update ", projectEditForm)
         .then(res => {
           // console.log(res.data);
           // alert(res.data);

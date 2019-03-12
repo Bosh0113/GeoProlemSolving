@@ -170,7 +170,7 @@ export default {
         if (valid) {
           this.axios
             .get(
-              "/api/user/login" +
+              "/GeoProblemSolving/user/login" +
                 "?email=" +
                 this.formInline.user +
                 "&password=" +

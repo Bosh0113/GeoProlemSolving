@@ -74,9 +74,16 @@
             <version>1.1</version>
         </dependency>
 
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+            <version>1.4</version>
+        </dependency>
+
     </dependencies>
 
     <build>
+        <finalName>GeoProblemSolving</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -88,5 +95,11 @@
         </plugins>
     </build>
 
+    <repositories>
+        <repository>
+            <id>spring-milestone</id>
+            <url>http://repo.spring.io/libs-release</url>
+        </repository>
+    </repositories>
 
 </project>

@@ -1,4 +1,4 @@
-<style>
+<style scoped>
 .detailContent {
   padding: 15px 10px;
   height: 500px;
@@ -182,7 +182,7 @@ export default {
     loadNotifications() {
       this.axios
         .get(
-          "/api/notice/inquiry?" +
+          "/GeoProblemSolving/notice/inquiry?" +
             "key=recipientId" +
             "&value=" +
             this.$store.state.userId
@@ -235,7 +235,7 @@ export default {
     deleteNotice(notice) {
       console.log("notice :" + notice.noticeId + " has been deleted.");
       this.axios
-        .get("/api/notice/delete" + "?noticeId=" + notice.noticeId)
+        .get("/GeoProblemSolving/notice/delete" + "?noticeId=" + notice.noticeId)
         .then(res => {
           if (res.data == "Success") {
             this.$Message.success("delete notification success.");
@@ -254,7 +254,7 @@ export default {
     readNotice(noticeId) {
       console.log("noticeId is " + noticeId);
       this.axios
-        .get("/api/notice/read" + "?noticeId=" + noticeId)
+        .get("/GeoProblemSolving/notice/read" + "?noticeId=" + noticeId)
         .then(res => {
           if (res.data == "Success") {
             this.$emit("readNotification");
@@ -274,7 +274,7 @@ export default {
       updateApply.append("content.approve", "false");
       updateApply.append("state", "read");
       this.axios
-        .post("/api/notice/update", updateApply)
+        .post("/GeoProblemSolving/notice/update", updateApply)
         .then(res => {
           if (res.data == "Success") {
             this.$emit("readNotification");
@@ -290,7 +290,7 @@ export default {
                 " ."
             };
             this.axios
-              .post("/api/notice/save", replyNotice)
+              .post("/GeoProblemSolving/notice/save", replyNotice)
               .then(result => {
                 if (result.data == "Success") {
                   this.$emit("sendNotice", apply.content.userId);
@@ -316,7 +316,7 @@ export default {
       updateApply.append("content.approve", "true");
       updateApply.append("state", "read");
       this.axios
-        .post("/api/notice/update", updateApply)
+        .post("/GeoProblemSolving/notice/update", updateApply)
         .then(res => {
           if (res.data == "Success") {
             this.$emit("readNotification");
@@ -324,7 +324,7 @@ export default {
             //update project members
             this.axios
               .get(
-                "/api/project/join?" +
+                "/GeoProblemSolving/project/join?" +
                   "projectId=" +
                   apply.content.projectId +
                   "&userId=" +
@@ -354,7 +354,7 @@ export default {
                 " ."
             };
             this.axios
-              .post("/api/notice/save", replyNotice)
+              .post("/GeoProblemSolving/notice/save", replyNotice)
               .then(result => {
                 if (result.data == "Success") {
                   this.$emit("sendNotice", apply.content.userId);
