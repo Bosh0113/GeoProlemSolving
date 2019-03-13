@@ -726,31 +726,31 @@
       </div>
     </Modal>
     <Modal
-                width="600px"
-                v-model="addModal"
-                title="add new task node"
-                @on-ok="addModule()"
-                @on-cancel="cancel()"
-              >
-                <div class="addNodeStyle">
-                  <span style="width:10%">Name</span>
-                  <Input
-                    v-model="moduleTitle"
-                    placeholder="Enter something..."
-                    style="width: 400px"
-                  />
-                </div>
-                <div class="addNodeStyle">
-                  <span style="width:10%">Type</span>
-                  <Select v-model="moduleType" style="width:400px" placeholder="please select type">
-                    <Option v-for="item in typeList" :key="item.index" :value="item">{{ item }}</Option>
-                  </Select>
-                </div>
-                <div class="addNodeStyle">
-                  <span style="width:10%">Detail</span>
-                  <textarea v-model="moduleDescription" style="width:400px" :rows="6"></textarea>
-                </div>
-              </Modal>
+      width="600px"
+      v-model="addModal"
+      title="add new task node"
+      @on-ok="addModule()"
+      @on-cancel="cancel()"
+    >
+      <div class="addNodeStyle">
+        <span style="width:10%">Name</span>
+        <Input
+          v-model="moduleTitle"
+          placeholder="Enter something..."
+          style="width: 400px"
+        />
+      </div>
+      <div class="addNodeStyle">
+        <span style="width:10%">Type</span>
+        <Select v-model="moduleType" style="width:400px" placeholder="please select type">
+          <Option v-for="item in typeList" :key="item.index" :value="item">{{ item }}</Option>
+        </Select>
+      </div>
+      <div class="addNodeStyle">
+        <span style="width:10%">Detail</span>
+        <textarea v-model="moduleDescription" style="width:400px" :rows="6"></textarea>
+      </div>
+    </Modal>
   </div>
 </template>
 <script>
@@ -1120,7 +1120,9 @@ export default {
         var messageJson = {};
         messageJson["type"] = "ping";
         messageJson["message"] = "ping";
-        this.moduleSocket.send(JSON.stringify(messageJson));
+        if(this.moduleSocket!=undefined){
+          this.moduleSocket.send(JSON.stringify(messageJson));
+        }
       }, 20000);
     },
     removeTimer() {

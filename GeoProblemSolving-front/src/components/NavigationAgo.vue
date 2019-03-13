@@ -109,7 +109,7 @@ export default {
       //消息机制
       noticeSocket: null,
       unreadNoticeCount: 0,
-      timer: null,
+      socketTimer: null,
       //导航栏宽度
       headerWidth:"",
     };
@@ -225,12 +225,14 @@ export default {
       this.noticeSocket.send(recipientId);
     },
     setTimer() {
-      this.timer = setInterval(() => {
-        this.noticeSocket.send("ping");
+      this.socketTimer = setInterval(() => {
+        if(this.noticeSocket!=undefined){
+          this.noticeSocket.send("ping");
+        }
       }, 20000);
     },
     removeTimer() {
-      clearInterval(this.timer);
+      clearInterval(this.socketTimer);
     },
     readNotification() {
       let newCount = this.unreadNoticeCount;
