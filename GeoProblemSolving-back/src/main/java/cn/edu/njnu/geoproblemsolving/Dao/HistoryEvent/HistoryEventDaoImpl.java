@@ -36,14 +36,16 @@ public class HistoryEventDaoImpl implements IHistoryEventDao {
     }
 
     @Override
-    public Object inquiryHistoryEvent(String scopeId){
+    public Object inquiryHistoryEvent(String key,String value){
         try {
 
-            Query query=new Query(Criteria.where("scopeId").is(scopeId));
-
-            List<HistoryEventEntity> historyEventEntities = mongoTemplate.find(query,HistoryEventEntity.class);
-
-            return historyEventEntities;
+            Query query=new Query(Criteria.where(key).is(value));
+            if (mongoTemplate.find(query,HistoryEventEntity.class).isEmpty()){
+                return "None";
+            }
+            else {
+                return mongoTemplate.find(query,HistoryEventEntity.class);
+            }
 
         }catch (Exception e){
             return "Fail";

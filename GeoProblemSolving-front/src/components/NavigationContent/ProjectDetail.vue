@@ -1080,13 +1080,19 @@ export default {
       formData.append("description", this.fileDescription);
       formData.append("type", this.fileType);
       formData.append("uploaderId", this.$store.state.userId);
-      formData.append("scopeId", this.currentProjectDetail.projectId);
+      formData.append("belong", "belong to project");
+      let scopeObject={
+        projectId:this.currentProjectDetail.projectId,
+        subProjectId:"",
+        moduleId:""
+      };
+      formData.append("scope", JSON.stringify(scopeObject));
       //这里还要添加其他的字段
       console.log(formData.get("file"));
       this.axios
         .post("/GeoProblemSolving/resource/upload", formData)
         .then(res => {
-          if (res != "None") {
+          if (res == "Success") {
             this.$Notice.open({
               title: "Upload notification title",
               desc: "File uploaded successfully",
@@ -1108,7 +1114,7 @@ export default {
       this.axios
         .get(
           "/GeoProblemSolving/resource/inquiry" +
-            "?key=scopeId" +
+            "?key=scope.projectId" +
             "&value=" +
             this.$route.params.id
         )

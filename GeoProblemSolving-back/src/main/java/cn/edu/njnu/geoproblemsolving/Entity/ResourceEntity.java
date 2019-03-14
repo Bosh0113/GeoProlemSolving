@@ -1,19 +1,25 @@
 package cn.edu.njnu.geoproblemsolving.Entity;
 
+import com.alibaba.fastjson.JSONObject;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "Resource")
 public class ResourceEntity {
 
     private String resourceId;
-    private String scopeId;         //public:projectId/private:subProjectId
+    private JSONObject scope;         //projectId/subProjectId
     private String name;
     private String description;
+    private String belong;
     private String type;
     private String fileSize;
     private String pathURL;
     private String uploaderId;
     private String uploadTime;
+
+    public void setBelong(String belong) {
+        this.belong = belong;
+    }
 
     public void setUploadTime(String uploadTime) {
         this.uploadTime = uploadTime;
@@ -43,8 +49,8 @@ public class ResourceEntity {
         this.resourceId = resourceId;
     }
 
-    public void setScopeId(String scopeId) {
-        this.scopeId = scopeId;
+    public void setScope(JSONObject scope) {
+        this.scope = scope;
     }
 
     public void setUploaderId(String uploaderId) {
@@ -75,8 +81,12 @@ public class ResourceEntity {
         return resourceId;
     }
 
-    public String getScopeId() {
-        return scopeId;
+    public JSONObject getScope() {
+        return scope;
+    }
+
+    public String getBelong() {
+        return belong;
     }
 
     public String getUploaderId() {

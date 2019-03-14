@@ -6,5 +6,5 @@ public interface IHistoryEventDao {
 
     String saveHistoryEvent(HistoryEventEntity historyEvent);
 
-    Object inquiryHistoryEvent(String scopeId);
+    Object inquiryHistoryEvent(String key, String value);
 }
