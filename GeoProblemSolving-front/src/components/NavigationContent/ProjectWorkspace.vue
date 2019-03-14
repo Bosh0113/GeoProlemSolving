@@ -905,7 +905,7 @@ export default {
       var that = this;
       $.ajax({
         url:
-          "/api/subProject/inquiry" +
+          "/GeoProblemSolving/subProject/inquiry" +
           "?key=subProjectId" +
           "&value=" +
           this.$route.params.id,
@@ -924,7 +924,7 @@ export default {
             for (let i = 0; i < membersList.length; i++) {
               $.ajax({
                 url:
-                  "/api/user/inquiry" +
+                  "/GeoProblemSolving/user/inquiry" +
                   "?key=" +
                   "userId" +
                   "&value=" +
@@ -949,7 +949,7 @@ export default {
       let that = this;
       this.axios
         .get(
-          "http://localhost:8081/history/inquiry?scopeId=" +
+          "http://localhost:8081/GeoProblemSolving/history/inquiry?scopeId=" +
             this.currentModule.moduleId
         )
         .then(res => {
@@ -995,7 +995,7 @@ export default {
       }
     },
     openModuleSocket(moduleId) {
-      var moduleSocketURL = "ws://localhost:8081/Module/" + moduleId;
+      var moduleSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + moduleId;
       this.moduleSocket = new WebSocket(moduleSocketURL);
       this.moduleSocket.onopen = this.onOpen;
       this.moduleSocket.onmessage = this.onMessage;
@@ -1039,11 +1039,13 @@ export default {
         // History["description"] = JSON.stringify(message);
         this.axios
           .post(
-            "http://localhost:8081/history/save",
+            "http://localhost:8081/GeoProblemSolving/history/save",
             "description=" +
               JSON.stringify(message) +
               "&scopeId=" +
               this.currentModule.moduleId
+              + "&userId=" +
+              this.$store.state.userId
           )
           .then(res => {
             if (res.data === "Fail") {
@@ -1095,7 +1097,7 @@ export default {
         for (let i = 0; i < members.length; i++) {
           this.axios
             .get(
-              "http://localhost:8081/user/inquiry" +
+              "http://localhost:8081/GeoProblemSolving/user/inquiry" +
                 "?key=" +
                 "userId" +
                 "&value=" +
@@ -1147,7 +1149,7 @@ export default {
       sessionStorage.setItem("subProjectId", this.$route.params.id);
       this.axios
         .get(
-          "/api/module/inquiry" + "?key=subProjectId" + "&value=" + subProjectId
+          "/GeoProblemSolving/module/inquiry" + "?key=subProjectId" + "&value=" + subProjectId
         )
         .then(res => {
           if (res.data != "None") {
@@ -1171,7 +1173,7 @@ export default {
       Module["creator"] = this.$store.state.userId;
       Module["type"] = this.moduleType;
       this.axios
-        .post("/api/module/create", Module)
+        .post("/GeoProblemSolving/module/create", Module)
         .then(res => {
           if (res.data === "Fail") {
             this.$Message.info("Fail");
@@ -1190,7 +1192,7 @@ export default {
     delModule() {
       this.axios
         .get(
-          "/api/module/delete" +
+          "/GeoProblemSolving/module/delete" +
             "?moduleId=" +
             this.moduleList[this.currentModuleIndex].moduleId
         )
@@ -1223,7 +1225,7 @@ export default {
       updateObject.append("type", this.updateModuleType);
       updateObject.append("creater", this.$store.state.userId);
       this.axios
-        .post("/api/module/update", updateObject)
+        .post("/GeoProblemSolving/module/update", updateObject)
         .then(res => {
           this.getAllModules();
         })
@@ -1276,7 +1278,7 @@ export default {
       this.inviteList = [];
       this.axios
         .get(
-          "/api/project/inquiry" +
+          "/GeoProblemSolving/project/inquiry" +
             "?key=projectId" +
             "&value=" +
             sessionStorage.getItem("projectId")
@@ -1286,7 +1288,7 @@ export default {
             let allMembers = res.data[0].members;
             $.ajax({
               url:
-                "/api/user/inquiry" +
+                "/GeoProblemSolving/user/inquiry" +
                 "?key=" +
                 "userId" +
                 "&value=" +
@@ -1322,7 +1324,7 @@ export default {
       for (let i = 0; i < this.inviteList.length; i++) {
         $.ajax({
           url:
-            "/api/subProject/join" +
+            "/GeoProblemSolving/subProject/join" +
             "?subProjectId=" +
             this.$route.params.id +
             "&userId=" +
@@ -1345,7 +1347,7 @@ export default {
     quitSubProject() {
       this.axios
         .get(
-          "/api/subProject/quit" +
+          "/GeoProblemSolving/subProject/quit" +
             "?subProjectId=" +
             this.$route.params.id +
             "&userId=" +
@@ -1391,7 +1393,7 @@ export default {
       taskForm["state"] = "todo";
       taskForm["order"] = "";
       this.axios
-        .post("/api/task/save", taskForm)
+        .post("/GeoProblemSolving/task/save", taskForm)
         .then(res => {
           this.inquiryTask();
         })
@@ -1409,7 +1411,7 @@ export default {
     editOneTask(index, taskList) {
       this.axios
         .get(
-          "/api/task/inquiry?" +
+          "/GeoProblemSolving/task/inquiry?" +
             "key=taskId" +
             "&value=" +
             taskList[index]["taskId"]
@@ -1439,7 +1441,7 @@ export default {
       taskForm.append("endTime", new Date(this.taskInfo.endTime));
       taskForm.append("state", this.taskInfo.state);
       this.axios
-        .post("/api/task/update", taskForm)
+        .post("/GeoProblemSolving/task/update", taskForm)
         .then(res => {
           if (res.data != "None" && res.data != "Fail") {
             this.inquiryTask();
@@ -1464,7 +1466,7 @@ export default {
       // /task/inquiry
       this.axios
         .get(
-          "/api/task/inquiryTodo?" + "moduleId=" + this.currentModule.moduleId
+          "/GeoProblemSolving/task/inquiryTodo?" + "moduleId=" + this.currentModule.moduleId
         )
         .then(res => {
           if (res.data != "None" && res.data != "Fail") {
@@ -1478,7 +1480,7 @@ export default {
         });
       this.axios
         .get(
-          "/api/task/inquiryDoing?" + "moduleId=" + this.currentModule.moduleId
+          "/GeoProblemSolving/task/inquiryDoing?" + "moduleId=" + this.currentModule.moduleId
         )
         .then(res => {
           if (res.data != "None" && res.data != "Fail") {
@@ -1492,7 +1494,7 @@ export default {
         });
       this.axios
         .get(
-          "/api/task/inquiryDone?" + "moduleId=" + this.currentModule.moduleId
+          "/GeoProblemSolving/task/inquiryDone?" + "moduleId=" + this.currentModule.moduleId
         )
         .then(res => {
           if (res.data != "None" && res.data != "Fail") {
@@ -1513,7 +1515,7 @@ export default {
         taskUpdateObj.append("order", i);
         taskUpdateObj.append("state", type);
         this.axios
-          .post("/api/task/update", taskUpdateObj)
+          .post("/GeoProblemSolving/task/update", taskUpdateObj)
           .then(res => {
             // console.log("---force---");
             // console.log(thisTask);
@@ -1536,7 +1538,7 @@ export default {
     },
     taskRemove(index, taskList) {
       this.axios
-        .get("/api/task/delete" + "?taskId=" + taskList[index]["taskId"])
+        .get("/GeoProblemSolving/task/delete" + "?taskId=" + taskList[index]["taskId"])
         .then(res => {
           if (res.data == "Success") {
             taskList.splice(index, 1);

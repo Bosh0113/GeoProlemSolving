@@ -187,25 +187,7 @@
             </div>
           </div>
           <div class="rightContent">
-            <Tabs value="Overview">
-              <TabPane label="Overview" name="Overview">
-                <Col span="12" offset="1">
-                  <div class="user-history">
-                  <Timeline style="margin-top:20px;margin-left:5%" >
-                    <TimelineItem v-for="(item,index) in userEventList" :key="index">
-                      <strong><p class="time">{{item.createTime}}</p></strong>
-                      <p class="content">{{item.description}}</p>
-                    </TimelineItem>
-                  </Timeline>
-                </div>
-                <div span="12" offset="1" class="user-data">
-                  <Table :columns="columns1" :data="data1"></Table>
-                  <Button type="primary" style="float:right;margin:20px">More</Button>
-                </div>
-                </Col>
-
-
-              </TabPane>
+            <Tabs value="Participatory">
               <TabPane label="Participatory Project" name="Participatory">
                 <div
                   v-for="(item,index) in joinedProjectsList"
@@ -224,7 +206,7 @@
                       <p
                         style="height:200px;text-indent:2em;overflow-y:scroll"
                       >{{item.introduction}}</p>
-                      <!-- <hr> -->
+                      <hr>
                       <br>
                       <div style="height:40px">
                         <span style="float:left">CreateTime:</span>
@@ -276,7 +258,7 @@
                       <p
                         style="height:200px;text-indent:2em;overflow-y:scroll"
                       >{{mProject.introduction}}</p>
-                      <!-- <hr> -->
+                      <hr>
                       <br>
                       <div>
                         <span style="float:left">CreateTime:</span>
@@ -292,6 +274,30 @@
                 <Row>
                   <Col span="23" offset="1"></Col>
                   <br>
+                  <Col span="10" offset="1" class="user-history">
+                    <Timeline style="margin-top:20px;margin-left:5%">
+                      <TimelineItem>
+                        <p class="time">2018-7-11</p>
+                        <p class="content">加入项目组</p>
+                      </TimelineItem>
+                      <TimelineItem>
+                        <p class="time">2018-7-13</p>
+                        <p class="content">进入准备工作阶段，负责收集数据</p>
+                      </TimelineItem>
+                      <TimelineItem>
+                        <p class="time">2018-7-15</p>
+                        <p class="content">收集数据工作完成，并上传至数据库</p>
+                      </TimelineItem>
+                      <TimelineItem>
+                        <p class="time">2018-7-20</p>
+                        <p class="content">参与建模流程，负责概念模型的绘制</p>
+                      </TimelineItem>
+                    </Timeline>
+                  </Col>
+                  <Col span="10" offset="1" class="user-data">
+                    <Table :columns="columns1" :data="data1"></Table>
+                    <Button type="primary" style="float:right;margin:20px">More</Button>
+                  </Col>
                 </Row>
               </div>
             </div>
@@ -325,97 +331,97 @@
 
     <!-- 编辑项目的modal -->
     <Modal
-      v-model="editProjectModal"
-      title="Edit project info"
-      ok-text="submit"
-      cancel-text="cancel"
-      @on-ok="editProjectSubmit"
-      @on-cancel="cancel"
-      width="900px"
-    >
-      <div style="flex">
-        <!-- <span>Category</span> -->
-        <div class="editStyle">
-          <span>Category</span>
-          <RadioGroup style="margin-left:5%;width:100%" v-model="editType">
-            <Radio label="Society"></Radio>
-            <Radio label="Atmosphere"></Radio>
-            <Radio label="Ecology"></Radio>
-            <Radio label="Soil"></Radio>
-            <Radio label="Water"></Radio>
-            <Radio label="Others"></Radio>
-          </RadioGroup>
-        </div>
-        <div class="editStyle">
-          <span>Title</span>
-          <Input
-            v-model="editTitle"
-            placeholder="Enter something..."
-            style="margin-left:5%;width:100%"
-          />
-        </div>
-        <div class="editStyle">
-          <span>Description</span>
-          <Input
-            v-model="editDescription"
-            placeholder="Enter something..."
-            style="margin-left:5%;width:100%"
-          />
-        </div>
-        <div class="editStyle">
-          <span>Introduction</span>
-          <Input
-            v-model="editIntroduction"
-            type="textarea"
-            placeholder="Enter something..."
-            style="margin-left:5%;width:100%"
-            :rows="4"
-          />
-        </div>
-        <div class="editStyle">
-          <span>Tag</span>
-          <Input
-            v-model="inputTag"
-            placeholder="Enter some tag to introduce the project"
-            style="margin-left:0.5%;width: 200px"
-            @keyup.enter.native="addTag(inputTag)"
-          />
-          <Button
-            icon="ios-add"
-            type="dashed"
-            size="small"
-            style="margin-left:2.5%"
-            @click="addTag(inputTag)"
-          >Add Tag</Button>
-          <!-- <div style="margin-left:5%">
+                        v-model="editProjectModal"
+                        title="Edit project info"
+                        ok-text="submit"
+                        cancel-text="cancel"
+                        @on-ok="editProjectSubmit"
+                        @on-cancel="cancel"
+                        width="900px"
+                      >
+                        <div style="flex">
+                          <!-- <span>Category</span> -->
+                          <div class="editStyle">
+                            <span>Category</span>
+                            <RadioGroup style="margin-left:5%;width:100%" v-model="editType">
+                              <Radio label="Society"></Radio>
+                              <Radio label="Atmosphere"></Radio>
+                              <Radio label="Ecology"></Radio>
+                              <Radio label="Soil"></Radio>
+                              <Radio label="Water"></Radio>
+                              <Radio label="Others"></Radio>
+                            </RadioGroup>
+                          </div>
+                          <div class="editStyle">
+                            <span>Title</span>
+                            <Input
+                              v-model="editTitle"
+                              placeholder="Enter something..."
+                              style="margin-left:5%;width:100%"
+                            />
+                          </div>
+                          <div class="editStyle">
+                            <span>Description</span>
+                            <Input
+                              v-model="editDescription"
+                              placeholder="Enter something..."
+                              style="margin-left:5%;width:100%"
+                            />
+                          </div>
+                          <div class="editStyle">
+                            <span>Introduction</span>
+                            <Input
+                              v-model="editIntroduction"
+                              type="textarea"
+                              placeholder="Enter something..."
+                              style="margin-left:5%;width:100%"
+                              :rows="4"
+                            />
+                          </div>
+                          <div class="editStyle">
+                            <span>Tag</span>
+                            <Input
+                              v-model="inputTag"
+                              placeholder="Enter some tag to introduce the project"
+                              style="margin-left:0.5%;width: 200px"
+                              @keyup.enter.native="addTag(inputTag)"
+                            />
+                            <Button
+                              icon="ios-add"
+                              type="dashed"
+                              size="small"
+                              style="margin-left:2.5%"
+                              @click="addTag(inputTag)"
+                            >Add Tag</Button>
+                            <!-- <div style="margin-left:5%">
                           <Tag color="primary" @on-close="deleteTag(index)" v-show="editTags!=''">{{item}}</Tag>
-          </div>-->
-        </div>
-        <div style="width:80%;margin-left:20%">
-          <Tag
-            color="primary"
-            v-for="(tag,index) in editTags"
-            :key="index"
-            closable
-            @on-close="deleteTag(index)"
-          >{{tag}}</Tag>
-        </div>
-        <div class="editStyle">
-          <span>Privacy</span>
-          <RadioGroup style="margin-left:0.5%" v-model="editPrivacy">
-            <Radio
-              label="Public"
-              title="Other users can find the group and see who has membership."
-            ></Radio>
-            <Radio
-              label="Discover"
-              title="Other users can find this group, but membership information is hidden."
-            ></Radio>
-            <Radio label="Private" title="Other users can not find this group."></Radio>
-          </RadioGroup>
-        </div>
-      </div>
-    </Modal>
+                            </div>-->
+                          </div>
+                          <div style="width:80%;margin-left:20%">
+                            <Tag
+                              color="primary"
+                              v-for="(tag,index) in editTags"
+                              :key="index"
+                              closable
+                              @on-close="deleteTag(index)"
+                            >{{tag}}</Tag>
+                          </div>
+                          <div class="editStyle">
+                            <span>Privacy</span>
+                            <RadioGroup style="margin-left:0.5%" v-model="editPrivacy">
+                              <Radio
+                                label="Public"
+                                title="Other users can find the group and see who has membership."
+                              ></Radio>
+                              <Radio
+                                label="Discover"
+                                title="Other users can find this group, but membership information is hidden."
+                              ></Radio>
+                              <Radio label="Private" title="Other users can not find this group."></Radio>
+                            </RadioGroup>
+                          </div>
+                        </div>
+                      </Modal>
   </div>
 </template>
 
@@ -425,7 +431,6 @@ export default {
   created() {
     this.getUserProfile();
     this.getManagerProjectList();
-    this.readPersonalEvent();
     this.detailSidebarHeight = window.innerHeight - 60 + "px";
   },
   computed: {
@@ -569,21 +574,14 @@ export default {
       joinedProjectsList: [],
 
       // 关于样式的变量定义
-      detailSidebarHeight: "",
-      // 用户event列表
-      userEventList:[],
+      detailSidebarHeight: ""
     };
   },
   methods: {
     // 获取用户的详细信息
     getUserProfile() {
       this.axios
-        .get(
-          "/GeoProblemSolving/user/inquiry" +
-            "?key=userId" +
-            "&value=" +
-            this.userId
-        )
+        .get("/GeoProblemSolving/user/inquiry" + "?key=userId" + "&value=" + this.userId)
         .then(res => {
           this.userDetail = res.data;
           //打印用户的具体信息
@@ -628,10 +626,7 @@ export default {
     getManagerProjectList() {
       this.axios
         .get(
-          "/GeoProblemSolving/project/inquiry" +
-            "?key=managerId" +
-            "&value=" +
-            this.userId
+          "/GeoProblemSolving/project/inquiry" + "?key=managerId" + "&value=" + this.userId
         )
         .then(res => {
           // 打印用户所管理的项目
@@ -645,7 +640,7 @@ export default {
       let quitData = new URLSearchParams();
       //包含项目id与用户名字段
       quitData.append("ProjectID", "");
-      quitData.append("UserName", this.$store.state.username);
+      quitData.append("UserName", this.state.username);
       this.axios
         .post("/GeoProblemSolving/TeamModeling/QuitProjectServlet", quitData)
         .then(res => {
@@ -664,11 +659,7 @@ export default {
     //注销账户的函数
     logOutAccount() {
       this.axios
-        .get(
-          "/GeoProblemSolving/user/remove?" +
-            "userId=" +
-            this.$store.state.userId
-        )
+        .get("/GeoProblemSolving/user/remove?" + "userId=" + this.$store.state.userId)
         .then(res => {
           // 打印注销之后的结果返回值
           // console.log("注销之后的返回值:"+ res.data);
@@ -722,9 +713,7 @@ export default {
         this.DelelteProjectIndex
       ].projectId;
       this.axios
-        .get(
-          "/GeoProblemSolving/project/delete?" + "projectId=" + selectProjectId
-        )
+        .get("/GeoProblemSolving/project/delete?" + "projectId=" + selectProjectId)
         .then(res => {
           if (res.data != "") {
             this.getManagerProjectList();
@@ -760,6 +749,18 @@ export default {
         .catch(err => {
           console.log(err.data);
         });
+    },
+    //获取历史事件轴的函数
+    getHistoryEvent() {
+      // this.axios.get(url, {
+      //   params: {
+      //     id:paramId
+      //   }
+      // })
+      // .then(function (response) {
+      // })
+      // .catch(function (error) {
+      // })
     },
     //更改个人信息的函数
     changeProfile() {},
@@ -834,17 +835,7 @@ export default {
       this.$router.push({ name: "ProjectDetail", params: { id: id } });
     },
     //获取个人上传的全部资源的函数
-    getUserFile() {},
-    readPersonalEvent(){
-      this.axios.get("/GeoProblemSolving/history/inquiry?" + "key=userId" + "&value=" + this.$store.state.userId)
-      .then(res=> {
-        this.userEventList = res.data;
-        console.table(result);
-      })
-      .catch(err=> {
-        console.log(err.data);
-      })
-    }
+    getUserFile() {}
   }
 };
 </script>
@@ -992,22 +983,22 @@ body {
 }
 .detailSidebar {
   min-width: 250px;
-  max-width: 300px;
+  max-width:300px;
   margin-right: 20px;
 }
 .rightContent {
   flex: 1;
 }
-.authorBtn:hover {
+.authorBtn:hover{
   background-color: #57a3f3;
-  color: white;
+  color:white;
 }
-.editBtn:hover {
+.editBtn:hover{
   background-color: #19be6b;
-  color: white;
+  color:white;
 }
-.deleteBtn:hover {
+.deleteBtn:hover{
   background-color: #ed4014;
-  color: white;
+  color:white;
 }
 </style>
