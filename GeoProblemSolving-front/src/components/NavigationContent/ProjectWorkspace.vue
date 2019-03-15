@@ -166,21 +166,22 @@
         <Card>
           <p
             slot="title"
-            style="height:40px;line-height:40px;font-size:20px"
+            style="height:40px;line-height:40px;font-size:20px;"
           >{{subProjectInfo.title}}</p>
           <div
             slot="extra"
             style="height:40px;display:flex;align-items:center"
             class="operatePanel"
           >
-            <Button type="default" @click="addModal = true" icon="md-add" class="addBtn">Add</Button>
-            <Button
-              type="default"
-              @click="delModal = true"
-              icon="md-remove"
-              class="removeBtn"
-            >Remove</Button>
+          <Button type="default" @click="addModal = true" icon="md-add" class="addBtn">Add</Button>
+          <template v-if="moduleList.length <= 0 || currentModuleIndex == -1 || order == 0">
+            <Button type="default" @click="conveneWork()" icon="md-mail">Convene</Button>
+            <Button type="default" @click="back2Project(projectInfo.projectId)" icon="md-arrow-back">Back</Button>
+          </template>
+          <template v-else>
+            <Button type="default" @click="delModal = true" icon="md-remove" class="removeBtn" >Remove</Button>
             <Button type="default" @click="editModalShow()" icon="md-brush" class="editBtn">Edit</Button>
+          </template>
           </div>
           <Row>
             <Col span="22" offset="1" style="margin-top:10px;background-color:white;">
@@ -193,7 +194,7 @@
                   :title="list.title"
                   :order="index+1"
                 ></Step>
-              </Steps>
+              </Steps>              
             </Col>
           </Row>
         </Card>
@@ -354,25 +355,23 @@
             <div :style="{height:sidebarHeight-100+'px'}">
               <div class="member-desc" v-for="member in olParticipants" :key="member.id">
                 <template style="margin-top:5px">
-                  <div class="member-image">
+                  <div
+                    class="member-image"
+                    @click="gotoPersonalSpace(member.userId)"
+                    style="cursor:pointer"
+                  >
                     <img
                       v-if="member.avatar != ''"
                       :src="member.avatar"
                       style="width:auto;height:100%"
-                      @click="gotoPersonalSpace(member.userId)"
                     >
-                    <img
-                      v-else-if="member.gender == 'female'"
-                      src="@/assets/images/female.png"
-                      style="width:auto;height:100%"
-                      @click="gotoPersonalSpace(member.userId)"
-                    >
-                    <img
+                    <avatar
+                      :username="member.userName"
+                      :size="40"
+                      style="margin-top:10px"
+                      :title="member.userName"
                       v-else
-                      src="@/assets/images/male.png"
-                      style="width:auto;height:100%"
-                      @click="gotoPersonalSpace(member.userId)"
-                    >
+                    ></avatar>
                   </div>
                   <div class="memebr-work">
                     <div class="userName">
@@ -1272,6 +1271,14 @@ export default {
       this.updateModuleTitle = this.moduleList[order].title;
       this.updateModuleType = this.moduleList[order].type;
       this.updateModuleDescription = this.moduleList[order].description;
+    },
+    // 返回项目页
+    back2Project(id){
+      this.$router.push( `../${id}`);
+    },
+    // 召集参与者
+    conveneWork(){
+      
     },
     //更新模块的函数
     updateModule() {
