@@ -71,7 +71,7 @@
               <div class="login-content">
                 <Form ref="formInline" :model="formInline" :rules="ruleInline" style="margin:25px">
                   <div>
-                    <FormItem prop="user" label="userName" :label-width="100">
+                    <FormItem prop="user" label="User Name" :label-width="100">
                       <Input
                         placeholder="Please input your username"
                         style="width: 90%"
@@ -82,7 +82,7 @@
                     </FormItem>
                   </div>
                   <br>
-                  <FormItem prop="password" label="password" :label-width="100">
+                  <FormItem prop="password" label="Password" :label-width="100">
                     <Input
                       placeholder="please input your password"
                       style="width: 90%"

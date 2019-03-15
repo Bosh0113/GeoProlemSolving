@@ -13,7 +13,7 @@ img {
   color: #c20c0c;
   cursor: pointer;
 }
-operateBtnGroup {
+.operateBtnGroup {
   --btnSize: 15px;
 }
 .operateBtnGroup button {
@@ -210,44 +210,6 @@ operateBtnGroup {
     </Row>
   </div>
 </template>
-<style scoped>
-img {
-  max-width: 100%;
-  max-height: 100%;
-}
-.whitespace {
-  height: 20px;
-}
-/* title标题悬浮时出现下划线且变色 */
-.projectTitle:hover {
-  cursor: pointer;
-}
-.operate button:hover{
-  cursor:default;
-}
-operateBtnGroup {
-  --btnSize: 15px;
-}
-.operateBtnGroup button {
-  font-size: 15px;
-  margin-left: 2.5%;
-}
-.operateBtnGroup button:hover {
-  font-size: var(--btnSize);
-}
-.btnCreate:hover {
-  background-color: #19be6b;
-  color: white;
-}
-.btnJoin:hover {
-  background-color: #57a3f3;
-  color: white;
-}
-/* Loading动画的特效 */
-.demo-spin-icon-load {
-  animation: ani-demo-spin 1s linear infinite;
-}
-</style>
 <script>
 import Avatar from "vue-avatar";
 export default {

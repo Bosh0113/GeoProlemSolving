@@ -122,7 +122,9 @@ public class ModuleSocket {
         String message = messageObject.toString();
         for (Map.Entry<String, ModuleSocket> server : modules.get(moduleId).entrySet()) {
             try {
-                server.getValue().session.getBasicRemote().sendText(message);
+                if(!server.getKey().equals(userId)){
+                    server.getValue().session.getBasicRemote().sendText(message);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }

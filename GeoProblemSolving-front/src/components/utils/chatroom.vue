@@ -7,7 +7,7 @@
 .main_part {
   display: flex;
 }
-.member_panel {
+.members_panel {
   width: 20%;
   max-height: 600px;
   background-color: #515a6e;
@@ -268,7 +268,7 @@
     <Row>
       <Col span="14" offset="5" class="outer-style">
         <div class="main_part">
-          <div class="member_panel">
+          <div class="members_panel">
             <div class="member_title">Members</div>
             <div class="member_search" style="display:flex">
               <Input

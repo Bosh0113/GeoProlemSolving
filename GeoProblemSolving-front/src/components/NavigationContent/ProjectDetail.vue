@@ -128,7 +128,11 @@
   background-color: #47cb89;
   color: white;
 } */
-
+.subProjectBtn,
+.uploadBtn,
+.inviteBtn {
+  color: black;
+}
 .popCenter {
   margin: 10px auto;
   overflow: hidden;
@@ -188,7 +192,14 @@
               <Row>
                 <Col :xs="12" :sm="10" :md="9" :lg="8">
                   <div class="detail_image">
-                    <img :src="currentProjectDetail.picture">
+                    <img :src="currentProjectDetail.picture" v-if="currentProjectDetail.picture!=''&&currentProjectDetail.picture!='undefined'">
+                    <avatar
+                      :username="currentProjectDetail.title"
+                      :size="300"
+                      :title="currentProjectDetail.title"
+                      :rounded="false"
+                      v-else>
+                    </avatar>
                   </div>
                 </Col>
                 <Col :xs="12" :sm="14" :md="15" :lg="16">
@@ -630,7 +641,7 @@
             @click="addTag(inputTag)"
           >Add Tag</Button>
           <!-- <div style="margin-left:5%">
-                          <Tag color="primary" @on-close="deleteTag(index)" v-show="editTags!=''">{{item}}</Tag>
+            <Tag color="primary" @on-close="deleteTag(index)" v-show="editTags!=''">{{item}}</Tag>
           </div>-->
         </div>
         <div style="width:80%;margin-left:20%">
@@ -661,7 +672,11 @@
   </div>
 </template>
 <script>
+import Avatar from "vue-avatar";
 export default {
+  components: {
+    Avatar
+  },
   data() {
     return {
       //编辑项目的字段
@@ -753,7 +768,6 @@ export default {
       ],
       // 关于控制项目编辑的模态框
       editProjectModal: false,
-
     };
   },
   created: function() {
@@ -949,7 +963,7 @@ export default {
       emailFormBody["mailContent"] = this.emailContent;
       console.log(emailFormBody);
       this.axios
-        .post("/GeoProblemSolving//email/send", emailFormBody)
+        .post("/GeoProblemSolving/email/send", emailFormBody)
         .then(res => {
           console.log(res.data);
         })
@@ -1055,7 +1069,7 @@ export default {
                 }
               });
             }
-            console.log(that.subProjectList);
+            // console.log(that.subProjectList);
             that.cutString(that.subProjectList, 200);
           }
         })
@@ -1115,7 +1129,7 @@ export default {
       this.axios
         .post("/GeoProblemSolving/resource/upload", formData)
         .then(res => {
-          if (res != "None") {
+          if (res == "Success") {
             this.$Notice.open({
               title: "Upload notification title",
               desc: "File uploaded successfully",
@@ -1186,7 +1200,7 @@ export default {
       });
     },
     cutString(data, len) {
-      console.table(data);
+      // console.table(data);
       for (var i = 0; i < data.length; i++) {
         data[i].description = data[i].description.substring(0, len) + "...";
       }
@@ -1230,7 +1244,7 @@ export default {
       projectEditForm.append("projectId", this.editProjectId);
       projectEditForm.append("managerId", this.$store.state.userId);
       this.axios
-        .post("http://localhost:8081/GeoProblemSolving/project/update ", projectEditForm)
+        .post("/GeoProblemSolving/project/update ", projectEditForm)
         .then(res => {
           // console.log(res.data);
           // alert(res.data);
