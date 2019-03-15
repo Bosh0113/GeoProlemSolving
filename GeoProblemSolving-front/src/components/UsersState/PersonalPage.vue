@@ -820,8 +820,10 @@ export default {
             this.$store.state.userId
         )
         .then(res => {
-          this.userEventList = res.data;
-          console.table(result);
+          if(res.data!="None"){
+            this.userEventList = res.data;
+            console.table(result);
+          }
         })
         .catch(err => {
           console.log(err.data);
@@ -836,8 +838,10 @@ export default {
             this.$store.state.userId
         )
         .then(res => {
-          this.userResourceList = res.data;
-          console.table(this.userResourceList);
+          if(res.data!="None"){
+            this.userResourceList = res.data;
+            console.table(this.userResourceList)
+          }
         })
         .catch(err => {
           console.log(err.data);
