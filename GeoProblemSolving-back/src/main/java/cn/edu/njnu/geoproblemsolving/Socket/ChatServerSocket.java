@@ -1,54 +1,100 @@
 package cn.edu.njnu.geoproblemsolving.Socket;
 
+import cn.edu.njnu.geoproblemsolving.Config.GetHttpSessionConfigurator;
+import com.alibaba.fastjson.JSONObject;
 import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpSession;
 import javax.websocket.*;
+import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 @Component
-@ServerEndpoint(value = "/ChatServer/{roomId}")
+@ServerEndpoint(value = "/ChatServer/{roomId}", configurator = GetHttpSessionConfigurator.class)
 public class ChatServerSocket {
 
     private Session session=null;
-    //初始化集合，用来存放每个客户端对应的服务器端的WebSocket对象
-    private static CopyOnWriteArraySet<ChatServerSocket> servers=new CopyOnWriteArraySet<>();
-    //定义了当一个新用户连接成功后所调用的方法
+    private static final Map<String,Map<String,ChatServerSocket>> rooms=new ConcurrentHashMap<>();
+
     @OnOpen
-    public void onOpen(Session session)
+    public void onOpen(@PathParam("roomId") String roomId, Session session,EndpointConfig config)
     {
         this.session=session;
-        servers.add(this);
-        System.out.println("连接已经建立,sessionID:"+session.getId());
-
+        HttpSession httpSession=(HttpSession) config.getUserProperties().get(HttpSession.class.getName());
+        if (!rooms.containsKey(roomId)){
+            Map<String,ChatServerSocket> room=new ConcurrentHashMap<>();
+            room.put(httpSession.getAttribute("userId").toString(), this);
+            rooms.put(roomId,room);
+        }
+        else {
+            rooms.get(roomId).put(httpSession.getAttribute("userId").toString(), this);
+        }
+        broadcastMembersToRoom(roomId);
     }
     //接收消息后所调用的方法
     @OnMessage
-    public void onMessage(String message)
+    public void onMessage(@PathParam("roomId") String roomId, String message)
     {
-        try
-        {
-            //向客户端发送消息
-            for (ChatServerSocket server:servers)
-            {
-                server.session.getBasicRemote().sendText(message);
-            }
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
+        JSONObject messageObject = JSONObject.parseObject(message);
+        String messageType = messageObject.getString("type");
+        if (messageType.equals("message")) {
+            broadcastMessageToRoom(roomId, message);
         }
     }
     @OnClose
-    public void onClose()
+    public void onClose(@PathParam("roomId") String roomId)
     {
-        servers.remove(this);
-        System.out.println("连接已经关闭");
+        for (Map.Entry<String, ChatServerSocket> server : rooms.get(roomId).entrySet()) {
+            if (server.getValue().equals(this)) {
+                rooms.get(roomId).remove(server.getKey());
+                break;
+            }
+        }
+        broadcastMembersToRoom(roomId);
     }
     @OnError
-    public void onError(Session session,Throwable error)
+    public void onError(@PathParam("roomId") String roomId,Throwable error)
     {
-        System.out.println("发生错误");
-        error.printStackTrace();
+        for (Map.Entry<String, ChatServerSocket> server : rooms.get(roomId).entrySet()) {
+            if (server.getValue().equals(this)) {
+                rooms.get(roomId).remove(server.getKey());
+                break;
+            }
+        }
+        broadcastMembersToRoom(roomId);
+    }
+
+    private void broadcastMembersToRoom(String roomId){
+        ArrayList<String> members = new ArrayList<>();
+        for (Map.Entry<String, ChatServerSocket> server : rooms.get(roomId).entrySet()) {
+            members.add(server.getKey());
+        }
+        JSONObject messageObject = new JSONObject();
+        messageObject.put("type", "members");
+        messageObject.put("message", members.toString());
+        String message = messageObject.toString();
+        for (Map.Entry<String, ChatServerSocket> server : rooms.get(roomId).entrySet()) {
+            try {
+                server.getValue().session.getBasicRemote().sendText(message);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+    private void broadcastMessageToRoom(String roomId,String message){
+        for (Map.Entry<String, ChatServerSocket> server : rooms.get(roomId).entrySet()) {
+            try {
+                server.getValue().session.getBasicRemote().sendText(message);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
