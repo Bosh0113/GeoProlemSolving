@@ -41,7 +41,7 @@
     </Form>
   </div>
 </template>
-<style>
+<style scoped>
 h1 {
   text-align: center;
   margin-top: 2.5%;
@@ -126,7 +126,7 @@ export default {
       console.log(formData.get("introduction"));
       console.log(formData.get("privacy"));
       console.log(formData.get("participants"));
-      this.axios.post("/api/TeamModeling/newProjectServlet", formData)
+      this.axios.post("/GeoProblemSolving/TeamModeling/newProjectServlet", formData)
       .then(function (res) {
         if(res.data === "ok"){
           alert("成功");

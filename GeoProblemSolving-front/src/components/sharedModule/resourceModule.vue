@@ -15,7 +15,7 @@
     </div>
   </Row>
 </template>
-<style>
+<style scoped>
 .member_panel {
   border: 1px solid lightgray;
   /* margin-top: 20px; */

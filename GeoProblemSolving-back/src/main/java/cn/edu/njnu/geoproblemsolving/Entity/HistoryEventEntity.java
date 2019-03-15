@@ -8,7 +8,12 @@ public class HistoryEventEntity {
     private String historyId;
     private String scopeId; //查询条件Id
     private String description;
+    private String userId;
     private String createTime;
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
 
     public void setCreateTime(String createTime) {
         this.createTime = createTime;
@@ -40,5 +45,9 @@ public class HistoryEventEntity {
 
     public String getHistoryId() {
         return historyId;
+    }
+
+    public String getUserId() {
+        return userId;
     }
 }

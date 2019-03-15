@@ -21,9 +21,11 @@
   width:20%;
   top: 0px;
   z-index: 1;
+
 }
 .navPart{
   width:85%;
+
 }
 </style>
 <template>
@@ -36,7 +38,8 @@
           theme="dark"
           active-name="home"
           @on-select="turnContent"
-          style="width:100%;z-index:0"
+          style="z-index:0"
+          width="auto"
         >
           <MenuItem name="home" class="menuItem" style="margin-left:30%">
             <span>Home</span>
@@ -172,7 +175,7 @@ export default {
       //get请求发送的是用户id
       this.axios
         .get(
-          "/api/notice/inquiry" +
+          "/GeoProblemSolving/notice/inquiry" +
             "?key=recipientId" +
             "&value=" +
             this.$store.state.userId
@@ -193,7 +196,7 @@ export default {
         });
     },
     initWebSocket() {
-      var noticeSocketURL = "ws://localhost:8081/NoticeSocket";
+      var noticeSocketURL = "ws://localhost:8081/GeoProblemSolving/NoticeSocket";
       this.noticeSocket = new WebSocket(noticeSocketURL);
       this.noticeSocket.onopen = this.onOpen;
       this.noticeSocket.onmessage = this.onMessage;
@@ -240,7 +243,7 @@ export default {
     changeSelect(name) {
       if (name == "logout") {
         this.axios
-          .get("/api/user/logout")
+          .get("/GeoProblemSolving/user/logout")
           .then(res => {
             this.$store.commit("userLogout");
             this.noticeSocket.close();

@@ -61,7 +61,7 @@ As I grew older, the gifts gave way to heart shaped boxes filled with my favorit
     </Row>
   </div>
 </template>
-<style>
+<style scoped>
 .main {
   top: 60px;
   height: 1800px;

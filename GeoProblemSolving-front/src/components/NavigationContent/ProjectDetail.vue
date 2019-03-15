@@ -15,7 +15,7 @@
 .detail_image {
   display: flex;
   align-items: center;
-  justify-content:center;
+  justify-content: center;
 }
 .detail_image img {
   width: 330px;
@@ -25,17 +25,14 @@
   padding: 20px;
   max-height: 350px;
 }
-.detail_description p {
-  /* padding: 0 20px 0 20px; */
-}
-.projectDescription{
-  text-indent:2em;
-  font-size:16px;
-  min-height:200px;
-  max-height:250px;
-  overflow-y:scroll;
-  width:100%;
-  padding:0 10px
+.projectDescription {
+  text-indent: 2em;
+  font-size: 16px;
+  min-height: 200px;
+  max-height: 250px;
+  overflow-y: scroll;
+  width: 100%;
+  padding: 0 10px;
 }
 .projectEditPanel {
   display: block;
@@ -58,8 +55,8 @@
   border: 1px solid gray;
   /* background-color: lightblue; */
 }
-.memberPanel{
-  padding:20px
+.memberPanel {
+  padding: 20px;
 }
 .subprojectPanel {
   height: auto;
@@ -121,7 +118,9 @@
   margin-right: 10px;
 }
 /* 按钮样式 */
-.subProjectBtn:hover,.inviteBtn:hover,.uploadBtn:hover {
+.subProjectBtn:hover,
+.inviteBtn:hover,
+.uploadBtn:hover {
   background-color: #47cb89;
   color: white;
 }
@@ -129,9 +128,7 @@
   background-color: #47cb89;
   color: white;
 } */
-.subProjectBtn,.uploadBtn,.inviteBtn {
-  color: black;
-}
+
 .popCenter {
   margin: 10px auto;
   overflow: hidden;
@@ -145,13 +142,32 @@
 }
 .editStyle span {
   width: 20%;
-  text-align: left
+  text-align: left;
 }
+
+/* 按钮样式统一 */
+.authorBtn:hover {
+  background-color: #57a3f3;
+  color: white;
+}
+.editBtn:hover {
+  background-color: #19be6b;
+  color: white;
+}
+.deleteBtn:hover {
+  background-color: #ed4014;
+  color: white;
+}
+.moreBtn:hover{
+  background-color: #57a3f3;
+  color: white;
+}
+/* 按钮样式统一结束 */
 </style>
 <template>
   <div class="main">
     <Row>
-      <Col span="20" offset="2">
+      <Col span="22" offset="1">
         <div class="whitespace"></div>
         <div class="whitespace"></div>
         <div class="detail" style="padding: 0 0 20px 0">
@@ -162,9 +178,12 @@
                 style="font-size:25px;height:40px;line-height:40px"
               >{{currentProjectDetail["title"]}}</p>
               <p slot="extra" style="height:40px;line-height:40px;">
-                <Button type="default" icon="md-brush" @click="editModalShow(currentProjectDetail['projectId'])" v-show="judgeIsManager(projectManager.userId)">
-                </Button>
-
+                <Button
+                  type="default"
+                  icon="md-brush"
+                  @click="editModalShow(currentProjectDetail['projectId'])"
+                  v-show="judgeIsManager(projectManager.userId)"
+                ></Button>
               </p>
               <Row>
                 <Col :xs="12" :sm="10" :md="9" :lg="8">
@@ -191,11 +210,7 @@
             <p slot="title" style="font-size:25px;height:40px;line-height:40px;">Members</p>
             <div slot="extra" style="height:40px" class="popCenter">
               <Poptip trigger="hover" content="Invite other members" placement="right">
-                <Button
-                  class="inviteBtn"
-                  v-show="isProjectManager"
-                  @click="inviteModalShow()"
-                >
+                <Button class="inviteBtn" v-show="isProjectManager" @click="inviteModalShow()">
                   <Icon type="md-person-add" size="20"/>
                 </Button>
               </Poptip>
@@ -337,8 +352,9 @@
                   <Col :lg="12" :md="24" :sm="24" :xs="24">
                     <Card class="subProjectStyle">
                       <Button
-                        type="primary"
+                        type="default"
                         slot="extra"
+                        class="authorBtn"
                         style="margin:-5px 5px 0 5px"
                         @click="handOverSubProjectShow(index)"
                         v-show="subProject.isManager"
@@ -346,7 +362,8 @@
                         title="Authorize"
                       ></Button>
                       <Button
-                        type="success"
+                        type="default"
+                        class="editBtn"
                         slot="extra"
                         style="margin:-5px 5px 0 5px"
                         @click="editSubProjectShow(index)"
@@ -355,7 +372,8 @@
                         title="edit"
                       ></Button>
                       <Button
-                        type="error"
+                        class="deleteBtn"
+                        type="default"
                         slot="extra"
                         style="margin:-5px 5px 0 5px"
                         @click="deleteSubProjectShow(index)"
@@ -466,13 +484,20 @@
           <Card>
             <p slot="title" style="font-size:25px;height:40px;line-height:40px;">Resource</p>
             <div slot="extra" style="display:flex;align-items:center;height:40px" class="popCenter">
-              <Poptip trigger="hover" content="upload new resource" placement="right">
-                <Button id="upload" type="default" @click="uploadFileModalShow()" class="uploadBtn">
-                <Icon type="md-cloud-upload" size="20"/>
-              </Button>
-            </Poptip>
+                <Button id="upload" type="default" @click="uploadFileModalShow()" class="uploadBtn" title="upload resource">
+                  <Icon type="md-cloud-upload" size="20"/>
+                </Button>
+              <Button
+                    class="moreBtn"
+                    type="default"
+                    style="margin-left: 10px"
+                    @click="toResourceList()"
+                    title="more"
+                  >
+                    <Icon type="md-more"/>
+                  </Button>
             </div>
-            <div>
+            <div style="height:300px;overflow-y:scroll">
               <Table
                 :columns="projectTableColName"
                 :data="this.projectResourceList"
@@ -488,8 +513,18 @@
                     style="margin-right: 5px"
                     :href="projectResourceList[index].pathURL"
                     @click="show(index)"
+                    title="download"
                   >
                     <Icon type="md-download"/>
+                  </Button>
+                  <Button
+                    type="warning"
+                    size="small"
+                    style="margin-right: 5px"
+                    @click=""
+                    title="View"
+                  >
+                  <Icon type="md-eye" />
                   </Button>
                 </template>
               </Table>
@@ -508,8 +543,18 @@
           :mask-closable="false"
         >
           <div style="display:flex;text-align:center;align-items:center;justify-content:center">
-            <span style="width:20%">Type</span>
-            <Input v-model="fileType"/>
+            <!-- 这里定义上传的几种资源类型供用户选择 -->
+            <span style="width:20%">File Type</span>
+            <RadioGroup v-model="fileType" style="width:80%">
+              <Radio label="image"></Radio>
+              <Radio label="video"></Radio>
+              <Radio label="data"></Radio>
+              <Radio label="paper"></Radio>
+              <Radio label="document"></Radio>
+              <Radio label="model"></Radio>
+              <Radio label="others"></Radio>
+            </RadioGroup>
+            <!-- 结束 -->
           </div>
           <br>
           <div style="display:flex;text-align:center;align-items:center;justify-content:center">
@@ -523,96 +568,96 @@
       </Col>
     </Row>
     <Modal
-                    v-model="editProjectModal"
-                    title="Edit Project"
-                    @on-ok="editProjectSubmit()"
-                    @on-cancel="cancel"
-                    :mask-closable="false"
-                    width="900px"
-                    >
-                    <div style="flex">
-                      <!-- <span>Category</span> -->
-                      <div class="editStyle">
-                        <span>Category</span>
-                        <RadioGroup style="margin-left:5%;width:100%" v-model="editType">
-                          <Radio label="Society"></Radio>
-                          <Radio label="Atmosphere"></Radio>
-                          <Radio label="Ecology"></Radio>
-                          <Radio label="Soil"></Radio>
-                          <Radio label="Water"></Radio>
-                          <Radio label="Others"></Radio>
-                        </RadioGroup>
-                      </div>
-                      <div class="editStyle">
-                        <span>Title</span>
-                        <Input
-                          v-model="editTitle"
-                          placeholder="Enter something..."
-                          style="margin-left:5%;width:100%"
-                        />
-                      </div>
-                      <div class="editStyle">
-                        <span>Description</span>
-                        <Input
-                          v-model="editDescription"
-                          placeholder="Enter something..."
-                          style="margin-left:5%;width:100%"
-                        />
-                      </div>
-                      <div class="editStyle">
-                        <span>Introduction</span>
-                        <Input
-                          v-model="editIntroduction"
-                          type="textarea"
-                          placeholder="Enter something..."
-                          style="margin-left:5%;width:100%"
-                          :rows="4"
-                        />
-                      </div>
-                      <div class="editStyle">
-                        <span>Tag</span>
-                        <Input
-                          v-model="inputTag"
-                          placeholder="Enter some tag to introduce the project"
-                          style="margin-left:0.5%;width: 200px"
-                          @keyup.enter.native="addTag(inputTag)"
-                        />
-                        <Button
-                          icon="ios-add"
-                          type="dashed"
-                          size="small"
-                          style="margin-left:2.5%"
-                          @click="addTag(inputTag)"
-                        >Add Tag</Button>
-                        <!-- <div style="margin-left:5%">
+      v-model="editProjectModal"
+      title="Edit Project"
+      @on-ok="editProjectSubmit()"
+      @on-cancel="cancel"
+      :mask-closable="false"
+      width="900px"
+    >
+      <div style="flex">
+        <!-- <span>Category</span> -->
+        <div class="editStyle">
+          <span>Category</span>
+          <RadioGroup style="margin-left:5%;width:100%" v-model="editType">
+            <Radio label="Society"></Radio>
+            <Radio label="Atmosphere"></Radio>
+            <Radio label="Ecology"></Radio>
+            <Radio label="Soil"></Radio>
+            <Radio label="Water"></Radio>
+            <Radio label="Others"></Radio>
+          </RadioGroup>
+        </div>
+        <div class="editStyle">
+          <span>Title</span>
+          <Input
+            v-model="editTitle"
+            placeholder="Enter something..."
+            style="margin-left:5%;width:100%"
+          />
+        </div>
+        <div class="editStyle">
+          <span>Description</span>
+          <Input
+            v-model="editDescription"
+            placeholder="Enter something..."
+            style="margin-left:5%;width:100%"
+          />
+        </div>
+        <div class="editStyle">
+          <span>Introduction</span>
+          <Input
+            v-model="editIntroduction"
+            type="textarea"
+            placeholder="Enter something..."
+            style="margin-left:5%;width:100%"
+            :rows="4"
+          />
+        </div>
+        <div class="editStyle">
+          <span>Tag</span>
+          <Input
+            v-model="inputTag"
+            placeholder="Enter some tag to introduce the project"
+            style="margin-left:0.5%;width: 200px"
+            @keyup.enter.native="addTag(inputTag)"
+          />
+          <Button
+            icon="ios-add"
+            type="dashed"
+            size="small"
+            style="margin-left:2.5%"
+            @click="addTag(inputTag)"
+          >Add Tag</Button>
+          <!-- <div style="margin-left:5%">
                           <Tag color="primary" @on-close="deleteTag(index)" v-show="editTags!=''">{{item}}</Tag>
-                        </div> -->
-                      </div>
-                      <div style="width:80%;margin-left:20%">
-                        <Tag
-                          color="primary"
-                          v-for="(tag,index) in editTags"
-                          :key="index"
-                          closable
-                          @on-close="deleteTag(index)"
-                        >{{tag}}</Tag>
-                      </div>
-                      <div class="editStyle">
-                        <span>Privacy</span>
-                        <RadioGroup style="margin-left:0.5%" v-model="editPrivacy">
-                          <Radio
-                            label="Public"
-                            title="Other users can find the group and see who has membership."
-                          ></Radio>
-                          <Radio
-                            label="Discover"
-                            title="Other users can find this group, but membership information is hidden."
-                          ></Radio>
-                          <Radio label="Private" title="Other users can not find this group."></Radio>
-                        </RadioGroup>
-                      </div>
-                    </div>
-                </Modal>
+          </div>-->
+        </div>
+        <div style="width:80%;margin-left:20%">
+          <Tag
+            color="primary"
+            v-for="(tag,index) in editTags"
+            :key="index"
+            closable
+            @on-close="deleteTag(index)"
+          >{{tag}}</Tag>
+        </div>
+        <div class="editStyle">
+          <span>Privacy</span>
+          <RadioGroup style="margin-left:0.5%" v-model="editPrivacy">
+            <Radio
+              label="Public"
+              title="Other users can find the group and see who has membership."
+            ></Radio>
+            <Radio
+              label="Discover"
+              title="Other users can find this group, but membership information is hidden."
+            ></Radio>
+            <Radio label="Private" title="Other users can not find this group."></Radio>
+          </RadioGroup>
+        </div>
+      </div>
+    </Modal>
   </div>
 </template>
 <script>
@@ -621,14 +666,14 @@ export default {
     return {
       //编辑项目的字段
       /*编辑项目专用的字段*/
-      editType:"",
-      editTags:"",
-      inputTag:"",
+      editType: "",
+      editTags: "",
+      inputTag: "",
       editDescription: "",
       editTitle: "",
       editIntroduction: "",
-      editPrivacy:"",
-      editProjectId:"",
+      editPrivacy: "",
+      editProjectId: "",
       /* 编辑项目字段结束*/
       projectManager: {},
       //确定用户是否有更新项目的权限，控制是否显示编辑的按钮，只有创建者才有权对项目进行编辑
@@ -684,29 +729,20 @@ export default {
         {
           title: "Name",
           key: "name",
-          width: 220
         },
         {
           title: "Description",
           key: "description",
-          width: 200
         },
         {
           title: "type",
           key: "type",
           sortable: true,
-          width: 100
         },
         {
           title: "uploadTime",
           key: "uploadTime",
           sortable: true,
-          width: 200
-        },
-        {
-          title: "uploaderId",
-          key: "uploaderId",
-          width: 200
         },
         {
           title: "Action",
@@ -716,7 +752,8 @@ export default {
         }
       ],
       // 关于控制项目编辑的模态框
-      editProjectModal:false,
+      editProjectModal: false,
+
     };
   },
   created: function() {
@@ -751,7 +788,7 @@ export default {
       try {
         $.ajax({
           url:
-            "/api/project/inquiry" +
+            "/GeoProblemSolving/project/inquiry" +
             "?key=" +
             queryObject["key"] +
             "&value=" +
@@ -775,7 +812,7 @@ export default {
                 that.currentProjectDetail["managerId"];
               $.ajax({
                 url:
-                  "/api/user/inquiry" +
+                  "/GeoProblemSolving/user/inquiry" +
                   "?key=" +
                   "userId" +
                   "&value=" +
@@ -873,7 +910,7 @@ export default {
       SubProject["managerId"] = this.$store.state.userId;
       console.log(SubProject);
       this.axios
-        .post("/api/subProject/create", SubProject)
+        .post("/GeoProblemSolving/subProject/create", SubProject)
         .then(res => {
           if (res.data != "Fail") {
             this.$Message.info("create success");
@@ -911,18 +948,19 @@ export default {
       emailFormBody["mailTitle"] = this.emailTitle;
       emailFormBody["mailContent"] = this.emailContent;
       console.log(emailFormBody);
-      this.axios.post("/api//email/send", emailFormBody)
-      .then(res=> {
-        console.log(res.data);
-      })
-      .catch(err=> {
-        console.log(err.data);
-      })
+      this.axios
+        .post("/GeoProblemSolving//email/send", emailFormBody)
+        .then(res => {
+          console.log(res.data);
+        })
+        .catch(err => {
+          console.log(err.data);
+        });
     },
     handOverSubProject() {
       this.axios
         .get(
-          "/api/subProject/manager?" +
+          "/GeoProblemSolving/subProject/manager?" +
             "subProjectId=" +
             this.subProjectList[this.editSubProjectindex].subProjectId +
             "&userId=" +
@@ -954,7 +992,7 @@ export default {
       obj.append("description", this.subProjectDescriptionEdit);
       // console.log(obj.get("title"));
       this.axios
-        .post("/api/subProject/update", obj)
+        .post("/GeoProblemSolving/subProject/update", obj)
         .then(res => {
           console.log(res.data);
           this.getAllSubProject();
@@ -970,7 +1008,7 @@ export default {
     deleteSubProject() {
       this.axios
         .get(
-          "/api/subProject/delete?" +
+          "/GeoProblemSolving/subProject/delete?" +
             "subProjectId=" +
             this.subProjectList[this.editSubProjectindex].subProjectId
         )
@@ -989,7 +1027,7 @@ export default {
       var that = this;
       this.axios
         .get(
-          "/api/subProject/inquiry" +
+          "/GeoProblemSolving/subProject/inquiry" +
             "?key=" +
             queryObject["key"] +
             "&value=" +
@@ -1005,7 +1043,7 @@ export default {
             for (let i = 0, n = 0; i < that.subProjectList.length; i++) {
               $.ajax({
                 url:
-                  "/api/user/inquiry" +
+                  "/GeoProblemSolving/user/inquiry" +
                   "?key=" +
                   "userId" +
                   "&value=" +
@@ -1064,11 +1102,18 @@ export default {
       formData.append("description", this.fileDescription);
       formData.append("type", this.fileType);
       formData.append("uploaderId", this.$store.state.userId);
-      formData.append("scopeId", this.currentProjectDetail.projectId);
+      // 添加字段属于那个项目
+      formData.append("belong",this.currentProjectDetail.title);
+      let scopeObject = {
+        projectId:this.currentProjectDetail.projectId,
+        subprojectId:"",
+        moduleId:"",
+      };
+      formData.append("scope",JSON.stringify(scopeObject));
       //这里还要添加其他的字段
       console.log(formData.get("file"));
       this.axios
-        .post("/api/resource/upload", formData)
+        .post("/GeoProblemSolving/resource/upload", formData)
         .then(res => {
           if (res != "None") {
             this.$Notice.open({
@@ -1077,6 +1122,7 @@ export default {
               duration: 2
             });
             //这里重新获取一次该项目下的全部资源
+            this.addUploadEvent(this.currentProjectDetail.projectId);
             this.getAllResource();
             // 创建一个函数根据pid去后台查询该项目下的资源
           }
@@ -1088,11 +1134,11 @@ export default {
     getAllResource() {
       // url是请求的网址
       //查询的形式是key-value格式
-      // this.axios.get("/api/resource/inquiry",obj)
+      // this.axios.get("/GeoProblemSolving/resource/inquiry",obj)
       this.axios
         .get(
-          "/api/resource/inquiry" +
-            "?key=scopeId" +
+          "/GeoProblemSolving/resource/inquiry" +
+            "?key=scope.projectId" +
             "&value=" +
             this.$route.params.id
         )
@@ -1157,49 +1203,49 @@ export default {
       }
       // console.log("挡墙登陆的账户是:"+ sessionStorage.getItem("userId"));
     },
-    editModalShow(id){
+    editModalShow(id) {
       // this.
       this.editProjectModal = true;
       let editProjectInfo = this.currentProjectDetail;
-      console.log(typeof(editProjectInfo['tag']));
+      console.log(typeof editProjectInfo["tag"]);
       this.editTitle = editProjectInfo.title;
       this.editIntroduction = editProjectInfo.introduction;
       this.editDescription = editProjectInfo.description;
       this.editType = editProjectInfo.category;
-      this.editTags = editProjectInfo['tag'];
-      console.log("权限是："+ editProjectInfo.privacy);
+      this.editTags = editProjectInfo["tag"];
+      console.log("权限是：" + editProjectInfo.privacy);
       this.editPrivacy = editProjectInfo.privacy;
       this.editProjectId = editProjectInfo.projectId;
     },
-    editProjectSubmit(){
+    editProjectSubmit() {
       // 将项目变更的信息进行提交
       let projectEditForm = new URLSearchParams();
       //做一个判断
-      projectEditForm.append("title",this.editTitle);
-      projectEditForm.append("category",this.editType);
-      projectEditForm.append("introduction",this.editIntroduction);
-      projectEditForm.append("description",this.editDescription);
-      projectEditForm.append("tag",this.editTags);
-      projectEditForm.append("privacy",this.editPrivacy);
-      projectEditForm.append("projectId",this.editProjectId);
-      projectEditForm.append("managerId",this.$store.state.userId);
-      this.axios.post("http://localhost:8081/project/update ", projectEditForm)
-      .then(res=>{
-        // console.log(res.data);
-        // alert(res.data);
-        this.getProjectDetail();
-        // this.getManagerProjectList();
-      })
-      .catch(err=> {
-        console.log(err.data);
-      })
+      projectEditForm.append("title", this.editTitle);
+      projectEditForm.append("category", this.editType);
+      projectEditForm.append("introduction", this.editIntroduction);
+      projectEditForm.append("description", this.editDescription);
+      projectEditForm.append("tag", this.editTags);
+      projectEditForm.append("privacy", this.editPrivacy);
+      projectEditForm.append("projectId", this.editProjectId);
+      projectEditForm.append("managerId", this.$store.state.userId);
+      this.axios
+        .post("http://localhost:8081/GeoProblemSolving/project/update ", projectEditForm)
+        .then(res => {
+          // console.log(res.data);
+          // alert(res.data);
+          this.getProjectDetail();
+          // this.getManagerProjectList();
+        })
+        .catch(err => {
+          console.log(err.data);
+        });
     },
     // 判断项目详情页面是否具备编辑权限，根据userId与projectId来比较
-    judgeIsManager(projectManagerId){
-      if(projectManagerId === this.$store.state.userId){
+    judgeIsManager(projectManagerId) {
+      if (projectManagerId === this.$store.state.userId) {
         return true;
-      }
-      else{
+      } else {
         return false;
       }
     },
@@ -1210,9 +1256,36 @@ export default {
       // console.log("增添后的数组是：" + this.editTags);
     },
     // 删除指定的标签
-    deleteTag(index){
+    deleteTag(index) {
       this.editTags.splice(index, 1);
     },
+    toResourceList(){
+      this.$router.push({path:'/resourceList'})
+    },
+    addUploadEvent(scopeId){
+      let form = {};
+      let description = this.$store.state.userName + ' uploaded a ' + this.fileType + ' file in ' + ' project called ' + this.currentProjectDetail.title;
+      form["description"] = description;
+      form["scopeId"] = scopeId;
+      this.axios.post("/GeoProblemSolving/history/save?", "description="+ description + "&scopeId=" + scopeId + "&userId=" + this.$store.state.userId)
+          .then(res=> {
+            console.log(res.data);
+          })
+          .catch(err=> {
+            console.log(err.data);
+          })
+    },
+    getResourceList(){
+      this.axios.get(url, {
+        params: {
+          id:paramId
+        }
+      })
+      .then(function (response) {
+      })
+      .catch(function (error) {
+      })
+    }
   }
 };
 </script>

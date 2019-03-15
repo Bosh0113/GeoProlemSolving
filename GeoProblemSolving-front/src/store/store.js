@@ -26,7 +26,7 @@ export default new Vuex.Store({
     mutations: {
         getUserInfo: state => {
             $.ajax({
-                url: "/api/user/state",
+                url: "/GeoProblemSolving/user/state",
                 type: "GET",
                 async: false,
                 success: function (data) {
