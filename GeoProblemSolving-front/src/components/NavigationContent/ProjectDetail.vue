@@ -214,8 +214,6 @@
             </Card>
           </div>
         </div>
-        <div class="whitespace"></div>
-        <div class="whitespace"></div>
         <div class="memberPanel">
           <Card :bordered="false">
             <p slot="title" style="font-size:25px;height:40px;line-height:40px;">Members</p>
