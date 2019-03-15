@@ -217,7 +217,7 @@
                 </Col>
                 <Col :xs="12" :sm="14" :md="15" :lg="16">
                   <div style="display:flex;height:250px;">
-                    <p
+                    <span
                       class="projectDescription"
                       v-if="currentProjectDetail"
                     >{{currentProjectDetail.introduction}}</span>
