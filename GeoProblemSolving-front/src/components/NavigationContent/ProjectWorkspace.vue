@@ -120,7 +120,7 @@
 .tool-panel {
   display: flex;
   height: auto;
-  justify-content: center;
+  /* justify-content: center; */
   align-items: center;
 }
 /* 工具库中抽屉的工具样式*/
@@ -130,7 +130,7 @@
 .singl_tool_style span {
   display: flex;
   text-align: center;
-  justify-content: center;
+  /* justify-content: center; */
   align-items: center;
 }
 .taskFormItem {
@@ -557,12 +557,30 @@
               <h1>General Tools</h1>
               <div class="tool-panel">
                 <div class="singl_tool_style">
-                  <Icon type="md-analytics" size="60" @click.native="show" title="Modeling Tools"/>
+                  <Icon type="md-analytics" size="60" @click.native="show" title="Modeling Tools" color="orange"/>
                   <br>
-                  <span style="display:flex;justify-content:center">11</span>
+                  <span style="display:flex;justify-content:center">Analyze</span>
                 </div>
-                <Icon type="md-analytics" size="60" @click.native="show" title="Modeling Tools"/>
-                <Icon type="md-analytics" size="60" @click.native="show" title="Modeling Tools"/>
+                <!-- <Icon type="md-brush" /> -->
+                <div class="singl_tool_style">
+                  <Icon type="md-brush" size="60" @click.native="show" title="DrawBoard" color="green"/>
+                  <br>
+                  <span style="display:flex;justify-content:center">Draw</span>
+                </div>
+                <!-- <Icon type="md-map" /> -->
+                <div class="singl_tool_style">
+                  <Icon type="md-map" size="60" @click.native="show" title="DrawBoard" color="lightblue"/>
+                  <br>
+                  <span style="display:flex;justify-content:center">Map</span>
+                </div>
+                <!-- <Icon type="ios-book-outline" /> -->
+                <div class="singl_tool_style">
+                  <Icon type="ios-book-outline" size="60" @click.native="show" title="DrawBoard" color="greenyellow"/>
+                  <br>
+                  <span style="display:flex;justify-content:center">Previewer</span>
+                </div>
+                <!-- <Icon type="md-analytics" size="60" @click.native="show" title="Modeling Tools"/>
+                <Icon type="md-analytics" size="60" @click.native="show" title="Modeling Tools"/> -->
               </div>
               <hr>
               <h1>Special Tools</h1>
