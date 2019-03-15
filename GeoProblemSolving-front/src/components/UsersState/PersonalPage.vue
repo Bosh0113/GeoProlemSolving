@@ -2,8 +2,9 @@
   <div>
     <Row>
       <Col span="22" offset="1">
-        <div class="mainPanel">
-          <div class="detailSidebar" :style="{height:detailSidebarHeight}">
+        <Row>
+          <Col :lg="5" :md="8" :sm="10" :xs="12">
+             <div class="detailSidebar" :style="{height:detailSidebarHeight}">
             <div class="user-img">
               <img v-bind:src="userDetail.avatar" class="u_img">
             </div>
@@ -13,7 +14,6 @@
             </div>
             <div class="user-desc" style="min-hieght:60px;padding:0 10px;border:1px dotted gray">
               <p>{{this.userDetail.introduction}}</p>
-              <!-- <Input type="textarea" :rows="4" :value="this.userDetail.introduction"/> -->
             </div>
             <div class="user-info">
               <div class="single-info">
@@ -58,7 +58,6 @@
                   v-model="editProfileModal"
                   width="600px"
                 >
-                  <!-- 修改个人信息的表单 -->
                   <Form :model="personalInfoItem" :label-width="80">
                     <FormItem label="Name" prop="userName">
                       <Input
@@ -185,13 +184,16 @@
               </Modal>
             </div>
           </div>
-          <div class="rightContent">
-            <Tabs value="Overview">
+          </Col>
+          <!-- <Col span="18" offset="1"> -->
+          <Col :lg="{span:18,offset:1}" :md="{span:15,offset:1}" :sm="{span:13,offset:1}" :xs="{span:11,offset:1}">
+            <div class="rightContent">
+                <Tabs value="Overview">
               <TabPane label="Overview" name="Overview">
                 <Col :lg="{span:22,offset:1}" :md="{span:22,offset:1}" :sm="{span:22,offset:1}">
-                  <Card>
+                  <Card >
                     <p slot="title">History Line</p>
-                    <Timeline style="margin-top:20px;margin-left:5%">
+                    <Timeline style="margin-top:20px;margin-left:5%;max-height:300px;overflow-y:auto">
                       <TimelineItem v-for="(item,index) in userEventList" :key="index">
                         <strong>
                           <p class="time">{{item.createTime}}</p>
@@ -202,10 +204,10 @@
                   </Card>
                   <br>
                   <div>
-                    <!-- <Card>
+                    <Card>
                       <p slot="title">Resource List</p>
                       <Table :data="userResourceList" :columns="resourceColumn" class="table"></Table>
-                    </Card> -->
+                    </Card>
                   </div>
                 </Col>
               </TabPane>
@@ -224,7 +226,7 @@
                         @click="goSingleProject(item.projectId)"
                       >{{item.title}}</p>
                       <p
-                        style="height:200px;text-indent:2em;overflow-y:scroll"
+                        style="height:200px;text-indent:2em;overflow-y:auto;word-break:break-word"
                       >{{item.introduction}}</p>
                       <br>
                       <div style="height:40px">
@@ -251,18 +253,10 @@
                         class="authorBtn"
                         type="default"
                         slot="extra"
+                        title="edit"
                         style="margin:-5px 5px 0 5px"
                         @click="authorizeModalShow(index)"
                         icon="md-happy"
-                      ></Button>
-                      <Button
-                        class="editBtn"
-                        type="default"
-                        slot="extra"
-                        style="margin:-5px 5px 0 5px"
-                        @click="editProjectModalShow(index)"
-                        icon="ios-brush"
-                        title="edit"
                       ></Button>
                       <Button
                         class="deleteBtn"
@@ -275,7 +269,7 @@
                       ></Button>
                       <!-- 表头结束 -->
                       <p
-                        style="height:200px;text-indent:2em;overflow-y:scroll"
+                       style="height:200px;text-indent:2em;overflow-y:auto;word-break:break-word"
                       >{{mProject.introduction}}</p>
                       <!-- <hr> -->
                       <br>
@@ -289,6 +283,11 @@
               </TabPane>
             </Tabs>
           </div>
+          </Col>
+        </Row>
+        <div>
+
+
         </div>
       </Col>
     </Row>
@@ -316,99 +315,7 @@
       </div>
     </Modal>
 
-    <!-- 编辑项目的modal -->
-    <Modal
-      v-model="editProjectModal"
-      title="Edit project info"
-      ok-text="submit"
-      cancel-text="cancel"
-      @on-ok="editProjectSubmit"
-      @on-cancel="cancel"
-      width="900px"
-    >
-      <div style="flex">
-        <!-- <span>Category</span> -->
-        <div class="editStyle">
-          <span>Category</span>
-          <RadioGroup style="margin-left:5%;width:100%" v-model="editType">
-            <Radio label="Society"></Radio>
-            <Radio label="Atmosphere"></Radio>
-            <Radio label="Ecology"></Radio>
-            <Radio label="Soil"></Radio>
-            <Radio label="Water"></Radio>
-            <Radio label="Others"></Radio>
-          </RadioGroup>
-        </div>
-        <div class="editStyle">
-          <span>Title</span>
-          <Input
-            v-model="editTitle"
-            placeholder="Enter something..."
-            style="margin-left:5%;width:100%"
-          />
-        </div>
-        <div class="editStyle">
-          <span>Description</span>
-          <Input
-            v-model="editDescription"
-            placeholder="Enter something..."
-            style="margin-left:5%;width:100%"
-          />
-        </div>
-        <div class="editStyle">
-          <span>Introduction</span>
-          <Input
-            v-model="editIntroduction"
-            type="textarea"
-            placeholder="Enter something..."
-            style="margin-left:5%;width:100%"
-            :rows="4"
-          />
-        </div>
-        <div class="editStyle">
-          <span>Tag</span>
-          <Input
-            v-model="inputTag"
-            placeholder="Enter some tag to introduce the project"
-            style="margin-left:0.5%;width: 200px"
-            @keyup.enter.native="addTag(inputTag)"
-          />
-          <Button
-            icon="ios-add"
-            type="dashed"
-            size="small"
-            style="margin-left:2.5%"
-            @click="addTag(inputTag)"
-          >Add Tag</Button>
-          <!-- <div style="margin-left:5%">
-                          <Tag color="primary" @on-close="deleteTag(index)" v-show="editTags!=''">{{item}}</Tag>
-          </div>-->
-        </div>
-        <div style="width:80%;margin-left:20%">
-          <Tag
-            color="primary"
-            v-for="(tag,index) in editTags"
-            :key="index"
-            closable
-            @on-close="deleteTag(index)"
-          >{{tag}}</Tag>
-        </div>
-        <div class="editStyle">
-          <span>Privacy</span>
-          <RadioGroup style="margin-left:0.5%" v-model="editPrivacy">
-            <Radio
-              label="Public"
-              title="Other users can find the group and see who has membership."
-            ></Radio>
-            <Radio
-              label="Discover"
-              title="Other users can find this group, but membership information is hidden."
-            ></Radio>
-            <Radio label="Private" title="Other users can not find this group."></Radio>
-          </RadioGroup>
-        </div>
-      </div>
-    </Modal>
+
   </div>
 </template>
 
@@ -463,21 +370,21 @@ export default {
         {
           type: "selection",
           width: 60,
-          align: "center",
+          align: "center"
         },
         {
           title: "Name",
           key: "name",
-          sortable: true,
+          sortable: true
         },
         {
           title: "Type",
-          key: "type",
+          key: "type"
         },
         {
           title: "Time",
           key: "uploadTime",
-          sortable: true,
+          sortable: true
         }
       ],
       userManagerProjectList: [
@@ -546,7 +453,7 @@ export default {
       detailSidebarHeight: "",
       // 用户event列表
       userEventList: [],
-      userResourceList: [],
+      userResourceList: []
       // rightContentWidth:"",
     };
   },
@@ -674,69 +581,24 @@ export default {
         })
         .catch(err => {});
     },
-    editProjectModalShow(index) {
-      this.editProjectIndex = index;
-      this.editProjectModal = true;
-      let editProjectInfo = this.userManagerProjectList[this.editProjectIndex];
-      console.log("当前编辑的项目的详情信息是:" + editProjectInfo.projectId);
-      this.editTitle = editProjectInfo.title;
-      this.editIntroduction = editProjectInfo.introduction;
-      this.editDescription = editProjectInfo.description;
-      this.editType = editProjectInfo.category;
-      this.editTags = editProjectInfo.tag.split(",");
-      this.editPrivacy = editProjectInfo.privacy;
-      this.editProjectId = editProjectInfo.projectId;
-    },
+    // editProjectModalShow(index) {
+    //   this.editProjectIndex = index;
+    //   this.editProjectModal = true;
+    //   let editProjectInfo = this.userManagerProjectList[this.editProjectIndex];
+    //   console.log("当前编辑的项目的详情信息是:" + editProjectInfo.projectId);
+    //   this.editTitle = editProjectInfo.title;
+    //   this.editIntroduction = editProjectInfo.introduction;
+    //   this.editDescription = editProjectInfo.description;
+    //   this.editType = editProjectInfo.category;
+    //   this.editTags = editProjectInfo.tag.split(",");
+    //   this.editPrivacy = editProjectInfo.privacy;
+    //   this.editProjectId = editProjectInfo.projectId;
+    // },
 
     cancel() {
       this.$Message.info("cancel");
     },
-    //删除项目的函数
-    deleteProjectModalShow(index) {
-      this.DelelteProjectIndex = index;
-      let selectProjectId = this.userManagerProjectList[
-        this.DelelteProjectIndex
-      ].projectId;
-      this.axios
-        .get(
-          "/GeoProblemSolving/project/delete?" + "projectId=" + selectProjectId
-        )
-        .then(res => {
-          if (res.data != "") {
-            this.getManagerProjectList();
-          }
 
-          //   if(res.data==="Success"){
-          //     this.$Message.info("Delete successfully");
-          //   }else{
-          //     this.$Message.info("Fail");
-          //   }
-        })
-        .catch(err => {});
-    },
-    //编辑项目的函数
-    editProjectSubmit() {
-      // 将项目变更的信息进行提交
-      let projectEditForm = new URLSearchParams();
-      //做一个判断
-      projectEditForm.append("title", this.editTitle);
-      projectEditForm.append("category", this.editType);
-      projectEditForm.append("introduction", this.editIntroduction);
-      projectEditForm.append("description", this.editDescription);
-      projectEditForm.append("tag", this.editTags);
-      projectEditForm.append("privacy", this.editPrivacy);
-      projectEditForm.append("projectId", this.editProjectId);
-      this.axios
-        .post("/GeoProblemSolving/project/update", projectEditForm)
-        .then(res => {
-          console.log(res.data);
-          alert(res.data);
-          this.getManagerProjectList();
-        })
-        .catch(err => {
-          console.log(err.data);
-        });
-    },
     //更改个人信息的函数
     changeProfile() {},
     editModalShow() {
@@ -848,12 +710,13 @@ export default {
 </script>
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.mainPanel {
+/* .mainPanel {
   display: flex;
-}
+} */
 .detailSidebar {
-  min-width: 250px;
-  max-width: 300px;
+  /* min-width: 250px;
+  max-width: 300px; */
+  /* width:300px; */
   margin-right: 20px;
 }
 .rightContent {
@@ -1009,7 +872,7 @@ body {
   background-color: #ed4014;
   color: white;
 }
-.table table{
+.table table {
   table-layout: auto;
   width: 100% !important;
 }
