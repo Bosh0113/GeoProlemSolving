@@ -143,18 +143,20 @@ public class ResourceDaoImpl implements IResourceDao {
                 // encode scopeId
                 List<ResourceEntity> resourceEntitites = mongoTemplate.find(query, ResourceEntity.class);
 
-//                for(int i = 0;i < resourceEntitites.size();i++){
-//                    // get
-//                    ResourceEntity resourceEntitity = resourceEntitites.get(i);
-//                    String scopeId = resourceEntitity.getScopeId();
-//                    // encode
-//                    if(scopeId.length() == 36) {
-//                        String randomID = UUID.randomUUID().toString().substring(0, 2);
-//                        scopeId = EncodeUtil.encode((scopeId + randomID).getBytes());
-//                    }
-//                    // set
-//                    resourceEntitity.setScopeId(scopeId);
-//                }
+                for(int i = 0;i < resourceEntitites.size();i++){
+                    // get
+                    ResourceEntity resourceEntitity = resourceEntitites.get(i);
+                    JSONObject scope = resourceEntitity.getScope();
+                    // encode
+                    String projectId = scope.getString("projectId");
+                    if(projectId.length() > 0) {
+                        String randomID = UUID.randomUUID().toString().substring(0, 2);
+                        projectId = EncodeUtil.encode((projectId + randomID).getBytes());
+                    }
+                    // set
+                    scope.put("projectId",projectId);
+                    resourceEntitity.setScope(scope);
+                }
 
                 return resourceEntitites;
             } else {
