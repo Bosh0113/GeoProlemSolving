@@ -1,4 +1,4 @@
-<style>
+<style scoped>
 .detailContent {
   padding: 15px 10px;
   height: 500px;

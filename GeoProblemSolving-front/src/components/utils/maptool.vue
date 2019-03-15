@@ -1,7 +1,7 @@
 <template>
   <div id="map" class="map"></div>
 </template>
-<style>
+<style scoped>
 @import "../../../static/css/Control.MiniMap.css";
 @import "../../../static/css/leaflet.pm.css";
 #map {

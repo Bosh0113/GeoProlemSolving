@@ -104,11 +104,11 @@
   transform: scale(1.25);
   transition: all 1s;
 }
-.member_panel {
+.member-panel {
   border: 1px solid lightgray;
   transition: all 1s;
 }
-/* .member_panel:hover,
+/* .member-panel:hover,
 .resource:hover {
   box-shadow: 1px 1px 2px 2px rgba(0, 0, 0, 0.2);
   transform: scale(1.05);
@@ -207,7 +207,7 @@
       <Row style="margin-top:20px">
         <Col :xs="8" :sm="7" :md="7" :lg="5" v-bind="this.participants" offset="1">
           <div
-            class="member_panel"
+            class="member-panel"
             :style="{height:sidebarHeight+'px'}"
             style="background-color:white"
           >
@@ -347,7 +347,7 @@
       <Row style="margin-top:20px">
         <Col :xs="8" :sm="7" :md="6" :lg="5" v-bind="this.olParticipants" offset="1">
           <div
-            class="member_panel"
+            class="member-panel"
             :style="{height:sidebarHeight+'px'}"
             style="background-color:white"
           >
@@ -718,7 +718,11 @@
     >
       <div class="addNodeStyle">
         <span style="width:10%">Name</span>
-        <Input v-model="moduleTitle" placeholder="Enter something..." style="width: 400px"/>
+        <Input
+          v-model="moduleTitle"
+          placeholder="Enter something..."
+          style="width: 400px"
+        />
       </div>
       <div class="addNodeStyle">
         <span style="width:10%">Type</span>
@@ -984,8 +988,7 @@ export default {
       }
     },
     openModuleSocket(moduleId) {
-      var moduleSocketURL =
-        "ws://localhost:8081/GeoProblemSolving/Module/" + moduleId;
+      var moduleSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + moduleId;
       this.moduleSocket = new WebSocket(moduleSocketURL);
       this.moduleSocket.onopen = this.onOpen;
       this.moduleSocket.onmessage = this.onMessage;

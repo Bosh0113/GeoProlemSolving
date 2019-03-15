@@ -15,7 +15,7 @@
 .detail_image {
   display: flex;
   align-items: center;
-  justify-content:center;
+  justify-content: center;
 }
 .detail_image img {
   width: 330px;
@@ -28,14 +28,14 @@
 .detail_description p {
   /* padding: 0 20px 0 20px; */
 }
-.projectDescription{
-  text-indent:2em;
-  font-size:16px;
-  min-height:200px;
-  max-height:250px;
-  overflow-y:scroll;
-  width:100%;
-  padding:0 10px
+.projectDescription {
+  text-indent: 2em;
+  font-size: 16px;
+  min-height: 200px;
+  max-height: 250px;
+  overflow-y: scroll;
+  width: 100%;
+  padding: 0 10px;
 }
 .projectEditPanel {
   display: block;
@@ -58,8 +58,8 @@
   border: 1px solid gray;
   /* background-color: lightblue; */
 }
-.memberPanel{
-  padding:20px
+.memberPanel {
+  padding: 20px;
 }
 .subprojectPanel {
   height: auto;
@@ -121,7 +121,9 @@
   margin-right: 10px;
 }
 /* 按钮样式 */
-.subProjectBtn:hover,.inviteBtn:hover,.uploadBtn:hover {
+.subProjectBtn:hover,
+.inviteBtn:hover,
+.uploadBtn:hover {
   background-color: #47cb89;
   color: white;
 }
@@ -129,7 +131,9 @@
   background-color: #47cb89;
   color: white;
 } */
-.subProjectBtn,.uploadBtn,.inviteBtn {
+.subProjectBtn,
+.uploadBtn,
+.inviteBtn {
   color: black;
 }
 .popCenter {
@@ -145,7 +149,7 @@
 }
 .editStyle span {
   width: 20%;
-  text-align: left
+  text-align: left;
 }
 </style>
 <template>
@@ -169,7 +173,14 @@
               <Row>
                 <Col :xs="12" :sm="10" :md="9" :lg="8">
                   <div class="detail_image">
-                    <img :src="currentProjectDetail.picture">
+                    <img :src="currentProjectDetail.picture" v-if="currentProjectDetail.picture!=''&&currentProjectDetail.picture!='undefined'">
+                    <avatar
+                      :username="currentProjectDetail.title"
+                      :size="300"
+                      :title="currentProjectDetail.title"
+                      :rounded="false"
+                      v-else>
+                    </avatar>
                   </div>
                 </Col>
                 <Col :xs="12" :sm="14" :md="15" :lg="16">
@@ -523,112 +534,116 @@
       </Col>
     </Row>
     <Modal
-                    v-model="editProjectModal"
-                    title="Edit Project"
-                    @on-ok="editProjectSubmit()"
-                    @on-cancel="cancel"
-                    :mask-closable="false"
-                    width="900px"
-                    >
-                    <div style="flex">
-                      <!-- <span>Category</span> -->
-                      <div class="editStyle">
-                        <span>Category</span>
-                        <RadioGroup style="margin-left:5%;width:100%" v-model="editType">
-                          <Radio label="Society"></Radio>
-                          <Radio label="Atmosphere"></Radio>
-                          <Radio label="Ecology"></Radio>
-                          <Radio label="Soil"></Radio>
-                          <Radio label="Water"></Radio>
-                          <Radio label="Others"></Radio>
-                        </RadioGroup>
-                      </div>
-                      <div class="editStyle">
-                        <span>Title</span>
-                        <Input
-                          v-model="editTitle"
-                          placeholder="Enter something..."
-                          style="margin-left:5%;width:100%"
-                        />
-                      </div>
-                      <div class="editStyle">
-                        <span>Description</span>
-                        <Input
-                          v-model="editDescription"
-                          placeholder="Enter something..."
-                          style="margin-left:5%;width:100%"
-                        />
-                      </div>
-                      <div class="editStyle">
-                        <span>Introduction</span>
-                        <Input
-                          v-model="editIntroduction"
-                          type="textarea"
-                          placeholder="Enter something..."
-                          style="margin-left:5%;width:100%"
-                          :rows="4"
-                        />
-                      </div>
-                      <div class="editStyle">
-                        <span>Tag</span>
-                        <Input
-                          v-model="inputTag"
-                          placeholder="Enter some tag to introduce the project"
-                          style="margin-left:0.5%;width: 200px"
-                          @keyup.enter.native="addTag(inputTag)"
-                        />
-                        <Button
-                          icon="ios-add"
-                          type="dashed"
-                          size="small"
-                          style="margin-left:2.5%"
-                          @click="addTag(inputTag)"
-                        >Add Tag</Button>
-                        <!-- <div style="margin-left:5%">
-                          <Tag color="primary" @on-close="deleteTag(index)" v-show="editTags!=''">{{item}}</Tag>
-                        </div> -->
-                      </div>
-                      <div style="width:80%;margin-left:20%">
-                        <Tag
-                          color="primary"
-                          v-for="(tag,index) in editTags"
-                          :key="index"
-                          closable
-                          @on-close="deleteTag(index)"
-                        >{{tag}}</Tag>
-                      </div>
-                      <div class="editStyle">
-                        <span>Privacy</span>
-                        <RadioGroup style="margin-left:0.5%" v-model="editPrivacy">
-                          <Radio
-                            label="Public"
-                            title="Other users can find the group and see who has membership."
-                          ></Radio>
-                          <Radio
-                            label="Discover"
-                            title="Other users can find this group, but membership information is hidden."
-                          ></Radio>
-                          <Radio label="Private" title="Other users can not find this group."></Radio>
-                        </RadioGroup>
-                      </div>
-                    </div>
-                </Modal>
+      v-model="editProjectModal"
+      title="Edit Project"
+      @on-ok="editProjectSubmit()"
+      @on-cancel="cancel"
+      :mask-closable="false"
+      width="900px"
+      >
+      <div style="flex">
+        <!-- <span>Category</span> -->
+        <div class="editStyle">
+          <span>Category</span>
+          <RadioGroup style="margin-left:5%;width:100%" v-model="editType">
+            <Radio label="Society"></Radio>
+            <Radio label="Atmosphere"></Radio>
+            <Radio label="Ecology"></Radio>
+            <Radio label="Soil"></Radio>
+            <Radio label="Water"></Radio>
+            <Radio label="Others"></Radio>
+          </RadioGroup>
+        </div>
+        <div class="editStyle">
+          <span>Title</span>
+          <Input
+            v-model="editTitle"
+            placeholder="Enter something..."
+            style="margin-left:5%;width:100%"
+          />
+        </div>
+        <div class="editStyle">
+          <span>Description</span>
+          <Input
+            v-model="editDescription"
+            placeholder="Enter something..."
+            style="margin-left:5%;width:100%"
+          />
+        </div>
+        <div class="editStyle">
+          <span>Introduction</span>
+          <Input
+            v-model="editIntroduction"
+            type="textarea"
+            placeholder="Enter something..."
+            style="margin-left:5%;width:100%"
+            :rows="4"
+          />
+        </div>
+        <div class="editStyle">
+          <span>Tag</span>
+          <Input
+            v-model="inputTag"
+            placeholder="Enter some tag to introduce the project"
+            style="margin-left:0.5%;width: 200px"
+            @keyup.enter.native="addTag(inputTag)"
+          />
+          <Button
+            icon="ios-add"
+            type="dashed"
+            size="small"
+            style="margin-left:2.5%"
+            @click="addTag(inputTag)"
+          >Add Tag</Button>
+          <!-- <div style="margin-left:5%">
+            <Tag color="primary" @on-close="deleteTag(index)" v-show="editTags!=''">{{item}}</Tag>
+          </div> -->
+        </div>
+        <div style="width:80%;margin-left:20%">
+          <Tag
+            color="primary"
+            v-for="(tag,index) in editTags"
+            :key="index"
+            closable
+            @on-close="deleteTag(index)"
+          >{{tag}}</Tag>
+        </div>
+        <div class="editStyle">
+          <span>Privacy</span>
+          <RadioGroup style="margin-left:0.5%" v-model="editPrivacy">
+            <Radio
+              label="Public"
+              title="Other users can find the group and see who has membership."
+            ></Radio>
+            <Radio
+              label="Discover"
+              title="Other users can find this group, but membership information is hidden."
+            ></Radio>
+            <Radio label="Private" title="Other users can not find this group."></Radio>
+          </RadioGroup>
+        </div>
+      </div>
+    </Modal>
   </div>
 </template>
 <script>
+import Avatar from "vue-avatar";
 export default {
+  components: {
+    Avatar
+  },
   data() {
     return {
       //编辑项目的字段
       /*编辑项目专用的字段*/
-      editType:"",
-      editTags:"",
-      inputTag:"",
+      editType: "",
+      editTags: "",
+      inputTag: "",
       editDescription: "",
       editTitle: "",
       editIntroduction: "",
-      editPrivacy:"",
-      editProjectId:"",
+      editPrivacy: "",
+      editProjectId: "",
       /* 编辑项目字段结束*/
       projectManager: {},
       //确定用户是否有更新项目的权限，控制是否显示编辑的按钮，只有创建者才有权对项目进行编辑
@@ -716,7 +731,7 @@ export default {
         }
       ],
       // 关于控制项目编辑的模态框
-      editProjectModal:false,
+      editProjectModal: false
     };
   },
   created: function() {
@@ -911,13 +926,14 @@ export default {
       emailFormBody["mailTitle"] = this.emailTitle;
       emailFormBody["mailContent"] = this.emailContent;
       console.log(emailFormBody);
-      this.axios.post("/GeoProblemSolving//email/send", emailFormBody)
-      .then(res=> {
-        console.log(res.data);
-      })
-      .catch(err=> {
-        console.log(err.data);
-      })
+      this.axios
+        .post("/GeoProblemSolving/email/send", emailFormBody)
+        .then(res => {
+          console.log(res.data);
+        })
+        .catch(err => {
+          console.log(err.data);
+        });
     },
     handOverSubProject() {
       this.axios
@@ -1017,7 +1033,7 @@ export default {
                 }
               });
             }
-            console.log(that.subProjectList);
+            // console.log(that.subProjectList);
             that.cutString(that.subProjectList, 200);
           }
         })
@@ -1064,13 +1080,19 @@ export default {
       formData.append("description", this.fileDescription);
       formData.append("type", this.fileType);
       formData.append("uploaderId", this.$store.state.userId);
-      formData.append("scopeId", this.currentProjectDetail.projectId);
+      formData.append("belong", "belong to project");
+      let scopeObject={
+        projectId:this.currentProjectDetail.projectId,
+        subProjectId:"",
+        moduleId:""
+      };
+      formData.append("scope", JSON.stringify(scopeObject));
       //这里还要添加其他的字段
       console.log(formData.get("file"));
       this.axios
         .post("/GeoProblemSolving/resource/upload", formData)
         .then(res => {
-          if (res != "None") {
+          if (res == "Success") {
             this.$Notice.open({
               title: "Upload notification title",
               desc: "File uploaded successfully",
@@ -1092,7 +1114,7 @@ export default {
       this.axios
         .get(
           "/GeoProblemSolving/resource/inquiry" +
-            "?key=scopeId" +
+            "?key=scope.projectId" +
             "&value=" +
             this.$route.params.id
         )
@@ -1140,7 +1162,7 @@ export default {
       });
     },
     cutString(data, len) {
-      console.table(data);
+      // console.table(data);
       for (var i = 0; i < data.length; i++) {
         data[i].description = data[i].description.substring(0, len) + "...";
       }
@@ -1157,49 +1179,49 @@ export default {
       }
       // console.log("挡墙登陆的账户是:"+ sessionStorage.getItem("userId"));
     },
-    editModalShow(id){
+    editModalShow(id) {
       // this.
       this.editProjectModal = true;
       let editProjectInfo = this.currentProjectDetail;
-      console.log(typeof(editProjectInfo['tag']));
+      console.log(typeof editProjectInfo["tag"]);
       this.editTitle = editProjectInfo.title;
       this.editIntroduction = editProjectInfo.introduction;
       this.editDescription = editProjectInfo.description;
       this.editType = editProjectInfo.category;
-      this.editTags = editProjectInfo['tag'];
-      console.log("权限是："+ editProjectInfo.privacy);
+      this.editTags = editProjectInfo["tag"];
+      console.log("权限是：" + editProjectInfo.privacy);
       this.editPrivacy = editProjectInfo.privacy;
       this.editProjectId = editProjectInfo.projectId;
     },
-    editProjectSubmit(){
+    editProjectSubmit() {
       // 将项目变更的信息进行提交
       let projectEditForm = new URLSearchParams();
       //做一个判断
-      projectEditForm.append("title",this.editTitle);
-      projectEditForm.append("category",this.editType);
-      projectEditForm.append("introduction",this.editIntroduction);
-      projectEditForm.append("description",this.editDescription);
-      projectEditForm.append("tag",this.editTags);
-      projectEditForm.append("privacy",this.editPrivacy);
-      projectEditForm.append("projectId",this.editProjectId);
-      projectEditForm.append("managerId",this.$store.state.userId);
-      this.axios.post("http://localhost:8081/GeoProblemSolving/project/update ", projectEditForm)
-      .then(res=>{
-        // console.log(res.data);
-        // alert(res.data);
-        this.getProjectDetail();
-        // this.getManagerProjectList();
-      })
-      .catch(err=> {
-        console.log(err.data);
-      })
+      projectEditForm.append("title", this.editTitle);
+      projectEditForm.append("category", this.editType);
+      projectEditForm.append("introduction", this.editIntroduction);
+      projectEditForm.append("description", this.editDescription);
+      projectEditForm.append("tag", this.editTags);
+      projectEditForm.append("privacy", this.editPrivacy);
+      projectEditForm.append("projectId", this.editProjectId);
+      projectEditForm.append("managerId", this.$store.state.userId);
+      this.axios
+        .post("/GeoProblemSolving/project/update ", projectEditForm)
+        .then(res => {
+          // console.log(res.data);
+          // alert(res.data);
+          this.getProjectDetail();
+          // this.getManagerProjectList();
+        })
+        .catch(err => {
+          console.log(err.data);
+        });
     },
     // 判断项目详情页面是否具备编辑权限，根据userId与projectId来比较
-    judgeIsManager(projectManagerId){
-      if(projectManagerId === this.$store.state.userId){
+    judgeIsManager(projectManagerId) {
+      if (projectManagerId === this.$store.state.userId) {
         return true;
-      }
-      else{
+      } else {
         return false;
       }
     },
@@ -1210,9 +1232,9 @@ export default {
       // console.log("增添后的数组是：" + this.editTags);
     },
     // 删除指定的标签
-    deleteTag(index){
+    deleteTag(index) {
       this.editTags.splice(index, 1);
-    },
+    }
   }
 };
 </script>
