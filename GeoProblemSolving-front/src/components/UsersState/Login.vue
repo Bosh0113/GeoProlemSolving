@@ -71,17 +71,18 @@
               <div class="login-content">
                 <Form ref="formInline" :model="formInline" :rules="ruleInline" style="margin:25px">
                   <div>
-                    <FormItem prop="user" label="userName" :label-width="100">
+                    <FormItem prop="user" label="User Name" :label-width="100">
                       <Input
                         placeholder="Please input your username"
                         style="width: 90%"
                         v-model="formInline.user"
                         type="text"
+
                       />
                     </FormItem>
                   </div>
                   <br>
-                  <FormItem prop="password" label="password" :label-width="100">
+                  <FormItem prop="password" label="Password" :label-width="100">
                     <Input
                       placeholder="please input your password"
                       style="width: 90%"
@@ -89,12 +90,15 @@
                       type="password"
                     />
                   </FormItem>
+                  <div style="display:flex;text-align:center;justify-content:center">
+                    <Checkbox v-model="checked">Automatic login within one week</Checkbox>
+                  </div>
                   <br>
                   <FormItem>
                     <div style="display:flex;align-items:center;justify-content:center">
                       <Button
                         type="default"
-                        @click="handleSubmit('formInline')"
+                        @click="login('formInline')"
                         v-model="formInline.State"
 
                         class="loginBtn"
@@ -156,13 +160,15 @@ export default {
       },
       contentStyle:{
         height:""
-      }
+      },
+      checked:false,
     };
   },
   mounted() {
     this.contentStyle.height = window.innerHeight - 60 + "px";
     this.loginStyle.marginTop = window.innerHeight/5+ "px";
     console.log("loginStyle.marginTop是：" + this.loginStyle.marginTop);
+    this.getlocalStorage();
   },
   methods: {
     handleSubmit(name) {
@@ -198,11 +204,60 @@ export default {
         }
       });
     },
+    login(name) {
+      this.$refs[name].validate(valid => {
+        if (valid) {
+          if(this.checked == true){
+             localStorage.setItem("user",this.formInline.user);
+             localStorage.setItem("password",this.formInline.password);
+             localStorage.setItem("statusRecord",this.checked);
+            //  statusRecord
+          }else if(this.checked == false){
+            localStorage.setItem("user",'');
+            localStorage.setItem("password",'');
+            localStorage.setItem("statusRecord",false);
+          }
+          this.axios
+            .get(
+              "/GeoProblemSolving/user/login" +
+                "?email=" +
+                this.formInline.user +
+                "&password=" +
+                this.formInline.password
+            )
+            .then(res => {
+              console.log(res.data);
+              if (res.data === "Fail") {
+                this.$Message.error("Invalid account or password.");
+              } else {
+                this.$Message.success("Success!");
+                this.$store.commit("userLogin", {
+                  userName: res.data.userName,
+                  avatar: res.data.avatar,
+                  userId: res.data.userId
+                });
+                this.$router.go(-1);
+
+              }
+            });
+        } else {
+          this.$Message.error(
+            "If you don't have an account, you can regisetr one."
+          );
+        }
+      });
+    },
     register: function() {
       this.$router.push({ name: "Register" });
     },
     goHome() {
       this.$router.push({ name: "Home" });
+    },
+    getlocalStorage(){
+      this.formInline.user = localStorage.getItem("user");
+      this.formInline.password = localStorage.getItem("password");
+      // 将字符串格式的true转换为boolean模式的true
+      this.checked = eval(localStorage.getItem("statusRecord"));
     }
   }
 };

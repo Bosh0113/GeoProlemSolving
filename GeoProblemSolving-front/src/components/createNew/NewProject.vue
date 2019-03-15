@@ -292,7 +292,7 @@ export default {
       let description = this.$store.state.userName + ' created a ' + this.formInline.category + ' project called ' + this.formInline.title;
       form["description"] = description;
       form["scopeId"] = scopeId;
-      this.axios.post("/GeoProblemSolving/history/save?", "description="+ description + "&scopeId=" + scopeId)
+      this.axios.post("/GeoProblemSolving/history/save?", "description="+ description + "&scopeId=" + scopeId + "&userId=" + this.$store.state.userId)
           .then(res=> {
             console.log(res.data);
             if(res.data === 'Success'){

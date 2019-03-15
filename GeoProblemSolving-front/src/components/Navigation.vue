@@ -21,9 +21,11 @@
   width:20%;
   top: 0px;
   z-index: 1;
+
 }
 .navPart{
   width:85%;
+
 }
 </style>
 <template>
@@ -36,7 +38,8 @@
           theme="dark"
           active-name="home"
           @on-select="turnContent"
-          style="width:100%;z-index:0"
+          style="z-index:0"
+          width="auto"
         >
           <MenuItem name="home" class="menuItem" style="margin-left:30%">
             <span>Home</span>

@@ -1,181 +1,309 @@
 <style scoped>
-
-.sidebar {
-  /* width: 260px; */
-  margin: 0 10px;
-}
-.sidebarPanel {
-  padding: 20px;
-}
-.rightPart {
-  padding: 20px;
+.main {
   display: flex;
-  align-items: center;
+}
+.sidebarTree {
+  padding-top: 20px;
+  /* background-color: lightgreen; */
+  min-width: 250px;
+  margin-right: 20px;
+}
+.resourcePanel {
+  flex: 1;
 }
 .topPanel {
+  margin-top: 20px;
   display: flex;
-  height: 60px;
-  align-items: center;
+}
+.btnPanel {
+  flex: 1;
+  /* justify-content:flex-start; */
+}
+.btnPanel button {
+  margin-left: 20px;
 }
 .searchPanel {
+  /* flex:1; */
   display: flex;
-  height: 60px;
-  align-items: center;
   float: right;
-}
-.topPanel button {
-  margin: 0 2.5%;
-}
-.buttonPanel {
-  padding: 0 20px;
-  height: 60px;
-  /* background-color: aqua; */
-}
-.resourceList{
-  /* height:400px; */
-  padding: 0 20px;
-  /* background-color:lightblue; */
-}
-.whitespace{
-  height:20px;
+  /* justify-content:flex-end; */
 }
 </style>
+
 <template>
-  <div class="">
-    <Row>
-      <Col :lg="5" :md="6" :sm="8" :xs="10">
-        <div class="sidebar" >
-          <div class="sidebarPanel">
-            <Menu :theme="sidebarTheme" active-name="1" width="auto" :style="{height:sidebarHeight}">
-              <MenuGroup title="Resource Collection">
-                <MenuItem name="Image">
-                  <Icon type="md-image"/>Image
-                </MenuItem>
-                <MenuItem name="Video">
-                  <Icon type="md-videocam"/>Video
-                </MenuItem>
-                <MenuItem name="document">
-                  <Icon type="md-document"/>Document
-                </MenuItem>
-                <MenuItem name="data">
-                  <Icon type="md-analytics"/>Data
-                </MenuItem>
-                <MenuItem name="others">
-                  <Icon type="logo-xbox"/>Others
-                </MenuItem>
-              </MenuGroup>
-            </Menu>
+  <Row>
+    <Col span="22" offset="1">
+      <div class="main">
+        <div class="sidebarTree">
+          <Menu
+            :theme="sidebarTheme"
+            active-name="1"
+            width="auto"
+            :style="{height:sidebarTreeHeight}"
+            @on-select="onMenuSelect"
+          >
+            <MenuGroup title="Resource Collection">
+              <MenuItem name="image">
+                <Icon type="md-image"/>Image
+              </MenuItem>
+              <MenuItem name="video">
+                <Icon type="md-videocam"/>Video
+              </MenuItem>
+              <MenuItem name="data">
+                <Icon type="md-analytics"/>Data
+              </MenuItem>
+              <!-- <Icon type="md-paper" /> -->
+              <MenuItem name="paper">
+                <Icon type="md-paper"/>Paper
+              </MenuItem>
+              <MenuItem name="document">
+                <Icon type="md-document"/>Document
+              </MenuItem>
+              <!-- <Icon type="logo-dropbox" /> -->
+              <MenuItem name="model">
+                <Icon type="logo-dropbox"/>Model
+              </MenuItem>
+              <MenuItem name="others">
+                <Icon type="logo-xbox"/>Others
+              </MenuItem>
+            </MenuGroup>
+          </Menu>
+        </div>
+        <div class="resourcePanel">
+          <div class="topPanel">
+            <div class="btnPanel">
+              <Button type="primary" title="upload resource" @click="fileUploadModalShow()">
+                <Icon type="ios-cloud-upload-outline" :size="20"/>
+              </Button>
+              <Button type="success" title="download resource" >
+                <Icon type="ios-download-outline" :size="20"/>
+              </Button>
+            </div>
+            <!-- <div class="searchPanel">
+              <Input
+                v-model="searchResourceInput"
+                placeholder="Enter something..."
+                style="width:auto"
+              >
+                <Button slot="append" icon="ios-search"></Button>
+              </Input>
+            </div> -->
+          </div>
+          <div style="height:20px"></div>
+          <div class="resourcePanel">
+            <Row>
+              <Col span="22" offset="1">
+                <Table border ref="selection" :columns="resourceColumn" :data="specifiedResourceList"></Table>
+              </Col>
+            </Row>
+            <div style="height:20px"></div>
+            <!-- <Table border ref="selection" :columns="columns4" :data="data1"></Table> -->
           </div>
         </div>
-      </Col>
-      <Col :lg="{ span: 19 }" :md="{ span: 18}" :sm="{ span: 16}" :xs="{ span: 14}">
-          <div class="rightPart">
-            <Col :lg="{ span: 6 }" :md="{ span: 8}" :sm="{ span: 10}" :xs="{ span: 12}">
-              <div class="topPanel">
-                <Button type="primary" title="upload resource">
-                  <Icon type="ios-cloud-upload-outline" :size="20"/>
-                </Button>
-                <Button type="success" title="download resource">
-                  <Icon type="ios-download-outline" :size="20"/>
-                </Button>
-              </div>
-            </Col>
-            <Col :lg="{ span: 18 }" :md="{ span: 16}" :sm="{ span: 14}" :xs="{ span: 12}">
-              <div class="searchPanel">
-                <Input
-                  v-model="searchResourceInput"
-                  placeholder="Enter something..."
-                  style="width:auto"
-                >
-                  <Button slot="append" icon="ios-search"></Button>
-                </Input>
-              </div>
-            </Col>
-            <br>
+      </div>
+    </Col>
+    <Modal
+        v-model="uploadModal"
+        title="Upload resource"
+        @on-ok="submitFile()"
+        @on-cancel="cancel()"
+        ok-text="submit"
+        cancel-text="cancel"
+        :mask-closable="false"
+        width="600px"
+        >
+          <div style="display:flex;text-align:center;align-items:center;justify-content:center">
+            <!-- 这里定义上传的几种资源类型供用户选择 -->
+            <span style="width:20%">Type</span>
+            <RadioGroup v-model="fileType" style="width:80%">
+              <Radio label="image"></Radio>
+              <Radio label="video"></Radio>
+              <Radio label="data"></Radio>
+              <Radio label="paper"></Radio>
+              <Radio label="document"></Radio>
+              <Radio label="model"></Radio>
+              <Radio label="others"></Radio>
+            </RadioGroup>
+            <!-- 结束 -->
           </div>
-          <div class="resourceList">
-          <div class="whitespace"></div>
-          <Table border ref="selection" :columns="columns4" :data="data1"></Table>
-        </div>
-      </Col>
-    </Row>
-  </div>
+          <br>
+          <div style="display:flex;text-align:center;align-items:center;justify-content:center">
+            <span style="width:20%">Description</span>
+            <Input type="textarea" :rows="2" v-model="fileDescription"/>
+          </div>
+          <br>
+          <input type="file" @change="getFile($event)" style="margin-left:20%">
+    </Modal>
+  </Row>
+
 </template>
 <script>
 export default {
   data() {
     return {
-      sidebarHeight: "",
-      sidebarTheme: "light",
-      rightPartWidth: "",
-      // 表格的高度
-      tableHeight:"",
-      //资源输入框输入的变量
+      sidebarTreeHeight: "",
       searchResourceInput: "",
-      //关于表格的列表变量
-      columns4: [
-                    {
-                        type: 'selection',
-                        width: 60,
-                        align: 'center',
-                        "sortable": true,
-                    },
-                    {
-                        title: 'Name',
-                        key: 'name',
-                        "sortable": true,
-                    },
-                    {
-                        title: 'Size',
-                        key: 'size',
-                        "sortable": true,
-                    },
-                    {
-                        title: 'Time',
-                        key: 'time',
-                        "sortable": true,
-                    }
-                ],
-                data1: [
-                    {
-                        name: 'lake_scene',
-                        size: "1.2MB",
-                        address: 'New York No. 1 Lake Park',
-                        time: '2016-10-03'
-                    },
-                    {
-                        name: 'park_scene',
-                        size: "2.5MB",
-                        address: 'London No. 1 Lake Park',
-                        time: '2016-10-01'
-                    },
-                    {
-                        name: 'park_scene2',
-                        size: "3MB",
-                        address: 'Sydney No. 1 Lake Park',
-                        time: '2016-10-02'
-                    },
-                    {
-                        name: 'park_scene3',
-                        size: "1.5MB",
-                        address: 'Ottawa No. 2 Lake Park',
-                        time: '2016-10-04'
-                    }
-                ]
+      // 侧边栏的颜色主题
+      sidebarTheme: "light",
+      resourceColumn: [
+        {
+          type: "selection",
+          width: 60,
+          align: "center",
+          sortable: true
+        },
+        {
+          title: "Name",
+          key: "name",
+          sortable: true
+        },
+        {
+          title: "Description",
+          key: "description",
+          sortable: true
+        },
+        {
+          title: "Belong",
+          key: "belong",
+        },
+        {
+          title: "Type",
+          key: "type",
+          sortable: true
+        },
+        {
+          title: "Uploader",
+          key: "uploader"
+        },
+        {
+          title: "Uploader Time",
+          key: "uploadTime",
+          sortable: true
+        }
+      ],
+      specifiedResourceListPre: [],
+      uploaderArray: [],
+      specifiedResourceList: [],
+      // 上传文件的模态框
+      uploadModal: false,
+      file: "",
+      fileDescription: "",
+      fileType: "",
     };
   },
-  methods: {
-    initHeight(){
-      this.sidebarHeight = window.innerHeight - 100 + "px";
-      this.rightPartWidth = window.innerWidth - 260 + "px";
-      // this.tableHeight = window.innerHeight - 180 + "px"
-    },
-    handleSelectAll (status) {
-      this.$refs.selection.selectAll(status);
-    }
-  },
   created() {
-    this.initHeight();
+    this.initLayout();
+    this.onMenuSelect("image");
+  },
+  methods: {
+    initLayout() {
+      this.sidebarTreeHeight = window.innerHeight - 80 + "px";
+    },
+    onMenuSelect(name) {
+      this.uploaderArray = [];
+      this.specifiedResourceList = [];
+      this.axios
+        .get(
+          "/GeoProblemSolving/resource/inquiry" + "?key=type" + "&value=" + name
+        )
+        .then(res => {
+          if (res.data != "None") {
+            this.specifiedResourceListPre = res.data;
+            // console.table(this.specifiedResourceListPre);
+            let userIdList = this.specifiedResourceListPre.map(function(
+              resource
+            ) {
+              return resource.uploaderId;
+            });
+            // console.log(userIdList);
+            var that = this;
+            if (userIdList.length != 0) {
+              userIdList.forEach(function(value, k) {
+                that.axios
+                  .get(
+                    "/GeoProblemSolving/user/inquiry" +
+                      "?key=userId" +
+                      "&value=" +
+                      value
+                  )
+                  .then(res => {
+                    var userInfoArray = [];
+                    that.uploaderArray.push(res.data);
+                    if (
+                      that.specifiedResourceListPre.length ==
+                      that.uploaderArray.length
+                    ) {
+                      // this.getList(that.uploaderArray);
+                      that.uploaderArray.forEach(function(item) {
+                        userInfoArray.push({
+                          id: item.userId,
+                          name: item.userName,
+                          organization: item.organization
+                        });
+                      });
+                      console.log(userInfoArray);
+                      that.specifiedResourceListPre.forEach(function(list) {
+                        userInfoArray.forEach(item => {
+                          if (list.uploaderId == item.id) {
+                            list["uploader"] = item.name + "(" +item.organization + ")";
+                          }
+                        });
+                      });
+                      that.specifiedResourceList = that.specifiedResourceListPre;                    }
+                  })
+                  .catch(err => {});
+              });
+            }
+          }
+        });
+    },
+    handleSelectAll(status) {
+      this.$refs.selection.selectAll(status);
+    },
+    fileUploadModalShow(){
+      this.uploadModal = true;
+      // alert(this.$store.state.userId);
+    },
+    //上传文件
+    submitFile() {
+      let formData = new FormData();
+      // 向 formData 对象中添加文件
+      formData.append("file", this.file);
+      formData.append("description", this.fileDescription);
+      formData.append("type", this.fileType);
+      formData.append("uploaderId", this.$store.state.userId);
+      // 添加字段属于那个项目
+      formData.append("belong",this.$store.state.userName);
+      let scopeObject = {
+        projectId:"",
+        subprojectId:"",
+        moduleId:"",
+      };
+      formData.append("scope",JSON.stringify(scopeObject));
+      //这里还要添加其他的字段
+      console.log(formData.get("file"));
+      this.axios
+        .post("/GeoProblemSolving/resource/upload", formData)
+        .then(res => {
+          if (res != "None") {
+            this.$Notice.open({
+              title: "Upload notification title",
+              desc: "File uploaded successfully",
+              duration: 2
+            });
+            //这里重新获取一次该项目下的全部资源
+            this.addUploadEvent(this.currentProjectDetail.projectId);
+            this.getAllResource();
+            // 创建一个函数根据pid去后台查询该项目下的资源
+          }
+          // console.log(res.data);
+        })
+        .catch(err => {});
+    },
+    getFile(event) {
+      this.file = event.target.files[0];
+      console.log(this.file);
+    },
   }
 };
 </script>

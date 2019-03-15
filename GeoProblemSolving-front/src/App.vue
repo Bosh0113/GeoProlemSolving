@@ -4,7 +4,7 @@
     <BackTop></BackTop>
   </div>
 </template>
-<style>
+<style scoped>
 body{
   /* overflow: hidden; */
   /* overflow-y: scroll; */
@@ -19,5 +19,5 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 </style>

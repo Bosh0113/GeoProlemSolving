@@ -1,5 +1,7 @@
 <template>
-  <div class="help">
+<Row>
+  <Col span="22" offset="1">
+    <div class="help">
     <ul>
     	<li v-for="(item,index) in showList" :key='index'>
     		<h1>{{item.personName}}:<span>{{item.viewName}}</span>,{{item.Date}},{{item.reason}}{{item.adress}}</h1>
@@ -9,6 +11,9 @@
     <br>
     <br>
   </div>
+  </Col>
+</Row>
+
 </template>
 
 <script>

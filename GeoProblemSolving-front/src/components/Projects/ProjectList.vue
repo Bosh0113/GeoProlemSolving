@@ -52,7 +52,7 @@ img {
             />
           </div>
         </div>
-        <div style="width:30%;display:flex;justify-content:center;align-items:center">
+        <div style="width:30%;display:flex;justify-content:flex-end;align-items:center">
           <Button
               router-link
               :to="{path:'newproject'}"

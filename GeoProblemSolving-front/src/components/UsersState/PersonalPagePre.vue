@@ -185,10 +185,10 @@
               </Modal>
             </div>
           </div>
-          <div class="rightContent">
+          <div class="rightContent" :style="{width:rightContentWidth}">
             <Tabs value="Overview">
               <TabPane label="Overview" name="Overview">
-                <Col :lg="{span:22,offset:1}" :md="{span:22,offset:1}" :sm="{span:22,offset:1}">
+                <Col :lg="{span:12,offset:1}" :md="{span:12,offset:1}" :sm="{span:10,offset:1}">
                   <Card>
                     <p slot="title">History Line</p>
                     <Timeline style="margin-top:20px;margin-left:5%">
@@ -202,10 +202,10 @@
                   </Card>
                   <br>
                   <div>
-                    <!-- <Card>
+                    <Card>
                       <p slot="title">Resource List</p>
                       <Table :data="userResourceList" :columns="resourceColumn" class="table"></Table>
-                    </Card> -->
+                    </Card>
                   </div>
                 </Col>
               </TabPane>
@@ -421,7 +421,7 @@ export default {
     this.readPersonalEvent();
     this.getUserResource();
     this.detailSidebarHeight = window.innerHeight - 60 + "px";
-    // this.rightContentWidth = window.innerWidth - 270 + "px";
+    this.rightContentWidth = window.innerWidth - 270 + "px";
   },
   computed: {
     username() {
@@ -542,12 +542,13 @@ export default {
       joinedProjectsNameArray: [],
       //加入的项目详情数组列表
       joinedProjectsList: [],
+
       // 关于样式的变量定义
       detailSidebarHeight: "",
       // 用户event列表
       userEventList: [],
       userResourceList: [],
-      // rightContentWidth:"",
+      rightContentWidth:"",
     };
   },
   methods: {
@@ -997,6 +998,7 @@ body {
 }
 
 /* 新定义的样式 */
+
 .authorBtn:hover {
   background-color: #57a3f3;
   color: white;

@@ -25,9 +25,6 @@
   padding: 20px;
   max-height: 350px;
 }
-.detail_description p {
-  /* padding: 0 20px 0 20px; */
-}
 .projectDescription {
   text-indent: 2em;
   font-size: 16px;
@@ -151,11 +148,30 @@
   width: 20%;
   text-align: left;
 }
+
+/* 按钮样式统一 */
+.authorBtn:hover {
+  background-color: #57a3f3;
+  color: white;
+}
+.editBtn:hover {
+  background-color: #19be6b;
+  color: white;
+}
+.deleteBtn:hover {
+  background-color: #ed4014;
+  color: white;
+}
+.moreBtn:hover{
+  background-color: #57a3f3;
+  color: white;
+}
+/* 按钮样式统一结束 */
 </style>
 <template>
   <div class="main">
     <Row>
-      <Col span="20" offset="2">
+      <Col span="22" offset="1">
         <div class="whitespace"></div>
         <div class="whitespace"></div>
         <div class="detail" style="padding: 0 0 20px 0">
@@ -166,9 +182,12 @@
                 style="font-size:25px;height:40px;line-height:40px"
               >{{currentProjectDetail["title"]}}</p>
               <p slot="extra" style="height:40px;line-height:40px;">
-                <Button type="default" icon="md-brush" @click="editModalShow(currentProjectDetail['projectId'])" v-show="judgeIsManager(projectManager.userId)">
-                </Button>
-
+                <Button
+                  type="default"
+                  icon="md-brush"
+                  @click="editModalShow(currentProjectDetail['projectId'])"
+                  v-show="judgeIsManager(projectManager.userId)"
+                ></Button>
               </p>
               <Row>
                 <Col :xs="12" :sm="10" :md="9" :lg="8">
@@ -202,11 +221,7 @@
             <p slot="title" style="font-size:25px;height:40px;line-height:40px;">Members</p>
             <div slot="extra" style="height:40px" class="popCenter">
               <Poptip trigger="hover" content="Invite other members" placement="right">
-                <Button
-                  class="inviteBtn"
-                  v-show="isProjectManager"
-                  @click="inviteModalShow()"
-                >
+                <Button class="inviteBtn" v-show="isProjectManager" @click="inviteModalShow()">
                   <Icon type="md-person-add" size="20"/>
                 </Button>
               </Poptip>
@@ -348,8 +363,9 @@
                   <Col :lg="12" :md="24" :sm="24" :xs="24">
                     <Card class="subProjectStyle">
                       <Button
-                        type="primary"
+                        type="default"
                         slot="extra"
+                        class="authorBtn"
                         style="margin:-5px 5px 0 5px"
                         @click="handOverSubProjectShow(index)"
                         v-show="subProject.isManager"
@@ -357,7 +373,8 @@
                         title="Authorize"
                       ></Button>
                       <Button
-                        type="success"
+                        type="default"
+                        class="editBtn"
                         slot="extra"
                         style="margin:-5px 5px 0 5px"
                         @click="editSubProjectShow(index)"
@@ -366,7 +383,8 @@
                         title="edit"
                       ></Button>
                       <Button
-                        type="error"
+                        class="deleteBtn"
+                        type="default"
                         slot="extra"
                         style="margin:-5px 5px 0 5px"
                         @click="deleteSubProjectShow(index)"
@@ -477,13 +495,20 @@
           <Card>
             <p slot="title" style="font-size:25px;height:40px;line-height:40px;">Resource</p>
             <div slot="extra" style="display:flex;align-items:center;height:40px" class="popCenter">
-              <Poptip trigger="hover" content="upload new resource" placement="right">
-                <Button id="upload" type="default" @click="uploadFileModalShow()" class="uploadBtn">
-                <Icon type="md-cloud-upload" size="20"/>
-              </Button>
-            </Poptip>
+                <Button id="upload" type="default" @click="uploadFileModalShow()" class="uploadBtn" title="upload resource">
+                  <Icon type="md-cloud-upload" size="20"/>
+                </Button>
+              <Button
+                    class="moreBtn"
+                    type="default"
+                    style="margin-left: 10px"
+                    @click="toResourceList()"
+                    title="more"
+                  >
+                    <Icon type="md-more"/>
+                  </Button>
             </div>
-            <div>
+            <div style="height:300px;overflow-y:scroll">
               <Table
                 :columns="projectTableColName"
                 :data="this.projectResourceList"
@@ -499,8 +524,18 @@
                     style="margin-right: 5px"
                     :href="projectResourceList[index].pathURL"
                     @click="show(index)"
+                    title="download"
                   >
                     <Icon type="md-download"/>
+                  </Button>
+                  <Button
+                    type="warning"
+                    size="small"
+                    style="margin-right: 5px"
+                    @click=""
+                    title="View"
+                  >
+                  <Icon type="md-eye" />
                   </Button>
                 </template>
               </Table>
@@ -519,8 +554,18 @@
           :mask-closable="false"
         >
           <div style="display:flex;text-align:center;align-items:center;justify-content:center">
-            <span style="width:20%">Type</span>
-            <Input v-model="fileType"/>
+            <!-- 这里定义上传的几种资源类型供用户选择 -->
+            <span style="width:20%">File Type</span>
+            <RadioGroup v-model="fileType" style="width:80%">
+              <Radio label="image"></Radio>
+              <Radio label="video"></Radio>
+              <Radio label="data"></Radio>
+              <Radio label="paper"></Radio>
+              <Radio label="document"></Radio>
+              <Radio label="model"></Radio>
+              <Radio label="others"></Radio>
+            </RadioGroup>
+            <!-- 结束 -->
           </div>
           <br>
           <div style="display:flex;text-align:center;align-items:center;justify-content:center">
@@ -540,7 +585,7 @@
       @on-cancel="cancel"
       :mask-closable="false"
       width="900px"
-      >
+    >
       <div style="flex">
         <!-- <span>Category</span> -->
         <div class="editStyle">
@@ -597,7 +642,7 @@
           >Add Tag</Button>
           <!-- <div style="margin-left:5%">
             <Tag color="primary" @on-close="deleteTag(index)" v-show="editTags!=''">{{item}}</Tag>
-          </div> -->
+          </div>-->
         </div>
         <div style="width:80%;margin-left:20%">
           <Tag
@@ -699,29 +744,20 @@ export default {
         {
           title: "Name",
           key: "name",
-          width: 220
         },
         {
           title: "Description",
           key: "description",
-          width: 200
         },
         {
           title: "type",
           key: "type",
           sortable: true,
-          width: 100
         },
         {
           title: "uploadTime",
           key: "uploadTime",
           sortable: true,
-          width: 200
-        },
-        {
-          title: "uploaderId",
-          key: "uploaderId",
-          width: 200
         },
         {
           title: "Action",
@@ -731,7 +767,7 @@ export default {
         }
       ],
       // 关于控制项目编辑的模态框
-      editProjectModal: false
+      editProjectModal: false,
     };
   },
   created: function() {
@@ -927,7 +963,7 @@ export default {
       emailFormBody["mailContent"] = this.emailContent;
       console.log(emailFormBody);
       this.axios
-        .post("/GeoProblemSolving//email/send", emailFormBody)
+        .post("/GeoProblemSolving/email/send", emailFormBody)
         .then(res => {
           console.log(res.data);
         })
@@ -1080,13 +1116,14 @@ export default {
       formData.append("description", this.fileDescription);
       formData.append("type", this.fileType);
       formData.append("uploaderId", this.$store.state.userId);
-      formData.append("belong", "belong to project");
-      let scopeObject={
+      // 添加字段属于那个项目
+      formData.append("belong",this.currentProjectDetail.title);
+      let scopeObject = {
         projectId:this.currentProjectDetail.projectId,
-        subProjectId:"",
-        moduleId:""
+        subprojectId:"",
+        moduleId:"",
       };
-      formData.append("scope", JSON.stringify(scopeObject));
+      formData.append("scope",JSON.stringify(scopeObject));
       //这里还要添加其他的字段
       console.log(formData.get("file"));
       this.axios
@@ -1099,6 +1136,7 @@ export default {
               duration: 2
             });
             //这里重新获取一次该项目下的全部资源
+            this.addUploadEvent(this.currentProjectDetail.projectId);
             this.getAllResource();
             // 创建一个函数根据pid去后台查询该项目下的资源
           }
@@ -1206,7 +1244,7 @@ export default {
       projectEditForm.append("projectId", this.editProjectId);
       projectEditForm.append("managerId", this.$store.state.userId);
       this.axios
-        .post("http://localhost:8081/GeoProblemSolving/project/update ", projectEditForm)
+        .post("/GeoProblemSolving/project/update ", projectEditForm)
         .then(res => {
           // console.log(res.data);
           // alert(res.data);
@@ -1234,6 +1272,33 @@ export default {
     // 删除指定的标签
     deleteTag(index) {
       this.editTags.splice(index, 1);
+    },
+    toResourceList(){
+      this.$router.push({path:'/resourceList'})
+    },
+    addUploadEvent(scopeId){
+      let form = {};
+      let description = this.$store.state.userName + ' uploaded a ' + this.fileType + ' file in ' + ' project called ' + this.currentProjectDetail.title;
+      form["description"] = description;
+      form["scopeId"] = scopeId;
+      this.axios.post("/GeoProblemSolving/history/save?", "description="+ description + "&scopeId=" + scopeId + "&userId=" + this.$store.state.userId)
+          .then(res=> {
+            console.log(res.data);
+          })
+          .catch(err=> {
+            console.log(err.data);
+          })
+    },
+    getResourceList(){
+      this.axios.get(url, {
+        params: {
+          id:paramId
+        }
+      })
+      .then(function (response) {
+      })
+      .catch(function (error) {
+      })
     }
   }
 };

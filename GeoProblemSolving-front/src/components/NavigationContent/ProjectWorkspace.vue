@@ -155,8 +155,8 @@
   text-overflow: ellipsis;
   max-width: 120px;
 }
-.operatePanel button{
-  margin-right:2.5%
+.operatePanel button {
+  margin-right: 2.5%;
 }
 </style>
 <template>
@@ -166,24 +166,25 @@
         <Card>
           <p
             slot="title"
-            style="height:40px;line-height:40px;font-size:20px"
+            style="height:40px;line-height:40px;font-size:20px;"
           >{{subProjectInfo.title}}</p>
-          <div slot="extra" style="height:40px;display:flex;align-items:center" class="operatePanel">
-              <Button type="default" @click="addModal = true" icon="md-add" class="addBtn">Add</Button>
-              <Button
-                type="default"
-                @click="delModal = true"
-                icon="md-remove"
-                class="removeBtn"
-              >Remove</Button>
-              <Button type="default" @click="editModalShow()" icon="md-brush" class="editBtn">Edit</Button>
+          <div
+            slot="extra"
+            style="height:40px;display:flex;align-items:center"
+            class="operatePanel"
+          >
+          <Button type="default" @click="addModal = true" icon="md-add" class="addBtn">Add</Button>
+          <template v-if="moduleList.length <= 0 || currentModuleIndex == -1 || order == 0">
+            <Button type="default" @click="conveneWork()" icon="md-mail">Convene</Button>
+            <Button type="default" @click="back2Project(projectInfo.projectId)" icon="md-arrow-back">Back</Button>
+          </template>
+          <template v-else>
+            <Button type="default" @click="delModal = true" icon="md-remove" class="removeBtn" >Remove</Button>
+            <Button type="default" @click="editModalShow()" icon="md-brush" class="editBtn">Edit</Button>
+          </template>
           </div>
           <Row>
-            <Col
-              span="22"
-              offset="1"
-              style="margin-top:10px;background-color:white;padding-top:20px;padding-bottom:20px"
-            >
+            <Col span="22" offset="1" style="margin-top:10px;background-color:white;">
               <Steps :current="order">
                 <Step title="start" icon="ios-home" @click.native="showDetail(0)" :order="0"></Step>
                 <Step
@@ -195,29 +196,15 @@
                 ></Step>
               </Steps>
             </Col>
-            <!-- <Col span="4" offset="1" v-show="isSubProjectManager" style="margin-top:10px">
-              <Button type="default" @click="addModal = true" icon="md-add" class="addBtn">Add</Button>
-              <Button
-                type="default"
-                @click="delModal = true"
-                icon="md-remove"
-                class="removeBtn"
-              >Remove</Button>
-              <Button type="default" @click="editModalShow()" icon="md-brush" class="editBtn">Edit</Button>
-            </Col> -->
           </Row>
         </Card>
       </Col>
     </Row>
-
     <div
       v-if="moduleList.length <= 0 || currentModuleIndex == -1 || order == 0"
       class="workspaceContent"
     >
-
-
       <Row style="margin-top:20px">
-        <!-- <Col :xs="8" :sm="7" :md="6" :lg="5" v-bind="this.participants"> -->
         <Col :xs="8" :sm="7" :md="7" :lg="5" v-bind="this.participants" offset="1">
           <div
             class="member-panel"
@@ -368,25 +355,23 @@
             <div :style="{height:sidebarHeight-100+'px'}">
               <div class="member-desc" v-for="member in olParticipants" :key="member.id">
                 <template style="margin-top:5px">
-                  <div class="member-image">
+                  <div
+                    class="member-image"
+                    @click="gotoPersonalSpace(member.userId)"
+                    style="cursor:pointer"
+                  >
                     <img
                       v-if="member.avatar != ''"
                       :src="member.avatar"
                       style="width:auto;height:100%"
-                      @click="gotoPersonalSpace(member.userId)"
                     >
-                    <img
-                      v-else-if="member.gender == 'female'"
-                      src="@/assets/images/female.png"
-                      style="width:auto;height:100%"
-                      @click="gotoPersonalSpace(member.userId)"
-                    >
-                    <img
+                    <avatar
+                      :username="member.userName"
+                      :size="40"
+                      style="margin-top:10px"
+                      :title="member.userName"
                       v-else
-                      src="@/assets/images/male.png"
-                      style="width:auto;height:100%"
-                      @click="gotoPersonalSpace(member.userId)"
-                    >
+                    ></avatar>
                   </div>
                   <div class="memebr-work">
                     <div class="userName">
@@ -410,7 +395,7 @@
             :md="16"
             :lg="16"
             :style="{height:sidebarHeight/5*3+'px'}"
-            style="margin-bottom:20px;margin-left:60px;"
+            style="margin-bottom:20px;margin-left:50px;"
           >
             <div style="width:45%;height:100%;float:left;background-color:white">
               <h2 style="width:100%;padding:10px 10px 0 10px">{{currentModule.title}}</h2>
@@ -421,8 +406,7 @@
               style="width:50%;height:100%;float:right;border:1px solid lightgray;background-color:white;overflow-y:scroll"
             >
               <Timeline style="padding:10px">
-                <!-- <TimelineItem v-if="records.length > 3"><a href="#">More</a></TimelineItem> -->
-                <TimelineItem v-for="(item,index) in records" :key="index">
+                <TimelineItem v-for="(item,index) in allRecords[currentModuleIndex]" :key="index">
                   <template v-if="item.type == 'participants'">
                     <span class="time" style="color:blue">{{item.time}}</span>
                     <span class="time" style="color:blue; margin-left:10px">{{item.who}}</span>
@@ -455,7 +439,7 @@
         <template>
           <Col :xs="14" :sm="15" :md="16" :lg="17">
             <Row>
-              <Col span="22" offset="1" style="padding: 5px 0;background-color:white">
+              <Col span="22" style="margin-left:50px;padding: 5px 0;background-color:white">
                 <Row type="flex" justify="center">
                   <Col span="7">
                     <Card :padding="0" :border="false">
@@ -773,6 +757,8 @@ export default {
   },
   data() {
     return {
+      // information of project
+      projectInfo: [],
       // info of subproject --by mzy
       subProjectInfo: [],
       //登陆者身份
@@ -847,9 +833,11 @@ export default {
         who: "",
         content: ""
       },
-      records: [],
+      // 所有module的记录
+      allRecords: [],
       // 当前参与者
       olParticipants: [],
+      ofParticipants: [],
       // 消息
       socketMsg: {
         type: "",
@@ -880,19 +868,22 @@ export default {
       }
     });
   },
+  beforeRouteLeave(to, from, next) {
+    // this.removeTimer();
+    this.closeModuleSocket();
+    next();
+  },
   mounted: function() {
     window.addEventListener("resize", this.initSize);
   },
   beforeDestroy: function() {
     window.removeEventListener("resize", this.initSize);
-    if (this.moduleSocket != null) {
-      this.moduleSocket.close();
-    }
+    this.closeModuleSocket();
   },
   methods: {
     initSize() {
       //侧边栏的高度随着屏幕的高度自适应
-      this.sidebarHeight = window.innerHeight - 280;
+      this.sidebarHeight = window.innerHeight - 232;
       //通知栏的属性设置，top表示距离顶部的距离，duration表示持续的时间
       this.$Notice.config({
         top: 50,
@@ -915,6 +906,7 @@ export default {
           if (data != "None") {
             let subProjectInfo = data[0];
             this.$set(this, "subProjectInfo", subProjectInfo);
+
             this.managerIdentity(subProjectInfo.managerId);
             this.memberIdentity(subProjectInfo["members"]);
             let membersList = subProjectInfo["members"];
@@ -937,6 +929,24 @@ export default {
               });
             }
             that.$set(this, "participants", participantsTemp);
+
+            this.axios
+              .get(
+                "/GeoProblemSolving/project/inquiry" +
+                  "?key=projectId" +
+                  "&value=" +
+                  this.subProjectInfo.projectId
+              )
+              .then(res => {
+                if (res.data != "None" && res.data != "Fail") {
+                  this.projectInfo = res.data[0];
+                } else {
+                  console.log(res.data);
+                }
+              })
+              .catch(err => {
+                console.log(err.data);
+              });
           }
         },
         error: function(err) {
@@ -944,19 +954,6 @@ export default {
         }
       });
     },
-    // initHistory(){
-    //   this.records = [];
-    //   let that = this;
-    //   this.axios.get("http://localhost:8081/GeoProblemSolving/history/inquiry?scopeId="+this.currentModule.moduleId)
-    //     .then(res => {
-    //       if (res.data != "Fail") {
-    //         for(let i = 0; i<res.data.length;i++){
-    //           let tempRecords = JSON.parse(res.data[i].description);
-    //           that.records.push(tempRecords);
-    //         }
-    //       }
-    //     });
-    // },
     managerIdentity(managerId) {
       if (managerId === this.$store.state.userId) {
         this.isSubProjectManager = true;
@@ -982,7 +979,7 @@ export default {
         this.inquiryTask();
         this.order = item;
         this.openModuleSocket(this.currentModule.moduleId);
-        // this.initHistory();
+        this.olParticipants = [];
       }
     },
     closeModuleSocket() {
@@ -1005,7 +1002,6 @@ export default {
     // 更新人员，更新数据，更新records
     onMessage(e) {
       let messageJson = JSON.parse(e.data);
-      var userIndex = -1;
 
       if (messageJson.type == "online") {
         this.record.time = messageJson.createTime;
@@ -1015,36 +1011,29 @@ export default {
         this.record.content = "leave this module.";
       } else if (messageJson.type == "message") {
         let message = messageJson.message;
-        // 更新数据 --by mzy
+
+        // 任务记录
         if (
           message.type == "tasks" &&
           message.whoid != this.$store.state.userId
         ) {
           this.inquiryTask();
         }
+        // 资源记录
         if (
           message.type == "resources" &&
           message.whoid != this.$store.state.userId
         ) {
         }
+        // 工具记录
+        if (
+          message.type == "tools" &&
+          message.whoid != this.$store.state.userId
+        ) {
+        }
 
         // 更新records --by mzy
-        this.records.push(message);
-        // let History = {};
-        // History["scopeId"] = this.currentModule.moduleId;
-        // History["description"] = JSON.stringify(message);
-        // this.axios
-        //   .post("http://localhost:8081/GeoProblemSolving/history/save", "description="+ JSON.stringify(message) + "&scopeId=" + this.currentModule.moduleId)
-        //   .then(res => {
-        //     if (res.data === "Fail") {
-        //       this.$Message.info("Fail");
-        //     } else if(res.data === "Success") {
-        //       this.$Message.info("Success");
-        //     }
-        //   })
-        //   .catch(err => {
-        //     console.log(err.data);
-        //   });
+        this.allRecords[this.currentModuleIndex].push(message);
 
       } else if (messageJson.type == "members") {
         // 比较 判断人员动态 更新records --by mzy
@@ -1055,6 +1044,95 @@ export default {
           .replace(/\s/g, "")
           .split(",");
 
+        this.olParticipantChange(members, this.ofParticipant);
+
+        //records 更新
+        this.record.type = "participants";
+        this.allRecords[this.currentModuleIndex].push(this.record);
+      }
+    },
+    onClose(e) {
+      this.removeTimer();
+      console.log("ModuleSocket连接断开！");
+    },
+    onError(e) {
+      this.removeTimer();
+      console.log("ModuleSocket连接错误！");
+    },
+    setTimer() {
+      this.timer = setInterval(() => {
+        var messageJson = {};
+        messageJson["type"] = "ping";
+        messageJson["message"] = "ping";
+        this.moduleSocket.send(JSON.stringify(messageJson));
+      }, 20000);
+    },
+    removeTimer() {
+      clearInterval(this.timer);
+    },
+    sendMessage(message) {
+      var messageJson = {};
+      messageJson["type"] = "message";
+      messageJson["message"] = message;
+      this.moduleSocket.send(JSON.stringify(messageJson));
+    },
+    // send2Notice(){
+    //       for (let i = 0; i < this.ofParticipants.length; i++) {
+    //         let notice = {};
+    //         notice["recipientId"] = this.ofParticipants[i].userId;
+    //         notice["type"] = "research";
+    //         notice["content"] = {
+    //           moduleId: this.currentModule.moduleId,
+    //           subProjectId: this.subProjectInfo.subProjectId,
+    //           title: "Research Notice",
+    //           description:
+    //             "The " +
+    //             this.currentModule.type +
+    //             " module " +
+    //             this.currentModule.title +
+    //             " in sub-project " +
+    //             this.subProjectInfo.title +
+    //             " of project " +
+    //             this.projectInfo.title +
+    //             " in which you participate has new progress!"
+    //         };
+    //         this.axios
+    //           .post("/GeoProblemSolving/notice/save", notice)
+    //           .then(res => {
+    //             this.$Message.info("Apply Successfully");
+    //             this.$emit("sendNotice", data.managerId);
+    //           })
+    //           .catch(err => {
+    //             console.log("申请失败的原因是：" + err.data);
+    //           });
+    //       }
+    // },
+    olParticipantChange(members, callback) {
+      let userIndex = -1;
+
+      // 自己刚上线，olParticipants空
+      if (this.olParticipants.length == 0) {
+        var that = this;
+        for (let i = 0; i < members.length; i++) {
+          this.axios
+            .get(
+              "http://localhost:8081/GeoProblemSolving/user/inquiry" +
+                "?key=" +
+                "userId" +
+                "&value=" +
+                members[i]
+            )
+            .then(res => {
+              if (res.data != "None" && res.data != "Fail") {
+                that.olParticipants.push(res.data);
+                that.record.content =
+                  "welcome to here, " + that.$store.state.userName;
+              } else if (res.data == "None") {
+              }
+            });
+        }
+      } else {
+        // members大于olParticipants，有人上线；小于olParticipants，离线
         if (members.length > this.olParticipants.length) {
           for (let i = 0; i < members.length; i++) {
             for (var j = 0; j < this.olParticipants.length; j++) {
@@ -1067,23 +1145,9 @@ export default {
               break;
             }
           }
-        } else if (members.length < this.olParticipants.length) {
-          for (let i = 0; i < this.olParticipants.length; i++) {
-            for (var j = 0; j < members.length; j++) {
-              if (this.olParticipants[i].userId == members[j]) {
-                break;
-              }
-            }
-            if (j == members.length) {
-              userIndex = i;
-              break;
-            }
-          }
-        }
-        // 人员渲染 --by mzy
-        this.olParticipants = [];
-        var that = this;
-        for (let i = 0; i < members.length; i++) {
+
+          // 人员渲染 --by mzy
+          var that = this;
           this.axios
             .get(
               "http://localhost:8081/GeoProblemSolving/user/inquiry" +
@@ -1101,38 +1165,36 @@ export default {
               } else if (res.data == "None") {
               }
             });
+        } else if (members.length < this.olParticipants.length) {
+          for (let i = 0; i < this.olParticipants.length; i++) {
+            for (var j = 0; j < members.length; j++) {
+              if (this.olParticipants[i].userId == members[j]) {
+                break;
+              }
+            }
+            if (j == members.length) {
+              userIndex = i;
+              break;
+            }
+          }
+          this.record.who = this.olParticipants[userIndex].userName;
+          this.record.content = "leave this module";
+          delete this.olParticipants[userIndex];
         }
-        //records 更新
-        this.record.type = "participants";
-        this.records.push(this.record);
       }
+      callback(members);
     },
-    onClose(e) {
-      this.removeTimer();
-      console.log("ModuleSocket连接断开！");
-    },
-    onError(e) {
-      this.removeTimer();
-      console.log("ModuleSocket连接错误！");
-    },
-    setTimer() {
-      this.timer = setInterval(() => {
-        var messageJson = {};
-        messageJson["type"] = "ping";
-        messageJson["message"] = "ping";
-        if(this.moduleSocket!=undefined){
-          this.moduleSocket.send(JSON.stringify(messageJson));
-        }
-      }, 20000);
-    },
-    removeTimer() {
-      clearInterval(this.timer);
-    },
-    sendMessage(message) {
-      var messageJson = {};
-      messageJson["type"] = "message";
-      messageJson["message"] = message;
-      this.moduleSocket.send(JSON.stringify(messageJson));
+    ofParticipant(olPersons) {
+      // this.ofParticipants = [];
+      // for (let i = 0; i < this.participants.length; i++) {
+      //   for (var j = 0; j < olPersons.length; j++) {
+      //     this.participants[i].userId == olPersons[j];
+      //     break;
+      //   }
+      //   if (j == olPersons.length) {
+      //     this.ofParticipants.push(this.participants[i]);
+      //   }
+      // }
     },
     getAllModules() {
       //这里重写以下获取module
@@ -1140,7 +1202,10 @@ export default {
       sessionStorage.setItem("subProjectId", this.$route.params.id);
       this.axios
         .get(
-          "/GeoProblemSolving/module/inquiry" + "?key=subProjectId" + "&value=" + subProjectId
+          "/GeoProblemSolving/module/inquiry" +
+            "?key=subProjectId" +
+            "&value=" +
+            subProjectId
         )
         .then(res => {
           if (res.data != "None") {
@@ -1148,6 +1213,12 @@ export default {
             this.currentModule = this.moduleList[0];
             if (this.currentModule != "") {
               this.inquiryTask();
+            }
+
+            // init allRecords
+            for (let i = 0; i < this.moduleList.length; i++) {
+              let records = [];
+              this.allRecords.push(records);
             }
           } else if (res.data == "None") {
             // this.$Message.info("There are no moduldes in this sub project,click create button to create one")
@@ -1203,6 +1274,14 @@ export default {
       this.updateModuleTitle = this.moduleList[order].title;
       this.updateModuleType = this.moduleList[order].type;
       this.updateModuleDescription = this.moduleList[order].description;
+    },
+    // 返回项目页
+    back2Project(id){
+      this.$router.push( `../${id}`);
+    },
+    // 召集参与者
+    conveneWork(){
+
     },
     //更新模块的函数
     updateModule() {
@@ -1267,49 +1346,33 @@ export default {
       let that = this;
       this.candidates = [];
       this.inviteList = [];
-      this.axios
-        .get(
-          "/GeoProblemSolving/project/inquiry" +
-            "?key=projectId" +
-            "&value=" +
-            sessionStorage.getItem("projectId")
-        )
-        .then(res => {
-          if (res.data != "None" && res.data != "Fail") {
-            let allMembers = res.data[0].members;
-            $.ajax({
-              url:
-                "/GeoProblemSolving/user/inquiry" +
-                "?key=" +
-                "userId" +
-                "&value=" +
-                res.data[0].managerId,
-              type: "GET",
-              async: false,
-              success: function(data) {
-                let manager = { userName: data.userName, userId: data.userId };
-                allMembers.unshift(manager);
-              }
-            });
-            for (let i = 0; i < allMembers.length; i++) {
-              let exist = false;
-              for (let j = 0; j < that.participants.length; j++) {
-                if (allMembers[i].userId === that.participants[j].userId) {
-                  exist = true;
-                }
-              }
-              if (!exist) {
-                that.candidates.push(allMembers[i]);
-              }
-            }
-            this.inviteModal = true;
-          } else {
-            console.log(res.data);
+      let allMembers = this.projectInfo.members;
+      $.ajax({
+        url:
+          "/GeoProblemSolving/user/inquiry" +
+          "?key=" +
+          "userId" +
+          "&value=" +
+          this.projectInfo.managerId,
+        type: "GET",
+        async: false,
+        success: function(data) {
+          let manager = { userName: data.userName, userId: data.userId };
+          allMembers.unshift(manager);
+        }
+      });
+      for (let i = 0; i < allMembers.length; i++) {
+        let exist = false;
+        for (let j = 0; j < that.participants.length; j++) {
+          if (allMembers[i].userId === that.participants[j].userId) {
+            exist = true;
           }
-        })
-        .catch(err => {
-          console.log(err.data);
-        });
+        }
+        if (!exist) {
+          that.candidates.push(allMembers[i]);
+        }
+      }
+      this.inviteModal = true;
     },
     inviteMembers() {
       for (let i = 0; i < this.inviteList.length; i++) {
@@ -1457,7 +1520,9 @@ export default {
       // /task/inquiry
       this.axios
         .get(
-          "/GeoProblemSolving/task/inquiryTodo?" + "moduleId=" + this.currentModule.moduleId
+          "/GeoProblemSolving/task/inquiryTodo?" +
+            "moduleId=" +
+            this.currentModule.moduleId
         )
         .then(res => {
           if (res.data != "None" && res.data != "Fail") {
@@ -1471,7 +1536,9 @@ export default {
         });
       this.axios
         .get(
-          "/GeoProblemSolving/task/inquiryDoing?" + "moduleId=" + this.currentModule.moduleId
+          "/GeoProblemSolving/task/inquiryDoing?" +
+            "moduleId=" +
+            this.currentModule.moduleId
         )
         .then(res => {
           if (res.data != "None" && res.data != "Fail") {
@@ -1485,7 +1552,9 @@ export default {
         });
       this.axios
         .get(
-          "/GeoProblemSolving/task/inquiryDone?" + "moduleId=" + this.currentModule.moduleId
+          "/GeoProblemSolving/task/inquiryDone?" +
+            "moduleId=" +
+            this.currentModule.moduleId
         )
         .then(res => {
           if (res.data != "None" && res.data != "Fail") {
@@ -1529,7 +1598,11 @@ export default {
     },
     taskRemove(index, taskList) {
       this.axios
-        .get("/GeoProblemSolving/task/delete" + "?taskId=" + taskList[index]["taskId"])
+        .get(
+          "/GeoProblemSolving/task/delete" +
+            "?taskId=" +
+            taskList[index]["taskId"]
+        )
         .then(res => {
           if (res.data == "Success") {
             taskList.splice(index, 1);
