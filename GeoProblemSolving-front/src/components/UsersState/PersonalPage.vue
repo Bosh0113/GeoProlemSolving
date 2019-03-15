@@ -558,7 +558,7 @@ export default {
     getUserProfile() {
       this.axios
         .get(
-          "/api/user/inquiry" +
+          "/GeoProblemSolving/user/inquiry" +
             "?key=userId" +
             "&value=" +
             this.userId
@@ -583,7 +583,7 @@ export default {
       for (let i = 0; i < projectIds.length; i++) {
         this.axios
           .get(
-            "http://localhost:8081/project/inquiry" +
+            "http://localhost:8081/GeoProblemSolving/project/inquiry" +
               "?key=projectId" +
               "&value=" +
               projectIds[i].projectId
@@ -607,7 +607,7 @@ export default {
     getManagerProjectList() {
       this.axios
         .get(
-          "/api/project/inquiry" +
+          "/GeoProblemSolving/project/inquiry" +
             "?key=managerId" +
             "&value=" +
             this.userId
@@ -626,7 +626,7 @@ export default {
       quitData.append("ProjectID", "");
       quitData.append("UserName", this.state.username);
       this.axios
-        .post("/api/TeamModeling/QuitProjectServlet", quitData)
+        .post("/GeoProblemSolving/TeamModeling/QuitProjectServlet", quitData)
         .then(res => {
           if (res.data === "Success") {
             this.$Message.success("Quit Success");
@@ -644,7 +644,7 @@ export default {
     logOutAccount() {
       this.axios
         .get(
-          "/api/user/remove?" +
+          "/GeoProblemSolving/user/remove?" +
             "userId=" +
             this.$store.state.userId
         )
@@ -680,7 +680,7 @@ export default {
       // }
       this.axios
         .get(
-          "/api/project/manager?" +
+          "/GeoProblemSolving/project/manager?" +
             "projectId=" +
             this.currentProjectId +
             "&newManagerId=" +
@@ -716,7 +716,7 @@ export default {
       ].projectId;
       this.axios
         .get(
-          "/api/project/delete?" +
+          "/GeoProblemSolving/project/delete?" +
             "projectId=" +
             selectProjectId
         )
@@ -745,7 +745,7 @@ export default {
       projectEditForm.append("tag",this.editTags);
       projectEditForm.append("privacy",this.editPrivacy);
       projectEditForm.append("projectId",this.editProjectId);
-      this.axios.post("/api/project/update", projectEditForm)
+      this.axios.post("/GeoProblemSolving/project/update", projectEditForm)
       .then(res=>{
         console.log(res.data);
         alert(res.data);
@@ -815,7 +815,7 @@ export default {
         }
       }
       this.axios
-          .post("/api/user/update", changedProfile)
+          .post("/GeoProblemSolving/user/update", changedProfile)
           .then(res => {
             if (res.data === "Success") {
               // this.drawerClose = true;

@@ -331,7 +331,7 @@ export default {
     getSpecificTypeProjects(data) {
       this.axios
         .get(
-          "/api/project/inquiry" +
+          "/GeoProblemSolving/project/inquiry" +
             "?key=" +
             data["key"] +
             "&value=" +
@@ -357,7 +357,7 @@ export default {
     joinProject(tab) {
       this.axios
         .get(
-          "/api/project/join?" +
+          "/GeoProblemSolving/project/join?" +
             "projectId=" +
             this.joinProjectId +
             "&userId=" +
@@ -406,7 +406,7 @@ export default {
         for (var i = 0, n = 0; i < projectList.length; i++) {
           $.ajax({
             url:
-              "/api/user/inquiry" +
+              "/GeoProblemSolving/user/inquiry" +
               "?key=" +
               "userId" +
               "&value=" +
@@ -478,7 +478,7 @@ export default {
         approve: "unknow"
       };
       this.axios
-        .post("/api/notice/save", joinForm)
+        .post("/GeoProblemSolving/notice/save", joinForm)
         .then(res => {
           this.$Message.info("Apply Successfully");
           this.$emit("sendNotice", data.managerId);

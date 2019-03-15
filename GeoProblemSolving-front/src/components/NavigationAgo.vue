@@ -173,7 +173,7 @@ export default {
       //get请求发送的是用户id
       this.axios
         .get(
-          "/api/notice/inquiry" +
+          "/GeoProblemSolving/notice/inquiry" +
             "?key=recipientId" +
             "&value=" +
             this.$store.state.userId
@@ -194,7 +194,7 @@ export default {
         });
     },
     initWebSocket() {
-      var noticeSocketURL = "ws://localhost:8081/NoticeSocket";
+      var noticeSocketURL = "ws://localhost:8081/GeoProblemSolving/NoticeSocket";
       this.noticeSocket = new WebSocket(noticeSocketURL);
       this.noticeSocket.onopen = this.onOpen;
       this.noticeSocket.onmessage = this.onMessage;
@@ -241,7 +241,7 @@ export default {
     changeSelect(name) {
       if (name == "logout") {
         this.axios
-          .get("/api/user/logout")
+          .get("/GeoProblemSolving/user/logout")
           .then(res => {
             this.$store.commit("userLogout");
             this.noticeSocket.close();
