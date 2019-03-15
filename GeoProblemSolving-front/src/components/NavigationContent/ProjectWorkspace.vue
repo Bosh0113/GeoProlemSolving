@@ -944,23 +944,6 @@ export default {
         }
       });
     },
-    initHistory() {
-      this.records = [];
-      let that = this;
-      this.axios
-        .get(
-          "http://localhost:8081/GeoProblemSolving/history/inquiry?scopeId=" +
-            this.currentModule.moduleId
-        )
-        .then(res => {
-          if (res.data != "Fail") {
-            for (let i = 0; i < res.data.length; i++) {
-              let tempRecords = JSON.parse(res.data[i].description);
-              that.records.push(tempRecords);
-            }
-          }
-        });
-    },
     managerIdentity(managerId) {
       if (managerId === this.$store.state.userId) {
         this.isSubProjectManager = true;

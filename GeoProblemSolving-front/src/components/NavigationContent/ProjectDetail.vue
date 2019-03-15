@@ -723,36 +723,6 @@ export default {
       file: "",
       fileDescription: "",
       fileType: "",
-      selectionList: [
-        {
-          value: "image",
-          label: "image"
-        },
-        {
-          value: "video",
-          label: "video"
-        },
-        {
-          value: "data",
-          label: "data"
-        },
-        {
-          value: "paper",
-          label: "paper"
-        },
-        {
-          value: "document",
-          label: "document"
-        },
-        {
-          value: "model",
-          label: "model"
-        },
-        {
-          value: "others",
-          label: "others"
-        }
-      ],
       //获取的资源的列表
       projectResourceList: [],
       projectTableColName: [
@@ -1132,7 +1102,14 @@ export default {
       formData.append("description", this.fileDescription);
       formData.append("type", this.fileType);
       formData.append("uploaderId", this.$store.state.userId);
-      formData.append("scopeId", this.currentProjectDetail.projectId);
+      // 添加字段属于那个项目
+      formData.append("belong",this.currentProjectDetail.title);
+      let scopeObject = {
+        projectId:this.currentProjectDetail.projectId,
+        subprojectId:"",
+        moduleId:"",
+      };
+      formData.append("scope",JSON.stringify(scopeObject));
       //这里还要添加其他的字段
       console.log(formData.get("file"));
       this.axios
@@ -1161,7 +1138,7 @@ export default {
       this.axios
         .get(
           "/GeoProblemSolving/resource/inquiry" +
-            "?key=scopeId" +
+            "?key=scope.projectId" +
             "&value=" +
             this.$route.params.id
         )

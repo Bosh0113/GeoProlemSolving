@@ -72,10 +72,10 @@
         <div class="resourcePanel">
           <div class="topPanel">
             <div class="btnPanel">
-              <Button type="primary" title="upload resource">
+              <Button type="primary" title="upload resource" @click="fileUploadModalShow()">
                 <Icon type="ios-cloud-upload-outline" :size="20"/>
               </Button>
-              <Button type="success" title="download resource">
+              <Button type="success" title="download resource" >
                 <Icon type="ios-download-outline" :size="20"/>
               </Button>
             </div>
@@ -89,15 +89,53 @@
               </Input>
             </div> -->
           </div>
+          <div style="height:20px"></div>
           <div class="resourcePanel">
+            <Row>
+              <Col span="22" offset="1">
+                <Table border ref="selection" :columns="resourceColumn" :data="specifiedResourceList"></Table>
+              </Col>
+            </Row>
             <div style="height:20px"></div>
             <!-- <Table border ref="selection" :columns="columns4" :data="data1"></Table> -->
-            <Table border ref="selection" :columns="resourceColumn" :data="specifiedResourceList"></Table>
           </div>
         </div>
       </div>
     </Col>
+    <Modal
+        v-model="uploadModal"
+        title="Upload resource"
+        @on-ok="submitFile()"
+        @on-cancel="cancel()"
+        ok-text="submit"
+        cancel-text="cancel"
+        :mask-closable="false"
+        width="600px"
+        >
+          <div style="display:flex;text-align:center;align-items:center;justify-content:center">
+            <!-- 这里定义上传的几种资源类型供用户选择 -->
+            <span style="width:20%">Type</span>
+            <RadioGroup v-model="fileType" style="width:80%">
+              <Radio label="image"></Radio>
+              <Radio label="video"></Radio>
+              <Radio label="data"></Radio>
+              <Radio label="paper"></Radio>
+              <Radio label="document"></Radio>
+              <Radio label="model"></Radio>
+              <Radio label="others"></Radio>
+            </RadioGroup>
+            <!-- 结束 -->
+          </div>
+          <br>
+          <div style="display:flex;text-align:center;align-items:center;justify-content:center">
+            <span style="width:20%">Description</span>
+            <Input type="textarea" :rows="2" v-model="fileDescription"/>
+          </div>
+          <br>
+          <input type="file" @change="getFile($event)" style="margin-left:20%">
+    </Modal>
   </Row>
+
 </template>
 <script>
 export default {
@@ -125,13 +163,12 @@ export default {
           sortable: true
         },
         {
-          title: "Type",
-          key: "type",
-          sortable: true
+          title: "Belong",
+          key: "belong",
         },
         {
-          title: "FileSize",
-          key: "fileSize",
+          title: "Type",
+          key: "type",
           sortable: true
         },
         {
@@ -146,7 +183,12 @@ export default {
       ],
       specifiedResourceListPre: [],
       uploaderArray: [],
-      specifiedResourceList: []
+      specifiedResourceList: [],
+      // 上传文件的模态框
+      uploadModal: false,
+      file: "",
+      fileDescription: "",
+      fileType: "",
     };
   },
   created() {
@@ -217,6 +259,50 @@ export default {
     },
     handleSelectAll(status) {
       this.$refs.selection.selectAll(status);
+    },
+    fileUploadModalShow(){
+      this.uploadModal = true;
+      // alert(this.$store.state.userId);
+    },
+    //上传文件
+    submitFile() {
+      let formData = new FormData();
+      // 向 formData 对象中添加文件
+      formData.append("file", this.file);
+      formData.append("description", this.fileDescription);
+      formData.append("type", this.fileType);
+      formData.append("uploaderId", this.$store.state.userId);
+      // 添加字段属于那个项目
+      formData.append("belong",this.$store.state.userName);
+      let scopeObject = {
+        projectId:"",
+        subprojectId:"",
+        moduleId:"",
+      };
+      formData.append("scope",JSON.stringify(scopeObject));
+      //这里还要添加其他的字段
+      console.log(formData.get("file"));
+      this.axios
+        .post("/GeoProblemSolving/resource/upload", formData)
+        .then(res => {
+          if (res != "None") {
+            this.$Notice.open({
+              title: "Upload notification title",
+              desc: "File uploaded successfully",
+              duration: 2
+            });
+            //这里重新获取一次该项目下的全部资源
+            this.addUploadEvent(this.currentProjectDetail.projectId);
+            this.getAllResource();
+            // 创建一个函数根据pid去后台查询该项目下的资源
+          }
+          // console.log(res.data);
+        })
+        .catch(err => {});
+    },
+    getFile(event) {
+      this.file = event.target.files[0];
+      console.log(this.file);
     },
   }
 };

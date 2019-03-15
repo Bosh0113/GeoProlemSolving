@@ -45,7 +45,9 @@
 </style>
 <template>
 <div>
-  <h1>Notifications</h1>
+  <Row>
+    <Col span="22" offset="1">
+      <h1>Notifications</h1>
   <Tabs type="card" value="notice" style="margin:20px 0">
     <TabPane :label="noticeTab" name="notice">
       <Card>
@@ -131,6 +133,9 @@
       </Card>
     </TabPane>
   </Tabs>
+    </Col>
+  </Row>
+
 </div>
 </template>
 <script>

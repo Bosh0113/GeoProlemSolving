@@ -7,7 +7,6 @@
             <div class="user-img">
               <img v-bind:src="userDetail.avatar" class="u_img">
             </div>
-
             <div style="text-align:center">
               <div class="single-info">{{userDetail.userName}}</div>
               <br>
@@ -189,22 +188,26 @@
           <div class="rightContent">
             <Tabs value="Overview">
               <TabPane label="Overview" name="Overview">
-                <Col span="12" offset="1">
-                  <div class="user-history">
-                  <Timeline style="margin-top:20px;margin-left:5%" >
-                    <TimelineItem v-for="(item,index) in userEventList" :key="index">
-                      <strong><p class="time">{{item.createTime}}</p></strong>
-                      <p class="content">{{item.description}}</p>
-                    </TimelineItem>
-                  </Timeline>
-                </div>
-                <div span="12" offset="1" class="user-data">
-                  <Table :columns="columns1" :data="data1"></Table>
-                  <Button type="primary" style="float:right;margin:20px">More</Button>
-                </div>
+                <Col :lg="{span:22,offset:1}" :md="{span:22,offset:1}" :sm="{span:22,offset:1}">
+                  <Card>
+                    <p slot="title">History Line</p>
+                    <Timeline style="margin-top:20px;margin-left:5%">
+                      <TimelineItem v-for="(item,index) in userEventList" :key="index">
+                        <strong>
+                          <p class="time">{{item.createTime}}</p>
+                        </strong>
+                        <p class="content">{{item.description}}</p>
+                      </TimelineItem>
+                    </Timeline>
+                  </Card>
+                  <br>
+                  <div>
+                    <!-- <Card>
+                      <p slot="title">Resource List</p>
+                      <Table :data="userResourceList" :columns="resourceColumn" class="table"></Table>
+                    </Card> -->
+                  </div>
                 </Col>
-
-
               </TabPane>
               <TabPane label="Participatory Project" name="Participatory">
                 <div
@@ -220,11 +223,9 @@
                         class="projectsTitle"
                         @click="goSingleProject(item.projectId)"
                       >{{item.title}}</p>
-                      <!-- <p>{{item.description}}</p> -->
                       <p
                         style="height:200px;text-indent:2em;overflow-y:scroll"
                       >{{item.introduction}}</p>
-                      <!-- <hr> -->
                       <br>
                       <div style="height:40px">
                         <span style="float:left">CreateTime:</span>
@@ -287,14 +288,6 @@
                 </div>
               </TabPane>
             </Tabs>
-            <div>
-              <div class="user-contribution">
-                <Row>
-                  <Col span="23" offset="1"></Col>
-                  <br>
-                </Row>
-              </div>
-            </div>
           </div>
         </div>
       </Col>
@@ -426,7 +419,9 @@ export default {
     this.getUserProfile();
     this.getManagerProjectList();
     this.readPersonalEvent();
+    this.getUserResource();
     this.detailSidebarHeight = window.innerHeight - 60 + "px";
+    // this.rightContentWidth = window.innerWidth - 270 + "px";
   },
   computed: {
     username() {
@@ -464,47 +459,27 @@ export default {
         avatar: ""
       },
       errors: {},
-      columns1: [
+      resourceColumn: [
+        {
+          type: "selection",
+          width: 60,
+          align: "center",
+        },
         {
           title: "Name",
-          key: "name"
+          key: "name",
+          sortable: true,
         },
         {
           title: "Type",
-          key: "type"
+          key: "type",
         },
         {
-          title: "Date",
-          key: "date"
+          title: "Time",
+          key: "uploadTime",
+          sortable: true,
         }
       ],
-      data1: [
-        {
-          name: "01.png",
-          type: "png",
-          address: "New York No. 1 Lake Park",
-          date: "2018-07-12"
-        },
-        {
-          name: "description.docx",
-          type: "file",
-          address: "London No. 1 Lake Park",
-          date: "2018-07-12"
-        },
-        {
-          name: "conceptModel.xml",
-          type: "xml file",
-          address: "Sydney No. 1 Lake Park",
-          date: "2018-07-21"
-        },
-        {
-          name: "conceptModel.png",
-          type: "png",
-          address: "Ottawa No. 2 Lake Park",
-          date: "2018-07-22"
-        }
-      ],
-      msg: "Welcome to PersonalPage",
       userManagerProjectList: [
         {
           title: "",
@@ -567,11 +542,12 @@ export default {
       joinedProjectsNameArray: [],
       //加入的项目详情数组列表
       joinedProjectsList: [],
-
       // 关于样式的变量定义
       detailSidebarHeight: "",
       // 用户event列表
-      userEventList:[],
+      userEventList: [],
+      userResourceList: [],
+      // rightContentWidth:"",
     };
   },
   methods: {
@@ -835,21 +811,54 @@ export default {
     },
     //获取个人上传的全部资源的函数
     getUserFile() {},
-    readPersonalEvent(){
-      this.axios.get("/GeoProblemSolving/history/inquiry?" + "key=userId" + "&value=" + this.$store.state.userId)
-      .then(res=> {
-        this.userEventList = res.data;
-        console.table(result);
-      })
-      .catch(err=> {
-        console.log(err.data);
-      })
+    readPersonalEvent() {
+      this.axios
+        .get(
+          "/GeoProblemSolving/history/inquiry?" +
+            "key=userId" +
+            "&value=" +
+            this.$store.state.userId
+        )
+        .then(res => {
+          this.userEventList = res.data;
+          console.table(result);
+        })
+        .catch(err => {
+          console.log(err.data);
+        });
+    },
+    getUserResource() {
+      this.axios
+        .get(
+          "/GeoProblemSolving/resource/inquiry" +
+            "?key=uploaderId" +
+            "&value=" +
+            this.$store.state.userId
+        )
+        .then(res => {
+          this.userResourceList = res.data;
+          console.table(this.userResourceList);
+        })
+        .catch(err => {
+          console.log(err.data);
+        });
     }
   }
 };
 </script>
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.mainPanel {
+  display: flex;
+}
+.detailSidebar {
+  min-width: 250px;
+  max-width: 300px;
+  margin-right: 20px;
+}
+.rightContent {
+  flex: 1;
+}
 img {
   padding: 10px;
   max-width: 100%;
@@ -905,7 +914,8 @@ body {
 .user-data {
   margin-top: 20px;
   border: 1px solid black;
-  height: 300px;
+  max-height: 300px;
+  overflow-y: scroll;
 }
 
 /* 表示空格间距的 */
@@ -987,17 +997,7 @@ body {
 }
 
 /* 新定义的样式 */
-.mainPanel {
-  display: flex;
-}
-.detailSidebar {
-  min-width: 250px;
-  max-width: 300px;
-  margin-right: 20px;
-}
-.rightContent {
-  flex: 1;
-}
+
 .authorBtn:hover {
   background-color: #57a3f3;
   color: white;
@@ -1009,5 +1009,9 @@ body {
 .deleteBtn:hover {
   background-color: #ed4014;
   color: white;
+}
+.table table{
+  table-layout: auto;
+  width: 100% !important;
 }
 </style>
