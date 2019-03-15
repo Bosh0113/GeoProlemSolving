@@ -7,6 +7,16 @@ img {
 .whitespace {
   height: 20px;
 }
+.projectTitle{
+  height:40px;
+  line-height:40px;
+  font-size:20px;
+  max-width:200px;
+  display:inline-block;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
 /* title标题悬浮时出现下划线且变色 */
 .projectTitle:hover {
   text-decoration: underline;
@@ -120,12 +130,11 @@ img {
             v-if="item.privacy=='Public'"
           >
             <Card style="height:auto;margin:20px 0 20px 0">
-              <p
+              <span
                 slot="title"
                 @click="goSingleProject(item.projectId)"
                 class="projectTitle"
-                style="height:40px;line-height:40px;font-size:20px;width:80%"
-              >{{item.title}}</p>
+              >{{item.title}}</span>
               <div
                 class="operate"
                 slot="extra"
@@ -150,7 +159,7 @@ img {
 
               <div style="display:flex;align-items:center;height:60px">
                 <Tag color="primary">Description</Tag>
-                <p style="padding: 0 10px">{{item.description}}</p>
+                <p style="padding: 0 10px;word-break:break-word">{{item.description}}</p>
               </div>
               <div style="height:300px;display:flex;justify-content:center">
                 <img :src="item.picture" v-if="item.picture!=''&&item.picture!='undefined'">

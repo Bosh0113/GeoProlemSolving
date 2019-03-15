@@ -16,23 +16,23 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  height:300px;
 }
 .detail_image img {
-  width: 330px;
-  height: 250px;
+  max-width: 100%;
+  max-height: 300px;
 }
 .detail_description {
   padding: 20px;
-  max-height: 350px;
+  max-height: auto;
 }
 .projectDescription {
+  word-break: break-all;
   text-indent: 2em;
   font-size: 16px;
-  min-height: 200px;
-  max-height: 250px;
-  overflow-y: scroll;
+  height:300px;
+  overflow-y: auto;
   width: 100%;
-  padding: 0 10px;
 }
 .projectEditPanel {
   display: block;
@@ -203,11 +203,11 @@
                   </div>
                 </Col>
                 <Col :xs="12" :sm="14" :md="15" :lg="16">
-                  <div style="display:flex;align-items:center;height:250px;">
-                    <p
+                  <div style="display:flex;align-items:center;height:300px;padding:20px">
+                    <span
                       class="projectDescription"
                       v-if="currentProjectDetail"
-                    >{{currentProjectDetail.introduction}}</p>
+                    >{{currentProjectDetail.introduction}}</span>
                   </div>
                 </Col>
               </Row>
