@@ -28,10 +28,8 @@
 .projectDescription {
   text-indent: 2em;
   font-size: 16px;
-  min-height: 200px;
-  max-height: 250px;
-  overflow-y: scroll;
-  width: 100%;
+  overflow-y: auto;
+  word-break: break-all;
   padding: 0 10px;
 }
 .projectEditPanel {
@@ -124,6 +122,10 @@
   background-color: #47cb89;
   color: white;
 }
+.deleteBtn:hover {
+  background-color: #ed4014;
+  color: white;
+}
 /* .inviteBtn:hover {
   background-color: #47cb89;
   color: white;
@@ -175,16 +177,25 @@
             <Card>
               <p
                 slot="title"
-                style="font-size:25px;height:40px;line-height:40px"
+                style="font-size:25px;height:40px;line-height:40px;max-width:50%"
               >{{currentProjectDetail["title"]}}</p>
-              <p slot="extra" style="height:40px;line-height:40px;">
+              <div slot="extra" style="height:40px;line-height:40px;display:flex;width:50%">
                 <Button
                   type="default"
                   icon="md-brush"
                   @click="editModalShow(currentProjectDetail['projectId'])"
                   v-show="judgeIsManager(projectManager.userId)"
                 ></Button>
-              </p>
+                <Button
+                  class="deleteBtn"
+                  type="default"
+                  icon="md-close"
+                  title="remove"
+                  style="margin-left:20px"
+                  @click="deleteProject()"
+                  v-show="judgeIsManager(projectManager.userId)"
+                ></Button>
+              </div>
               <Row>
                 <Col :xs="12" :sm="10" :md="9" :lg="8">
                   <div class="detail_image">
@@ -192,7 +203,7 @@
                   </div>
                 </Col>
                 <Col :xs="12" :sm="14" :md="15" :lg="16">
-                  <div style="display:flex;align-items:center;height:250px;">
+                  <div style="display:flex;height:250px;">
                     <p
                       class="projectDescription"
                       v-if="currentProjectDetail"
@@ -566,6 +577,17 @@
         </Modal>
         <br>
       </Col>
+      <Modal
+        v-model="removeProjectModal"
+        title="Delete warning "
+        @on-ok="ok"
+        @on-cancel="cancel"
+        ok-text="ok"
+        cancel-text = "cancel"
+        >
+        <p>Do you want to delete this project? Please think twice before you choose.</p>
+    </Modal>
+      <!-- removeProjectModal -->
     </Row>
     <Modal
       v-model="editProjectModal"
@@ -753,7 +775,7 @@ export default {
       ],
       // 关于控制项目编辑的模态框
       editProjectModal: false,
-
+      removeProjectModal :false,
     };
   },
   created: function() {
@@ -1285,7 +1307,31 @@ export default {
       })
       .catch(function (error) {
       })
-    }
+    },
+    removeProjectModalShow(){
+      this.removeProjectModal = true;
+    },
+    //删除项目的函数
+    deleteProject() {
+      // let selectProjectId = this.userManagerProjectList[
+      //   this.DelelteProjectIndex
+      // ].projectId;
+      console.log(this.currentProjectDetail.projectId);
+      this.axios
+        .get(
+          "/GeoProblemSolving/project/delete?" + "projectId=" + this.currentProjectDetail.projectId
+        )
+        .then(res => {
+          if (res.data != "") {
+            this.$Notice.success({
+                    title: 'Notification title',
+                    desc: "Delete successfully"
+                });
+            this.$router.push({name:"Project"});
+          }
+        })
+        .catch(err => {});
+    },
   }
 };
 </script>
