@@ -335,6 +335,12 @@ export default {
     handleRemove() {
       this.img = "";
     }
+  },
+  created(){
+    // 加入判断，如果未登录自动跳转登录页面
+    if(this.$store.state.userId == ''){
+      this.$router.push({name:"Login"});
+    }
   }
 };
 </script>

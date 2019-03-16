@@ -52,6 +52,7 @@ export default new Vuex.Store({
         userLogout: (state) => {
             state.userState = false;
             state.userName = 'visitor';
+            state.userId = '';
         },
         uploadAvatar: (state, avatar) => {
             state.avatar = avatar;
