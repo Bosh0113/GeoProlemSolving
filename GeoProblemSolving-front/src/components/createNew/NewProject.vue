@@ -35,7 +35,7 @@
       <FormItem prop="Privacy">
         <div class="inline_style">
           <div class="hintTitle">Privacy</div>
-          <RadioGroup v-model="formInline.privacy" style="width:80%">
+          <RadioGroup v-model="formInline.privacy" style="width:80%" >
             <Radio
               label="Public"
               title="Other users can find the group and see who has membership."
@@ -218,7 +218,7 @@ export default {
         title: "",
         category: "",
         introduction: "",
-        privacy: "",
+        privacy: "Public",
         description: "",
         //tag列表
         tagList: []
