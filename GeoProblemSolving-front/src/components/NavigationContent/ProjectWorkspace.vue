@@ -173,14 +173,14 @@
             style="height:40px;display:flex;align-items:center"
             class="operatePanel"
           >
-          <Button type="default" @click="addModal = true" icon="md-add" class="addBtn">Add</Button>
+          <Button type="default" @click="addModal = true" icon="md-add" class="addBtn" title="Add a new module">Add</Button>
           <template v-if="moduleList.length <= 0 || currentModuleIndex == -1 || order == 0">
-            <Button type="default" @click="conveneWork()" icon="md-mail">Convene</Button>
-            <Button type="default" @click="back2Project(projectInfo.projectId)" icon="md-arrow-back">Back</Button>
+            <Button type="default" @click="conveneWork()" icon="md-mail" title="Start to work">Convene</Button>
+            <Button type="default" @click="back2Project(projectInfo.projectId)" icon="md-arrow-back" title="Back to project page">Back</Button>
           </template>
           <template v-else>
-            <Button type="default" @click="delModal = true" icon="md-remove" class="removeBtn" >Remove</Button>
-            <Button type="default" @click="editModalShow()" icon="md-brush" class="editBtn">Edit</Button>
+            <Button type="default" @click="delModal = true" icon="md-remove" class="removeBtn" title="Remove this module">Remove</Button>
+            <Button type="default" @click="editModalShow()" icon="md-brush" class="editBtn" title="Edit this module">Edit</Button>
           </template>
           </div>
           <Row>
@@ -1281,7 +1281,32 @@ export default {
     },
     // 召集参与者
     conveneWork(){
-
+      for(let i = 0;i<this.participants.length;i++){  
+        if(this.participants[i].userId != this.$store.state.userId) {     
+          let notice = {};
+          notice["recipientId"] = this.participants[i].userId;
+          notice["type"] = "Work";
+          notice["content"] = {
+            subProjectId: this.subProjectInfo.subProjectId,
+            title: "Work Notice",
+            description:
+              "The sub-project " +
+              this.subProjectInfo.title +
+              " of project " +
+              this.projectInfo.title +
+              " in which you participate has new progress!"
+          };
+          this.axios
+            .post("/GeoProblemSolving/notice/save", notice)
+            .then(res => {
+              this.$Message.info("Apply Successfully");
+              this.$emit("sendNotice", data.managerId);
+              })
+              .catch(err => {
+                console.log("申请失败的原因是：" + err.data);
+            });
+        }
+      }
     },
     //更新模块的函数
     updateModule() {

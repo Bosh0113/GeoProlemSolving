@@ -48,7 +48,7 @@
             <span>Project</span>
           </MenuItem>
           <MenuItem name="participants">
-            <span>Participants</span>
+            <span>Participant</span>
           </MenuItem>
           <MenuItem name="community">
             <span>Community</span>

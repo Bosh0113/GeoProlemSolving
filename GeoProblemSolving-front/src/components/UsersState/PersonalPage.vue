@@ -4,291 +4,300 @@
       <Col span="22" offset="1">
         <Row>
           <Col :lg="5" :md="8" :sm="10" :xs="12">
-             <div class="detailSidebar" :style="{height:detailSidebarHeight}">
-            <div class="user-img">
-              <img v-bind:src="userDetail.avatar" class="u_img">
-            </div>
-            <div style="text-align:center">
-              <div class="single-info">{{userDetail.userName}}</div>
-              <br>
-            </div>
-            <div class="user-desc" style="min-hieght:60px;padding:0 10px;border:1px dotted gray">
-              <p>{{this.userDetail.introduction}}</p>
-            </div>
-            <div class="user-info">
-              <div class="single-info">
-                <span>email:</span>
-                <span style="float:right">{{userDetail.email}}</span>
+            <div class="detailSidebar" :style="{height:detailSidebarHeight}">
+              <div class="user-img">
+                <img v-bind:src="userDetail.avatar" class="u_img">
               </div>
-              <div class="single-info">
-                <span>phone</span>
-                <span style="float:right">{{userDetail.mobilePhone}}</span>
+              <div style="text-align:center">
+                <div class="single-info">{{userDetail.userName}}</div>
+                <br>
               </div>
-              <div class="single-info">
-                <span>job:</span>
-                <span style="float:right">{{userDetail.jobTitle}}</span>
+              <div class="user-desc" style="min-hieght:60px;padding:0 10px;border:1px dotted gray">
+                <p>{{this.userDetail.introduction}}</p>
               </div>
-              <div class="single-info">
-                <span>location:</span>
-                <span style="float:right">{{userDetail.country}}&nbsp{{userDetail.city}}</span>
-              </div>
-              <div class="single-info">
-                <span>organization</span>
-                <span style="float:right">{{userDetail.organization}}</span>
-              </div>
-              <div class="single-info">
-                <span>direction</span>
-                <span style="float:right">{{userDetail.direction}}</span>
-              </div>
-              <div class="single-info">
-                <span>homepage</span>
-                <span style="float:right">{{userDetail.homePage}}</span>
-              </div>
-              <div class="whitespace"></div>
-              <div class="display:flex">
-                <Button
-                  type="success"
-                  style="height:40px;float:left"
-                  @click="editModalShow()"
-                >Update</Button>
-                <Drawer
-                  title="Profile Edit Panel"
-                  placement="left"
-                  :closable="true"
-                  v-model="editProfileModal"
-                  width="600px"
-                >
-                  <Form :model="personalInfoItem" :label-width="80">
-                    <FormItem label="Name" prop="userName">
-                      <Input
-                        v-model="personalInfoItem.userName"
-                        :class="{InputStyle: inputstyle}"
-                        :placeholder="userDetail.userName"
-                      ></Input>
-                    </FormItem>
-                    <FormItem label="Password" prop="password">
-                      <Input
-                        v-model="personalInfoItem.password"
-                        :class="{InputStyle: inputstyle}"
-                        :placeholder="userDetail.password"
-                      ></Input>
-                    </FormItem>
-                    <FormItem label="Job Title" prop="jobTitle">
-                      <Input
-                        v-model="personalInfoItem.jobTitle"
-                        :class="{InputStyle: inputstyle}"
-                        :placeholder="userDetail.jobTitle"
-                      ></Input>
-                    </FormItem>
-                    <FormItem label="E-mail" prop="email">
-                      <Input
-                        v-model="personalInfoItem.email"
-                        :class="{InputStyle: inputstyle}"
-                        :placeholder="userDetail.email"
-                      ></Input>
-                    </FormItem>
-                    <FormItem label="Phone" prop="mobilePhone">
-                      <Input
-                        v-model="personalInfoItem.mobilePhone"
-                        :class="{InputStyle: inputstyle}"
-                        :placeholder="userDetail.mobilePhone"
-                      ></Input>
-                    </FormItem>
-                    <FormItem label="Country" prop="country">
-                      <Input
-                        v-model="personalInfoItem.country"
-                        :class="{InputStyle: inputstyle}"
-                        :placeholder="userDetail.country"
-                      ></Input>
-                    </FormItem>
-                    <FormItem label="City" prop="city">
-                      <Input
-                        v-model="personalInfoItem.city"
-                        :class="{InputStyle: inputstyle}"
-                        :placeholder="userDetail.city"
-                      ></Input>
-                    </FormItem>
-                    <FormItem label="Agency" prop="organization">
-                      <Input
-                        v-model="personalInfoItem.organization"
-                        :class="{InputStyle: inputstyle}"
-                        :placeholder="userDetail.organization"
-                      ></Input>
-                    </FormItem>
-                    <FormItem label="Direction" prop="direction">
-                      <Input
-                        v-model="personalInfoItem.direction"
-                        :class="{InputStyle: inputstyle}"
-                        :placeholder="userDetail.direction"
-                      ></Input>
-                    </FormItem>
-                    <FormItem label="Url" prop="homePage">
-                      <Input
-                        v-model="personalInfoItem.homePage"
-                        :class="{InputStyle: inputstyle}"
-                        :placeholder="userDetail.homePage"
-                      ></Input>
-                    </FormItem>
-                    <FormItem label="Introduce" prop="introduction">
-                      <Input
-                        v-model="personalInfoItem.introduction"
-                        type="textarea"
-                        :autosize="{minRows: 2,maxRows: 5}"
-                        :placeholder="userDetail.introduction"
-                      ></Input>
-                    </FormItem>
-                    <FormItem label="Avatar" prop="avatar">
-                      <div>
-                        <div class="demo-upload-list" v-if="userDetail.avatar!=''">
-                          <template>
-                            <img v-bind:src="userDetail.avatar">
-                            <div class="demo-upload-list-cover">
-                              <Icon type="ios-eye-outline" @click.native="handleView()"></Icon>
-                              <Icon type="ios-trash-outline" @click.native="handleRemove()"></Icon>
-                            </div>
-                          </template>
+              <div class="user-info">
+                <div class="single-info">
+                  <span>email:</span>
+                  <span style="float:right">{{userDetail.email}}</span>
+                </div>
+                <div class="single-info">
+                  <span>phone</span>
+                  <span style="float:right">{{userDetail.mobilePhone}}</span>
+                </div>
+                <div class="single-info">
+                  <span>job:</span>
+                  <span style="float:right">{{userDetail.jobTitle}}</span>
+                </div>
+                <div class="single-info">
+                  <span>location:</span>
+                  <span style="float:right">{{userDetail.country}}&nbsp{{userDetail.city}}</span>
+                </div>
+                <div class="single-info">
+                  <span>organization</span>
+                  <span style="float:right">{{userDetail.organization}}</span>
+                </div>
+                <div class="single-info">
+                  <span>direction</span>
+                  <span style="float:right">{{userDetail.direction}}</span>
+                </div>
+                <div class="single-info">
+                  <span>homepage</span>
+                  <span style="float:right">{{userDetail.homePage}}</span>
+                </div>
+                <div class="whitespace"></div>
+                <div class="display:flex">
+                  <Button
+                    type="success"
+                    style="height:40px;float:left"
+                    @click="editModalShow()"
+                  >Update</Button>
+                  <Drawer
+                    title="Profile Edit Panel"
+                    placement="left"
+                    :closable="true"
+                    v-model="editProfileModal"
+                    width="600px"
+                  >
+                    <Form :model="personalInfoItem" :label-width="80">
+                      <FormItem label="Name" prop="userName">
+                        <Input
+                          v-model="personalInfoItem.userName"
+                          :class="{InputStyle: inputstyle}"
+                          :placeholder="userDetail.userName"
+                        ></Input>
+                      </FormItem>
+                      <FormItem label="Password" prop="password">
+                        <Input
+                          v-model="personalInfoItem.password"
+                          :class="{InputStyle: inputstyle}"
+                          :placeholder="userDetail.password"
+                        ></Input>
+                      </FormItem>
+                      <FormItem label="Job Title" prop="jobTitle">
+                        <Input
+                          v-model="personalInfoItem.jobTitle"
+                          :class="{InputStyle: inputstyle}"
+                          :placeholder="userDetail.jobTitle"
+                        ></Input>
+                      </FormItem>
+                      <FormItem label="E-mail" prop="email">
+                        <Input
+                          v-model="personalInfoItem.email"
+                          :class="{InputStyle: inputstyle}"
+                          :placeholder="userDetail.email"
+                        ></Input>
+                      </FormItem>
+                      <FormItem label="Phone" prop="mobilePhone">
+                        <Input
+                          v-model="personalInfoItem.mobilePhone"
+                          :class="{InputStyle: inputstyle}"
+                          :placeholder="userDetail.mobilePhone"
+                        ></Input>
+                      </FormItem>
+                      <FormItem label="Country" prop="country">
+                        <Input
+                          v-model="personalInfoItem.country"
+                          :class="{InputStyle: inputstyle}"
+                          :placeholder="userDetail.country"
+                        ></Input>
+                      </FormItem>
+                      <FormItem label="City" prop="city">
+                        <Input
+                          v-model="personalInfoItem.city"
+                          :class="{InputStyle: inputstyle}"
+                          :placeholder="userDetail.city"
+                        ></Input>
+                      </FormItem>
+                      <FormItem label="Agency" prop="organization">
+                        <Input
+                          v-model="personalInfoItem.organization"
+                          :class="{InputStyle: inputstyle}"
+                          :placeholder="userDetail.organization"
+                        ></Input>
+                      </FormItem>
+                      <FormItem label="Direction" prop="direction">
+                        <Input
+                          v-model="personalInfoItem.direction"
+                          :class="{InputStyle: inputstyle}"
+                          :placeholder="userDetail.direction"
+                        ></Input>
+                      </FormItem>
+                      <FormItem label="Url" prop="homePage">
+                        <Input
+                          v-model="personalInfoItem.homePage"
+                          :class="{InputStyle: inputstyle}"
+                          :placeholder="userDetail.homePage"
+                        ></Input>
+                      </FormItem>
+                      <FormItem label="Introduce" prop="introduction">
+                        <Input
+                          v-model="personalInfoItem.introduction"
+                          type="textarea"
+                          :autosize="{minRows: 2,maxRows: 5}"
+                          :placeholder="userDetail.introduction"
+                        ></Input>
+                      </FormItem>
+                      <FormItem label="Avatar" prop="avatar">
+                        <div>
+                          <div class="demo-upload-list" v-if="userDetail.avatar!=''">
+                            <template>
+                              <img v-bind:src="userDetail.avatar">
+                              <div class="demo-upload-list-cover">
+                                <Icon type="ios-eye-outline" @click.native="handleView()"></Icon>
+                                <Icon type="ios-trash-outline" @click.native="handleRemove()"></Icon>
+                              </div>
+                            </template>
+                          </div>
+                          <div class="uploadBox">
+                            <Icon
+                              type="ios-camera"
+                              size="20"
+                              style="position:absolute;margin:18px;"
+                            ></Icon>
+                            <input @change="uploadPhoto($event)" type="file" class="uploadAvatar">
+                          </div>
+                          <Modal title="View Image" v-model="visible">
+                            <img :src="userDetail.avatar" v-if="visible" style="width: 100%">
+                          </Modal>
                         </div>
-                        <div class="uploadBox">
-                          <Icon type="ios-camera" size="20" style="position:absolute;margin:18px;"></Icon>
-                          <input @change="uploadPhoto($event)" type="file" class="uploadAvatar">
-                        </div>
-                        <Modal title="View Image" v-model="visible">
-                          <img :src="userDetail.avatar" v-if="visible" style="width: 100%">
-                        </Modal>
-                      </div>
-                    </FormItem>
-                    <FormItem>
-                      <Button type="success" @click="submitProfileEdit(personalInfoItem)">Submit</Button>
-                      <Button @click style="margin-left: 50%" type="primary">Reset</Button>
-                    </FormItem>
-                  </Form>
-                </Drawer>
-                <Button
-                  type="error"
-                  style="height:40px;float:right"
-                  @click="logOutModalShow()"
-                >logOut</Button>
-              </div>
+                      </FormItem>
+                      <FormItem>
+                        <Button type="success" @click="submitProfileEdit(personalInfoItem)">Submit</Button>
+                        <Button @click style="margin-left: 50%" type="primary">Reset</Button>
+                      </FormItem>
+                    </Form>
+                  </Drawer>
+                  <Button
+                    type="error"
+                    style="height:40px;float:right"
+                    @click="logOutModalShow()"
+                  >logOut</Button>
+                </div>
 
-              <Modal
-                v-model="logOutProfileModal"
-                title="Logout Warning"
-                @on-ok="logOutAccount()"
-                @on-cancel="cancel"
-                logOutAccount-text="assure"
-                cancel-text="cancel"
-              >
-                <p
-                  style="font-size:20px"
-                >If you choose logout your account,the personal information you have filled will be removed.</p>
-              </Modal>
+                <Modal
+                  v-model="logOutProfileModal"
+                  title="Logout Warning"
+                  @on-ok="logOutAccount()"
+                  @on-cancel="cancel"
+                  logOutAccount-text="assure"
+                  cancel-text="cancel"
+                >
+                  <p
+                    style="font-size:20px"
+                  >If you choose logout your account,the personal information you have filled will be removed.</p>
+                </Modal>
+              </div>
             </div>
-          </div>
           </Col>
           <!-- <Col span="18" offset="1"> -->
-          <Col :lg="{span:18,offset:1}" :md="{span:15,offset:1}" :sm="{span:13,offset:1}" :xs="{span:11,offset:1}">
+          <Col
+            :lg="{span:18,offset:1}"
+            :md="{span:15,offset:1}"
+            :sm="{span:13,offset:1}"
+            :xs="{span:11,offset:1}"
+          >
             <div class="rightContent">
-                <Tabs value="Overview">
-              <TabPane label="Overview" name="Overview">
-                <Col :lg="{span:22,offset:1}" :md="{span:22,offset:1}" :sm="{span:22,offset:1}">
-                  <Card >
-                    <p slot="title">History Line</p>
-                    <Timeline style="margin-top:20px;margin-left:5%;max-height:300px;overflow-y:auto">
-                      <TimelineItem v-for="(item,index) in userEventList" :key="index">
-                        <strong>
-                          <p class="time">{{item.createTime}}</p>
-                        </strong>
-                        <p class="content">{{item.description}}</p>
-                      </TimelineItem>
-                    </Timeline>
-                  </Card>
-                  <br>
-                  <div>
+              <Tabs value="Overview">
+                <TabPane label="Overview" name="Overview">
+                  <Col :lg="{span:22,offset:1}" :md="{span:22,offset:1}" :sm="{span:22,offset:1}">
                     <Card>
-                      <p slot="title">Resource List</p>
-                      <Table :data="userResourceList" :columns="resourceColumn" class="table"></Table>
+                      <p slot="title">History Line</p>
+                      <Timeline
+                        style="margin-top:20px;margin-left:5%;max-height:300px;overflow-y:auto"
+                      >
+                        <TimelineItem v-for="(item,index) in userEventList" :key="index">
+                          <strong>
+                            <p class="time">{{item.createTime}}</p>
+                          </strong>
+                          <p class="content">{{item.description}}</p>
+                        </TimelineItem>
+                      </Timeline>
                     </Card>
+                    <br>
+                    <div>
+                      <Card>
+                        <p slot="title">Resource List</p>
+                        <Table :data="userResourceList" :columns="resourceColumn" class="table"></Table>
+                      </Card>
+                    </div>
+                  </Col>
+                </TabPane>
+                <TabPane label="Participatory Project" name="Participatory">
+                  <div
+                    v-for="(item,index) in joinedProjectsList"
+                    :key="index"
+                    v-show="joinedProjectsList!='None'"
+                  >
+                    <Col :lg="{span:11, offset:1}" :md="{span:22, offset:1}">
+                      <Card style="height:320px;margin-top:20px;">
+                        <p
+                          slot="title"
+                          style="height:40x"
+                          class="projectsTitle"
+                          @click="goSingleProject(item.projectId)"
+                        >{{item.title}}</p>
+                        <p
+                          style="height:200px;text-indent:2em;overflow-y:auto;word-break:break-word"
+                        >{{item.introduction}}</p>
+                        <br>
+                        <div style="height:40px">
+                          <span style="float:left">CreateTime:</span>
+                          <span style="float:right">{{item.createTime}}</span>
+                        </div>
+                      </Card>
+                    </Col>
                   </div>
-                </Col>
-              </TabPane>
-              <TabPane label="Participatory Project" name="Participatory">
-                <div
-                  v-for="(item,index) in joinedProjectsList"
-                  :key="index"
-                  v-show="joinedProjectsList!='None'"
-                >
-                  <Col :lg="{span:11, offset:1}" :md="{span:22, offset:1}">
-                    <Card style="height:320px;margin-top:20px;">
-                      <p
-                        slot="title"
-                        style="height:40x"
-                        class="projectsTitle"
-                        @click="goSingleProject(item.projectId)"
-                      >{{item.title}}</p>
-                      <p
-                        style="height:200px;text-indent:2em;overflow-y:auto;word-break:break-word"
-                      >{{item.introduction}}</p>
-                      <br>
-                      <div style="height:40px">
-                        <span style="float:left">CreateTime:</span>
-                        <span style="float:right">{{item.createTime}}</span>
-                      </div>
-                    </Card>
-                  </Col>
-                </div>
-              </TabPane>
-              <TabPane label="Management Project" name="Management">
-                <div
-                  v-for="(mProject,index) in userManagerProjectList"
-                  v-show="userManagerProjectList!='None'"
-                >
-                  <Col :lg="{span:11, offset:1}" :md="{span:22, offset:1}">
-                    <Card style="height:320px;margin-top:20px">
-                      <p
-                        slot="title"
-                        class="projectsTitle"
-                        @click="goSingleProject(mProject.projectId)"
-                      >{{mProject.title}}</p>
-                      <Button
-                        class="authorBtn"
-                        type="default"
-                        slot="extra"
-                        title="edit"
-                        style="margin:-5px 5px 0 5px"
-                        @click="authorizeModalShow(index)"
-                        icon="md-happy"
-                      ></Button>
-                      <Button
-                        class="deleteBtn"
-                        type="default"
-                        slot="extra"
-                        style="margin:-5px 5px 0 5px"
-                        @click="deleteProjectModalShow(index)"
-                        icon="md-close"
-                        title="remove"
-                      ></Button>
-                      <!-- 表头结束 -->
-                      <p
-                       style="height:200px;text-indent:2em;overflow-y:auto;word-break:break-word"
-                      >{{mProject.introduction}}</p>
-                      <!-- <hr> -->
-                      <br>
-                      <div>
-                        <span style="float:left">CreateTime:</span>
-                        <span style="float:right">{{mProject.createTime}}</span>
-                      </div>
-                    </Card>
-                  </Col>
-                </div>
-              </TabPane>
-            </Tabs>
-          </div>
+                </TabPane>
+                <TabPane label="Management Project" name="Management">
+                  <div
+                    v-for="(mProject,index) in userManagerProjectList"
+                    v-show="userManagerProjectList!='None'"
+                    :key="index"
+                  >
+                    <Col :lg="{span:11, offset:1}" :md="{span:22, offset:1}">
+                      <Card style="height:320px;margin-top:20px">
+                        <p
+                          slot="title"
+                          class="projectsTitle"
+                          @click="goSingleProject(mProject.projectId)"
+                        >{{mProject.title}}</p>
+                        <Button
+                          class="authorBtn"
+                          type="default"
+                          slot="extra"
+                          title="Privilege change"
+                          style="margin:-5px 5px 0 5px"
+                          @click="authorizeModalShow(index)"
+                          icon="md-happy"
+                        ></Button>
+                        <Button
+                          class="deleteBtn"
+                          type="default"
+                          slot="extra"
+                          style="margin:-5px 5px 0 5px"
+                          @click="deleteProjectModalShow(index)"
+                          icon="md-close"
+                          title="remove"
+                        ></Button>
+                        <!-- 表头结束 -->
+                        <p
+                          style="height:200px;text-indent:2em;overflow-y:auto;word-break:break-word"
+                        >{{mProject.introduction}}</p>
+                        <!-- <hr> -->
+                        <br>
+                        <div>
+                          <span style="float:left">CreateTime:</span>
+                          <span style="float:right">{{mProject.createTime}}</span>
+                        </div>
+                      </Card>
+                    </Col>
+                  </div>
+                </TabPane>
+              </Tabs>
+            </div>
           </Col>
         </Row>
-        <div>
-
-
-        </div>
+        <div></div>
       </Col>
     </Row>
     <!-- 授权的modal -->
@@ -302,11 +311,7 @@
       <p style="slot">Hand the project to others</p>
       <div>
         <RadioGroup v-model="selectManagerId">
-          <Radio
-            v-for="(member,index) in projectMemberList"
-            :key="member.index"
-            :label="member.userId"
-          >
+          <Radio v-for="member in projectMemberList" :key="member.index" :label="member.userId">
             <span>{{member.userName}}</span>
           </Radio>
         </RadioGroup>
@@ -314,8 +319,6 @@
         <!-- <tag v-for="(member,index) in projectMemberList" @click="choose(index)" :key="member.index">{{member.userName}}</tag> -->
       </div>
     </Modal>
-
-
   </div>
 </template>
 
@@ -567,6 +570,7 @@ export default {
       this.authorizeProjectModal = true;
       this.projectMemberList = this.userManagerProjectList[index].members;
     },
+    deleteProjectModalShow(index) {},
     authorize() {
       this.axios
         .get(
@@ -580,6 +584,26 @@ export default {
           console.log(res.data);
         })
         .catch(err => {});
+
+      let notice = {};
+      notice["recipientId"] = this.selectManagerId;
+      notice["type"] = "Notice";
+      notice["content"] = {
+        title: "Manager change",
+        description:
+          "You have been the manager of project " +
+          this.userManagerProjectList[index].title +
+          " !"
+      };
+      this.axios
+        .post("/GeoProblemSolving/notice/save", notice)
+        .then(res => {
+          this.$Message.info("Apply Successfully");
+          this.$emit("sendNotice", data.managerId);
+        })
+        .catch(err => {
+          console.log("申请失败的原因是：" + err.data);
+        });
     },
     // editProjectModalShow(index) {
     //   this.editProjectIndex = index;
@@ -682,7 +706,7 @@ export default {
             this.$store.state.userId
         )
         .then(res => {
-          if(res.data!="None"){
+          if (res.data != "None") {
             this.userEventList = res.data;
             console.table(result);
           }
@@ -700,9 +724,9 @@ export default {
             this.$store.state.userId
         )
         .then(res => {
-          if(res.data!="None"){
+          if (res.data != "None" && res.data != "Fail") {
             this.userResourceList = res.data;
-            console.table(this.userResourceList)
+            console.table(this.userResourceList);
           }
         })
         .catch(err => {
