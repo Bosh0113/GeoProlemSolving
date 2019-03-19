@@ -906,6 +906,8 @@ export default {
           if (data != "None") {
             let subProjectInfo = data[0];
             this.$set(this, "subProjectInfo", subProjectInfo);
+            sessionStorage.setItem("subProjectId",subProjectInfo.subProjectId);
+            sessionStorage.setItem("subProjectName",subProjectInfo.title)
 
             this.managerIdentity(subProjectInfo.managerId);
             this.memberIdentity(subProjectInfo["members"]);
@@ -976,6 +978,8 @@ export default {
       } else {
         this.currentModuleIndex = item - 1;
         this.currentModule = this.moduleList[this.currentModuleIndex];
+        sessionStorage.setItem("moduleId",this.currentModule.moduleId);
+        sessionStorage.setItem("moduleName",this.currentModule.title);
         this.inquiryTask();
         this.order = item;
         this.openModuleSocket(this.currentModule.moduleId);
@@ -1199,7 +1203,6 @@ export default {
     getAllModules() {
       //这里重写以下获取module
       let subProjectId = this.$route.params.id;
-      sessionStorage.setItem("subProjectId", this.$route.params.id);
       this.axios
         .get(
           "/GeoProblemSolving/module/inquiry" +
@@ -1648,8 +1651,6 @@ export default {
       this.sendMessage(this.socketMsg);
     },
     gotoPersonalSpace(id) {
-      // sessionStorage.setItem("memberId",data);
-      // this.$router.push({name: 'ProjectDetail',params:{id:id} });
       if (id == sessionStorage.getItem("userId")) {
         this.$router.push({ name: "PersonalPage" });
       } else {

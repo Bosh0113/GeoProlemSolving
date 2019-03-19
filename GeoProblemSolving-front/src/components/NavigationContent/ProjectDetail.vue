@@ -445,7 +445,7 @@
                 <div style="height:100px;background:azure">
                   <RadioGroup v-model="newManagerId">
                     <Radio
-                      v-for="(member,index) in subjectMembers"
+                      v-for="(member,index) in projectMembers"
                       :key="member.index"
                       :label="member.userId"
                     >
@@ -591,7 +591,7 @@
       <Modal
         v-model="removeProjectModal"
         title="Delete warning "
-        @on-ok="ok"
+        @on-ok="deleteComplete"
         @on-cancel="cancel"
         ok-text="ok"
         cancel-text = "cancel"
@@ -730,7 +730,7 @@ export default {
       //移交权限给新的管理者
       handOverSubProjectModal: false,
       newManagerId: "",
-      subjectMembers: [],
+      projectMembers: [],
       //编辑项目的按钮
       editinfoModal: false,
       //子项目的列表
@@ -863,10 +863,8 @@ export default {
                   console.log("Get manager name fail.");
                 }
               });
-              sessionStorage.setItem(
-                "projectId",
-                that.currentProjectDetail.projectId
-              );
+              sessionStorage.setItem("projectId",that.currentProjectDetail.projectId);
+              sessionStorage.setItem("projectName",that.currentProjectDetail.title);
               //将tag进行分割
               that.currentProjectDetail.tag = that.currentProjectDetail.tag.split(
                 ","
@@ -1230,8 +1228,6 @@ export default {
       return data;
     },
     gotoPersonalPage(id) {
-      // sessionStorage.setItem("memberId",data);
-      // this.$router.push({name: 'ProjectDetail',params:{id:id} });
       console.log({ id });
       if (id == sessionStorage.getItem("userId")) {
         this.$router.push({ name: "PersonalPage" });
@@ -1254,6 +1250,7 @@ export default {
       this.editPrivacy = editProjectInfo.privacy;
       this.editProjectId = editProjectInfo.projectId;
     },
+    deleteComplete(){},
     editProjectSubmit() {
       // 将项目变更的信息进行提交
       let projectEditForm = new URLSearchParams();
