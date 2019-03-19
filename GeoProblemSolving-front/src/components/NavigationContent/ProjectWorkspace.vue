@@ -826,13 +826,7 @@ export default {
       // web socket for module
       moduleSocket: null,
       timer: null,
-      // 动态记录相关
-      record: {
-        type: "",
-        time: "",
-        who: "",
-        content: ""
-      },
+      // 动态记录相关      
       // 所有module的记录
       allRecords: [],
       // 当前参与者
@@ -1006,14 +1000,20 @@ export default {
     // 更新人员，更新数据，更新records
     onMessage(e) {
       let messageJson = JSON.parse(e.data);
-
-      if (messageJson.type == "online") {
-        this.record.time = messageJson.createTime;
-        this.record.content = "enter this module.";
-      } else if (messageJson.type == "offline") {
-        this.record.time = messageJson.createTime;
-        this.record.content = "leave this module.";
-      } else if (messageJson.type == "message") {
+      let record = {
+        type: "",
+        time: "",
+        who: "",
+        content: ""
+      };
+      // if (messageJson.type == "online") {
+      //   this.record.time = messageJson.createTime;
+      //   this.record.content = "enter this module.";
+      // } else if (messageJson.type == "offline") {
+      //   this.record.time = messageJson.createTime;
+      //   this.record.content = "leave this module.";
+      // }
+      if (messageJson.type == "message") {
         let message = messageJson.message;
 
         // 任务记录
@@ -1021,6 +1021,7 @@ export default {
           message.type == "tasks" &&
           message.whoid != this.$store.state.userId
         ) {
+          //-----------------------------------------------------有点问题------------------------------------
           this.inquiryTask();
         }
         // 资源记录
@@ -1048,11 +1049,7 @@ export default {
           .replace(/\s/g, "")
           .split(",");
 
-        this.olParticipantChange(members, this.ofParticipant);
-
-        //records 更新
-        this.record.type = "participants";
-        this.allRecords[this.currentModuleIndex].push(this.record);
+        this.olParticipantChange(members, this.ofParticipant);       
       }
     },
     onClose(e) {
@@ -1113,6 +1110,12 @@ export default {
     // },
     olParticipantChange(members, callback) {
       let userIndex = -1;
+      var record = {
+        type: "participants",
+        time: new Date().toLocaleString(),
+        who: "",
+        content: ""
+      };
 
       // 自己刚上线，olParticipants空
       if (this.olParticipants.length == 0) {
@@ -1129,7 +1132,7 @@ export default {
             .then(res => {
               if (res.data != "None" && res.data != "Fail") {
                 that.olParticipants.push(res.data);
-                that.record.content =
+                record.content =
                   "welcome to here, " + that.$store.state.userName;
               } else if (res.data == "None") {
               }
@@ -1138,7 +1141,7 @@ export default {
       } else {
         // members大于olParticipants，有人上线；小于olParticipants，离线
         if (members.length > this.olParticipants.length) {
-          for (let i = 0; i < members.length; i++) {
+          for (var i = 0; i < members.length; i++) {
             for (var j = 0; j < this.olParticipants.length; j++) {
               if (members[i] == this.olParticipants[j].userId) {
                 break;
@@ -1158,19 +1161,21 @@ export default {
                 "?key=" +
                 "userId" +
                 "&value=" +
-                members[i]
+                members[userIndex]
             )
             .then(res => {
               if (res.data != "None" && res.data != "Fail") {
                 that.olParticipants.push(res.data);
                 if (userIndex != -1) {
-                  that.record.who = that.olParticipants[userIndex].userName;
+                  record.who = res.data.userName;
+                  record.content = "enter this module.";
                 }
               } else if (res.data == "None") {
               }
             });
+            
         } else if (members.length < this.olParticipants.length) {
-          for (let i = 0; i < this.olParticipants.length; i++) {
+          for (var i = 0; i < this.olParticipants.length; i++) {
             for (var j = 0; j < members.length; j++) {
               if (this.olParticipants[i].userId == members[j]) {
                 break;
@@ -1181,12 +1186,14 @@ export default {
               break;
             }
           }
-          this.record.who = this.olParticipants[userIndex].userName;
-          this.record.content = "leave this module";
-          delete this.olParticipants[userIndex];
+          record.who = this.olParticipants[userIndex].userName;
+          record.content = "leave this module.";
+          this.olParticipants.splice(userIndex,1);
         }
       }
-      callback(members);
+      //records 更新
+      this.allRecords[this.currentModuleIndex].push(record);
+      // callback(members);
     },
     ofParticipant(olPersons) {
       // this.ofParticipants = [];

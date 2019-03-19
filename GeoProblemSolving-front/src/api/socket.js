@@ -33,6 +33,10 @@ function initWebSocket(para) { //初始化websocket
     }
 }
 
+function close(){
+    websock.close();
+}
+
 // 实际调用的方法
 function sendSock(agentData, callback) {
     global_callback = callback;
@@ -75,4 +79,4 @@ function websocketOpen(e) {
 
 // initWebSocket();
 
-export { sendSock, initWebSocket }
+export { sendSock, initWebSocket, close }

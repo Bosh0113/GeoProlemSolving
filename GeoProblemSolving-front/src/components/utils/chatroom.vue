@@ -6,21 +6,22 @@
 }
 .main_part {
   display: flex;
+  height:600px;
 }
 .members_panel {
   width: 20%;
-  max-height: 600px;
+  height: 600px;
   background-color: #515a6e;
   color: white;
   font-weight: bold;
 }
-.message_panel {
+/* .message_panel {
   width: 60%;
   background-color: cornsilk;
-  /* max-height:600px; */
-}
+} */
+
 .search_panel {
-  width: 20%;
+  width: 30%;
   background-color: white;
   border: 1px solid lightgray;
   max-height: 600px;
@@ -98,7 +99,7 @@
 .send_panel {
   display: flex;
 }
-.u_avater {  
+.u_avater {
   padding-top:5px;
   width: 2.5%;
   margin-right: 5%;
@@ -249,7 +250,7 @@
 <template>
   <div>
     <Row>
-      <Col span="14" offset="5" class="outer-style">
+      <Col span="18" offset="3" class="outer-style">
         <div class="main_part">
           <div class="members_panel">
             <div class="group">
@@ -264,7 +265,7 @@
             <div class="participants">
               <h3 class="friends_title">Participants</h3>
               <div v-for="(participant,index) in participants" :key="index" class="f_list">
-                <div>                  
+                <div>
                   <img v-if="participant.avatar != '' && participant.avatar!='undefined'" :src="participant.avatar" style="width:auto;height:100%">
                   <avatar v-else :username= participant.userName :size="35" :rounded="false"></avatar>
                 </div>
@@ -272,7 +273,7 @@
               </div>
             </div>
           </div>
-          <div class="message_panel">
+          <div class="message_panel" :style="message_panelObj">
             <div class="message_navbar">
               <div class="select_name">
                 <div class="s_name" v-show="this.select_group!==''">{{this.select_group}}</div>
@@ -281,7 +282,7 @@
                 <Button class="top_btn" @click="showRecords">Records</Button>
               </div>
             </div>
-            <div class="message_list_panel">
+            <div class="message_list_panel" >
               <!-- 这里设计聊天的信息窗口 -->
               <div style="display:flex" v-for="(list,index) in msglist" :key="index">
                 <template v-if="list.fromid === thisUserId">
@@ -365,12 +366,12 @@ export default {
     init(){
       this.moduleId = sessionStorage.getItem("moduleId");
       this.subProjectId = sessionStorage.getItem("subProjectId");
-      this.projectId = sessionStorage.getItem("projectId");      
+      this.projectId = sessionStorage.getItem("projectId");
       this.moduleName = sessionStorage.getItem("moduleName");
       this.subProjectName = sessionStorage.getItem("subProjectName");
-      this.projectName = sessionStorage.getItem("projectName");   
+      this.projectName = sessionStorage.getItem("projectName");
       //groups
-      this.groups = [        
+      this.groups = [
         { name: this.moduleName, id: this.moduleId, scope: "Chat in the module"},
         { name: this.subProjectName, id:this.subProjectId, scope:"Chat in the subproject"},
         { name: this.projectName, id:this.projectId, scope:"Chat in the project"}
@@ -379,7 +380,7 @@ export default {
       this.getParticipants(this.moduleId,"module");
     },
     changeChatroom(index){
-      //close socket------------------------------------------------------------------
+      this.socketApi.close();
       if(index == 0){
         this.getParticipants(this.moduleId,"module");
         this.select_group = this.moduleName;
@@ -387,18 +388,18 @@ export default {
       }
       else if(index == 1){
         this.getParticipants(this.subProjectId,"subproject");
-        this.select_group = this.subProjectName;        
+        this.select_group = this.subProjectName;
         this.startWebSocket(this.subProjectId);
       }
       else if(index == 2){
         this.getParticipants(this.projectId,"project");
-        this.select_group = this.projectName;        
+        this.select_group = this.projectName;
         this.startWebSocket(this.projectId);
       }
     },
     getParticipants(id,scope) {
       if(scope == "module"){
-        
+
       }
       else if(scope=="subproject"){
         let that = this;
@@ -439,8 +440,8 @@ export default {
           }
         });
       }
-      else if(scope=="project"){        
-        let that = this;     
+      else if(scope=="project"){
+        let that = this;
         let queryObject = { key: "projectId", value: that.projectId };
         try {
           $.ajax({
@@ -490,6 +491,8 @@ export default {
     },
     showRecords(){
       this.recordsPanel = !this.recordsPanel;
+      this.message_panelObj.width= '80%';
+      this.message_panelObj['borderRight']='1px solid lightgray';
     },
     send(msg) {
       // console.log(msg);
@@ -498,6 +501,7 @@ export default {
       let current_time = myDate.toLocaleString(); //获取日期与时间
 
       this.send_msg = {
+        type:"message",
         from: this.$store.state.userName,
         fromid: this.$store.state.userId,
         content: this.message,
@@ -534,6 +538,7 @@ export default {
       this.socketApi.initWebSocket("ChatServer/" + id);
 
       this.send_msg = {
+        type:"test",
         from: "Test",
         fromid: this.$store.state.userId,
         content: "TestChat"
@@ -546,24 +551,11 @@ export default {
     },
     sortMsglist() {}
   },
-  // add by mzy for navigation guards
-  beforeRouteEnter: (to, from, next) => {
-    next(vm => {
-      if (!vm.$store.getters.userState) {
-        next("/login");
-      } else {
-        // 判断条件还需要考虑
-        // alert("No access");
-        // vm.$router.go(-1);
-        next();
-      }
-    });
-  },
   created() {
     this.init();
     this.startWebSocket(this.moduleId);
   },
-  destroyed() {
+  beforeDestroy() {
     this.socketApi.close();
   },
   beforeRouteEnter: (to, from, next) => {
@@ -572,7 +564,7 @@ export default {
       if (!vm.$store.getters.userState || vm.$store.state.userId == "") {
         vm.$router.push({name:"Login"});
       } else {
-        
+
       }
     });
   },
@@ -592,7 +584,14 @@ export default {
       send_msg: [],
       query_date: "",
       thisUserName: this.$store.state.userName,
-      thisUserId: this.$store.state.userId
+      thisUserId: this.$store.state.userId,
+      // 关于折叠栏
+      // collapsePanel:true,
+      message_panelObj: {
+        width: "80%" ,
+        borderRight:'1px solid lightgray',
+        // backgroundColor:'cornsilk'
+      }
     };
   }
 };

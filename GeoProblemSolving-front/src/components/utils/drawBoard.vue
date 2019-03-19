@@ -51,11 +51,11 @@
     <div class="content">
       <div class="content-left">
         <div class="setterSize">
-          <span>线条粗细:{{penSize}}</span>
+          <span>Thickness of line:{{penSize}}</span>
           <mu-slider v-model="penSize" :step="1" :max="30"/>
-          <span>虚线长度:{{lineType[0]}}</span>
+          <span>Dotted length:{{lineType[0]}}</span>
           <mu-slider v-model="lineType[0]" :step="1" :max="100"/>
-          <span>虚线间距:{{lineType[1]}}</span>
+          <span>Dotted interval:{{lineType[1]}}</span>
           <mu-slider v-model="lineType[1]" :step="1" :max="100"/>
         </div>
         <div v-for="tool in tools" :key="tool.index">
@@ -107,7 +107,7 @@ export default {
       context_bak: null,
       ischoosecolor: false,
       toolsToggle: false,
-      chooseColorBtn: "选择颜色",
+      chooseColorBtn: "Select Color",
       color: {
         hex: "#2196f3",
         hsl: {
@@ -200,7 +200,7 @@ export default {
       this.context_bak = this.canvas_bak.getContext("2d");
     },
     setColor() {
-      this.chooseColorBtn = this.ischoosecolor ? "选择颜色" : "确认选择";
+      this.chooseColorBtn = this.ischoosecolor ? "Select Color" : "Ok";
       this.ischoosecolor = this.ischoosecolor ? false : true;
       //这里选择后需要将属性传递过去
     },
@@ -638,6 +638,7 @@ export default {
     },
     socket() {
       this.send_line = {
+        type:"drawing",
         from: this.$store.state.userName,
         fromid: this.$store.state.userId,
         content: this.line
@@ -696,11 +697,12 @@ export default {
       let eY = line.Points[pointsLength - 1].Y;
       this.drawOnMouseup(eX, eY, collaGraphType);
     },
-    startWebSocket(data) {
-      let roomId = sessionStorage.getItem("subProjectId");
-      this.socketApi.initWebSocket("ChatServer/" + roomId);
+    startWebSocket() {
+      let roomId = sessionStorage.getItem("moduleId");
+      this.socketApi.initWebSocket("DrawServer/" + roomId);
 
       this.send_msg = {
+        type:"test",
         from: "Test",
         fromid: this.$store.state.userId,
         content: "TestChat"
@@ -711,23 +713,20 @@ export default {
   components: {
     PhotoshopPicker: Photoshop
   },
-  // add by mzy for navigation guards
   beforeRouteEnter: (to, from, next) => {
+    // alert(this.isSubProjectMember);
     next(vm => {
-      if (!vm.$store.getters.userState) {
-        next("/login");
+      if (!vm.$store.getters.userState || vm.$store.state.userId == "") {
+        vm.$router.push({name:"Login"});
       } else {
-        // 判断条件还需要考虑
-        // alert("No access");
-        // vm.$router.go(-1);
-        next();
+
       }
     });
   },
   created() {
     this.startWebSocket();
   },
-  destroyed() {
+  beforeDestroy() {
     this.socketApi.close();
   },
   mounted() {
