@@ -198,7 +198,7 @@
                   icon="md-close"
                   title="remove"
                   style="margin-left:20px"
-                  @click="deleteProject()"
+                  @click="deleteProjectShow()"
                   v-show="judgeIsManager(projectManager.userId)"
                 ></Button>
               </div>
@@ -591,7 +591,7 @@
       <Modal
         v-model="removeProjectModal"
         title="Delete warning "
-        @on-ok="ok"
+        @on-ok="deleteProject"
         @on-cancel="cancel"
         ok-text="ok"
         cancel-text = "cancel"
@@ -1327,6 +1327,9 @@ export default {
       this.removeProjectModal = true;
     },
     //删除项目的函数
+    deleteProjectShow(){
+      this.removeProjectModal=true;
+    },
     deleteProject() {
       // let selectProjectId = this.userManagerProjectList[
       //   this.DelelteProjectIndex
