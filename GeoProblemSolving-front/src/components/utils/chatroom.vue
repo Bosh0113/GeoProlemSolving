@@ -552,6 +552,8 @@ export default {
     sortMsglist() {}
   },
   created() {
+  },
+  mounted(){
     this.init();
     this.startWebSocket(this.moduleId);
   },

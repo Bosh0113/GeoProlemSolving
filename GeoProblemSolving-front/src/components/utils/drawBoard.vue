@@ -652,7 +652,7 @@ export default {
       let lineData = JSON.parse(data);
 
       if (lineData.from === "Test") {
-        console.log(chatMsg.content);
+        console.log(lineData.content);
       } else {
         //判断消息的发出者
         var uid = lineData.fromid;
@@ -724,7 +724,6 @@ export default {
     });
   },
   created() {
-    this.startWebSocket();
   },
   beforeDestroy() {
     this.socketApi.close();
@@ -735,12 +734,14 @@ export default {
     this.addkeyBoardlistener();
     this.drawType(this.tools[0]);
     this.canvas_bak.addEventListener("click", this.falseColor);
+    this.startWebSocket();
     window.addEventListener("resize", () => {
       this.canvasSize = {
         width: window.screen.availWidth - 320,
         height: window.screen.availHeight * 0.75
       };
     });
+    
   }
 };
 </script>

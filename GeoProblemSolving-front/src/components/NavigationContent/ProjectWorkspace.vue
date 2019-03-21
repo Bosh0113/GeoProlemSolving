@@ -767,7 +767,7 @@ export default {
       // 关于邀请的模态框
       inviteModal: false,
       quitModal: false,
-      sidebarHeight: "",
+      sidebarHeight: 800,
       participants: [],
       candidates: [],
       inviteList: [],

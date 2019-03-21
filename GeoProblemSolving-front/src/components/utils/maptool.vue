@@ -1,47 +1,83 @@
 <template>
-  <div id="map" class="map"></div>
+  <div id="map" class="map" :style="{height:windowHeight+'px'}"></div>
 </template>
-<style scoped>
+<style>
 @import "../../../static/css/Control.MiniMap.css";
 @import "../../../static/css/leaflet.pm.css";
 #map {
   width: 100%;
-  height: 600px;
 }
 </style>
 <script>
-// import { LMap, LTileLayer, LMarker, LPopup } from "vue2-leaflet";
 import minimap from "../../../static/js/Control.MiniMap.min.js";
 import pm from "../../../static/js/leaflet.pm.min.js";
+import * as socketApi from "./../../api/socket.js";
 export default {
   components: {},
   methods: {
+    initSize(){
+      this.windowHeight = window.innerHeight;
+    },
     initMap() {
-      this.map = L.map("map").setView(this.center, this.zoom);
+      this.tdtVectorMap = "http://t0.tianditu.gov.cn/vec_w/wmts?tk=d6b0b78f412853967d91042483385d2c"+
+        "&SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=vec&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}";
+      this.tdtVectorAno = "http://t0.tianditu.gov.cn/cva_w/wmts?tk=d6b0b78f412853967d91042483385d2c"+
+        "&SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cva&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}";
+      this.tdtImgMap = "http://t0.tianditu.gov.cn/img_w/wmts?tk=d6b0b78f412853967d91042483385d2c"+
+        "&SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}";
+      this.tdtImgAno = "http://t0.tianditu.gov.cn/cia_w/wmts?tk=d6b0b78f412853967d91042483385d2c"+
+        "&SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cia&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}";
+      this.tdtTerrMap = "http://t0.tianditu.com/ter_w/wmts?tk=d6b0b78f412853967d91042483385d2c"+
+        "&SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=ter&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}";
+      this.tdtTerrAno = "http://t0.tianditu.com/cta_w/wmts?tk=d6b0b78f412853967d91042483385d2c"+
+        "&SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cta&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}";
+
+      this.map = L.map("map",{
+        // crs:L.CRS.EPSG4326,
+        center:L.latLng(32.07, 118.78),
+        zoom:13
+      });
     },
     initLayer() {
-      this.baseLayer = L.tileLayer("http://{s}.tile.osm.org/{z}/{x}/{y}.png", {
-        maxZoom: 18,
-        attribution:
-          '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-      });
-      this.baseLayer.addTo(this.map);
+      
+      this.drawingLayerGroup = L.layerGroup([]);
+      this.drawingLayerGroup.addTo(this.map);
     },
     initControl() {
-      // 图层控件
-      var satellite = L.tileLayer(
-        "http://www.google.cn/maps/vt?lyrs=s@189&gl=cn&x={x}&y={y}&z={z}",
-        {
-          maxZoom: 18,
-          attribution:
-            '&copy; <a href="http://www.google.com/maps/">GoogleMap</a> contributors'
-        }
-      );
-      var baseLayers = {
-        basemap: this.baseLayer,
-        satellite: satellite
+      // 图层控件 
+      var vectorMap = L.tileLayer(this.tdtVectorMap, { 
+        maxZoom: 18,
+        attribution:
+            '&copy; <a href="http://map.tianditu.gov.cn/">tianditu</a> contributors'
+        });
+      var vectorAno = L.tileLayer(this.tdtVectorAno, { maxZoom: 18 });
+      var vector = L.layerGroup([vectorMap,vectorAno]);
+
+      var satelliteMap = L.tileLayer(this.tdtImgMap, { 
+        maxZoom: 18,
+        attribution:
+            '&copy; <a href="http://map.tianditu.gov.cn/">tianditu</a> contributors'
+        });      
+      var satelliteAno = L.tileLayer(this.tdtImgAno, { maxZoom: 18 } );
+      var satellite = L.layerGroup([satelliteMap,satelliteAno]);
+
+      var terrainMap = L.tileLayer(this.tdtTerrMap, { 
+        maxZoom: 18,
+        attribution:
+            '&copy; <a href="http://map.tianditu.gov.cn/">tianditu</a> contributors'
+        });
+      var terrainAno = L.tileLayer(this.tdtTerrAno, { maxZoom: 18 });
+      var terrain = L.layerGroup([terrainMap,terrainAno]);
+
+      this.baseLayers = {
+        "Vector map": vector,
+        "Satellite map":satellite,
+        "Terrain map":terrain
+        // "Google satellite map": googleSatellite
       };
-      L.control.layers(baseLayers).addTo(this.map);
+      var overlayLayers = {};
+      L.control.layers(this.baseLayers,overlayLayers).addTo(this.map);
+      this.baseLayers["Vector map"].addTo(this.map);
 
       // 比例尺
       L.control
@@ -51,14 +87,7 @@ export default {
         .addTo(this.map);
 
       // 鹰眼
-      var normal = L.tileLayer(
-        "http://www.google.cn/maps/vt?lyrs=m@189&gl=cn&x={x}&y={y}&z={z}",
-        {
-          maxZoom: 18,
-          attribution:
-            '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-        }
-      );
+      var normal = L.tileLayer( this.tdtVectorMap, { maxZoom: 18 } );
       var miniMap = new L.Control.MiniMap(normal, {
         toggleDisplay: true,
         minimized: false,
@@ -75,73 +104,230 @@ export default {
         drawCircle: true, // adds button to draw a cricle
         cutPolygon: false, // adds button to cut a hole in a polygon
         editMode: false, // adds button to toggle edit mode for all layers
+        dragMode:false,
         removalMode: true // adds a button to remove layers
       };
-      // add leaflet.pm controls to the map
       this.map.pm.addControls(options);
     },
     listenDraw() {
+      this.send_content = {};
+      let isMouseDown = false;
+      let isZoomControl = false;
+
+      this.map.on("mousedown",e=>{
+        isMouseDown = true;
+      });
+
+      this.map.on("mouseup",e=>{
+        isMouseDown = false;
+      });
+
+      //缩放控件事件
+      var element = document.querySelector('a.leaflet-control-zoom-in');
+      L.DomEvent.addListener(element, 'click', function (e) {
+          isZoomControl = true;
+      });
+      element = document.querySelector('a.leaflet-control-zoom-out');
+      L.DomEvent.addListener(element, 'click', function (e) {
+          isZoomControl = true;
+      });
+
+      // 图层控件
+      this.map.on("baselayerchange",e=>{
+        this.send_content={
+            type:"overlay",
+            layer: e.name,
+            from:this.$store.state.userName,
+            fromid:this.$store.state.userId
+          }
+        this.socketApi.sendSock(this.send_content, this.getSocketConnect);
+      });
+      
+      //缩放事件 与 鼠标事件同时发生
+      this.map.on("zoomend", e=>{
+        if(this.map.scrollWheelZoom || isZoomControl){      
+          this.send_content={
+            type:"zoom",
+            zoom: this.map.getZoom(),
+            from:this.$store.state.userName,
+            fromid:this.$store.state.userId
+          }
+          this.socketApi.sendSock(this.send_content, this.getSocketConnect);
+          isZoomControl = false;
+        }
+      });
+
+      //拖拽事件
+      this.map.on("moveend", e=>{
+        if(isMouseDown){
+          this.send_content={
+            type:"move",
+            center:this.map.getCenter(),
+            from:this.$store.state.userName,
+            fromid:this.$store.state.userId
+          }
+          this.socketApi.sendSock(this.send_content, this.getSocketConnect);
+        }
+      });
+
+      // 画图事件
       this.map.on("pm:create", e => {
-        console.log(e);
+        // this.drawingLayerGroup.addLayer(e.layer);
         let points = null;
-        this.shape = e.shape;
-        switch (this.shape) {
+        switch (e.shape) {
           case "Marker":
             this.traces = [];
             points = e.layer._latlng;
             this.traces.push(points);
-            console.log(this.traces);
             break;
           case "Line":
             this.traces = [];
             points = e.layer._latlngs;
             this.traces.push(points);
-            console.log(this.traces);
             break;
           case "Rectangle":
             this.traces = [];
             points = e.layer._latlngs;
             this.traces.push(points);
-            console.log(this.traces);
             break;
           case "Poly":
             this.traces = [];
             points = e.layer._latlngs;
             this.traces.push(points);
-            console.log(this.traces);
             break;
           case "Circle":
             this.traces = [];
             points = e.layer._latlng;
             this.traces.push(points);
-            let radius = e.layer._radius;
-            this.traces.push(radius);
-            console.log(this.traces);
+            let radius = e.layer._mRadius;
+            this.traces.push(radius);            
             break;
         }
+        
+        this.send_content={
+          type:"add",
+          shape:e.shape,
+          layer:this.traces,
+          from:this.$store.state.userName,
+          fromid:this.$store.state.userId
+        }
+        this.socketApi.sendSock(this.send_content, this.getSocketConnect);
       });
 
+      // 删除事件
       this.map.on("pm:remove", e => {
-          console.log(e);
-        });
+        let layerId = this.drawingLayerGroup.getLayerId(e.layer);
+        this.send_content={
+          type: "remove",
+          layerId: layerId,
+          from: this.$store.state.userName,
+          fromid: this.$store.state.userId
+        }
+        
+        this.socketApi.sendSock(this.send_content, this.getSocketConnect);
+      });
+    },
+    getSocketConnect(data) {
+      let socketMsg = JSON.parse(data);
+
+      if (socketMsg.type === "Test") {
+        console.log(chatMsg.content);
+      } else {
+        //判断消息的发出者
+        var uid = socketMsg.fromid;
+        if (uid !== this.$store.state.userId && uid !== undefined) {
+          
+          switch (socketMsg.type){            
+            case "zoom":{
+              this.map.setZoom(socketMsg.zoom);
+              break;
+            }
+            case "move":{              
+              this.map.panTo(socketMsg.center);
+              break;
+            }
+            case "overlay":{              
+              this.baseLayers[socketMsg.layer].addTo(this.map);
+              break;
+            }
+            case "remove": {
+              this.drawingLayerGroup.removeLayer(socketMsg.layerId);
+              break;
+            }
+            case "add":{
+              let drawingLayer = null;
+              switch (socketMsg.shape) {
+                case "Marker":
+                  drawingLayer= L.marker(socketMsg.layer[0]);
+                  break;
+                case "Line":
+                  drawingLayer = L.polyline(socketMsg.layer);
+                  break;
+                case "Rectangle":
+                  drawingLayer = L.rectangle(socketMsg.layer);
+                  break;
+                case "Poly":
+                  drawingLayer = L.polygon(socketMsg.layer);
+                  break;
+                case "Circle":
+                  drawingLayer = L.circle(socketMsg.layer[0],{radius:socketMsg.layer[1]});
+                  break;
+              }
+              this.drawingLayerGroup.addLayer(drawingLayer);
+            }
+          }         
+        }
+      }
+    },
+    startWebSocket() {
+      let roomId = sessionStorage.getItem("moduleId");
+      this.socketApi.initWebSocket("MapServer/" + roomId);
+
+      this.send_content= {
+        type:"test",
+        from: "Test",
+        fromid: this.$store.state.userId,
+        content: "TestChat"
+      };
+      this.socketApi.sendSock(this.send_content, this.getSocketConnect);
     }
   },
-  created() {},
   mounted() {
+    this.initSize();
     this.initMap();
     this.initLayer();
     this.initControl();
+    this.startWebSocket();
     this.listenDraw();
+    window.addEventListener("resize", this.initSize);
+  },
+  beforeDestroy() {
+    window.removeEventListener("resize", this.initSize);
+    this.socketApi.close();
+  },
+  beforeRouteEnter: (to, from, next) => {
+    // alert(this.isSubProjectMember);
+    next(vm => {
+      if (!vm.$store.getters.userState || vm.$store.state.userId == "") {
+        vm.$router.push({name:"Login"});
+      } else {
+
+      }
+    });
   },
   data() {
     return {
-      map: null,
-      baseLayer: null,
-      zoom: 13,
-      center: L.latLng(32.07, 118.78),
-      shape: null,
-      traces: [],
-      send_content: []
+      windowHeight:800,
+      tdtVectorMap:"",
+      tdtVectorAno:"",
+      tdtImgMap:"",
+      tdtImgAno:"",
+      map: null,   
+      baseLayers: null,
+      traces: {},
+      send_content: {},
+      //存储绘制的图像layer
+      drawingLayerGroup:null
     };
   }
 };
