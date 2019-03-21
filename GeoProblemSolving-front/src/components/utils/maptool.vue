@@ -7,6 +7,32 @@
 #map {
   width: 100%;
 }
+#import-data{
+  background-color:white;
+  width:30px;
+  height:30px;
+  border-bottom:1px solid lightgray;
+  cursor: pointer;
+}
+#import-data:hover{
+  background-color:#f3f3f3;
+  width:30px;
+  height:30px;
+  border-bottom:1px solid lightgray;
+  cursor: pointer;
+}
+#export-data{  
+  background-color:white;
+  width:30px;
+  height:30px;
+  cursor: pointer;
+}
+#export-data:hover{  
+  background-color:#f3f3f3;
+  width:30px;
+  height:30px;
+  cursor: pointer;
+}
 </style>
 <script>
 import minimap from "../../../static/js/Control.MiniMap.min.js";
@@ -33,7 +59,7 @@ export default {
         "&SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cta&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}";
 
       this.map = L.map("map",{
-        // crs:L.CRS.EPSG4326,
+        crs:L.CRS.EPSG3857,
         center:L.latLng(32.07, 118.78),
         zoom:13
       });
@@ -108,11 +134,69 @@ export default {
         removalMode: true // adds a button to remove layers
       };
       this.map.pm.addControls(options);
+
+      this.diyDataControl();
+    },
+    diyDataControl(){
+      var that = this;
+      L.Control.Data = L.Control.extend({
+          //在此定义参数    
+          options: {
+            position: 'topleft'
+          },
+          //在此初始化
+          initialize: function (map) {
+          },
+          onAdd: function(map){
+              this._container = L.DomUtil.create('div', 'leaflet-exportData');
+              this._container.style= 'border:2px solid rgba(128,128,128,0.5);border-radius:6px';
+
+              let importData = document.createElement('div');
+              importData.id = 'import-data';
+              importData.title = 'Import GeoJSON';
+              importData.onclick = this._importData;
+              let iconImport = document.createElement('img');
+              iconImport.src="../../../static/Images/import.png";
+              iconImport.style='margin-left: 3.5px;margin-top: 3px';
+              importData.appendChild(iconImport);
+      
+              let exportData = document.createElement('div');
+              exportData.id = 'export-data';
+              exportData.title = 'Export GeoJSON';
+              exportData.onclick = this._exportData;
+              let iconExport = document.createElement('img');
+              iconExport.src="../../../static/Images/export.png";
+              iconExport.style='margin-left: 3.5px;margin-top: 3px';
+              exportData.appendChild(iconExport);
+
+              this._container.appendChild(importData);
+              this._container.appendChild(exportData);
+              return this._container;
+          },
+          _exportData(){      
+            that.map.eachLayer(function(layer){
+              try{                
+                var json = layer.toGeoJSON();
+                console.log(json);
+              }
+              catch(e){}
+            });
+          },
+          _importData(){      
+            alert ("Hello World!");
+          },
+          
+      });
+      L.control.data = function(){
+        return new L.Control.Data();
+      }
+      L.control.data().addTo(this.map);
     },
     listenDraw() {
       this.send_content = {};
       let isMouseDown = false;
       let isZoomControl = false;
+      let isDoubleClick = false;
 
       this.map.on("mousedown",e=>{
         isMouseDown = true;
@@ -120,6 +204,10 @@ export default {
 
       this.map.on("mouseup",e=>{
         isMouseDown = false;
+      });
+
+      this.map.on("dblclick",e=>{
+        isDoubleClick = true;
       });
 
       //缩放控件事件
@@ -145,7 +233,7 @@ export default {
       
       //缩放事件 与 鼠标事件同时发生
       this.map.on("zoomend", e=>{
-        if(this.map.scrollWheelZoom || isZoomControl){      
+        if(this.map.scrollWheelZoom || isZoomControl || isDoubleClick){      
           this.send_content={
             type:"zoom",
             zoom: this.map.getZoom(),
@@ -154,6 +242,7 @@ export default {
           }
           this.socketApi.sendSock(this.send_content, this.getSocketConnect);
           isZoomControl = false;
+          isDoubleClick = false;
         }
       });
 
@@ -214,7 +303,7 @@ export default {
         this.socketApi.sendSock(this.send_content, this.getSocketConnect);
       });
 
-      // 删除事件
+      // 删除事件???
       this.map.on("pm:remove", e => {
         let layerId = this.drawingLayerGroup.getLayerId(e.layer);
         this.send_content={
