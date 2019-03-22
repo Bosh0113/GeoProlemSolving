@@ -1,5 +1,31 @@
 <template>
-  <div id="map" class="map" :style="{height:windowHeight+'px'}"></div>
+  <div id="map" class="map" :style="{height:windowHeight+'px'}">
+    <Modal
+        v-model="modalExport"
+        title="Export GeoJSON">
+        <h3>Save this data into resouce center.<Button style="margin-left:50px">OK</Button></h3>
+        <br>
+        <h3>Download this data directly.<Button style="margin-left:50px" @click="downloadGeoJson">Download</Button></h3>
+    </Modal>
+    <Modal
+        v-model="modalImport"
+        title="Import GeoJSON"
+        @on-ok="viewData">
+        <Upload type="drag" :before-upload="handleUpload" action="-">
+          <div style="padding: 20px 0">
+              <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
+              <p>Click or drag files here to upload</p>
+          </div>
+        </Upload>
+        <div v-show="showFile">
+          <span id="show-file">
+            <i class="ivu-icon ivu-icon-md-document"></i>{{uploadDataName}}
+          </span>
+        </div>
+        <br>
+        <h3>Import data from resource center.<Button style="margin-left:20px">Go</Button></h3>
+    </Modal>
+  </div>
 </template>
 <style>
 @import "../../../static/css/Control.MiniMap.css";
@@ -122,15 +148,15 @@ export default {
 
       // 绘图控件
       var options = {
-        position: "topright", // toolbar position, options are 'topleft', 'topright', 'bottomleft', 'bottomright'
+        position: "topleft", // toolbar position, options are 'topleft', 'topright', 'bottomleft', 'bottomright'
         drawMarker: true, // adds button to draw markers
         drawPolyline: true, // adds button to draw a polyline
         drawRectangle: true, // adds button to draw a rectangle
         drawPolygon: true, // adds button to draw a polygon
         drawCircle: true, // adds button to draw a cricle
-        cutPolygon: false, // adds button to cut a hole in a polygon
-        editMode: false, // adds button to toggle edit mode for all layers
-        dragMode:false,
+        cutPolygon: true, // adds button to cut a hole in a polygon
+        editMode: true, // adds button to toggle edit mode for all layers
+        dragMode:true,
         removalMode: true // adds a button to remove layers
       };
       this.map.pm.addControls(options);
@@ -142,7 +168,7 @@ export default {
       L.Control.Data = L.Control.extend({
           //在此定义参数    
           options: {
-            position: 'topleft'
+            position: 'topright'
           },
           //在此初始化
           initialize: function (map) {
@@ -173,17 +199,24 @@ export default {
               this._container.appendChild(exportData);
               return this._container;
           },
-          _exportData(){      
+          _exportData(){
+            var featuresSet= {"type":"FeatureCollection","features":[]};
             that.map.eachLayer(function(layer){
-              try{                
+              try{
                 var json = layer.toGeoJSON();
-                console.log(json);
+                if(json.type == "Feature"){
+                  featuresSet.features.push(json);
+                }
               }
               catch(e){}
             });
+            if(featuresSet.features.length>0){
+              that.geojsonBlob = new Blob([JSON.stringify(featuresSet,null,2)],{type:'application/json'});
+              that.modalExport = true;
+            }
           },
-          _importData(){      
-            alert ("Hello World!");
+          _importData(){
+            that.modalImport = true;
           },
           
       });
@@ -192,11 +225,97 @@ export default {
       }
       L.control.data().addTo(this.map);
     },
+    downloadGeoJson(){
+      var reader = new FileReader();
+      if(this.geojsonBlob != null){
+
+        reader.readAsDataURL(this.geojsonBlob);
+        reader.onload = function (e) {
+          var a = document.createElement('a');
+          a.download = 'geodata.json';
+          a.href = e.target.result;
+          $("body").append(a);
+          a.click();
+          $(a).remove();
+        }
+      }
+    },
+    handleUpload (file) {
+      var that = this;   
+      var reader = new FileReader();
+      this.uploadDataName = file.name;
+      reader.readAsText(file, "UTF-8");
+      reader.onload = function(e) {
+        let json = e.target.result;
+        try{
+          that.uploadGeoJson = JSON.parse(json);
+          that.showFile = true;
+        }
+        catch(e) {
+          that.showFile = false;
+          that.uploadGeoJson = null;
+          alert("Data format error.");
+        }
+      };
+      reader.onerror = function () {
+        alert("Input data error.");
+        that.showFile = false;
+        that.uploadGeoJson = null;
+      };
+      return false;
+    },
+    viewData(){      
+      this.send_content={
+        type:"uploaddata",
+        layer: this.uploadGeoJson,
+        from:this.$store.state.userName,
+        fromid:this.$store.state.userId
+      }
+      this.socketApi.sendSock(this.send_content, this.getSocketConnect);
+
+      for(let i = 0; i < this.uploadGeoJson.features.length; i++){
+        let feature = this.uploadGeoJson.features[i];
+        let type = feature.geometry.type;
+        switch (type){
+          case "Point":{
+            //坐标转换
+            let latlng = L.latLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
+            var coordinates = latlng;
+
+            L.marker(coordinates).addTo(this.map);
+            break;
+          }
+          case "LineString": {
+            for(let j = 0;j<feature.geometry.coordinates.length;j++){
+              var latlng = {lat:feature.geometry.coordinates[j][1], lng:feature.geometry.coordinates[j][0]};
+              feature.geometry.coordinates[j]=latlng;
+            }
+
+            L.polyline(feature.geometry.coordinates).addTo(this.map);
+            break;
+          }
+          case "Polygon":{
+            for(let j = 0;j<feature.geometry.coordinates.length;j++){
+              for(let k = 0;k<feature.geometry.coordinates[j].length;k++){
+                let latlng = {lat:feature.geometry.coordinates[j][k][1], lng:feature.geometry.coordinates[j][k][0]};
+                feature.geometry.coordinates[j][k]=latlng;
+              }
+            }
+            L.polygon(feature.geometry.coordinates).addTo(this.map);
+            break;
+          }         
+        }
+      }
+
+      this.showFile = false;
+      this.uploadGeoJson = null;
+    },
     listenDraw() {
       this.send_content = {};
       let isMouseDown = false;
       let isZoomControl = false;
       let isDoubleClick = false;
+      let isLayerCtrlClick = false;
 
       this.map.on("mousedown",e=>{
         isMouseDown = true;
@@ -204,6 +323,7 @@ export default {
 
       this.map.on("mouseup",e=>{
         isMouseDown = false;
+        isLayerCtrlClick = true;
       });
 
       this.map.on("dblclick",e=>{
@@ -222,13 +342,16 @@ export default {
 
       // 图层控件
       this.map.on("baselayerchange",e=>{
-        this.send_content={
-            type:"overlay",
-            layer: e.name,
-            from:this.$store.state.userName,
-            fromid:this.$store.state.userId
-          }
-        this.socketApi.sendSock(this.send_content, this.getSocketConnect);
+        if(isLayerCtrlClick){
+          this.send_content={
+              type:"overlay",
+              layer: e.name,
+              from:this.$store.state.userName,
+              fromid:this.$store.state.userId
+            }
+          this.socketApi.sendSock(this.send_content, this.getSocketConnect);
+        }
+        isLayerCtrlClick = false;
       });
       
       //缩放事件 与 鼠标事件同时发生
@@ -335,7 +458,15 @@ export default {
               this.map.panTo(socketMsg.center);
               break;
             }
-            case "overlay":{              
+            case "overlay":{
+              try{
+                this.map.removeLayer(this.baseLayers["Terrain map"]);
+              }
+              catch (e){}
+              try{
+                this.map.removeLayer(this.baseLayers["Satellite map"]);
+              }
+              catch (e){}
               this.baseLayers[socketMsg.layer].addTo(this.map);
               break;
             }
@@ -363,6 +494,11 @@ export default {
                   break;
               }
               this.drawingLayerGroup.addLayer(drawingLayer);
+            }
+            case "uploaddata":{
+              this.uploadGeoJson = socketMsg.layer;
+              this.viewData();
+              break;
             }
           }         
         }
@@ -407,16 +543,20 @@ export default {
   data() {
     return {
       windowHeight:800,
-      tdtVectorMap:"",
-      tdtVectorAno:"",
-      tdtImgMap:"",
-      tdtImgAno:"",
+      modalExport:false,
+      modalImport:false,
       map: null,   
       baseLayers: null,
       traces: {},
       send_content: {},
+      //geojson blob
+      geojsonBlob: null,
+      showFile:false,
+      uploadDataName:"",
+      uploadGeoJson:null,
       //存储绘制的图像layer
       drawingLayerGroup:null
+
     };
   }
 };

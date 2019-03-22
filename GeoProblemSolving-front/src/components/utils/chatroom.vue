@@ -257,7 +257,7 @@
               <h3 class="group_title">Groups</h3>
               <div v-for="(group,index) in groups" :key="index" class="f_list" >
                 <div>
-                  <avatar :username= group.name :size="35" :rounded="false" :title= group.scope></avatar>
+                  <avatar :username= group.scope :size="35" :rounded="false" :title= group.title></avatar>
                 </div>
                 <div class="name" :title= group.scope style="cursor:pointer" @click="changeChatroom(index)">{{group.name}}</div>
               </div>
@@ -372,9 +372,9 @@ export default {
       this.projectName = sessionStorage.getItem("projectName");
       //groups
       this.groups = [
-        { name: this.moduleName, id: this.moduleId, scope: "Chat in the module"},
-        { name: this.subProjectName, id:this.subProjectId, scope:"Chat in the subproject"},
-        { name: this.projectName, id:this.projectId, scope:"Chat in the project"}
+        { name: this.moduleName, id: this.moduleId, scope:"Module", title: "Chat in the module"},
+        { name: this.subProjectName, id:this.subProjectId, scope:"Subproject", title:"Chat in the subproject"},
+        { name: this.projectName, id:this.projectId, scope:"Project", title:"Chat in the project"}
       ];
       //participants
       this.getParticipants(this.moduleId,"module");
