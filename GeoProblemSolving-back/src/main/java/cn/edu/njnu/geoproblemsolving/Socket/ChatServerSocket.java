@@ -89,10 +89,12 @@ public class ChatServerSocket {
 
     private void broadcastMessageToRoom(String roomId,String message){
         for (Map.Entry<String, ChatServerSocket> server : rooms.get(roomId).entrySet()) {
-            try {
-                server.getValue().session.getBasicRemote().sendText(message);
-            } catch (Exception e) {
-                e.printStackTrace();
+            if (!this.equals(server.getValue())) {
+                try {
+                    server.getValue().session.getBasicRemote().sendText(message);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
     }

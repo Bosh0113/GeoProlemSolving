@@ -503,7 +503,7 @@ export default {
       this.send_msg = {
         type:"message",
         from: this.$store.state.userName,
-        fromid: this.$store.state.userId,
+        fromid:this.$store.state.userId,
         content: this.message,
         time: current_time
       };
@@ -512,26 +512,20 @@ export default {
       if (this.message !== "") {
         this.my_msglist.push(this.send_msg);
         this.msglist.push(this.send_msg);
-
         this.socketApi.sendSock(this.send_msg, this.getSocketConnect);
       }
       this.message = "";
     },
     getSocketConnect(data) {
-      var chatMsg = JSON.parse(data);
+      var chatMsg = data;
       if (chatMsg.from === "Test") {
         console.log(chatMsg.content);
-      } else {
+      }
+      else if (data.type === "members"){} 
+      else {
         //判断消息的发出者
-        var uid = chatMsg.fromid;
-        if (
-          uid !== this.$store.state.userId &&
-          uid !== undefined
-          // uid !== ""
-        ) {
-          this.other_msglist.push(chatMsg);
-          this.msglist.push(chatMsg);
-        }
+        this.other_msglist.push(chatMsg);
+        this.msglist.push(chatMsg);
       }
     },
     startWebSocket(id) {
@@ -540,7 +534,6 @@ export default {
       this.send_msg = {
         type:"test",
         from: "Test",
-        fromid: this.$store.state.userId,
         content: "TestChat"
       };
       this.socketApi.sendSock(this.send_msg, this.getSocketConnect);

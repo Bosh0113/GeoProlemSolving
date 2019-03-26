@@ -1352,10 +1352,10 @@ export default {
     },
     show() {
       let mId = sessionStorage.getItem("moduleId");
-      window.location.href =
-        "http://202.195.237.252:8088/TeamWorking/Collaborative/ConceptualModel/index.html?groupID=" +
+      sessionStorage.setItem("username","123");
+      window.open("http://localhost:8081/GeoProblemSolving/Collaborative/ConceptualModel/index.html?groupID=" +
         mId +
-        "-ConceptualModel";
+        "-ConceptualModel") ;
     },
     createModuleSuccess(title) {
       this.$Notice.success({

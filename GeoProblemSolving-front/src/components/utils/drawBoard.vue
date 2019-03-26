@@ -639,8 +639,6 @@ export default {
     socket() {
       this.send_line = {
         type:"drawing",
-        from: this.$store.state.userName,
-        fromid: this.$store.state.userId,
         content: this.line
       };
       this.lines.push(this.send_line);
@@ -649,22 +647,16 @@ export default {
       this.socketApi.sendSock(this.send_line, this.getSocketConnect);
     },
     getSocketConnect(data) {
-      let lineData = JSON.parse(data);
+      let lineData = data;
 
       if (lineData.from === "Test") {
         console.log(lineData.content);
-      } else {
-        //判断消息的发出者
-        var uid = lineData.fromid;
-        if (
-          uid !== this.$store.state.userId &&
-          uid !== undefined
-          // uid !== ""
-        ) {
-          //画面协同更新
-          this.line = lineData.content;
-          this.collaDrawLine(this.line);
-        }
+      } 
+      else if(lineData.type === "members"){}
+      else {        
+        //画面协同更新
+        this.line = lineData.content;
+        this.collaDrawLine(this.line);        
       }
     },
     collaDrawLine(line) {
@@ -704,7 +696,6 @@ export default {
       this.send_msg = {
         type:"test",
         from: "Test",
-        fromid: this.$store.state.userId,
         content: "TestChat"
       };
       this.socketApi.sendSock(this.send_msg, this.getSocketConnect);
@@ -746,7 +737,7 @@ export default {
 };
 </script>
 <style scoped>
-@i mport "//fonts.useso.com/css?family=Roboto:300,400,500,700,400italic";
+/* @import "//fonts.useso.com/css?family=Roboto:300,400,500,700,400italic"; */
 @import "http://cdn.bootcss.com/material-design-icons/3.0.1/iconfont/material-icons.css";
 * {
   -webkit-user-select: none;

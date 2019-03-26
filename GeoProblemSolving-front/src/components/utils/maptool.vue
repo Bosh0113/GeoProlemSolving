@@ -90,8 +90,7 @@ export default {
         zoom:13
       });
     },
-    initLayer() {
-      
+    initLayer() {      
       this.drawingLayerGroup = L.layerGroup([]);
       this.drawingLayerGroup.addTo(this.map);
     },
@@ -154,9 +153,9 @@ export default {
         drawRectangle: true, // adds button to draw a rectangle
         drawPolygon: true, // adds button to draw a polygon
         drawCircle: true, // adds button to draw a cricle
-        cutPolygon: true, // adds button to cut a hole in a polygon
-        editMode: true, // adds button to toggle edit mode for all layers
-        dragMode:true,
+        cutPolygon: false, // adds button to cut a hole in a polygon
+        editMode: false, // adds button to toggle edit mode for all layers
+        dragMode:false,
         removalMode: true // adds a button to remove layers
       };
       this.map.pm.addControls(options);
@@ -264,48 +263,22 @@ export default {
       };
       return false;
     },
-    viewData(){      
+    viewData(){
+      // 协同  
       this.send_content={
         type:"uploaddata",
-        layer: this.uploadGeoJson,
-        from:this.$store.state.userName,
-        fromid:this.$store.state.userId
+        layer: this.uploadGeoJson
       }
       this.socketApi.sendSock(this.send_content, this.getSocketConnect);
 
-      for(let i = 0; i < this.uploadGeoJson.features.length; i++){
-        let feature = this.uploadGeoJson.features[i];
-        let type = feature.geometry.type;
-        switch (type){
-          case "Point":{
-            //坐标转换
-            let latlng = L.latLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
-            var coordinates = latlng;
-
-            L.marker(coordinates).addTo(this.map);
-            break;
-          }
-          case "LineString": {
-            for(let j = 0;j<feature.geometry.coordinates.length;j++){
-              var latlng = {lat:feature.geometry.coordinates[j][1], lng:feature.geometry.coordinates[j][0]};
-              feature.geometry.coordinates[j]=latlng;
-            }
-
-            L.polyline(feature.geometry.coordinates).addTo(this.map);
-            break;
-          }
-          case "Polygon":{
-            for(let j = 0;j<feature.geometry.coordinates.length;j++){
-              for(let k = 0;k<feature.geometry.coordinates[j].length;k++){
-                let latlng = {lat:feature.geometry.coordinates[j][k][1], lng:feature.geometry.coordinates[j][k][0]};
-                feature.geometry.coordinates[j][k]=latlng;
-              }
-            }
-            L.polygon(feature.geometry.coordinates).addTo(this.map);
-            break;
-          }         
+      let geoJsonLayer = L.geoJSON(this.uploadGeoJson, {
+        style: function (feature) {
+            return {color: "green"};
         }
-      }
+      }).bindPopup(function (layer) {
+          return layer.feature.properties.description;
+      });      
+      this.drawingLayerGroup.addLayer(geoJsonLayer);      
 
       this.showFile = false;
       this.uploadGeoJson = null;
@@ -345,23 +318,19 @@ export default {
         if(isLayerCtrlClick){
           this.send_content={
               type:"overlay",
-              layer: e.name,
-              from:this.$store.state.userName,
-              fromid:this.$store.state.userId
+              layer: e.name
             }
           this.socketApi.sendSock(this.send_content, this.getSocketConnect);
         }
         isLayerCtrlClick = false;
       });
-      
+     
       //缩放事件 与 鼠标事件同时发生
       this.map.on("zoomend", e=>{
         if(this.map.scrollWheelZoom || isZoomControl || isDoubleClick){      
           this.send_content={
             type:"zoom",
-            zoom: this.map.getZoom(),
-            from:this.$store.state.userName,
-            fromid:this.$store.state.userId
+            zoom: this.map.getZoom()
           }
           this.socketApi.sendSock(this.send_content, this.getSocketConnect);
           isZoomControl = false;
@@ -369,22 +338,41 @@ export default {
         }
       });
 
-      //拖拽事件
+      //地图拖拽事件
       this.map.on("moveend", e=>{
         if(isMouseDown){
           this.send_content={
             type:"move",
-            center:this.map.getCenter(),
-            from:this.$store.state.userName,
-            fromid:this.$store.state.userId
+            center:this.map.getCenter()
           }
           this.socketApi.sendSock(this.send_content, this.getSocketConnect);
         }
       });
 
+      // 裁剪事件
+      this.map.on("pm:cut",e=>{
+        // this.drawingLayerGroup.removeLayer(e.originalLayer);
+        // this.drawingLayerGroup.addLayer(e.layer);
+        // this.send_content={
+        //     type:"cut",
+        //     layer: this.drawingLayerGroup.toGeoJSON()
+        //   }
+        // this.socketApi.sendSock(this.send_content, this.getSocketConnect);
+      });
+      
+      // 删除事件
+      this.map.on("pm:remove",e=>{
+        this.drawingLayerGroup.removeLayer(e.layer);
+        this.send_content={
+            type:"remove",
+            layer: this.drawingLayerGroup.toGeoJSON()
+          }
+        this.socketApi.sendSock(this.send_content, this.getSocketConnect);
+      });
+
       // 画图事件
       this.map.on("pm:create", e => {
-        // this.drawingLayerGroup.addLayer(e.layer);
+        this.drawingLayerGroup.addLayer(e.layer);
         let points = null;
         switch (e.shape) {
           case "Marker":
@@ -419,36 +407,21 @@ export default {
         this.send_content={
           type:"add",
           shape:e.shape,
-          layer:this.traces,
-          from:this.$store.state.userName,
-          fromid:this.$store.state.userId
+          layer:this.traces
         }
-        this.socketApi.sendSock(this.send_content, this.getSocketConnect);
-      });
-
-      // 删除事件???
-      this.map.on("pm:remove", e => {
-        let layerId = this.drawingLayerGroup.getLayerId(e.layer);
-        this.send_content={
-          type: "remove",
-          layerId: layerId,
-          from: this.$store.state.userName,
-          fromid: this.$store.state.userId
-        }
-        
         this.socketApi.sendSock(this.send_content, this.getSocketConnect);
       });
     },
     getSocketConnect(data) {
-      let socketMsg = JSON.parse(data);
+      let socketMsg = data;
 
-      if (socketMsg.type === "Test") {
-        console.log(chatMsg.content);
-      } else {
+      if (socketMsg.type === "test") {
+        console.log(socketMsg.content);
+      }
+      else if(socketMsg.type === "members") {}
+      else {
         //判断消息的发出者
-        var uid = socketMsg.fromid;
-        if (uid !== this.$store.state.userId && uid !== undefined) {
-          
+        
           switch (socketMsg.type){            
             case "zoom":{
               this.map.setZoom(socketMsg.zoom);
@@ -471,7 +444,15 @@ export default {
               break;
             }
             case "remove": {
-              this.drawingLayerGroup.removeLayer(socketMsg.layerId);
+              this.drawingLayerGroup.clearLayers();
+              let geoJson = socketMsg.layer;
+              let geoJsonLayer = L.geoJSON(geoJson, {
+                style: function (feature) {
+                }
+              }).bindPopup(function (layer) {
+                  // return layer.feature.properties.description;
+              });
+              this.drawingLayerGroup.addLayer(geoJsonLayer);
               break;
             }
             case "add":{
@@ -494,14 +475,34 @@ export default {
                   break;
               }
               this.drawingLayerGroup.addLayer(drawingLayer);
-            }
-            case "uploaddata":{
-              this.uploadGeoJson = socketMsg.layer;
-              this.viewData();
+
               break;
             }
-          }         
-        }
+            case "cut": {
+              // this.drawingLayerGroup.clearLayers();
+              // let geoJson = socketMsg.layer;
+              // let geoJsonLayer = L.geoJSON(geoJson, {
+              //   style: function (feature) {
+              //   }
+              // }).bindPopup(function (layer) {
+              //     return layer.feature.properties.description;
+              // });
+              // this.drawingLayerGroup.addLayer(geoJsonLayer);
+              // break;
+            }
+            case "uploaddata":{
+              let geoJson = socketMsg.layer;
+              let geoJsonLayer = L.geoJSON(geoJson, {
+                style: function (feature) {
+                    return {color: "green"};
+                }
+              }).bindPopup(function (layer) {
+                  return layer.feature.properties.description;
+              });
+              this.drawingLayerGroup.addLayer(geoJsonLayer);
+              break;
+            }
+          }
       }
     },
     startWebSocket() {
@@ -511,7 +512,6 @@ export default {
       this.send_content= {
         type:"test",
         from: "Test",
-        fromid: this.$store.state.userId,
         content: "TestChat"
       };
       this.socketApi.sendSock(this.send_content, this.getSocketConnect);
