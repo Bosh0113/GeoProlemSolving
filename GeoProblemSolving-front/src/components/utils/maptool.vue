@@ -440,6 +440,10 @@ export default {
                 this.map.removeLayer(this.baseLayers["Satellite map"]);
               }
               catch (e){}
+              try{
+                this.map.removeLayer(this.baseLayers["Vector map"]);
+              }
+              catch (e){}
               this.baseLayers[socketMsg.layer].addTo(this.map);
               break;
             }
