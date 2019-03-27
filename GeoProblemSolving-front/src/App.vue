@@ -5,10 +5,6 @@
   </div>
 </template>
 <style scoped>
-body{
-  /* overflow: hidden; */
-  /* overflow-y: scroll; */
-}
 </style>
 <script>
 export default {

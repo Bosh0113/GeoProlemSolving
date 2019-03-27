@@ -3,6 +3,7 @@ package cn.edu.njnu.geoproblemsolving.Dao.SubProject;
 import cn.edu.njnu.geoproblemsolving.Dao.Method.EncodeUtil;
 import cn.edu.njnu.geoproblemsolving.Entity.SubProjectEntity;
 import cn.edu.njnu.geoproblemsolving.Dao.Method.CommonMethod;
+import cn.edu.njnu.geoproblemsolving.Entity.UserEntity;
 import com.alibaba.fastjson.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -12,6 +13,8 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,48 +24,58 @@ public class SubProjectDaoImpl implements ISubProjectDao {
     private final MongoTemplate mongoTemplate;
 
     @Autowired
-    public SubProjectDaoImpl(MongoTemplate mongoTemplate){this.mongoTemplate=mongoTemplate;}
+    public SubProjectDaoImpl(MongoTemplate mongoTemplate) {
+        this.mongoTemplate = mongoTemplate;
+    }
 
     @Override
-    public String createSubProject(SubProjectEntity subProject){
+    public String createSubProject(SubProjectEntity subProject) {
         try {
+            Date data = new Date();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            String subProjectId = UUID.randomUUID().toString();
+            subProject.setSubProjectId(subProjectId);
+            subProject.setMembers(new JSONArray());
+            subProject.setCreateTime(dateFormat.format(data));
+
             // decode projectId
             String pid = subProject.getProjectId();
-            if(pid.length() > 36) {
+            if (pid.length() > 36) {
                 String projectId = new String(EncodeUtil.decode(pid));
                 subProject.setProjectId(projectId.substring(0, projectId.length() - 2));
             }
-
+            Query queryUser = Query.query(Criteria.where("userId").is(subProject.getManagerId()));
+            UserEntity managerInfo = mongoTemplate.findOne(queryUser, UserEntity.class);
+            subProject.setManagerName(managerInfo.getUserName());
             mongoTemplate.save(subProject);
             return subProject.getSubProjectId();
-        }catch (Exception e){
+        } catch (Exception e) {
             return "Fail";
         }
     }
 
     @Override
-    public Object readSubProject(String key,String value){
+    public Object readSubProject(String key, String value) {
         try {
             // decode
             String projectId = value;
-            if(projectId.length() > 36) {
+            if (projectId.length() > 36) {
                 String pid = new String(EncodeUtil.decode(projectId));
                 value = pid.substring(0, pid.length() - 2);
             }
 
-            Query query=new Query(Criteria.where(key).is(value));
-            if (mongoTemplate.find(query,SubProjectEntity.class).isEmpty()){
+            Query query = new Query(Criteria.where(key).is(value));
+            if (mongoTemplate.find(query, SubProjectEntity.class).isEmpty()) {
                 return "None";
-            }
-            else {
-                List<SubProjectEntity> subProjectEntities = mongoTemplate.find(query,SubProjectEntity.class);
+            } else {
+                List<SubProjectEntity> subProjectEntities = mongoTemplate.find(query, SubProjectEntity.class);
 
-                for(int i = 0;i < subProjectEntities.size();i++){
+                for (int i = 0; i < subProjectEntities.size(); i++) {
                     // get
                     SubProjectEntity subProjectEntity = subProjectEntities.get(i);
                     projectId = subProjectEntity.getProjectId();
                     // encode
-                    if(projectId.length() == 36) {
+                    if (projectId.length() == 36) {
                         String randomID = UUID.randomUUID().toString().substring(0, 2);
                         projectId = EncodeUtil.encode((projectId + randomID).getBytes());
                     }
@@ -72,103 +85,106 @@ public class SubProjectDaoImpl implements ISubProjectDao {
 
                 return subProjectEntities;
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             return "Fail";
         }
     }
 
     @Override
-    public String deleteSubProject(String key,String value){
+    public String deleteSubProject(String key, String value) {
         try {
-            Query query=new Query(Criteria.where(key).is(value));
-            mongoTemplate.remove(query,SubProjectEntity.class);
+            Query query = new Query(Criteria.where(key).is(value));
+            mongoTemplate.remove(query, SubProjectEntity.class);
             return "Success";
-        }catch (Exception e){
+        } catch (Exception e) {
             return "Fail";
         }
     }
 
     @Override
-    public String updateSubProject(HttpServletRequest request){
+    public String updateSubProject(HttpServletRequest request) {
         try {
             String subProjectId = request.getParameter("subProjectId");
-            Query query=new Query(Criteria.where("subProjectId").is(subProjectId));
-            CommonMethod method=new CommonMethod();
-            Update update=method.setUpdate(request);
-            mongoTemplate.updateFirst(query,update,SubProjectEntity.class);
+            Query query = new Query(Criteria.where("subProjectId").is(subProjectId));
+            CommonMethod method = new CommonMethod();
+            Update update = method.setUpdate(request);
+            mongoTemplate.updateFirst(query, update, SubProjectEntity.class);
             return "Success";
-        }catch (Exception e){
+        } catch (Exception e) {
             return "Fail";
         }
     }
 
     @Override
-    public Object joinSubProject(String subProjectId,String userId){
+    public Object joinSubProject(String subProjectId, String userId) {
         try {
-            Query query=new Query(Criteria.where("subProjectId").is(subProjectId));
-            if (!mongoTemplate.find(query,SubProjectEntity.class).isEmpty()){
-                SubProjectEntity subProject=mongoTemplate.findOne(query,SubProjectEntity.class);
-                String managerId=subProject.getManagerId();
-                JSONArray members=subProject.getMembers();
-                CommonMethod method=new CommonMethod();
-                Object result=method.joinGroup(members,managerId,userId,mongoTemplate);
-                if (result.equals("Exist")){
+            Query query = new Query(Criteria.where("subProjectId").is(subProjectId));
+            if (!mongoTemplate.find(query, SubProjectEntity.class).isEmpty()) {
+                SubProjectEntity subProject = mongoTemplate.findOne(query, SubProjectEntity.class);
+                String managerId = subProject.getManagerId();
+                JSONArray members = subProject.getMembers();
+                CommonMethod method = new CommonMethod();
+                Query queryUser=Query.query(Criteria.where("userId").is(userId));
+                UserEntity userEntity=mongoTemplate.findOne(queryUser,UserEntity.class);
+                Object result = method.joinGroup(members, managerId, userId,userEntity.getUserName(), mongoTemplate);
+                if (result.equals("Exist")) {
                     return "Exist";
+                } else {
+                    Update update = new Update();
+                    update.set("members", result);
+                    mongoTemplate.updateFirst(query, update, SubProjectEntity.class);
+                    return mongoTemplate.findOne(query, SubProjectEntity.class);
                 }
-                else {
-                    Update update=new Update();
-                    update.set("members",result);
-                    mongoTemplate.updateFirst(query,update,SubProjectEntity.class);
-                    return mongoTemplate.findOne(query,SubProjectEntity.class);
-                }
-            }
-            else {
+            } else {
                 return "None";
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             return "Fail";
         }
     }
 
     @Override
-    public String quitSubProject(String subProjectId,String userId){
+    public String quitSubProject(String subProjectId, String userId) {
         try {
 
-            Query query=new Query(Criteria.where("subProjectId").is(subProjectId));
-            if (!mongoTemplate.find(query,SubProjectEntity.class).isEmpty()){
-                SubProjectEntity subProject=mongoTemplate.findOne(query,SubProjectEntity.class);
-                JSONArray members=subProject.getMembers();
-                CommonMethod method=new CommonMethod();
-                JSONArray newMembers=method.quitGroup(members,userId,"userId");
-                Update update= new Update();
-                update.set("members",newMembers);
-                mongoTemplate.updateFirst(query,update,SubProjectEntity.class);
+            Query query = new Query(Criteria.where("subProjectId").is(subProjectId));
+            if (!mongoTemplate.find(query, SubProjectEntity.class).isEmpty()) {
+                SubProjectEntity subProject = mongoTemplate.findOne(query, SubProjectEntity.class);
+                JSONArray members = subProject.getMembers();
+                CommonMethod method = new CommonMethod();
+                JSONArray newMembers = method.quitGroup(members, userId, "userId");
+                Update update = new Update();
+                update.set("members", newMembers);
+                mongoTemplate.updateFirst(query, update, SubProjectEntity.class);
                 return "Success";
-            }
-            else {
+            } else {
                 return "None";
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             return "Fail";
         }
     }
 
     @Override
-    public Object changeManager(String subProjectId,String userId){
+    public Object changeManager(String subProjectId, String userId) {
         try {
-            Query query=new Query(Criteria.where("subProjectId").is(subProjectId));
-            SubProjectEntity subProject=mongoTemplate.findOne(query,SubProjectEntity.class);
-            String foreManagerId=subProject.getManagerId();
-            JSONArray members=subProject.getMembers();
-            CommonMethod method=new CommonMethod();
-            JSONArray newMembers=method.quitGroup(members,userId,"userId");
-            JSONArray newMembers1=(JSONArray)method.joinGroup(newMembers,userId,foreManagerId,mongoTemplate);
-            Update update=new Update();
-            update.set("members",newMembers1);
-            update.set("managerId",userId);
-            mongoTemplate.updateFirst(query,update,SubProjectEntity.class);
-            return mongoTemplate.findOne(query,SubProjectEntity.class);
-        }catch (Exception e){
+            Query query = new Query(Criteria.where("subProjectId").is(subProjectId));
+            SubProjectEntity subProject = mongoTemplate.findOne(query, SubProjectEntity.class);
+            String foreManagerId = subProject.getManagerId();
+            String foreManagerName=subProject.getManagerName();
+            JSONArray members = subProject.getMembers();
+            CommonMethod method = new CommonMethod();
+            JSONArray newMembers = method.quitGroup(members, userId, "userId");
+            JSONArray newMembers1 = (JSONArray) method.joinGroup(newMembers, userId, foreManagerId,foreManagerName, mongoTemplate);
+            Query queryUser =Query.query(Criteria.where("userId").is(userId));
+            UserEntity newManager=mongoTemplate.findOne(queryUser,UserEntity.class);
+            Update update = new Update();
+            update.set("members", newMembers1);
+            update.set("managerId", newManager.getUserId());
+            update.set("managerName",newManager.getUserName());
+            mongoTemplate.updateFirst(query, update, SubProjectEntity.class);
+            return mongoTemplate.findOne(query, SubProjectEntity.class);
+        } catch (Exception e) {
             return "Fail";
         }
     }

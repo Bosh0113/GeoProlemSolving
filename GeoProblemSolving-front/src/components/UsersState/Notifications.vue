@@ -140,7 +140,7 @@
 </template>
 <script>
 export default {
-  created() {
+  mounted() {
     this.loadNotifications();
   },
   data() {
@@ -190,7 +190,7 @@ export default {
           "/GeoProblemSolving/notice/inquiry?" +
             "key=recipientId" +
             "&value=" +
-            this.$store.state.userId
+            this.$store.getters.userId
         )
         .then(res => {
           if (res.data !== "Fail") {

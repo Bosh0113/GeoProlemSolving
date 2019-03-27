@@ -251,11 +251,11 @@ export default {
   components: {},
   computed: {
     avatar() {
-      return this.$store.state.avatar;
+      return this.$store.getters.avatar;
     }
   },
-  created() {
-    this.$store.state.avatar = "";
+  mounted() {
+    this.$store.getters.avatar = "";
   },
   data() {
     var validatePass = (rule, value, callback) => {

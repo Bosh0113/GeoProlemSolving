@@ -2,14 +2,11 @@ package cn.edu.njnu.geoproblemsolving.Controller;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Project.ProjectDaoImpl;
 import cn.edu.njnu.geoproblemsolving.Entity.ProjectEntity;
-import com.alibaba.fastjson.JSONArray;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.text.SimpleDateFormat;
-import java.util.*;
 
 @CrossOrigin(origins = "*",allowCredentials = "true")
 @RestController
@@ -22,14 +19,6 @@ public class ProjectController {
     public String createProject(@RequestBody ProjectEntity project){
         ProjectDaoImpl projectDao=new ProjectDaoImpl(mongoTemplate);
         try{
-            Date date = new Date();
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-            String projectId=UUID.randomUUID().toString();
-            project.setProjectId(projectId);
-            JSONArray members=new JSONArray();
-            project.setMembers(members);
-            project.setCreateTime(dateFormat.format(date));
-            project.setEndTime("");
             return projectDao.createProject(project);
         }catch (Exception e){
             return "Fail";

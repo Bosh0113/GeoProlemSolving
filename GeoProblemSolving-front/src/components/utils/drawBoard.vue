@@ -83,6 +83,7 @@
 import { Photoshop } from "vue-color";
 import { canvas } from "leaflet";
 import * as socketApi from "./../../api/socket.js";
+import MuseUI from "./../../utils/MuseUI";
 export default {
   name: "draw",
   data() {
@@ -638,8 +639,8 @@ export default {
     },
     socket() {
       this.send_line = {
-        from: this.$store.state.userName,
-        fromid: this.$store.state.userId,
+        from: this.$store.getters.userName,
+        fromid: this.$store.getters.userId,
         content: this.line
       };
       this.lines.push(this.send_line);
@@ -656,7 +657,7 @@ export default {
         //判断消息的发出者
         var uid = lineData.fromid;
         if (
-          uid !== this.$store.state.userId &&
+          uid !== this.$store.getters.userId &&
           uid !== undefined
           // uid !== ""
         ) {
@@ -702,7 +703,7 @@ export default {
 
       this.send_msg = {
         from: "Test",
-        fromid: this.$store.state.userId,
+        fromid: this.$store.getters.userId,
         content: "TestChat"
       };
       this.socketApi.sendSock(this.send_msg, this.getSocketConnect);

@@ -11,8 +11,13 @@ public class SubProjectEntity {
     private String title;
     private String description;
     private String managerId;
+    private String managerName;
     private JSONArray members;
     private String createTime;
+
+    public String getManagerName() {
+        return managerName;
+    }
 
     public String getDescription() {
         return description;
@@ -64,6 +69,10 @@ public class SubProjectEntity {
 
     public void setManagerId(String managerId) {
         this.managerId = managerId;
+    }
+
+    public void setManagerName(String managerName) {
+        this.managerName = managerName;
     }
 
     public void setSubProjectId(String subProjectId) {

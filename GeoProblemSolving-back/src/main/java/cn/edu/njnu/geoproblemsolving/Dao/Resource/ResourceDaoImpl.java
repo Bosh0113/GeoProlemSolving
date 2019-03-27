@@ -2,6 +2,7 @@ package cn.edu.njnu.geoproblemsolving.Dao.Resource;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Method.EncodeUtil;
 import cn.edu.njnu.geoproblemsolving.Entity.ResourceEntity;
+import cn.edu.njnu.geoproblemsolving.Entity.UserEntity;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
@@ -105,6 +106,8 @@ public class ResourceDaoImpl implements IResourceDao {
                             String sid = new String(EncodeUtil.decode(projectId));
                             projectId = sid.substring(0, sid.length() - 2);
                         }
+                        Query queryUser=Query.query(Criteria.where("userId").is(request.getParameter("uploaderId")));
+                        UserEntity uploader=mongoTemplate.findOne(queryUser,UserEntity.class);
                         scope.put("projectId", projectId);
                         resourceEntity.setScope(scope);
                         resourceEntity.setName(fileNames);
@@ -113,7 +116,9 @@ public class ResourceDaoImpl implements IResourceDao {
                         resourceEntity.setType(request.getParameter("type"));
                         resourceEntity.setFileSize(fileSize);
                         resourceEntity.setPathURL(pathURL);
-                        resourceEntity.setUploaderId(request.getParameter("uploaderId"));
+                        resourceEntity.setUploaderId(uploader.getUserId());
+                        resourceEntity.setUploaderName(uploader.getUserName());
+                        resourceEntity.setOrganization(uploader.getOrganization());
                         resourceEntity.setUploadTime(uploadTime);
                         mongoTemplate.save(resourceEntity);
                     } else {

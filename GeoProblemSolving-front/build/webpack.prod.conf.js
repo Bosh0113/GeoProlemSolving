@@ -12,6 +12,8 @@ const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 
 const env = require('../config/prod.env')
+const PrerenderSpaPlugin =require('prerender-spa-plugin')
+const Renderer =PrerenderSpaPlugin.PuppeteerRenderer
 
 const webpackConfig = merge(baseWebpackConfig, {
   module: {
@@ -24,6 +26,7 @@ const webpackConfig = merge(baseWebpackConfig, {
   devtool: config.build.productionSourceMap ? config.build.devtool : false,
   output: {
     path: config.build.assetsRoot,
+    publicPath:'/',
     filename: utils.assetsPath('js/[name].[chunkhash].js'),
     chunkFilename: utils.assetsPath('js/[id].[chunkhash].js')
   },
@@ -115,7 +118,22 @@ const webpackConfig = merge(baseWebpackConfig, {
         to: config.build.assetsSubDirectory,
         ignore: ['.*']
       }
-    ])
+    ]),
+
+    // prerender-spa-plugin
+    // new PrerenderSpaPlugin({
+    //   staticDir:path.join(__dirname,'../dist'),
+    //   routes:['/projectlist'],
+    //   outputDir:path.join(config.build.assetsRoot, config.build.assetsPublicPath),
+    //   indexPath: path.join(config.build.assetsRoot, 'index.html'),
+    //   renderer: new Renderer({
+    //     inject: {
+    //       foo: 'bar'
+    //     },
+    //     headless: false,
+    //     renderAfterDocumentEvent: 'render-event',
+    //   })
+    // })
   ]
 })
 

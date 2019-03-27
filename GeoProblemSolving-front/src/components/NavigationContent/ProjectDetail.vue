@@ -232,7 +232,7 @@
             <p slot="title" style="font-size:25px;height:40px;line-height:40px;">Members</p>
             <div slot="extra" style="height:40px" class="popCenter">
               <Poptip trigger="hover" content="Invite other members" placement="right">
-                <Button class="inviteBtn" v-show="isProjectManager" @click="inviteModalShow()">
+                <Button class="inviteBtn" v-show="this.currentProjectDetail.isManager" @click="inviteModalShow()">
                   <Icon type="md-person-add" size="20"/>
                 </Button>
               </Poptip>
@@ -329,7 +329,7 @@
                 <Button
                   class="subProjectBtn"
                   @click="subProjectModal = true"
-                  v-show="this.isProjectManager||this.isProjectMember"
+                  v-show="this.currentProjectDetail.isManager||this.currentProjectDetail.isMember"
                 >
                   <Icon type="md-add" size="20"/>
                 </Button>
@@ -415,7 +415,7 @@
                         <span
                           style="float:left;color:white;background-color:#2d8cf0;padding:2.5px;min-width:100px;text-align:center"
                         >manager</span>
-                        <span style="float:right;padding:2.5px">{{subProject.manager}}</span>
+                        <span style="float:right;padding:2.5px">{{subProject.managerName}}</span>
                       </div>
                       <br>
                       <div class="whitespace"></div>
@@ -695,6 +695,7 @@
 </template>
 <script>
 import Avatar from "vue-avatar";
+import VueClipboards from "./../../utils/VueClipboards";
 export default {
   components: {
     Avatar
@@ -714,16 +715,14 @@ export default {
       /* 编辑项目字段结束*/
       projectManager: {},
       //确定用户是否有更新项目的权限，控制是否显示编辑的按钮，只有创建者才有权对项目进行编辑
-      isProjectManager: false,
-      isProjectMember: false,
       copyProjectId: "",
       copyProjectTitle: "",
       copyProjectIdStatus: false,
       copyProjectTitleStatus: false,
       currentProjectDetail: {
-        members: [],
-        introduction: "",
-        projectId: ""
+        // members: [],
+        // introduction: "",
+        // projectId: ""
       },
       //确定用户是否有更新项目的权限，控制是否显示编辑的按钮，只有创建者才有权对项目进行编辑
       projectEditAble: false,
@@ -793,15 +792,16 @@ export default {
       removeProjectModal :false,
     };
   },
-  created: function() {
-    // alert(111);
+  created(){
+    this.getAllSubProject();
+    this.getAllResource();
+  },
+  mounted() {
     this.$Message.config({
       top: 150,
       duration: 3
     });
     this.getProjectDetail();
-    this.getAllSubProject();
-    this.getAllResource();
   },
   // add by mzy for navigation guards
   beforeRouteEnter: (to, from, next) => {
@@ -809,9 +809,9 @@ export default {
       if (!vm.$store.getters.userState) {
         next("/login");
       } else {
-        if (!(vm.isProjectManager || vm.isProjectMember)) {
+        if (!(vm.currentProjectDetail.isManager || vm.currentProjectDetail.isMember)) {
           alert("No access");
-          next("/project");
+          next("/projectlist");
           // vm.$router.go(-1);
         }
       }
@@ -819,77 +819,69 @@ export default {
   },
   methods: {
     getProjectDetail() {
+      let projectInfo=this.$store.getters.project;
       let pid = this.$route.params.id;
-      let queryObject = { key: "projectId", value: pid };
       var that = this;
-      try {
-        $.ajax({
-          url:
-            "/GeoProblemSolving/project/inquiry" +
-            "?key=" +
-            queryObject["key"] +
-            "&value=" +
-            queryObject["value"],
-          type: "GET",
-          async: false,
-          success: function(data) {
-            if (data === "None") {
-              that.currentProjectDetail = {
-                members: [],
-                introduction: "",
-                projectId: ""
-              };
-            } else {
-              let obj = data;
-              that.currentProjectDetail = obj[0];
-              // 邀请他人加入项目的form的复制项目id与项目名的按钮
-              that.copyProjectId = that.currentProjectDetail.projectId;
-              that.copyProjectTitle = that.currentProjectDetail.title;
-              that.projectManager.userId =
-                that.currentProjectDetail["managerId"];
-              $.ajax({
-                url:
-                  "/GeoProblemSolving/user/inquiry" +
-                  "?key=" +
-                  "userId" +
-                  "&value=" +
-                  that.projectManager.userId,
-                type: "GET",
-                async: false,
-                success: function(data) {
-                  that.projectManager.userName = data.userName;
-                },
-                error: function(err) {
-                  console.log("Get manager name fail.");
-                }
-              });
-              sessionStorage.setItem(
-                "projectId",
-                that.currentProjectDetail.projectId
-              );
-              //将tag进行分割
-              that.currentProjectDetail.tag = that.currentProjectDetail.tag.split(
-                ","
-              );
-              that.isProjectManager = that.managerIdentity(
-                that.currentProjectDetail.managerId
-              );
-              that.isProjectMember = that.memberIdentity(
-                that.currentProjectDetail.members
-              );
-              // this.getAllSubProject(queryObject);
-            }
-          },
-          error: function(err) {
-            console.log("Get manager name fail.");
-          }
-        });
-      } catch (err) {
-        console.log(err);
+      if(JSON.stringify(projectInfo)!="{}" && projectInfo.projectId==pid){
+        that.currentProjectDetail=projectInfo;
+        this.updateRelatedInfo();
       }
+      else{
+        let queryObject = { key: "projectId", value: pid };
+        try {
+          $.ajax({
+            url:
+              "/GeoProblemSolving/project/inquiry" +
+              "?key=" +
+              queryObject["key"] +
+              "&value=" +
+              queryObject["value"],
+            type: "GET",
+            async: false,
+            success: function(data) {
+              if (data === "None") {
+                that.currentProjectDetail = {
+                  members: [],
+                  introduction: "",
+                  projectId: ""
+                };
+              } else {
+                let projectInfo = data[0];
+                projectInfo.isManager=that.managerIdentity(projectInfo.managerId);
+                projectInfo.isMember=that.memberIdentity(projectInfo.members);
+                that.currentProjectDetail = projectInfo;
+                that.$store.commit("setProjectInfo", projectInfo);
+                that.updateRelatedInfo();
+              }
+            },
+            error: function(err) {
+              console.log("Get manager name fail.");
+            }
+          });
+        } catch (err) {
+          console.log(err);
+        }
+      }
+      
+    },
+    updateRelatedInfo(){
+      var that = this;
+      // 邀请他人加入项目的form的复制项目id与项目名的按钮
+      that.copyProjectId = that.currentProjectDetail.projectId;
+      that.copyProjectTitle = that.currentProjectDetail.title;
+      that.projectManager.userId = that.currentProjectDetail.managerId;
+      that.projectManager.userName = that.currentProjectDetail.managerName;
+      sessionStorage.setItem(
+        "projectId",
+        that.currentProjectDetail.projectId
+      );
+      //将tag进行分割
+      that.currentProjectDetail.tag = that.currentProjectDetail.tag.split(
+        ","
+      );
     },
     managerIdentity(managerId) {
-      if (managerId === this.$store.state.userId) {
+      if (managerId === this.$store.getters.userId) {
         return true;
       } else {
         return false;
@@ -898,7 +890,7 @@ export default {
     memberIdentity(members) {
       let isMember;
       for (let i = 0; i < members.length; i++) {
-        if (members[i].userId === this.$store.state.userId) {
+        if (members[i].userId === this.$store.getters.userId) {
           isMember = true;
           break;
         }
@@ -922,8 +914,11 @@ export default {
       let isManager, isMember;
       for (let i = 0; i < this.subProjectList.length; i++) {
         if (this.subProjectList[i]["subProjectId"] === data) {
-          isManager = this.subProjectList[i]["isManager"];
-          isMember = this.subProjectList[i]["isMembers"];
+          let subProjectInfo=this.subProjectList[i];
+          isManager = subProjectInfo["isManager"];
+          isMember = subProjectInfo["isMember"];
+          this.$store.commit("setSubProjectInfo", subProjectInfo);
+          break;
         }
       }
       if (this.$store.getters.userState) {
@@ -944,7 +939,7 @@ export default {
       SubProject["description"] = this.subProjectDescription;
       SubProject["title"] = this.subProjectTitle;
       SubProject["projectId"] = this.currentProjectDetail.projectId;
-      SubProject["managerId"] = this.$store.state.userId;
+      SubProject["managerId"] = this.$store.getters.userId;
       console.log(SubProject);
       this.axios
         .post("/GeoProblemSolving/subProject/create", SubProject)
@@ -968,7 +963,7 @@ export default {
       this.editSubProjectindex = index;
       this.subProjectMembers = this.subProjectList[index].members;
       // if it is the member of the sub-project
-      this.isSubMember = memberIdentity(this.subProjectMembers);
+      this.isSubMember = this.memberIdentity(this.subProjectMembers);
       this.handOverSubProjectModal = true;
     },
     addEmail(email) {
@@ -1076,23 +1071,7 @@ export default {
           } else {
             //改变this的指向，此时this需要赋值给其他变量
             that.subProjectList = res.data;
-            that.subProjectList = that.identity(that.subProjectList);
-            for (let i = 0, n = 0; i < that.subProjectList.length; i++) {
-              $.ajax({
-                url:
-                  "/GeoProblemSolving/user/inquiry" +
-                  "?key=" +
-                  "userId" +
-                  "&value=" +
-                  that.subProjectList[i]["managerId"],
-                type: "GET",
-                async: false,
-                success: function(data) {
-                  that.subProjectList[n++]["manager"] = data.userName;
-                }
-              });
-            }
-            // console.log(that.subProjectList);
+            that.identity(that.subProjectList);
             that.cutString(that.subProjectList, 200);
           }
         })
@@ -1102,12 +1081,10 @@ export default {
     },
     identity(list) {
       for (var i = 0; i < list.length; i++) {
-        let isSubManager = this.managerIdentity(list[i]["managerId"]);
-        list[i]["isManager"] = isSubManager;
-        let isSubMember = this.memberIdentity(list[i]["members"]);
-        list[i]["isMember"] = isSubMember;
+        list[i]["isManager"] = this.managerIdentity(list[i]["managerId"]);
+        list[i]["isMember"] = this.memberIdentity(list[i]["members"]);
       }
-      return list;
+      this.$set(this,"subProjectList",list);
     },
     showDetail(data) {
       alert(data);
@@ -1126,7 +1103,7 @@ export default {
     },
     getFile(event) {
       this.file = event.target.files[0];
-      console.log(this.file);
+      // console.log(this.file);
     },
     //上传文件
     submitFile() {
@@ -1138,7 +1115,7 @@ export default {
       formData.append("file", this.file);
       formData.append("description", this.fileDescription);
       formData.append("type", this.fileType);
-      formData.append("uploaderId", this.$store.state.userId);
+      formData.append("uploaderId", this.$store.getters.userId);
       // 添加字段属于那个项目
       formData.append("belong",this.currentProjectDetail.title);
       let scopeObject = {
@@ -1148,11 +1125,11 @@ export default {
       };
       formData.append("scope",JSON.stringify(scopeObject));
       //这里还要添加其他的字段
-      console.log(formData.get("file"));
+      // console.log(formData.get("file"));
       this.axios
         .post("/GeoProblemSolving/resource/upload", formData)
         .then(res => {
-          if (res == "Success") {
+          if (res.data == "Success") {
             this.$Notice.open({
               title: "Upload notification title",
               desc: "File uploaded successfully",
@@ -1180,10 +1157,9 @@ export default {
             this.$route.params.id
         )
         .then(res => {
-          console.log(res.data);
           //写渲染函数，取到所有资源
           if (res.data !== "None") {
-            this.projectResourceList = res.data;
+            this.$set(this,"projectResourceList",res.data);
           } else {
             this.projectResourceList = [];
           }
@@ -1230,15 +1206,12 @@ export default {
       return data;
     },
     gotoPersonalPage(id) {
-      // sessionStorage.setItem("memberId",data);
-      // this.$router.push({name: 'ProjectDetail',params:{id:id} });
       console.log({ id });
-      if (id == sessionStorage.getItem("userId")) {
+      if (id == this.$store.getters.userId) {
         this.$router.push({ name: "PersonalPage" });
       } else {
         this.$router.push({ name: "MemberDetailPage", params: { id: id } });
       }
-      // console.log("挡墙登陆的账户是:"+ sessionStorage.getItem("userId"));
     },
     editModalShow(id) {
       // this.
@@ -1265,7 +1238,7 @@ export default {
       projectEditForm.append("tag", this.editTags);
       projectEditForm.append("privacy", this.editPrivacy);
       projectEditForm.append("projectId", this.editProjectId);
-      projectEditForm.append("managerId", this.$store.state.userId);
+      projectEditForm.append("managerId", this.$store.getters.userId);
       this.axios
         .post("/GeoProblemSolving/project/update ", projectEditForm)
         .then(res => {
@@ -1280,7 +1253,7 @@ export default {
     },
     // 判断项目详情页面是否具备编辑权限，根据userId与projectId来比较
     judgeIsManager(projectManagerId) {
-      if (projectManagerId === this.$store.state.userId) {
+      if (projectManagerId === this.$store.getters.userId) {
         return true;
       } else {
         return false;
@@ -1301,10 +1274,10 @@ export default {
     },
     addUploadEvent(scopeId){
       let form = {};
-      let description = this.$store.state.userName + ' uploaded a ' + this.fileType + ' file in ' + ' project called ' + this.currentProjectDetail.title;
+      let description = this.$store.getters.userName + ' uploaded a ' + this.fileType + ' file in ' + ' project called ' + this.currentProjectDetail.title;
       form["description"] = description;
       form["scopeId"] = scopeId;
-      this.axios.post("/GeoProblemSolving/history/save?", "description="+ description + "&scopeId=" + scopeId + "&userId=" + this.$store.state.userId)
+      this.axios.post("/GeoProblemSolving/history/save?", "description="+ description + "&scopeId=" + scopeId + "&userId=" + this.$store.getters.userId)
           .then(res=> {
             console.log(res.data);
           })
