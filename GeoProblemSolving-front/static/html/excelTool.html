@@ -1,0 +1,340 @@
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>Document</title>
+  <link rel="stylesheet" href="./css/jquery.jexcel.css" type="text/css" />
+  <!-- 引入样式 -->
+  <link rel="stylesheet" href="./css/index.css" />
+  <style>
+    .app-head {
+        background-color: white;
+        box-shadow: 9px 9px 6px 10px #d1d1d1;
+        height: inherit;
+        text-align: center;
+        padding: 0px 40px;
+        margin-bottom: 20px !important;
+      }
+
+      .logo div {
+        font: bold 28px arial;
+        text-decoration: none;
+        line-height: 60px;
+        color: #409eff;
+        line-height: 80px;
+      }
+      .step2 {
+        position: absolute;
+        z-index: 10;
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        box-shadow: 2px 2px 2px #ddd;
+        padding: 20px;
+        left: 40%;
+        top: 25%;
+      }
+
+      .step2 > .el-row:nth-child(2n + 1) {
+        margin: 10px 0;
+        border-bottom: 1px solid #ddd;
+        padding: 4px 0;
+      }
+      .step2 > .el-row:last-child {
+        border: none;
+      }
+      .close-step2 {
+        position: absolute;
+        right: 1.2rem;
+        top: 1rem;
+        cursor: pointer;
+      }
+      label {
+        color: rebeccapurple;
+      }
+      .el-aside {
+        border-right: 1px solid #777;
+        padding: 0 20px;
+      }
+
+      .el-aside > p {
+        padding: 0 15px;
+      }
+
+      .el-textarea {
+        width: 70%;
+        padding: 0 30px;
+      }
+
+      .rightBody {
+        padding-left: 25px;
+      }
+    </style>
+</head>
+
+<body>
+  <div id="app">
+    <div class="app-head">
+      <el-row :gutter="20">
+        <el-col class="logo" :span="4">
+          <div>OpenGMS</div>
+        </el-col>
+      </el-row>
+    </div>
+
+    <el-container>
+      <el-aside width="25%">
+        <h1>Geodetector</h1>
+        <h4>Introduction</h4>
+        <p>
+          This table edit tool is offers the following functions to help you create edit
+          <strong>csv,excel</strong> data,you can open the file existed in loacl storage,except that,
+          you can download your file just edit.
+        </p>
+        <h4>How to Use</h4>
+        <p>
+          1.click open button , and choose your local file,and edit it.
+        </p>
+        <el-input type="textarea" :autosize="true" resize="none" :disabled="true" v-model="textarea">
+        </el-input>
+        <p>2.Double click the cell , you can edit the content table cell.</p>
+        <p>3.Click donwload button,you can download the file in your own PC</p>
+        <p>
+            <input type='button' value='Order by' onclick="$('#tablePanel').jexcel('orderBy', $(this).next().val())">
+            <select>
+            <option value='0'>Column 1</option>
+            <option value='1'>Column 2</option>
+            <option value='2'>Column 3</option>
+            <option value='3'>Column 4</option>
+            </select>
+        </p>
+
+        <el-row>
+          <el-col :span="2">
+            <el-upload action="http://172.21.213.235:8060/geodata?type=file" :on-success="uploadFileSuccess" multiple="false"
+              ref="upload" limit="1" name="myfile">
+              <el-button>open</el-button>
+            </el-upload>
+          </el-col>
+          <el-col :span="2" :offset="3">
+            <el-button @click="destroy">clear</el-button>
+          </el-col>
+          <el-col :span="2" :offset="3">
+            <el-button @click="download">download</el-button>
+          </el-col>
+        </el-row>
+      </el-aside>
+      <div class="rightBody">
+        <el-main>
+          <el-tabs v-model="activeTab" tab-position="top">
+            <el-tab-pane label="tablePanel" name="tablePanel">
+              <div id="tablePanel"></div>
+            </el-tab-pane>
+          </el-tabs>
+        </el-main>
+      </div>
+    </el-container>
+  </div>
+</body>
+<script src="./js/jquery.min.js"></script>
+<script src="./js/vue.min.js"></script>
+<!-- 引入组件库 -->
+<script src="./js/index.js"></script>
+<script src="./js/jquery.csv.min.js"></script>
+<script src="./js/jquery.jexcel.js"></script>
+<script>
+  var emptyExcel = $.fn.jexcel("helper", {
+    action: "createEmptyData",
+    cols: 20,
+    rows: 20
+  });
+  // others
+  var data;
+  var vue = new Vue({
+    el: "#app",
+    data: {
+      textarea: "And your file must be like this：\nx,y,z\n1,2,3\n1,2,3",
+      outputHas: false,
+      showXYSelect: false,
+      headers: [],
+      xValue: [],
+      yValue: "",
+      activeTab: "tablePanel",
+      activeSubTab: "",
+      collapseItems: [],
+      // 表格的socket工具
+      tableToolSocket: null,
+      excelSocket: null,
+      // empty
+    },
+    computed: {
+      transferHeaders() {
+        let data = [];
+        let row0 = $("#tablePanel").jexcel("getRowData", 0);
+        this.headers.forEach((el, index) => {
+          let flag = parseInt(row0[index]) === Number(row0[index]);
+          if (flag) {
+            data.push({
+              key: el,
+              label: el
+            });
+          } else {}
+        });
+        return data;
+      }
+    },
+    methods: {
+      init() {
+        console.log("init");
+        $("#tablePanel").jexcel({
+          data: emptyExcel,
+          tableOverflow: false,
+          minDimensions: [20, 20],
+          onchange: this.handler,
+          oninsertrow: this.insertrow,
+          ondeleterow: this.deleterow,
+        });
+        if (WebSocket) {
+          this.openExcelSocket();
+        } else {
+          alert("不支持");
+        }
+      },
+      // 下载文件
+      download() {
+        $("#tablePanel").jexcel("download");
+      },
+      computeHeaders() {
+        let h = [];
+        if ($("#tablePanel").jexcel("getData")[0] === undefined) {
+          return h;
+        }
+        let len = $("#tablePanel").jexcel("getData")[0].length;
+        for (let i = 0; i < len; i++) {
+          let headersIndex = $("#tablePanel").jexcel("getHeader", i);
+          if (
+            $("#tablePanel").jexcel("getValue", headersIndex + 1) != ""
+          ) {
+            h.push(headersIndex);
+          }
+        }
+        return h;
+      },
+      destroy() {
+        $("#tablePanel").jexcel({
+          data: emptyExcel
+        });
+        this.$refs.upload.clearFiles();
+        this.headers = [];
+        this.xValue = [];
+        this.yValue = "";
+        this.outputHas = false;
+        this.activeTab = "tablePanel";
+      },
+      uploadFileSuccess(response, file, fileList) {
+        this.$refs.upload.clearFiles();
+        const id = response.data;
+        let inThis = this;
+        $("#tablePanel").jexcel({
+          // Full CSV URL
+          csv: "http://172.21.213.235:8060/geodata/" + id,
+          // // Use the first row of your CSV as the headers
+          csvHeaders: true,
+          // Headers
+          colWidths: [100, 100, 100, 100],
+          tableOverflow: false,
+          minDimensions: [20, 20],
+          onload() {
+            inThis.headers = inThis.computeHeaders();
+            inThis.$notify({
+              title: "成功",
+              message: "上传成功",
+              type: "success"
+            });
+          }
+        });
+      },
+      onopen() {
+        console.log("TableSocket连接成功！");
+      }
+      // websocket
+      ,
+      closeModuleSocket() {
+        if (this.moduleSocket != null) {
+          this.moduleSocket.close();
+        }
+      },
+      openExcelSocket() {
+        let moduleId = "111";
+        var moduleSocketURL = "ws://localhost:8081/GeoProblemSolving/ExcelTool/" + moduleId;
+        this.excelSocket = new WebSocket(moduleSocketURL);
+        this.excelSocket.onopen = this.onopen;
+        this.excelSocket.onmessage = this.onMessage;
+        this.excelSocket.onclose = this.onClose;
+        this.excelSocket.onerror = this.onError;
+        this.setTimer();
+      },
+      onOpen() {
+        console.log("ModuleSocket连接成功！");
+      },
+      onMessage(e) {
+        let messageJson = JSON.parse(e.data);
+        console.log(messageJson);
+      },
+      onClose(e) {
+        this.removeTimer();
+        console.log("ModuleSocket连接断开！");
+      },
+      onError(e) {
+        this.removeTimer();
+        console.log("ModuleSocket连接错误！");
+      },
+      setTimer() {
+        this.timer = setInterval(() => {
+          var messageJson = {};
+          messageJson["type"] = "ping";
+          messageJson["message"] = "ping";
+          this.excelSocket.send(JSON.stringify(messageJson));
+        }, 20000);
+      },
+      removeTimer() {
+        clearInterval(this.timer);
+      },
+      sendMessage(message) {
+        var messageJson = {};
+        messageJson["type"] = "edit";
+        messageJson["location"] = message.location;
+        messageJson["content"] = message.content;
+        this.excelSocket.send(JSON.stringify(messageJson));
+      },
+      // 测试的
+      handler(obj, cell, val){
+        console.log('My table id: ' + $(obj).prop('id'));
+        console.log('Cell changed: ' + $(cell).prop('id'));
+        console.log('Value: ' + val);
+        var messageJson = {};
+        messageJson["location"] = $(cell).prop('id');
+        messageJson["content"] = val;
+        console.log(messageJson);
+        this.sendMessage(messageJson);
+      },
+      insertrow(obj){
+        alert('new row added on table: ' + $(obj).prop('id'));
+        console.log("插入的行是" + $obj);
+      },
+      deleterow(obj){
+        alert('row excluded on table: ' + $(obj).prop('id'));
+      }
+
+    },
+    created() {
+      this.$nextTick(() => {
+        this.init();
+      });
+    },
+    mounted() {}
+  });
+</script>
+
+</html>
