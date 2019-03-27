@@ -217,7 +217,15 @@
                     <div>
                       <Card>
                         <p slot="title">Resource List</p>
-                        <Table :data="userResourceList" :columns="resourceColumn" class="table"></Table>
+                        <Table :data="userResourceList" :columns="resourceColumn" class="table">
+                          <template slot-scope="{ row }" slot="name">
+                            <strong>{{ row.name }}</strong>
+                          </template>
+                          <template slot-scope="{ row, index }" slot="action">
+                            <Button type="success" size="small" style="margin-right: 5px" :href="userResourceList[index].pathURL" title="download" @click="download(index)"><Icon type="md-download"/></Button>
+                            <Button type="warning" size="small"><Icon type="md-eye"/></Button>
+                          </template>
+                        </Table>
                       </Card>
                     </div>
                   </Col>
@@ -386,6 +394,12 @@ export default {
           title: "Time",
           key: "uploadTime",
           sortable: true
+        },
+        {
+          title: "Action",
+          slot: "action",
+          width: 150,
+          align: "center"
         }
       ],
       userManagerProjectList: [
@@ -689,11 +703,15 @@ export default {
         .then(res => {
           if (res.data != "None" && res.data != "Fail") {
             this.userResourceList = res.data;
+            console.table(this.userResourceList);
           }
         })
         .catch(err => {
           console.log(err.data);
         });
+    },
+    download(index){
+      window.open(this.userResourceList[index].pathURL);
     }
   }
 };
