@@ -133,6 +133,7 @@
 <script src="./js/jquery.min.js"></script>
 <script src="./js/jquery.csv.min.js"></script>
 <script src="./js/jquery.jexcel.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.14.1/xlsx.full.min.js"></script>
 <script>
     var emptyExcel = $.fn.jexcel("helper", {
         action: "createEmptyData",
@@ -153,7 +154,7 @@
             activeTab: "tablePanel",
             // 表格的socket工具
             excelSocket: null,
-            boolCollaborate:false
+            boolCollaborate: false
         },
         computed: {
             transferHeaders() {
@@ -185,7 +186,6 @@
                     ondeleterow: this.deleterow,
                     ondeletecolumn: this.deletecol,
                     onsort: this.tableSort,
-                    onresize: this.tableResize,
                     onmoverow: this.rowMove
                 });
                 if (WebSocket) {
@@ -197,6 +197,7 @@
             // 下载文件
             download() {
                 $("#tablePanel").jexcel("download");
+                var data = $('#tablePanel').jexcel('getData', false);
             },
             computeHeaders() {
                 var h = [];
@@ -228,25 +229,14 @@
             uploadFileSuccess(response, file, fileList) {
                 this.$refs.upload.clearFiles();
                 var id = response.data;
-                var inThis = this;
-                $("#tablePanel").jexcel({
-                    // Full CSV URL
-                    csv: "http://172.21.213.235:8060/geodata/" + id,
-                    // // Use the first row of your CSV as the headers
-                    csvHeaders: true,
-                    // Headers
-                    colWidths: [100, 100, 100, 100],
-                    tableOverflow: false,
-                    minDimensions: [20, 20],
-                    onload() {
-                        inThis.headers = inThis.computeHeaders();
-                        inThis.$notify({
-                            title: "成功",
-                            message: "上传成功",
-                            type: "success"
-                        });
-                    }
-                });
+                this.uploadData(file.name, id);
+
+                var socket_content = {
+                    type: "upload",
+                    DataId: id,
+                    fileName: file.name
+                };
+                this.excelSocket.send(JSON.stringify(socket_content));
             },
             onopen() {
                 console.log("TableSocket连接成功！");
@@ -283,17 +273,112 @@
             },
             setTimer() {
                 this.timer = setInterval(function () {
-                        var messageJson = {};
-                        messageJson["type"] = "ping";
-                        messageJson["message"] = "ping";
-                        this.excelSocket.send(JSON.stringify(messageJson));
-                    }, 20000);
+                    var messageJson = {};
+                    messageJson["type"] = "ping";
+                    messageJson["message"] = "ping";
+                    this.excelSocket.send(JSON.stringify(messageJson));
+                }, 20000);
             },
             removeTimer() {
                 clearInterval(this.timer);
             },
+            uploadData(filename, id){
+                var inThis = this;
+                if (/\S*.csv/.test(filename)) {
+                    $("#tablePanel").jexcel({
+                        // Full CSV URL
+                        csv: "http://172.21.213.235:8060/geodata/" + id,
+                        // // Use the first row of your CSV as the headers
+                        csvHeaders: true,
+                        // Headers
+                        colWidths: [100, 100, 100, 100],
+                        tableOverflow: false,
+                        minDimensions: [20, 20],
+                        onchange: inThis.handler,
+                        oninsertrow: inThis.insertrow,
+                        oninsertcolumn: inThis.insertcol,
+                        ondeleterow: inThis.deleterow,
+                        ondeletecolumn: inThis.deletecol,
+                        onsort: inThis.tableSort,
+                        onmoverow: inThis.rowMove,
+                        onload() {
+                            inThis.headers = inThis.computeHeaders();
+                            inThis.$notify({
+                                title: "成功",
+                                message: "上传成功",
+                                type: "success"
+                            });
+                        }
+                    });
+                }
+                else if (/\S*.xls/.test(filename) || /\S*.xlsx/.test(filename)) {
+                    // 获取数据
+                    var xhr = new XMLHttpRequest();
+                    xhr.open("GET", "http://172.21.213.235:8060/geodata/" + id, true);
+                    xhr.responseType = 'blob';
+                    xhr.onload = function(e) {
+                        if (this.status == 200) {
+                            var myBlob = this.response;
+
+                            var fileReader = new FileReader();
+                            fileReader.readAsBinaryString(myBlob);
+                            fileReader.onload = function (ev) {
+                                try {
+                                    var data = ev.target.result;
+                                    var workbook = XLSX.read(data, {
+                                        type: "binary"
+                                    });
+                                    var wsname = workbook.SheetNames[0]; //取第一张表
+                                    var ws = XLSX.utils.sheet_to_json(workbook.Sheets[wsname]);
+
+                                    var arr = Object.keys(ws[0]);
+
+                                    //生成json表格内容
+                                    var list1 = [];
+                                    var list2 = [];
+                                    for (var i = 0; i < ws.length; i++) {
+                                        for (var key in ws[i]) {
+                                            list1.push(ws[i][key]);
+                                        }
+                                        list2[i] = list1;
+                                        list1 = [];
+                                    }
+
+                                    var excelData = list2;
+                                    $("#tablePanel").jexcel({
+                                        data: excelData,
+                                        colHeaders: arr,
+                                        tableOverflow: false,
+                                        csvHeaders: true,
+                                        minDimensions: [20, 20],
+                                        onchange: inThis.handler,
+                                        oninsertrow: inThis.insertrow,
+                                        oninsertcolumn: inThis.insertcol,
+                                        ondeleterow: inThis.deleterow,
+                                        ondeletecolumn: inThis.deletecol,
+                                        onsort: inThis.tableSort,
+                                        onmoverow: inThis.rowMove,
+                                        onload() {
+                                            inThis.headers = inThis.computeHeaders();
+                                            inThis.$notify({
+                                                title: "成功",
+                                                message: "上传成功",
+                                                type: "success"
+                                            });
+                                        }
+                                    });
+
+                                } catch (e) {
+                                    return false;
+                                }
+                            };
+                        }
+                    };
+                    xhr.send();
+                }
+            },
             insertrow(obj, mixed, rowNumber) {
-                if(!this.boolCollaborate) {
+                if (!this.boolCollaborate) {
                     var socket_content = {
                         type: "insert_row",
                         row: rowNumber,
@@ -304,7 +389,7 @@
                 this.boolCollaborate = false;
             },
             insertcol(obj, mixed, properties, columnNumber) {
-                if(!this.boolCollaborate) {
+                if (!this.boolCollaborate) {
                     var socket_content = {
                         type: "insert_col",
                         column: columnNumber,
@@ -316,7 +401,7 @@
                 this.boolCollaborate = false;
             },
             handler(obj, cell, val) {
-                if(!this.boolCollaborate) {
+                if (!this.boolCollaborate) {
                     var socket_content = {};
                     socket_content["type"] = "value_change";
                     socket_content["cell"] = $(cell).prop('id');
@@ -327,7 +412,7 @@
                 this.boolCollaborate = false;
             },
             deleterow(obj, row, num, rcd) {
-                if(!this.boolCollaborate) {
+                if (!this.boolCollaborate) {
                     var socket_content = {
                         type: "delete_row",
                         row: row,
@@ -338,7 +423,7 @@
                 this.boolCollaborate = false;
             },
             deletecol(obj, col, num, rcd) {
-                if(!this.boolCollaborate) {
+                if (!this.boolCollaborate) {
                     var socket_content = {
                         type: "delete_column",
                         column: col,
@@ -348,8 +433,8 @@
                 }
                 this.boolCollaborate = false;
             },
-            rowMove(obj, movefrom, moveto){
-                if(!this.boolCollaborate) {
+            rowMove(obj, movefrom, moveto) {
+                if (!this.boolCollaborate) {
                     var socket_content = {
                         type: "row_move",
                         moveFrom: movefrom,
@@ -359,8 +444,8 @@
                 }
                 this.boolCollaborate = false;
             },
-            tableSort(obj, col ,order){
-                if(!this.boolCollaborate) {
+            tableSort(obj, col, order) {
+                if (!this.boolCollaborate) {
                     var socket_content = {
                         type: "sort",
                         column: col,
@@ -370,34 +455,38 @@
                 }
                 this.boolCollaborate = false;
             },
-            getSocketContent(data){
+            getSocketContent(data) {
                 this.boolCollaborate = true;
-                switch (data.type){
-                    case "insert_row" :{
+                switch (data.type) {
+                    case "upload" : {
+                        this.uploadData(data.fileName, data.DataId);
+                        break;
+                    }
+                    case "insert_row" : {
                         $('#tablePanel').jexcel('insertRow', data.mixed, data.row);
                         break;
                     }
-                    case "insert_col" :{
+                    case "insert_col" : {
                         $('#tablePanel').jexcel('insertColumn', data.mixed, data.properties, data.column);
                         break;
                     }
-                    case "value_change" :{
+                    case "value_change" : {
                         $('#tablePanel').jexcel('setValue', data.cell, data.value);
                         break;
                     }
-                    case "delete_row" :{
+                    case "delete_row" : {
                         $('#tablePanel').jexcel('deleteRow', data.row, data.NumofRow);
                         break;
                     }
-                    case "delete_column" :{
+                    case "delete_column" : {
                         $('#tablePanel').jexcel('deleteColumn', data.column, data.NumofCol);
                         break;
                     }
-                    case "row_move" :{
+                    case "row_move" : {
                         $('#tablePanel').jexcel('moveRow', data.moveFrom, data.moveTo);
                         break;
                     }
-                    case "sort" :{
+                    case "sort" : {
                         $('#tablePanel').jexcel('orderBy', data.column, data.order);
                         break;
                     }

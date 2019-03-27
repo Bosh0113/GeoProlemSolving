@@ -16,6 +16,7 @@ import Notifications from '@/components/UsersState/Notifications.vue'
 import chatUtil from '@/components/utils/chatroom.vue'
 import drawUtil from '@/components/utils/drawBoard.vue'
 import mapTool from '@/components/utils/mapTool.vue'
+import dataCharts from '@/components/utils/charts.vue'
 import projectworkspace from '@/components/NavigationContent/ProjectWorkspace.vue'
 import mavonEditor from 'mavon-editor'
 import 'mavon-editor/dist/css/index.css'
@@ -49,6 +50,7 @@ const routes = [{
     { path: '/chat' ,name :'chatUtil',component: chatUtil},
     { path: '/draw', name: 'drawUtil', component:drawUtil},
     { path: '/map', name: 'mapTool', component:mapTool},
+    { path: '/charts', name: 'dataCharts', component:dataCharts},
 ]
 export default new Router({
   routes,
