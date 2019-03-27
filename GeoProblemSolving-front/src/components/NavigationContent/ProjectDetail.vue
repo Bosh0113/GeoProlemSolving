@@ -1129,7 +1129,7 @@ export default {
       this.axios
         .post("/GeoProblemSolving/resource/upload", formData)
         .then(res => {
-          if (res.data == "Success") {
+          if (res.data!="Size over" && res.data.length>0) {
             this.$Notice.open({
               title: "Upload notification title",
               desc: "File uploaded successfully",
