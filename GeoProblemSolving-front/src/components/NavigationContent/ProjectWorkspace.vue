@@ -1302,7 +1302,7 @@ export default {
     // 召集参与者
     conveneWork(){
       for(let i = 0;i<this.participants.length;i++){  
-        if(this.participants[i].userId != this.$store.state.userId) {     
+        if(this.participants[i].userId != this.$store.getters.userId) {     
           let notice = {};
           notice["recipientId"] = this.participants[i].userId;
           notice["type"] = "Work";
