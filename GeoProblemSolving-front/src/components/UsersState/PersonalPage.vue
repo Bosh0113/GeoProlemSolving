@@ -323,12 +323,15 @@
 import Avatar from "vue-avatar";
 export default {
   created() {
+    // 获取用户信息
     this.getUserProfile();
-    this.getManagerProjectList();
-    this.readPersonalEvent();
+    // 获取用户资源
     this.getUserResource();
+    // 获取用户管理列表
+    this.getManagerProjectList();
+    // 获取用户的历史event
+    this.readPersonalEvent();
     this.detailSidebarHeight = window.innerHeight - 60 + "px";
-    // this.rightContentWidth = window.innerWidth - 270 + "px";
   },
   computed: {
     username() {
@@ -343,7 +346,7 @@ export default {
   },
   mounted() {
     this.getUserProfile();
-    this.getManagerProjectList();
+    // this.getManagerProjectList();
   },
   components: {
     Avatar
@@ -458,7 +461,7 @@ export default {
     };
   },
   methods: {
-    // 获取用户的详细信息
+    //获取用户的详细信息
     getUserProfile() {
       this.axios
         .get(
@@ -479,7 +482,6 @@ export default {
           console.log(err.data);
         });
     },
-    //获取用户参与的所有项目列表
     //获取用户参与的项目列表
     getParticipatoryList(projectIds) {
       var count = projectIds.length;
@@ -517,8 +519,6 @@ export default {
             this.userId
         )
         .then(res => {
-          // 打印用户所管理的项目
-          // console.log(res.data);
           this.userManagerProjectList = res.data;
         })
         .catch(err => {});
@@ -553,10 +553,7 @@ export default {
             this.$store.state.userId
         )
         .then(res => {
-          // 打印注销之后的结果返回值
-          // console.log("注销之后的返回值:"+ res.data);
           this.$router.push({ name: "Home" });
-          // this.$router.router.push()
         })
         .catch(err => {
           console.log(err.data);
@@ -581,20 +578,6 @@ export default {
         })
         .catch(err => {});
     },
-    // editProjectModalShow(index) {
-    //   this.editProjectIndex = index;
-    //   this.editProjectModal = true;
-    //   let editProjectInfo = this.userManagerProjectList[this.editProjectIndex];
-    //   console.log("当前编辑的项目的详情信息是:" + editProjectInfo.projectId);
-    //   this.editTitle = editProjectInfo.title;
-    //   this.editIntroduction = editProjectInfo.introduction;
-    //   this.editDescription = editProjectInfo.description;
-    //   this.editType = editProjectInfo.category;
-    //   this.editTags = editProjectInfo.tag.split(",");
-    //   this.editPrivacy = editProjectInfo.privacy;
-    //   this.editProjectId = editProjectInfo.projectId;
-    // },
-
     cancel() {
       this.$Message.info("cancel");
     },
@@ -712,15 +695,8 @@ export default {
   }
 };
 </script>
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-/* .mainPanel {
-  display: flex;
-} */
 .detailSidebar {
-  /* min-width: 250px;
-  max-width: 300px; */
-  /* width:300px; */
   margin-right: 20px;
 }
 .rightContent {

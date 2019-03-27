@@ -446,6 +446,7 @@ export default {
           " .",
         projectId: data.projectId,
         projectTitle: data.title,
+        scope:"project",
         approve: "unknow"
       };
       this.axios

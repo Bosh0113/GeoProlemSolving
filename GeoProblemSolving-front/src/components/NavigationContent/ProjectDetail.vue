@@ -16,7 +16,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  height:300px;
+  height: 300px;
 }
 .detail_image img {
   max-width: 100%;
@@ -166,9 +166,19 @@
   background-color: #ed4014;
   color: white;
 }
-.moreBtn:hover{
+.moreBtn:hover {
   background-color: #57a3f3;
   color: white;
+}
+.subProjectTitle {
+  height: 40px;
+  line-height: 40px;
+  font-size: 20px;
+  max-width: 200px;
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 /* 按钮样式统一结束 */
 </style>
@@ -205,14 +215,17 @@
               <Row>
                 <Col :xs="12" :sm="10" :md="9" :lg="8">
                   <div class="detail_image">
-                    <img :src="currentProjectDetail.picture" v-if="currentProjectDetail.picture!=''&&currentProjectDetail.picture!='undefined'">
+                    <img
+                      :src="currentProjectDetail.picture"
+                      v-if="currentProjectDetail.picture!=''&&currentProjectDetail.picture!='undefined'"
+                    >
                     <avatar
                       :username="currentProjectDetail.title"
                       :size="300"
                       :title="currentProjectDetail.title"
                       :rounded="false"
-                      v-else>
-                    </avatar>
+                      v-else
+                    ></avatar>
                   </div>
                 </Col>
                 <Col :xs="12" :sm="14" :md="15" :lg="16">
@@ -373,41 +386,26 @@
                 <div v-for="(subProject,index) in subProjectList" :key="subProject.index" style>
                   <Col :lg="12" :md="24" :sm="24" :xs="24">
                     <Card class="subProjectStyle">
-                      <Button
-                        type="default"
-                        slot="extra"
-                        class="authorBtn"
-                        style="margin:-5px 5px 0 5px"
-                        @click="handOverSubProjectShow(index)"
-                        v-show="subProject.isManager"
-                        icon="md-happy"
-                        title="Authorize"
-                      ></Button>
-                      <Button
-                        type="default"
-                        class="editBtn"
-                        slot="extra"
-                        style="margin:-5px 5px 0 5px"
-                        @click="editSubProjectShow(index)"
-                        v-show="subProject.isManager"
-                        icon="ios-brush"
-                        title="edit"
-                      ></Button>
-                      <Button
-                        class="deleteBtn"
-                        type="default"
-                        slot="extra"
-                        style="margin:-5px 5px 0 5px"
-                        @click="deleteSubProjectShow(index)"
-                        v-show="subProject.isManager"
-                        icon="md-close"
-                        title="remove"
-                      ></Button>
-                      <p
+                      <span
                         slot="title"
-                        @click="goWorkspace(subProject.subProjectId)"
+                        @click="goWorkspace(subProject.subProjectId,subProject.members,subProject.isManager)"
                         class="subProjectTitle"
-                      >{{subProject["title"]}}</p>
+                      >{{subProject["title"]}}</span>
+                      <div slot="extra" style="height:auto;display:flex;align-items:center">
+                        <Button
+                          type="default"
+                          v-show="subProject['isMember'] == true||subProject['isManager'] == true"
+                        >
+                          <Icon type="md-person"/>
+                        </Button>
+                        <Button
+                          type="success"
+                          v-show="subProject['isMember'] == false&&subProject['isManager'] == false"
+                          @click="joinSubProject(subProject)"
+                        >
+                          <Icon type="md-add"/>
+                        </Button>
+                      </div>
                       <p class="subProjectDescription">{{subProject["description"]}}</p>
                       <!-- <hr> -->
                       <br>
@@ -506,18 +504,24 @@
           <Card>
             <p slot="title" style="font-size:25px;height:40px;line-height:40px;">Resource</p>
             <div slot="extra" style="display:flex;align-items:center;height:40px" class="popCenter">
-                <Button id="upload" type="default" @click="uploadFileModalShow()" class="uploadBtn" title="upload resource">
-                  <Icon type="md-cloud-upload" size="20"/>
-                </Button>
               <Button
-                    class="moreBtn"
-                    type="default"
-                    style="margin-left: 10px"
-                    @click="toResourceList()"
-                    title="more"
-                  >
-                    <Icon type="md-more"/>
-                  </Button>
+                id="upload"
+                type="default"
+                @click="uploadFileModalShow()"
+                class="uploadBtn"
+                title="upload resource"
+              >
+                <Icon type="md-cloud-upload" size="20"/>
+              </Button>
+              <Button
+                class="moreBtn"
+                type="default"
+                style="margin-left: 10px"
+                @click="toResourceList()"
+                title="more"
+              >
+                <Icon type="md-more"/>
+              </Button>
             </div>
             <div style="height:300px;overflow-y:scroll">
               <Table
@@ -539,14 +543,8 @@
                   >
                     <Icon type="md-download"/>
                   </Button>
-                  <Button
-                    type="warning"
-                    size="small"
-                    style="margin-right: 5px"
-                    @click=""
-                    title="View"
-                  >
-                  <Icon type="md-eye" />
+                  <Button type="warning" size="small" style="margin-right: 5px" @click title="View">
+                    <Icon type="md-eye"/>
                   </Button>
                 </template>
               </Table>
@@ -594,10 +592,10 @@
         @on-ok="ok"
         @on-cancel="cancel"
         ok-text="ok"
-        cancel-text = "cancel"
-        >
+        cancel-text="cancel"
+      >
         <p>Do you want to delete this project? Please think twice before you choose.</p>
-    </Modal>
+      </Modal>
       <!-- removeProjectModal -->
     </Row>
     <Modal
@@ -765,21 +763,21 @@ export default {
       projectTableColName: [
         {
           title: "Name",
-          key: "name",
+          key: "name"
         },
         {
           title: "Description",
-          key: "description",
+          key: "description"
         },
         {
           title: "type",
           key: "type",
-          sortable: true,
+          sortable: true
         },
         {
           title: "uploadTime",
           key: "uploadTime",
-          sortable: true,
+          sortable: true
         },
         {
           title: "Action",
@@ -790,7 +788,7 @@ export default {
       ],
       // 关于控制项目编辑的模态框
       editProjectModal: false,
-      removeProjectModal :false,
+      removeProjectModal: false
     };
   },
   created: function() {
@@ -914,27 +912,30 @@ export default {
       // 提交要修改的信息即可
       this.$Message.info("ok");
     },
+    ok() {},
     cancel() {
       this.$Message.info("cancel");
     },
     //前往工作空间
-    goWorkspace(data) {
-      let isManager, isMember;
-      for (let i = 0; i < this.subProjectList.length; i++) {
-        if (this.subProjectList[i]["subProjectId"] === data) {
-          isManager = this.subProjectList[i]["isManager"];
-          isMember = this.subProjectList[i]["isMembers"];
-        }
+    goWorkspace(id, memberList, isManager) {
+      var isMember;
+      if (memberList != []) {
+        memberList.forEach(item => {
+          if (item.userId == this.$store.state.userId) {
+            isMember = true;
+          } else {
+            isMember = false;
+          }
+        });
+      } else {
       }
       if (this.$store.getters.userState) {
         if (isManager || isMember) {
-          this.$router.push({ path: `${data}/workspace` });
+          this.$router.push({ path: `${id}/workspace` });
         } else {
           this.$Message.error("You have no property to access it");
-          // alert("No access.");
         }
       } else {
-        // showMessage();
         this.$router.push({ path: "/login" });
       }
     },
@@ -1077,6 +1078,7 @@ export default {
             //改变this的指向，此时this需要赋值给其他变量
             that.subProjectList = res.data;
             that.subProjectList = that.identity(that.subProjectList);
+
             for (let i = 0, n = 0; i < that.subProjectList.length; i++) {
               $.ajax({
                 url:
@@ -1094,6 +1096,7 @@ export default {
             }
             // console.log(that.subProjectList);
             that.cutString(that.subProjectList, 200);
+            console.table(that.subProjectList);
           }
         })
         .catch(err => {
@@ -1108,6 +1111,17 @@ export default {
         list[i]["isMember"] = isSubMember;
       }
       return list;
+    },
+    isMemberJudge(data) {
+      data.forEach(item => {
+        if (item.userId === this.$store.state.userId) {
+          return true;
+        } else {
+          return false;
+        }
+      });
+      // if(data.userId)
+      // members[i].userId === this.$store.state.userId
     },
     showDetail(data) {
       alert(data);
@@ -1140,13 +1154,13 @@ export default {
       formData.append("type", this.fileType);
       formData.append("uploaderId", this.$store.state.userId);
       // 添加字段属于那个项目
-      formData.append("belong",this.currentProjectDetail.title);
+      formData.append("belong", this.currentProjectDetail.title);
       let scopeObject = {
-        projectId:this.currentProjectDetail.projectId,
-        subprojectId:"",
-        moduleId:"",
+        projectId: this.currentProjectDetail.projectId,
+        subprojectId: "",
+        moduleId: ""
       };
-      formData.append("scope",JSON.stringify(scopeObject));
+      formData.append("scope", JSON.stringify(scopeObject));
       //这里还要添加其他的字段
       console.log(formData.get("file"));
       this.axios
@@ -1296,34 +1310,48 @@ export default {
     deleteTag(index) {
       this.editTags.splice(index, 1);
     },
-    toResourceList(){
-      this.$router.push({path:'/resourceList'})
+    toResourceList() {
+      this.$router.push({ path: "/resourceList" });
     },
-    addUploadEvent(scopeId){
+    addUploadEvent(scopeId) {
       let form = {};
-      let description = this.$store.state.userName + ' uploaded a ' + this.fileType + ' file in ' + ' project called ' + this.currentProjectDetail.title;
+      let description =
+        this.$store.state.userName +
+        " uploaded a " +
+        this.fileType +
+        " file in " +
+        " project called " +
+        this.currentProjectDetail.title;
       form["description"] = description;
       form["scopeId"] = scopeId;
-      this.axios.post("/GeoProblemSolving/history/save?", "description="+ description + "&scopeId=" + scopeId + "&userId=" + this.$store.state.userId)
-          .then(res=> {
-            console.log(res.data);
-          })
-          .catch(err=> {
-            console.log(err.data);
-          })
+      this.axios
+        .post(
+          "/GeoProblemSolving/history/save?",
+          "description=" +
+            description +
+            "&scopeId=" +
+            scopeId +
+            "&userId=" +
+            this.$store.state.userId
+        )
+        .then(res => {
+          console.log(res.data);
+        })
+        .catch(err => {
+          console.log(err.data);
+        });
     },
-    getResourceList(){
-      this.axios.get(url, {
-        params: {
-          id:paramId
-        }
-      })
-      .then(function (response) {
-      })
-      .catch(function (error) {
-      })
+    getResourceList() {
+      this.axios
+        .get(url, {
+          params: {
+            id: paramId
+          }
+        })
+        .then(function(response) {})
+        .catch(function(error) {});
     },
-    removeProjectModalShow(){
+    removeProjectModalShow() {
       this.removeProjectModal = true;
     },
     //删除项目的函数
@@ -1334,19 +1362,52 @@ export default {
       console.log(this.currentProjectDetail.projectId);
       this.axios
         .get(
-          "/GeoProblemSolving/project/delete?" + "projectId=" + this.currentProjectDetail.projectId
+          "/GeoProblemSolving/project/delete?" +
+            "projectId=" +
+            this.currentProjectDetail.projectId
         )
         .then(res => {
           if (res.data != "") {
             this.$Notice.success({
-                    title: 'Notification title',
-                    desc: "Delete successfully"
-                });
-            this.$router.push({name:"Project"});
+              title: "Notification title",
+              desc: "Delete successfully"
+            });
+            this.$router.push({ name: "Project" });
           }
         })
         .catch(err => {});
     },
+    joinSubProject(project){
+      // alert(id);
+      console.table(project);
+      let joinSubPForm = {};
+      joinSubPForm["recipientId"] = project.managerId;
+      joinSubPForm["type"] = "apply";
+      joinSubPForm["content"] = {
+        userName: this.$store.state.userName,
+        userId: this.$store.state.userId,
+        title: "Group application",
+        description:
+          "User " +
+          this.$store.state.userName +
+          " apply to join in your project's sub project: " +
+          project.title +
+          " .",
+        projectId: project.subProjectId,
+        projectTitle: project.title,
+        scope:"subProject",
+        approve: "unknow"
+      };
+      this.axios
+        .post("/GeoProblemSolving/notice/save", joinSubPForm)
+        .then(res => {
+          this.$Message.info("Apply Successfully");
+          this.$emit("sendNotice", project.managerId);
+        })
+        .catch(err => {
+          console.log("申请失败的原因是：" + err.data);
+        });
+    }
   }
 };
 </script>

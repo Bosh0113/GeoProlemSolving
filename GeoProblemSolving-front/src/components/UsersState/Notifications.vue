@@ -329,8 +329,8 @@ export default {
             //update project members
             this.axios
               .get(
-                "/GeoProblemSolving/project/join?" +
-                  "projectId=" +
+                "/GeoProblemSolving/"+apply.content.scope+"/join?" +
+                  apply.content.scope+"Id=" +
                   apply.content.projectId +
                   "&userId=" +
                   apply.content.userId

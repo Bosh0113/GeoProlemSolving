@@ -563,7 +563,7 @@
                 </div>
                 <!-- <Icon type="md-brush" /> -->
                 <div class="singl_tool_style">
-                  <Icon type="md-brush" size="60" @click.native="show" title="DrawBoard" color="green"/>
+                  <Icon type="md-brush" size="60" @click.native="excel" title="DrawBoard" color="green"/>
                   <br>
                   <span style="display:flex;justify-content:center">Draw</span>
                 </div>
@@ -1339,6 +1339,12 @@ export default {
         "http://202.195.237.252:8088/TeamWorking/Collaborative/ConceptualModel/index.html?groupID=" +
         mId +
         "-ConceptualModel";
+    },
+    excel(){
+      let mId = sessionStorage.getItem("moduleId");
+      console.log("mid是"+ mId);
+      window.location.href =
+        "../../../static/html/excelTool.html"
     },
     createModuleSuccess(title) {
       this.$Notice.success({
