@@ -1,8 +1,10 @@
 package cn.edu.njnu.geoproblemsolving.Socket;
 
+import cn.edu.njnu.geoproblemsolving.Config.GetHttpSessionConfigurator;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpSession;
 import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
@@ -14,7 +16,7 @@ import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-@ServerEndpoint(value = "/ConceptualModel/{groupID}")
+@ServerEndpoint(value = "/ConceptualModel/{groupID}", configurator = GetHttpSessionConfigurator.class)
 public class ConceptualModelSocket {
     private Session session=null;
     private static final Map<String, Set<ConceptualModelSocket>> groups=new ConcurrentHashMap<>();
@@ -23,8 +25,11 @@ public class ConceptualModelSocket {
     private static final Map<String, ArrayList<String>> requireLists=new ConcurrentHashMap<>();
 
     @OnOpen
-    public void onOpen(@PathParam("groupID") String groupID,Session session){
+    public void onOpen(@PathParam("groupID") String groupID,Session session, EndpointConfig config){
         this.session=session;
+        HttpSession httpSession=(HttpSession) config.getUserProperties().get(HttpSession.class.getName());
+        System.out.println(httpSession.getAttribute("userId").toString());
+
         if (!groups.containsKey(groupID)){
             Set<ConceptualModelSocket> group=new HashSet<>();
             group.add(this);

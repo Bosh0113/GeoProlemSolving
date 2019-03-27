@@ -173,14 +173,14 @@
             style="height:40px;display:flex;align-items:center"
             class="operatePanel"
           >
-          <Button type="default" @click="addModal = true" icon="md-add" class="addBtn">Add</Button>
+          <Button type="default" @click="addModal = true" icon="md-add" class="addBtn" title="Add a new module">Add</Button>
           <template v-if="moduleList.length <= 0 || currentModuleIndex == -1 || order == 0">
-            <Button type="default" @click="conveneWork()" icon="md-mail">Convene</Button>
-            <Button type="default" @click="back2Project(projectInfo.projectId)" icon="md-arrow-back">Back</Button>
+            <Button type="default" @click="conveneWork()" icon="md-mail" title="Start to work">Convene</Button>
+            <Button type="default" @click="back2Project(projectInfo.projectId)" icon="md-arrow-back" title="Back to project page">Back</Button>
           </template>
           <template v-else>
-            <Button type="default" @click="delModal = true" icon="md-remove" class="removeBtn" >Remove</Button>
-            <Button type="default" @click="editModalShow()" icon="md-brush" class="editBtn">Edit</Button>
+            <Button type="default" @click="delModal = true" icon="md-remove" class="removeBtn" title="Remove this module">Remove</Button>
+            <Button type="default" @click="editModalShow()" icon="md-brush" class="editBtn" title="Edit this module">Edit</Button>
           </template>
           </div>
           <Row>
@@ -785,7 +785,7 @@ export default {
       // 关于邀请的模态框
       inviteModal: false,
       quitModal: false,
-      sidebarHeight: "",
+      sidebarHeight: 800,
       participants: [],
       candidates: [],
       inviteList: [],
@@ -844,13 +844,7 @@ export default {
       // web socket for module
       moduleSocket: null,
       timer: null,
-      // 动态记录相关
-      record: {
-        type: "",
-        time: "",
-        who: "",
-        content: ""
-      },
+      // 动态记录相关      
       // 所有module的记录
       allRecords: [],
       // 当前参与者
@@ -924,6 +918,8 @@ export default {
           if (data != "None") {
             let subProjectInfo = data[0];
             this.$set(this, "subProjectInfo", subProjectInfo);
+            sessionStorage.setItem("subProjectId",subProjectInfo.subProjectId);
+            sessionStorage.setItem("subProjectName",subProjectInfo.title)
 
             this.managerIdentity(subProjectInfo.managerId);
             this.memberIdentity(subProjectInfo["members"]);
@@ -994,6 +990,8 @@ export default {
       } else {
         this.currentModuleIndex = item - 1;
         this.currentModule = this.moduleList[this.currentModuleIndex];
+        sessionStorage.setItem("moduleId",this.currentModule.moduleId);
+        sessionStorage.setItem("moduleName",this.currentModule.title);
         this.inquiryTask();
         this.order = item;
         this.openModuleSocket(this.currentModule.moduleId);
@@ -1020,14 +1018,20 @@ export default {
     // 更新人员，更新数据，更新records
     onMessage(e) {
       let messageJson = JSON.parse(e.data);
-
-      if (messageJson.type == "online") {
-        this.record.time = messageJson.createTime;
-        this.record.content = "enter this module.";
-      } else if (messageJson.type == "offline") {
-        this.record.time = messageJson.createTime;
-        this.record.content = "leave this module.";
-      } else if (messageJson.type == "message") {
+      let record = {
+        type: "",
+        time: "",
+        who: "",
+        content: ""
+      };
+      // if (messageJson.type == "online") {
+      //   this.record.time = messageJson.createTime;
+      //   this.record.content = "enter this module.";
+      // } else if (messageJson.type == "offline") {
+      //   this.record.time = messageJson.createTime;
+      //   this.record.content = "leave this module.";
+      // }
+      if (messageJson.type == "message") {
         let message = messageJson.message;
 
         // 任务记录
@@ -1035,6 +1039,7 @@ export default {
           message.type == "tasks" &&
           message.whoid != this.$store.state.userId
         ) {
+          //-----------------------------------------------------有点问题------------------------------------
           this.inquiryTask();
         }
         // 资源记录
@@ -1062,11 +1067,7 @@ export default {
           .replace(/\s/g, "")
           .split(",");
 
-        this.olParticipantChange(members, this.ofParticipant);
-
-        //records 更新
-        this.record.type = "participants";
-        this.allRecords[this.currentModuleIndex].push(this.record);
+        this.olParticipantChange(members, this.ofParticipant);       
       }
     },
     onClose(e) {
@@ -1127,6 +1128,12 @@ export default {
     // },
     olParticipantChange(members, callback) {
       let userIndex = -1;
+      var record = {
+        type: "participants",
+        time: new Date().toLocaleString(),
+        who: "",
+        content: ""
+      };
 
       // 自己刚上线，olParticipants空
       if (this.olParticipants.length == 0) {
@@ -1143,7 +1150,7 @@ export default {
             .then(res => {
               if (res.data != "None" && res.data != "Fail") {
                 that.olParticipants.push(res.data);
-                that.record.content =
+                record.content =
                   "welcome to here, " + that.$store.state.userName;
               } else if (res.data == "None") {
               }
@@ -1152,7 +1159,7 @@ export default {
       } else {
         // members大于olParticipants，有人上线；小于olParticipants，离线
         if (members.length > this.olParticipants.length) {
-          for (let i = 0; i < members.length; i++) {
+          for (var i = 0; i < members.length; i++) {
             for (var j = 0; j < this.olParticipants.length; j++) {
               if (members[i] == this.olParticipants[j].userId) {
                 break;
@@ -1172,19 +1179,21 @@ export default {
                 "?key=" +
                 "userId" +
                 "&value=" +
-                members[i]
+                members[userIndex]
             )
             .then(res => {
               if (res.data != "None" && res.data != "Fail") {
                 that.olParticipants.push(res.data);
                 if (userIndex != -1) {
-                  that.record.who = that.olParticipants[userIndex].userName;
+                  record.who = res.data.userName;
+                  record.content = "enter this module.";
                 }
               } else if (res.data == "None") {
               }
             });
+            
         } else if (members.length < this.olParticipants.length) {
-          for (let i = 0; i < this.olParticipants.length; i++) {
+          for (var i = 0; i < this.olParticipants.length; i++) {
             for (var j = 0; j < members.length; j++) {
               if (this.olParticipants[i].userId == members[j]) {
                 break;
@@ -1195,12 +1204,14 @@ export default {
               break;
             }
           }
-          this.record.who = this.olParticipants[userIndex].userName;
-          this.record.content = "leave this module";
-          delete this.olParticipants[userIndex];
+          record.who = this.olParticipants[userIndex].userName;
+          record.content = "leave this module.";
+          this.olParticipants.splice(userIndex,1);
         }
       }
-      callback(members);
+      //records 更新
+      this.allRecords[this.currentModuleIndex].push(record);
+      // callback(members);
     },
     ofParticipant(olPersons) {
       // this.ofParticipants = [];
@@ -1217,7 +1228,6 @@ export default {
     getAllModules() {
       //这里重写以下获取module
       let subProjectId = this.$route.params.id;
-      sessionStorage.setItem("subProjectId", this.$route.params.id);
       this.axios
         .get(
           "/GeoProblemSolving/module/inquiry" +
@@ -1299,7 +1309,32 @@ export default {
     },
     // 召集参与者
     conveneWork(){
-
+      for(let i = 0;i<this.participants.length;i++){  
+        if(this.participants[i].userId != this.$store.state.userId) {     
+          let notice = {};
+          notice["recipientId"] = this.participants[i].userId;
+          notice["type"] = "Work";
+          notice["content"] = {
+            subProjectId: this.subProjectInfo.subProjectId,
+            title: "Work Notice",
+            description:
+              "The sub-project " +
+              this.subProjectInfo.title +
+              " of project " +
+              this.projectInfo.title +
+              " in which you participate has new progress!"
+          };
+          this.axios
+            .post("/GeoProblemSolving/notice/save", notice)
+            .then(res => {
+              this.$Message.info("Apply Successfully");
+              this.$emit("sendNotice", data.managerId);
+              })
+              .catch(err => {
+                console.log("申请失败的原因是：" + err.data);
+            });
+        }
+      }
     },
     //更新模块的函数
     updateModule() {
@@ -1335,10 +1370,10 @@ export default {
     },
     show() {
       let mId = sessionStorage.getItem("moduleId");
-      window.location.href =
-        "http://202.195.237.252:8088/TeamWorking/Collaborative/ConceptualModel/index.html?groupID=" +
+      sessionStorage.setItem("username","123");
+      window.open("http://localhost:8081/GeoProblemSolving/Collaborative/ConceptualModel/index.html?groupID=" +
         mId +
-        "-ConceptualModel";
+        "-ConceptualModel") ;
     },
     createModuleSuccess(title) {
       this.$Notice.success({
@@ -1641,8 +1676,6 @@ export default {
       this.sendMessage(this.socketMsg);
     },
     gotoPersonalSpace(id) {
-      // sessionStorage.setItem("memberId",data);
-      // this.$router.push({name: 'ProjectDetail',params:{id:id} });
       if (id == sessionStorage.getItem("userId")) {
         this.$router.push({ name: "PersonalPage" });
       } else {

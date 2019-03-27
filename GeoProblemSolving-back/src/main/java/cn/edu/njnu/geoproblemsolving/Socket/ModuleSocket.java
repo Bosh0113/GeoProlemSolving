@@ -88,10 +88,12 @@ public class ModuleSocket {
 
     private void broadcastMessageToModule(String moduleId, String message) {
         for (Map.Entry<String, ModuleSocket> server : modules.get(moduleId).entrySet()) {
-            try {
-                server.getValue().session.getBasicRemote().sendText(message);
-            } catch (Exception e) {
-                e.printStackTrace();
+            if (!this.equals(server.getValue())) {
+                try {
+                    server.getValue().session.getBasicRemote().sendText(message);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
     }

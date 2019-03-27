@@ -58,20 +58,38 @@
           </Card>
           <template v-else-if="this.noticeList.length>0">
             <div class="noticeDetail" v-for="notice in this.noticeList" :key="notice.index">
-              <Card style="height:100%">
-                <template v-if="notice.state=='unread'">
-                  <Badge dot>
-                    <h4>{{notice.content.title}}</h4>
-                  </Badge>
-                  <span class="noticeDeleteBtn" @click="deleteNotice(notice)">×</span>
-                </template>
-                <h4 v-else>{{notice.content.title}}
-                  <span class="noticeDeleteBtn" @click="deleteNotice(notice)">×</span>
-                </h4>
-                <small class="noticeDescription">{{notice.content.description}}</small>
-                <small>{{notice.createTime}}</small>
-                <Button class="noticeReadBtn" v-if="notice.state=='unread'" @click="readNotice(notice.noticeId)">Got it</Button>
-              </Card>
+              <template v-if="notice.type =='Work'">
+                <Card style="height:100%">
+                  <template v-if="notice.state=='unread'">
+                    <Badge dot>
+                      <h4>{{notice.content.title}}</h4>
+                    </Badge>
+                    <span class="noticeDeleteBtn" @click="deleteNotice(notice)">×</span>
+                  </template>
+                  <h4 v-else>{{notice.content.title}}
+                    <span class="noticeDeleteBtn" @click="deleteNotice(notice)">×</span>
+                  </h4>
+                  <small class="noticeDescription">{{notice.content.description}}</small>
+                  <small>{{notice.createTime}}</small>
+                  <Button class="noticeReadBtn" v-if="notice.state=='unread'" @click="gotoWork(notice.noticeId, notice.content.subProjectId)">Go</Button>
+                </Card>
+              </template>
+              <template v-else>
+                <Card style="height:100%">
+                  <template v-if="notice.state=='unread'">
+                    <Badge dot>
+                      <h4>{{notice.content.title}}</h4>
+                    </Badge>
+                    <span class="noticeDeleteBtn" @click="deleteNotice(notice)">×</span>
+                  </template>
+                  <h4 v-else>{{notice.content.title}}
+                    <span class="noticeDeleteBtn" @click="deleteNotice(notice)">×</span>
+                  </h4>
+                  <small class="noticeDescription">{{notice.content.description}}</small>
+                  <small>{{notice.createTime}}</small>
+                  <Button class="noticeReadBtn" v-if="notice.state=='unread'" @click="readNotice(notice.noticeId)">Got it</Button>
+                </Card>
+              </template>
             </div>
           </template>
         </div>
@@ -257,7 +275,6 @@ export default {
         });
     },
     readNotice(noticeId) {
-      console.log("noticeId is " + noticeId);
       this.axios
         .get("/GeoProblemSolving/notice/read" + "?noticeId=" + noticeId)
         .then(res => {
@@ -271,6 +288,23 @@ export default {
         .catch(err => {
           this.$Message.danger("update notification fail.");
         });
+    },
+    gotoWork(noticeId,subProjectId){      
+      this.axios
+        .get("/GeoProblemSolving/notice/read" + "?noticeId=" + noticeId)
+        .then(res => {
+          if (res.data == "Success") {
+            this.$emit("readNotification");
+            this.loadNotifications();
+          } else {
+            this.$Message.danger("update notification fail.");
+          }
+        })
+        .catch(err => {
+          this.$Message.danger("update notification fail.");
+        });
+      
+      this.$router.push( `./project/${id}/workspace`);
     },
     refuseApply(apply) {
       console.log(apply.content.title + " has been refused.");

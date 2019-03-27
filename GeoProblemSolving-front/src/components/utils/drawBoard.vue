@@ -51,11 +51,11 @@
     <div class="content">
       <div class="content-left">
         <div class="setterSize">
-          <span>线条粗细:{{penSize}}</span>
+          <span>Thickness of line:{{penSize}}</span>
           <mu-slider v-model="penSize" :step="1" :max="30"/>
-          <span>虚线长度:{{lineType[0]}}</span>
+          <span>Dotted length:{{lineType[0]}}</span>
           <mu-slider v-model="lineType[0]" :step="1" :max="100"/>
-          <span>虚线间距:{{lineType[1]}}</span>
+          <span>Dotted interval:{{lineType[1]}}</span>
           <mu-slider v-model="lineType[1]" :step="1" :max="100"/>
         </div>
         <div v-for="tool in tools" :key="tool.index">
@@ -107,7 +107,7 @@ export default {
       context_bak: null,
       ischoosecolor: false,
       toolsToggle: false,
-      chooseColorBtn: "选择颜色",
+      chooseColorBtn: "Select Color",
       color: {
         hex: "#2196f3",
         hsl: {
@@ -200,7 +200,7 @@ export default {
       this.context_bak = this.canvas_bak.getContext("2d");
     },
     setColor() {
-      this.chooseColorBtn = this.ischoosecolor ? "选择颜色" : "确认选择";
+      this.chooseColorBtn = this.ischoosecolor ? "Select Color" : "Ok";
       this.ischoosecolor = this.ischoosecolor ? false : true;
       //这里选择后需要将属性传递过去
     },
@@ -638,8 +638,7 @@ export default {
     },
     socket() {
       this.send_line = {
-        from: this.$store.state.userName,
-        fromid: this.$store.state.userId,
+        type:"drawing",
         content: this.line
       };
       this.lines.push(this.send_line);
@@ -648,22 +647,16 @@ export default {
       this.socketApi.sendSock(this.send_line, this.getSocketConnect);
     },
     getSocketConnect(data) {
-      let lineData = JSON.parse(data);
+      let lineData = data;
 
       if (lineData.from === "Test") {
-        console.log(chatMsg.content);
-      } else {
-        //判断消息的发出者
-        var uid = lineData.fromid;
-        if (
-          uid !== this.$store.state.userId &&
-          uid !== undefined
-          // uid !== ""
-        ) {
-          //画面协同更新
-          this.line = lineData.content;
-          this.collaDrawLine(this.line);
-        }
+        console.log(lineData.content);
+      } 
+      else if(lineData.type === "members"){}
+      else {        
+        //画面协同更新
+        this.line = lineData.content;
+        this.collaDrawLine(this.line);        
       }
     },
     collaDrawLine(line) {
@@ -696,13 +689,13 @@ export default {
       let eY = line.Points[pointsLength - 1].Y;
       this.drawOnMouseup(eX, eY, collaGraphType);
     },
-    startWebSocket(data) {
-      let roomId = sessionStorage.getItem("subProjectId");
-      this.socketApi.initWebSocket("ChatServer/" + roomId);
+    startWebSocket() {
+      let roomId = sessionStorage.getItem("moduleId");
+      this.socketApi.initWebSocket("DrawServer/" + roomId);
 
       this.send_msg = {
+        type:"test",
         from: "Test",
-        fromid: this.$store.state.userId,
         content: "TestChat"
       };
       this.socketApi.sendSock(this.send_msg, this.getSocketConnect);
@@ -711,23 +704,19 @@ export default {
   components: {
     PhotoshopPicker: Photoshop
   },
-  // add by mzy for navigation guards
   beforeRouteEnter: (to, from, next) => {
+    // alert(this.isSubProjectMember);
     next(vm => {
-      if (!vm.$store.getters.userState) {
-        next("/login");
+      if (!vm.$store.getters.userState || vm.$store.state.userId == "") {
+        vm.$router.push({name:"Login"});
       } else {
-        // 判断条件还需要考虑
-        // alert("No access");
-        // vm.$router.go(-1);
-        next();
+
       }
     });
   },
   created() {
-    this.startWebSocket();
   },
-  destroyed() {
+  beforeDestroy() {
     this.socketApi.close();
   },
   mounted() {
@@ -736,12 +725,14 @@ export default {
     this.addkeyBoardlistener();
     this.drawType(this.tools[0]);
     this.canvas_bak.addEventListener("click", this.falseColor);
+    this.startWebSocket();
     window.addEventListener("resize", () => {
       this.canvasSize = {
         width: window.screen.availWidth - 320,
         height: window.screen.availHeight * 0.75
       };
     });
+    
   }
 };
 </script>

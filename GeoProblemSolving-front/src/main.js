@@ -7,7 +7,7 @@ import router from './router'
 import iView from 'iview'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
-import $ from 'jquery'
+// import $ from 'jquery'
 import 'iview/dist/styles/iview.css'
 import store from './store/store.js'
 //引入index.js文件夹
