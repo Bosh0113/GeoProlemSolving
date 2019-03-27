@@ -913,7 +913,7 @@ export default {
       var isMember;
       if (memberList != []) {
         memberList.forEach(item => {
-          if (item.userId == this.$store.state.userId) {
+          if (item.userId == this.$store.getters.userId) {
             isMember = true;
           } else {
             isMember = false;
@@ -1071,7 +1071,6 @@ export default {
             that.subProjectList = res.data;
             that.identity(that.subProjectList);
             that.cutString(that.subProjectList, 200);
-            console.table(that.subProjectList);
           }
         })
         .catch(err => {
@@ -1087,14 +1086,12 @@ export default {
     },
     isMemberJudge(data) {
       data.forEach(item => {
-        if (item.userId === this.$store.state.userId) {
+        if (item.userId === this.$store.getters.userId) {
           return true;
         } else {
           return false;
         }
       });
-      // if(data.userId)
-      // members[i].userId === this.$store.state.userId
     },
     showDetail(data) {
       alert(data);
@@ -1285,7 +1282,7 @@ export default {
     addUploadEvent(scopeId) {
       let form = {};
       let description =
-        this.$store.state.userName +
+        this.$store.getters.userName +
         " uploaded a " +
         this.fileType +
         " file in " +
@@ -1301,7 +1298,7 @@ export default {
             "&scopeId=" +
             scopeId +
             "&userId=" +
-            this.$store.state.userId
+            this.$store.getters.userId
         )
         .then(res => {
           console.log(res.data);
@@ -1356,12 +1353,12 @@ export default {
       joinSubPForm["recipientId"] = project.managerId;
       joinSubPForm["type"] = "apply";
       joinSubPForm["content"] = {
-        userName: this.$store.state.userName,
-        userId: this.$store.state.userId,
+        userName: this.$store.getters.userName,
+        userId: this.$store.getters.userId,
         title: "Group application",
         description:
           "User " +
-          this.$store.state.userName +
+          this.$store.getters.userName +
           " apply to join in your project's sub project: " +
           project.title +
           " .",

@@ -502,8 +502,8 @@ export default {
 
       this.send_msg = {
         type:"message",
-        from: this.$store.state.userName,
-        fromid:this.$store.state.userId,
+        from: this.$store.getters.userName,
+        fromid:this.$store.getters.userId,
         content: this.message,
         time: current_time
       };
@@ -556,7 +556,7 @@ export default {
   beforeRouteEnter: (to, from, next) => {
     // alert(this.isSubProjectMember);
     next(vm => {
-      if (!vm.$store.getters.userState || vm.$store.state.userId == "") {
+      if (!vm.$store.getters.userState || vm.$store.getters.userId == "") {
         vm.$router.push({name:"Login"});
       } else {
 
@@ -578,8 +578,8 @@ export default {
       msglist: [],
       send_msg: [],
       query_date: "",
-      thisUserName: this.$store.state.userName,
-      thisUserId: this.$store.state.userId,
+      thisUserName: this.$store.getters.userName,
+      thisUserId: this.$store.getters.userId,
       // 关于折叠栏
       // collapsePanel:true,
       message_panelObj: {

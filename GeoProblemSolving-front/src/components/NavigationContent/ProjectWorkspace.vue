@@ -457,10 +457,10 @@
                         element="ul"
                         :options="{group:'task'}"
                         v-model="taskTodo"
-                        @start="startMove()"
-                        @update="taskOrderUpdate(taskTodo,'todo')"
-                        @add="taskOrderUpdate(taskTodo,'todo')"
-                        @remove="taskOrderUpdate(taskTodo,'todo')"
+                        @start="setMoveCount()"
+                        @update="updateMoveTask(taskTodo,'todo')"
+                        @add="addMoveTask(taskTodo,'todo')"
+                        @remove="removeMoveTask(taskTodo,'todo')"
                       >
                         <Card v-for="(item,index) in taskTodo" :key="index" :padding="3">
                           <div>
@@ -486,10 +486,10 @@
                         element="ul"
                         :options="{group:'task'}"
                         v-model="taskDoing"
-                        @start="startMove()"
-                        @update="taskOrderUpdate(taskDoing,'doing')"
-                        @add="taskOrderUpdate(taskDoing,'doing')"
-                        @remove="taskOrderUpdate(taskDoing,'doing')"
+                        @start="setMoveCount()"
+                        @update="updateMoveTask(taskDoing,'doing')"
+                        @add="addMoveTask(taskDoing,'doing')"
+                        @remove="removeMoveTask(taskDoing,'doing')"
                       >
                         <Card v-for="(item,index)  in taskDoing" :key="index" :padding="3">
                           <div>
@@ -515,10 +515,10 @@
                         element="ul"
                         :options="{group:'task'}"
                         v-model="taskDone"
-                        @start="startMove()"
-                        @update="taskOrderUpdate(taskDone)"
-                        @add="taskOrderUpdate(taskDone,'done')"
-                        @remove="taskOrderUpdate(taskDone,'done')"
+                        @start="setMoveCount()"
+                        @update="updateMoveTask(taskDone,'done')"
+                        @add="addMoveTask(taskDone,'done')"
+                        @remove="removeMoveTask(taskDone,'done')"
                       >
                         <Card v-for="(item,index) in taskDone" :key="index" :padding="3">
                           <div>
@@ -839,6 +839,7 @@ export default {
       taskTodo: [],
       taskDoing: [],
       taskDone: [],
+      MoveCount: 0,
       // web socket for module
       moduleSocket: null,
       timer: null,
@@ -1302,7 +1303,7 @@ export default {
     // 召集参与者
     conveneWork(){
       for(let i = 0;i<this.participants.length;i++){  
-        if(this.participants[i].userId != this.$store.state.userId) {     
+        if(this.participants[i].userId != this.$store.getters.userId) {     
           let notice = {};
           notice["recipientId"] = this.participants[i].userId;
           notice["type"] = "Work";
@@ -1492,17 +1493,19 @@ export default {
       this.axios
         .post("/GeoProblemSolving/task/save", taskForm)
         .then(res => {
-          this.inquiryTask();
+          if(res.data=="Success"){
+            // 任务更新socket
+            this.socketMsg.whoid = this.$store.getters.userId;
+            this.socketMsg.who = this.$store.getters.userName;
+            this.socketMsg.type = "tasks";
+            this.socketMsg.content = "created a new task.";
+            this.socketMsg.time = new Date().toLocaleString();
+            this.sendMessage(this.socketMsg);
+            this.inquiryTask();
+          }
         })
         .catch(err => {});
 
-      // 任务更新socket
-      this.socketMsg.whoid = this.$store.getters.userId;
-      this.socketMsg.who = this.$store.getters.userName;
-      this.socketMsg.type = "tasks";
-      this.socketMsg.content = "created a new task.";
-      this.socketMsg.time = new Date().toLocaleString();
-      this.sendMessage(this.socketMsg);
     },
     //打开task编辑器
     editOneTask(index, taskList) {
@@ -1541,7 +1544,13 @@ export default {
         .post("/GeoProblemSolving/task/update", taskForm)
         .then(res => {
           if (res.data != "None" && res.data != "Fail") {
-            this.inquiryTask();
+            this.inquiryTask();      // 任务更新socket
+            this.socketMsg.whoid = this.$store.getters.userId;
+            this.socketMsg.who = this.$store.getters.userName;
+            this.socketMsg.type = "tasks";
+            this.socketMsg.content = "edited a new task.";
+            this.socketMsg.time = new Date().toLocaleString();
+            this.sendMessage(this.socketMsg);
           } else {
             this.$Message.error("Fail!");
           }
@@ -1550,13 +1559,7 @@ export default {
           console.log(err.data);
         });
 
-      // 任务更新socket
-      this.socketMsg.whoid = this.$store.getters.userId;
-      this.socketMsg.who = this.$store.getters.userName;
-      this.socketMsg.type = "tasks";
-      this.socketMsg.content = "edited a new task.";
-      this.socketMsg.time = new Date().toLocaleString();
-      this.sendMessage(this.socketMsg);
+
     },
     //查询task
     inquiryTask() {
@@ -1610,6 +1613,21 @@ export default {
           console.log(err.data);
         });
     },
+    setMoveCount(){
+      this.MoveCount=2;
+    },
+    addMoveTask(taskList, type){
+      this.MoveCount--;
+      this.taskOrderUpdate(taskList, type);
+    },
+    removeMoveTask(taskList, type){
+      this.MoveCount--;
+      this.taskOrderUpdate(taskList, type);
+    },
+    updateMoveTask(taskList, type){
+      this.MoveCount-=2;
+      this.taskOrderUpdate(taskList, type);
+    },
     taskOrderUpdate(taskList, type) {
       for (let i = 0; i < taskList.length; i++) {
         let thisTask = taskList[i];
@@ -1620,17 +1638,18 @@ export default {
         this.axios
           .post("/GeoProblemSolving/task/update", taskUpdateObj)
           .then(res => {
-            // console.log("---force---");
-            // console.log(thisTask);
-            // console.log("---updated---");
-            // console.log(res.data);
+            if(res.data!="Fail"){
+              if(this.MoveCount==0){
+                this.endMove();
+              }
+            }
           })
           .catch(err => {
             console.log(err.data);
           });
       }
     },
-    startMove(taskList, type) {
+    endMove() {
       // 任务更新socket
       this.socketMsg.whoid = this.$store.getters.userId;
       this.socketMsg.who = this.$store.getters.userName;
@@ -1649,6 +1668,13 @@ export default {
         .then(res => {
           if (res.data == "Success") {
             taskList.splice(index, 1);
+            // 任务更新socket
+            this.socketMsg.whoid = this.$store.getters.userId;
+            this.socketMsg.who = this.$store.getters.userName;
+            this.socketMsg.type = "tasks";
+            this.socketMsg.content = "removed a task.";
+            this.socketMsg.time = new Date().toLocaleString();
+            this.sendMessage(this.socketMsg);
           } else {
             this.$Message.error("Fail!");
           }
@@ -1657,13 +1683,6 @@ export default {
           this.$Message.error("Fail!");
         });
 
-      // 任务更新socket
-      this.socketMsg.whoid = this.$store.getters.userId;
-      this.socketMsg.who = this.$store.getters.userName;
-      this.socketMsg.type = "tasks";
-      this.socketMsg.content = "removed a task.";
-      this.socketMsg.time = new Date().toLocaleString();
-      this.sendMessage(this.socketMsg);
     },
     gotoPersonalSpace(id) {
       if (id == this.$store.getters.userId) {
