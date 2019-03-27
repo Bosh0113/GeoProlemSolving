@@ -1063,7 +1063,6 @@ export default {
           message.type == "tasks" &&
           message.whoid != this.$store.getters.userId
         ) {
-          //-----------------------------------------------------有点问题------------------------------------
           this.inquiryTask();
         }
         // 资源记录
