@@ -94,6 +94,7 @@ const treeData = {
       }
     ]
   }
+import VCharts from "./../../utils/VCharts";
 export default {
   name: "Participants",
   methods: {},

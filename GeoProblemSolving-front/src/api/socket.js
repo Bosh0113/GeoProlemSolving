@@ -10,9 +10,7 @@ function getWebIP() {
 }
 
 function initWebSocket(para) { //初始化websocket
-    //ws地址
-    // var wsurl = "ws://localhost:8081/GeoProblemSolving/TeamModeling/Chat"
-    // para = ""
+    // var wsurl = "ws://202.195.237.252:8082/GeoProblemSolving/" + para;
     var wsurl = "ws://localhost:8081/GeoProblemSolving/" + para;
     console.log(wsurl);
     // var wsurl = "ws://" +getWebIP()+ ":" + serverPort;

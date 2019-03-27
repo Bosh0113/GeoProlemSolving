@@ -83,6 +83,7 @@
 import { Photoshop } from "vue-color";
 import { canvas } from "leaflet";
 import * as socketApi from "./../../api/socket.js";
+import MuseUI from "./../../utils/MuseUI";
 export default {
   name: "draw",
   data() {

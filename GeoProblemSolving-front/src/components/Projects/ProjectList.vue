@@ -64,8 +64,7 @@ img {
         </div>
         <div style="width:30%;display:flex;justify-content:flex-end;align-items:center">
           <Button
-              router-link
-              :to="{path:'newproject'}"
+              @click="newProject"
               type="default"
               class="btnCreate"
               style="margin-right:2.5%;font-size:15px"
@@ -176,7 +175,7 @@ img {
                 <span style="height:20px;width:45%;color:white;text-align:left;">
                   <Tag color="primary" style="width:78.2px;text-align:center">Creator</Tag>
                 </span>
-                <span style="height:20px;margin-left:5%">{{item.creator}}</span>
+                <span style="height:20px;margin-left:5%">{{item.managerName}}</span>
               </div>
               <div style="height:40px;align-items:center;display:flex;padding:0 20px 0 20px">
                 <span style="height:20px;width:45%;color:white;text-align:left;">
@@ -190,7 +189,7 @@ img {
                 title="Join in project"
                 ok-text="Submit"
                 cancel-text="Cancel"
-                @on-ok="joinProject(currentTab)"
+                @on-ok="joinProject()"
                 @on-cancel="cancel"
               >
                 <div style="display:flex;align-items:center">
@@ -222,7 +221,7 @@ img {
 <script>
 import Avatar from "vue-avatar";
 export default {
-  created() {
+  mounted() {
     // 作用是在一开始就到后台获取water资源类型的项目，作为默认值
     let initObject = { key: "category", value: "Water" };
     this.getSpecificTypeProjects(initObject);
@@ -239,21 +238,14 @@ export default {
       });
     }
   },
-  mounted() {},
   components: {
     Avatar
   },
   data() {
     return {
-      ecologyProjectList: [],
-      atmosphereProjectList: [],
-      societyProjectList: [],
-      othersProjectList: [],
       //Tab栏当前选中的信息
       currentTab: "water",
       currentProjectList: [],
-      quitShow: false,
-      joinShow: false,
       isMember: false,
       isManager: false,
       // join按钮点击后模态框
@@ -262,8 +254,6 @@ export default {
       quitModal: false,
       //加入项目的Id号
       joinProjectId: "",
-      currentProject: {},
-      quitSubProject: {},
       //搜索的输入框
       search: "",
       currentProjectsStatus: 2
@@ -312,10 +302,8 @@ export default {
           if (res.data === "None") {
             this.currentProjectList = [];
             this.currentProjectsStatus = 0;
-            // this.$Message.info("There are no projects in this category");
           } else {
-            let list = res.data;
-            this.judgeMember(list);
+            this.judgeMember(res.data);
             this.currentProjectsStatus = 1;
           }
         })
@@ -324,34 +312,29 @@ export default {
         });
       return this.currentProjectList;
     },
+    newProject(){
+      if (!this.$store.getters.userState) {
+        this.$router.push({ name: "Login" });
+      }else{
+        this.$router.push({ name: "NewProject" });
+      }
+    },
     //项目成员的id和name都要加进去
-    joinProject(tab) {
+    joinProject() {
       this.axios
         .get(
           "/GeoProblemSolving/project/join?" +
             "projectId=" +
             this.joinProjectId +
             "&userId=" +
-            this.$store.state.userId
+            this.$store.getters.userId
         )
         .then(res => {
           if (res.data === "Success") {
             this.$Message.info("Join success");
-            let initObject = { key: "category", value: "Water" };
-            this.getSpecificTypeProjects(initObject);
+            joinedRefresh();
           } else if (res.data === "Exist") {
             this.$Message.info("you have already be a member in project");
-            var that = this;
-            let initObject = { key: "category", value: "Water" };
-            that.getSpecificTypeProjects(initObject);
-            for (var i = 0; i < that.currentProjectList.length; i++) {
-              if (that.currentProjectList[i].projectId === that.joinProjectId) {
-                //把这个作为参数传递过去
-                that.currentProject = that.currentProjectList[i];
-                let obj = that.currentProjectList[i].members;
-                this.joinRequest(obj);
-              }
-            }
           }
         })
         .catch(err => {
@@ -362,10 +345,13 @@ export default {
     cancel() {
       this.$Message.info("Clicked cancel");
     },
-    joinRequest(data) {
-      for (var i = 0; i < data.length; i++) {
-        if (data[i].userId === this.$store.state.userId) {
-          this.currentProject["isMember"] = true;
+    joinedRefresh() {
+      let projectList=this.currentProjectList;
+      let length=this.currentProjectList.length;
+      for (var i = 0; i < length; i++) {
+        if (projectList[i].projectId === this.joinProjectId) {
+          this.currentProjectList[i]["isMember"] = true;
+          break;
         }
       }
     },
@@ -374,30 +360,17 @@ export default {
       //这样的话拿到了用户的id与name
       let projectList = list;
       if (projectList.length != 0) {
-        for (var i = 0, n = 0; i < projectList.length; i++) {
-          $.ajax({
-            url:
-              "/GeoProblemSolving/user/inquiry" +
-              "?key=" +
-              "userId" +
-              "&value=" +
-              projectList[i]["managerId"],
-            type: "GET",
-            async: false,
-            success: data => {
-              projectList[n++]["creator"] = data.userName;
-            }
-          });
+        for (var i = 0; i < projectList.length; i++) {
           let managerId = projectList[i].managerId;
           let members = projectList[i].members;
-          if (managerId == this.$store.state.userId) {
+          if (managerId == this.$store.getters.userId) {
             projectList[i]["isManager"] = true;
           } else {
             projectList[i]["isManager"] = false;
           }
           if (members.length != 0) {
             for (var j = 0; j < members.length; j++) {
-              if (members[j].userId == this.$store.state.userId) {
+              if (members[j].userId == this.$store.getters.userId) {
                 projectList[i]["isMember"] = true;
                 break;
               } else {
@@ -416,8 +389,11 @@ export default {
       let isManager, isMember;
       for (let i = 0; i < this.currentProjectList.length; i++) {
         if (this.currentProjectList[i]["projectId"] === id) {
-          isManager = this.currentProjectList[i]["isManager"];
-          isMember = this.currentProjectList[i]["isMember"];
+          let projectInfo=this.currentProjectList[i];
+          isManager = projectInfo["isManager"];
+          isMember = projectInfo["isMember"];
+          this.$store.commit("setProjectInfo", projectInfo);
+          break;
         }
       }
       if (this.$store.getters.userState) {
@@ -435,17 +411,18 @@ export default {
       joinForm["recipientId"] = data.managerId;
       joinForm["type"] = "apply";
       joinForm["content"] = {
-        userName: this.$store.state.userName,
-        userId: this.$store.state.userId,
+        userName: this.$store.getters.userName,
+        userId: this.$store.getters.userId,
         title: "Group application",
         description:
           "User " +
-          this.$store.state.userName +
+          this.$store.getters.userName +
           " apply to join in your project: " +
           data.title +
           " .",
         projectId: data.projectId,
         projectTitle: data.title,
+        scope:"project",
         approve: "unknow"
       };
       this.axios

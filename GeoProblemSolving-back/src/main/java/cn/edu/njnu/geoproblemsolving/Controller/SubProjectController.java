@@ -2,15 +2,11 @@ package cn.edu.njnu.geoproblemsolving.Controller;
 
 import cn.edu.njnu.geoproblemsolving.Dao.SubProject.SubProjectDaoImpl;
 import cn.edu.njnu.geoproblemsolving.Entity.SubProjectEntity;
-import com.alibaba.fastjson.JSONArray;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.UUID;
 
 @CrossOrigin(origins = "*",allowCredentials = "true")
 @RestController
@@ -23,12 +19,6 @@ public class SubProjectController {
     @RequestMapping(value = "/create", produces = {"application/json;charset=UTF-8"},method = RequestMethod.POST)
     public String createSubProject(@RequestBody SubProjectEntity subProject){
         SubProjectDaoImpl subProjectDao=new SubProjectDaoImpl(mongoTemplate);
-        Date data=new Date();
-        SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-        String subProjectId=UUID.randomUUID().toString();
-        subProject.setSubProjectId(subProjectId);
-        subProject.setMembers(new JSONArray());
-        subProject.setCreateTime(dateFormat.format(data));
         return subProjectDao.createSubProject(subProject);
     }
 

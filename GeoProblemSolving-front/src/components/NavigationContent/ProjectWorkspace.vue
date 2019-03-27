@@ -176,7 +176,7 @@
           <Button type="default" @click="addModal = true" icon="md-add" class="addBtn" title="Add a new module">Add</Button>
           <template v-if="moduleList.length <= 0 || currentModuleIndex == -1 || order == 0">
             <Button type="default" @click="conveneWork()" icon="md-mail" title="Start to work">Convene</Button>
-            <Button type="default" @click="back2Project(projectInfo.projectId)" icon="md-arrow-back" title="Back to project page">Back</Button>
+            <Button type="default" @click="backProject()" icon="md-arrow-back" title="Back to project page">Back</Button>
           </template>
           <template v-else>
             <Button type="default" @click="delModal = true" icon="md-remove" class="removeBtn" title="Remove this module">Remove</Button>
@@ -213,7 +213,7 @@
           >
             <div class="title">Participants</div>
             <div :style="{height:sidebarHeight-100+'px'}">
-              <div class="member-desc" v-for="(member,index) in participants" :key="member.index">
+              <div class="member-desc" v-for="(member,index) in this.participants" :key="member.index">
                 <template v-if="index==0">
                   <Badge text="♔" type="warning" class="userAvatar">
                     <div
@@ -286,13 +286,13 @@
                 type="success"
                 style="text-align:center;width:100px"
                 @click="inviteMembersModalShow()"
-                v-if="isSubProjectManager"
+                v-if="this.subProjectInfo.isManager"
               >Invite</Button>
               <Button
                 type="warning"
                 style="text-align:center;width:100px"
                 @click="quitModal=true"
-                v-else-if="isSubProjectMember"
+                v-else-if="this.subProjectInfo.isMember"
               >Quit</Button>
               <Modal
                 v-model="quitModal"
@@ -313,7 +313,7 @@
                 <div>
                   <p>Members:</p>
                   <Tag
-                    v-for="participant in participants"
+                    v-for="participant in this.participants"
                     :key="participant.index"
                   >{{participant.userName}}</Tag>
                   <p>Candidates:</p>
@@ -450,7 +450,7 @@
                         class="createTaskBtn"
                         style="margin-top:-10px"
                         @click="createTaskModalShow()"
-                        v-show="isSubProjectManager||isSubProjectMember"
+                        v-show="this.subProjectInfo.isManager||this.subProjectInfo.isMember"
                       >Add</Button>
                       <draggable
                         class="taskList"
@@ -563,7 +563,7 @@
                 </div>
                 <!-- <Icon type="md-brush" /> -->
                 <div class="singl_tool_style">
-                  <Icon type="md-brush" size="60" @click.native="show" title="DrawBoard" color="green"/>
+                  <Icon type="md-brush" size="60" @click.native="excel" title="DrawBoard" color="green"/>
                   <br>
                   <span style="display:flex;justify-content:center">Draw</span>
                 </div>
@@ -776,12 +776,10 @@ export default {
   data() {
     return {
       // information of project
-      projectInfo: [],
+      projectInfo: {},
       // info of subproject --by mzy
       subProjectInfo: [],
       //登陆者身份
-      isSubProjectManager: false, //为管理者
-      isSubProjectMember: false, //为成员
       // 关于邀请的模态框
       inviteModal: false,
       quitModal: false,
@@ -862,17 +860,19 @@ export default {
   },
   created() {
     this.init();
+  },
+  mounted() {
+    window.addEventListener("resize", this.initSize);
     this.getAllModules();
     // this.inquiryTask();
   },
   // add by mzy for navigation guards
   beforeRouteEnter: (to, from, next) => {
-    // alert(this.isSubProjectMember);
     next(vm => {
       if (!vm.$store.getters.userState) {
         next("/login");
       } else {
-        if (!(vm.isSubProjectManager || vm.isSubProjectMember)) {
+        if (!(vm.subProjectInfo.isManager || vm.subProjectInfo.isMember)) {
           alert("No access");
           // next(`/project/${vm.$store.getters.currentProjectId}`);
           vm.$router.go(-1);
@@ -884,9 +884,6 @@ export default {
     // this.removeTimer();
     this.closeModuleSocket();
     next();
-  },
-  mounted: function() {
-    window.addEventListener("resize", this.initSize);
   },
   beforeDestroy: function() {
     window.removeEventListener("resize", this.initSize);
@@ -906,61 +903,35 @@ export default {
     init() {
       this.initSize();
       var that = this;
+      let subProjectId = this.$route.params.id;
+      let subProjectInfo = this.$store.getters.subProject;
+      if (
+        JSON.stringify(subProjectInfo) != "{}" &&
+        subProjectInfo.subProjectId == subProjectId
+      ) {
+        this.$set(this, "subProjectInfo", subProjectInfo);
+        this.showMembers();
+      } else {
+      }
       $.ajax({
         url:
           "/GeoProblemSolving/subProject/inquiry" +
           "?key=subProjectId" +
           "&value=" +
-          this.$route.params.id,
+          subProjectId,
         type: "GET",
         async: false,
         success: data => {
           if (data != "None") {
-            let subProjectInfo = data[0];
+            subProjectInfo = data[0];
             this.$set(this, "subProjectInfo", subProjectInfo);
             sessionStorage.setItem("subProjectId",subProjectInfo.subProjectId);
             sessionStorage.setItem("subProjectName",subProjectInfo.title)
 
             this.managerIdentity(subProjectInfo.managerId);
-            this.memberIdentity(subProjectInfo["members"]);
-            let membersList = subProjectInfo["members"];
-            let manager = { userId: subProjectInfo["managerId"] };
-            membersList.unshift(manager);
-            let participantsTemp = [];
-            for (let i = 0; i < membersList.length; i++) {
-              $.ajax({
-                url:
-                  "/GeoProblemSolving/user/inquiry" +
-                  "?key=" +
-                  "userId" +
-                  "&value=" +
-                  membersList[i].userId,
-                type: "GET",
-                async: false,
-                success: function(data) {
-                  participantsTemp.push(data);
-                }
-              });
-            }
-            that.$set(this, "participants", participantsTemp);
-
-            this.axios
-              .get(
-                "/GeoProblemSolving/project/inquiry" +
-                  "?key=projectId" +
-                  "&value=" +
-                  this.subProjectInfo.projectId
-              )
-              .then(res => {
-                if (res.data != "None" && res.data != "Fail") {
-                  this.projectInfo = res.data[0];
-                } else {
-                  console.log(res.data);
-                }
-              })
-              .catch(err => {
-                console.log(err.data);
-              });
+            this.memberIdentity(subProjectInfo.members);
+            this.$store.commit("setSubProjectInfo", subProjectInfo);
+            this.showMembers();
           }
         },
         error: function(err) {
@@ -969,16 +940,67 @@ export default {
       });
     },
     managerIdentity(managerId) {
-      if (managerId === this.$store.state.userId) {
-        this.isSubProjectManager = true;
+      if (managerId === this.$store.getters.userId) {
+        this.subProjectInfo.isManager = true;
       }
     },
     memberIdentity(members) {
       for (let i = 0; i < members.length; i++) {
-        if (members[i].userId === this.$store.state.userId) {
-          this.isSubProjectMember = true;
+        if (members[i].userId === this.$store.getters.userId) {
+          this.subProjectInfo.isMember = true;
           break;
         }
+      }
+    },
+    showMembers() {
+      let membersList = this.subProjectInfo.members;
+      let manager = { userId: this.subProjectInfo.managerId };
+      membersList.unshift(manager);
+      let participantsTemp = [];
+      let index = membersList.length;
+      for (let i = 0; i < membersList.length; i++) {
+        this.axios
+          .get(
+            "/GeoProblemSolving/user/inquiry" +
+              "?key=" +
+              "userId" +
+              "&value=" +
+              membersList[i].userId
+          )
+          .then(res => {
+            participantsTemp.push(res.data);
+            if (index-- == 1) {
+              this.$set(this, "participants", participantsTemp);
+            }
+          })
+          .catch(err => {});
+      }
+    },
+    getProjectInfo() {
+      let projectInfo = this.$store.getters.project;
+      if (
+        JSON.stringify(projectInfo) != "{}" &&
+        projectInfo.projectId == this.subProjectInfo.projectId
+      ) {
+        this.projectInfo = projectInfo;
+      } else {
+        this.axios
+          .get(
+            "/GeoProblemSolving/project/inquiry" +
+              "?key=projectId" +
+              "&value=" +
+              this.subProjectInfo.projectId
+          )
+          .then(res => {
+            if (res.data != "None" && res.data != "Fail") {
+              this.projectInfo = res.data[0];
+            } else {
+              console.log(res.data);
+            }
+          })
+          .catch(err => {
+            console.log(err.data);
+          });
       }
     },
     showDetail(item) {
@@ -1005,6 +1027,7 @@ export default {
     },
     openModuleSocket(moduleId) {
       var moduleSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + moduleId;
+      // var moduleSocketURL = "ws://202.195.237.252:8082/GeoProblemSolving/Module/" + moduleId;
       this.moduleSocket = new WebSocket(moduleSocketURL);
       this.moduleSocket.onopen = this.onOpen;
       this.moduleSocket.onmessage = this.onMessage;
@@ -1037,7 +1060,7 @@ export default {
         // 任务记录
         if (
           message.type == "tasks" &&
-          message.whoid != this.$store.state.userId
+          message.whoid != this.$store.getters.userId
         ) {
           //-----------------------------------------------------有点问题------------------------------------
           this.inquiryTask();
@@ -1045,19 +1068,18 @@ export default {
         // 资源记录
         if (
           message.type == "resources" &&
-          message.whoid != this.$store.state.userId
+          message.whoid != this.$store.getters.userId
         ) {
         }
         // 工具记录
         if (
           message.type == "tools" &&
-          message.whoid != this.$store.state.userId
+          message.whoid != this.$store.getters.userId
         ) {
         }
 
         // 更新records --by mzy
         this.allRecords[this.currentModuleIndex].push(message);
-
       } else if (messageJson.type == "members") {
         // 比较 判断人员动态 更新records --by mzy
 
@@ -1095,37 +1117,6 @@ export default {
       messageJson["message"] = message;
       this.moduleSocket.send(JSON.stringify(messageJson));
     },
-    // send2Notice(){
-    //       for (let i = 0; i < this.ofParticipants.length; i++) {
-    //         let notice = {};
-    //         notice["recipientId"] = this.ofParticipants[i].userId;
-    //         notice["type"] = "research";
-    //         notice["content"] = {
-    //           moduleId: this.currentModule.moduleId,
-    //           subProjectId: this.subProjectInfo.subProjectId,
-    //           title: "Research Notice",
-    //           description:
-    //             "The " +
-    //             this.currentModule.type +
-    //             " module " +
-    //             this.currentModule.title +
-    //             " in sub-project " +
-    //             this.subProjectInfo.title +
-    //             " of project " +
-    //             this.projectInfo.title +
-    //             " in which you participate has new progress!"
-    //         };
-    //         this.axios
-    //           .post("/GeoProblemSolving/notice/save", notice)
-    //           .then(res => {
-    //             this.$Message.info("Apply Successfully");
-    //             this.$emit("sendNotice", data.managerId);
-    //           })
-    //           .catch(err => {
-    //             console.log("申请失败的原因是：" + err.data);
-    //           });
-    //       }
-    // },
     olParticipantChange(members, callback) {
       let userIndex = -1;
       var record = {
@@ -1141,7 +1132,7 @@ export default {
         for (let i = 0; i < members.length; i++) {
           this.axios
             .get(
-              "http://localhost:8081/GeoProblemSolving/user/inquiry" +
+              "/GeoProblemSolving/user/inquiry" +
                 "?key=" +
                 "userId" +
                 "&value=" +
@@ -1151,7 +1142,7 @@ export default {
               if (res.data != "None" && res.data != "Fail") {
                 that.olParticipants.push(res.data);
                 record.content =
-                  "welcome to here, " + that.$store.state.userName;
+                  "welcome to here, " + that.$store.getters.userName;
               } else if (res.data == "None") {
               }
             });
@@ -1175,7 +1166,7 @@ export default {
           var that = this;
           this.axios
             .get(
-              "http://localhost:8081/GeoProblemSolving/user/inquiry" +
+              "/GeoProblemSolving/user/inquiry" +
                 "?key=" +
                 "userId" +
                 "&value=" +
@@ -1242,7 +1233,6 @@ export default {
             if (this.currentModule != "") {
               this.inquiryTask();
             }
-
             // init allRecords
             for (let i = 0; i < this.moduleList.length; i++) {
               let records = [];
@@ -1260,7 +1250,7 @@ export default {
       Module["subProjectId"] = this.$route.params.id;
       Module["title"] = this.moduleTitle;
       Module["description"] = this.moduleDescription;
-      Module["creator"] = this.$store.state.userId;
+      Module["creator"] = this.$store.getters.userId;
       Module["type"] = this.moduleType;
       this.axios
         .post("/GeoProblemSolving/module/create", Module)
@@ -1304,8 +1294,10 @@ export default {
       this.updateModuleDescription = this.moduleList[order].description;
     },
     // 返回项目页
-    back2Project(id){
-      this.$router.push( `../${id}`);
+    backProject() {
+      this.getProjectInfo();
+      let id = this.projectInfo.projectId;
+      this.$router.push(`../${id}`);
     },
     // 召集参与者
     conveneWork(){
@@ -1346,7 +1338,7 @@ export default {
       updateObject.append("title", this.updateModuleTitle);
       updateObject.append("description", this.updateModuleDescription);
       updateObject.append("type", this.updateModuleType);
-      updateObject.append("creater", this.$store.state.userId);
+      updateObject.append("creater", this.$store.getters.userId);
       this.axios
         .post("/GeoProblemSolving/module/update", updateObject)
         .then(res => {
@@ -1375,6 +1367,12 @@ export default {
         mId +
         "-ConceptualModel") ;
     },
+    excel(){
+      let mId = sessionStorage.getItem("moduleId");
+      console.log("mid是"+ mId);
+      window.location.href =
+        "../../../static/html/excelTool.html"
+    },
     createModuleSuccess(title) {
       this.$Notice.success({
         title: "Create Notification",
@@ -1396,24 +1394,16 @@ export default {
     },
     //加载并打开成员邀请Modal
     inviteMembersModalShow() {
+      this.getProjectInfo();
       let that = this;
       this.candidates = [];
       this.inviteList = [];
       let allMembers = this.projectInfo.members;
-      $.ajax({
-        url:
-          "/GeoProblemSolving/user/inquiry" +
-          "?key=" +
-          "userId" +
-          "&value=" +
-          this.projectInfo.managerId,
-        type: "GET",
-        async: false,
-        success: function(data) {
-          let manager = { userName: data.userName, userId: data.userId };
-          allMembers.unshift(manager);
-        }
-      });
+      let manager = {
+        userName: this.projectInfo.managerName,
+        userId: this.projectInfo.managerId
+      };
+      allMembers.unshift(manager);
       for (let i = 0; i < allMembers.length; i++) {
         let exist = false;
         for (let j = 0; j < that.participants.length; j++) {
@@ -1458,7 +1448,7 @@ export default {
             "?subProjectId=" +
             this.$route.params.id +
             "&userId=" +
-            this.$store.state.userId
+            this.$store.getters.userId
         )
         .then(res => {
           if (res.data == "Success") {
@@ -1495,7 +1485,7 @@ export default {
       taskForm["description"] = this.taskInfo.description;
       taskForm["startTime"] = new Date(this.taskInfo.startTime);
       taskForm["endTime"] = new Date(this.taskInfo.endTime);
-      taskForm["creatorId"] = this.$store.state.userId;
+      taskForm["creatorId"] = this.$store.getters.userId;
       taskForm["moduleId"] = this.currentModule.moduleId;
       taskForm["state"] = "todo";
       taskForm["order"] = "";
@@ -1507,8 +1497,8 @@ export default {
         .catch(err => {});
 
       // 任务更新socket
-      this.socketMsg.whoid = this.$store.state.userId;
-      this.socketMsg.who = this.$store.state.userName;
+      this.socketMsg.whoid = this.$store.getters.userId;
+      this.socketMsg.who = this.$store.getters.userName;
       this.socketMsg.type = "tasks";
       this.socketMsg.content = "created a new task.";
       this.socketMsg.time = new Date().toLocaleString();
@@ -1561,8 +1551,8 @@ export default {
         });
 
       // 任务更新socket
-      this.socketMsg.whoid = this.$store.state.userId;
-      this.socketMsg.who = this.$store.state.userName;
+      this.socketMsg.whoid = this.$store.getters.userId;
+      this.socketMsg.who = this.$store.getters.userName;
       this.socketMsg.type = "tasks";
       this.socketMsg.content = "edited a new task.";
       this.socketMsg.time = new Date().toLocaleString();
@@ -1642,8 +1632,8 @@ export default {
     },
     startMove(taskList, type) {
       // 任务更新socket
-      this.socketMsg.whoid = this.$store.state.userId;
-      this.socketMsg.who = this.$store.state.userName;
+      this.socketMsg.whoid = this.$store.getters.userId;
+      this.socketMsg.who = this.$store.getters.userName;
       this.socketMsg.type = "tasks";
       this.socketMsg.content = "changed the task schedule.";
       this.socketMsg.time = new Date().toLocaleString();
@@ -1668,20 +1658,19 @@ export default {
         });
 
       // 任务更新socket
-      this.socketMsg.whoid = this.$store.state.userId;
-      this.socketMsg.who = this.$store.state.userName;
+      this.socketMsg.whoid = this.$store.getters.userId;
+      this.socketMsg.who = this.$store.getters.userName;
       this.socketMsg.type = "tasks";
       this.socketMsg.content = "removed a task.";
       this.socketMsg.time = new Date().toLocaleString();
       this.sendMessage(this.socketMsg);
     },
     gotoPersonalSpace(id) {
-      if (id == sessionStorage.getItem("userId")) {
+      if (id == this.$store.getters.userId) {
         this.$router.push({ name: "PersonalPage" });
       } else {
         this.$router.push({ name: "MemberDetailPage", params: { id: id } });
       }
-      // console.log("挡墙登陆的账户是:"+ sessionStorage.getItem("userId"));
     }
   }
 };

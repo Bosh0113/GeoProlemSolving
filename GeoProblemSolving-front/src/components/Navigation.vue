@@ -116,8 +116,8 @@ export default {
       headerWidth:"",
     };
   },
-  created() {
-    if (this.$store.state.userState) {
+  mounted() {
+    if (this.$store.getters.userState) {
       this.setTimer();
       this.initWebSocket();
       this.getUnreadNoticeCount();
@@ -133,13 +133,13 @@ export default {
   },
   computed: {
     userState() {
-      return this.$store.state.userState;
+      return this.$store.getters.userState;
     },
     userName() {
-      return this.$store.state.userName;
+      return this.$store.getters.userName;
     },
     avatar() {
-      return this.$store.state.avatar;
+      return this.$store.getters.avatar;
     }
   },
   methods: {
@@ -178,7 +178,7 @@ export default {
           "/GeoProblemSolving/notice/inquiry" +
             "?key=recipientId" +
             "&value=" +
-            this.$store.state.userId
+            this.$store.getters.userId
         )
         .then(res => {
           let noticeList = res.data;
@@ -197,6 +197,7 @@ export default {
     },
     initWebSocket() {
       var noticeSocketURL = "ws://localhost:8081/GeoProblemSolving/NoticeSocket";
+      // var noticeSocketURL = "ws://202.195.237.252:8082/GeoProblemSolving/NoticeSocket";
       this.noticeSocket = new WebSocket(noticeSocketURL);
       this.noticeSocket.onopen = this.onOpen;
       this.noticeSocket.onmessage = this.onMessage;

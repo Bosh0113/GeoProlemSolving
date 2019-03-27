@@ -202,7 +202,7 @@ export default {
     };
   },
 
-  created() {
+  mounted() {
     this.getTopicDetail();
     this.setMainStyle();
     // let headerWidth = window.innerWidth+'px';

@@ -158,7 +158,7 @@
 </template>
 <script>
 export default {
-  created() {
+  mounted() {
     this.loadNotifications();
   },
   data() {
@@ -208,7 +208,7 @@ export default {
           "/GeoProblemSolving/notice/inquiry?" +
             "key=recipientId" +
             "&value=" +
-            this.$store.state.userId
+            this.$store.getters.userId
         )
         .then(res => {
           if (res.data !== "Fail") {
@@ -363,8 +363,8 @@ export default {
             //update project members
             this.axios
               .get(
-                "/GeoProblemSolving/project/join?" +
-                  "projectId=" +
+                "/GeoProblemSolving/"+apply.content.scope+"/join?" +
+                  apply.content.scope+"Id=" +
                   apply.content.projectId +
                   "&userId=" +
                   apply.content.userId

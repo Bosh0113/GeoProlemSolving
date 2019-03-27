@@ -245,7 +245,7 @@ export default {
     getUserProfile() {
       this.axios
         .get(
-          "http://localhost:8081/GeoProblemSolving/user/inquiry" +
+          "/GeoProblemSolving/user/inquiry" +
             "?key=userId" +
             "&value=" +
             this.$route.params.id
@@ -283,7 +283,7 @@ export default {
           "/GeoProblemSolving/resource/inquiry" +
             "?key=uploaderId" +
             "&value=" +
-            this.$store.state.userId
+            this.$store.getters.userId
         )
         .then(res => {
           this.userResourceList = res.data;
@@ -314,7 +314,7 @@ export default {
       for (let i = 0; i < projectIds.length; i++) {
         this.axios
           .get(
-            "http://localhost:8081/GeoProblemSolving/project/inquiry" +
+            "/GeoProblemSolving/project/inquiry" +
               "?key=projectId" +
               "&value=" +
               projectIds[i].projectId
@@ -335,14 +335,13 @@ export default {
       }
     },
   },
-  created() {
+  mounted() {
     this.getUserProfile();
     this.getManagerProjectList();
     this.readPersonalEvent();
     this.getUserResource();
     this.detailSidebarHeight = window.innerHeight - 60 + "px";
   },
-  mounted() {}
 };
 </script>
 

@@ -4,7 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 
 public interface IResourceDao {
 
-    String saveResource(HttpServletRequest request);
+    Object saveResource(HttpServletRequest request);
 
     Object readResource(String key,String value);
 

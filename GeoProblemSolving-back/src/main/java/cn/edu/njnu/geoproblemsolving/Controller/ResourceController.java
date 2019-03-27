@@ -15,7 +15,7 @@ public class ResourceController {
     private MongoTemplate mongoTemplate;
 
     @RequestMapping(value = "/upload",method = RequestMethod.POST)
-    public String uploadResource(HttpServletRequest request){
+    public Object uploadResource(HttpServletRequest request){
         ResourceDaoImpl resourceDao=new ResourceDaoImpl(mongoTemplate);
         return resourceDao.saveResource(request);
     }
