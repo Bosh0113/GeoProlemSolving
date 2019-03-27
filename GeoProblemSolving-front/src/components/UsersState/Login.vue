@@ -15,17 +15,17 @@
 .content {
   /* background: url("./../../assets/back.png") no-repeat; */
   background-color: var(--layout-background);
-  display:flex;
+  display: flex;
   /* align-items:center; */
-  justify-content:center;
+  justify-content: center;
 }
 .loginDiv {
   border: var(--loginBorder);
   --loginContentColor: white;
   --loginFontColor: white;
   --loginTitleColor: #57a3f3;
-  width:30%;
-  --loginBtnFontSize:15px;
+  width: 30%;
+  --loginBtnFontSize: 15px;
 }
 .login_title {
   background-color: var(--loginTitleColor);
@@ -49,15 +49,14 @@
   margin-top: 5px;
   margin-left: 2.5%;
 }
-.loginBtn{
-  font-size: var(--loginBtnFontSize)
+.loginBtn {
+  font-size: var(--loginBtnFontSize);
 }
-.loginBtn:hover{
-  color:white;
+.loginBtn:hover {
+  color: white;
   background-color: var(--loginTitleColor);
-  font-size: var(--loginBtnFontSize)
+  font-size: var(--loginBtnFontSize);
 }
-
 </style>
 <template>
   <div class="layout">
@@ -98,9 +97,8 @@
                     <div style="display:flex;align-items:center;justify-content:center">
                       <Button
                         type="default"
-                        @click="login('formInline')"
+                        @click='login("formInline")'
                         v-model="formInline.State"
-
                         class="loginBtn"
                       >Log in</Button>
                     </div>
@@ -123,8 +121,6 @@ export default {
     Username() {
       return this.$store.getters.userName;
     }
-  },
-  created() {
   },
   data() {
     return {
@@ -167,43 +163,9 @@ export default {
   mounted() {
     this.contentStyle.height = window.innerHeight - 60 + "px";
     this.loginStyle.marginTop = window.innerHeight/5+ "px";
-    console.log("loginStyle.marginTop是：" + this.loginStyle.marginTop);
     this.getlocalStorage();
   },
   methods: {
-    handleSubmit(name) {
-      this.$refs[name].validate(valid => {
-        if (valid) {
-          this.axios
-            .get(
-              "/GeoProblemSolving/user/login" +
-                "?email=" +
-                this.formInline.user +
-                "&password=" +
-                this.formInline.password
-            )
-            .then(res => {
-              console.log(res.data);
-              if (res.data === "Fail") {
-                this.$Message.error("Invalid account or password.");
-              } else {
-                this.$Message.success("Success!");
-                this.$store.commit("userLogin", {
-                  userName: res.data.userName,
-                  avatar: res.data.avatar,
-                  userId: res.data.userId
-                });
-                this.$router.go(-1);
-
-              }
-            });
-        } else {
-          this.$Message.error(
-            "If you don't have an account, you can regisetr one."
-          );
-        }
-      });
-    },
     login(name) {
       this.$refs[name].validate(valid => {
         if (valid) {
@@ -226,16 +188,11 @@ export default {
                 this.formInline.password
             )
             .then(res => {
-              console.log(res.data);
               if (res.data === "Fail") {
                 this.$Message.error("Invalid account or password.");
               } else {
                 this.$Message.success("Success!");
-                this.$store.commit("userLogin", {
-                  userName: res.data.userName,
-                  avatar: res.data.avatar,
-                  userId: res.data.userId
-                });
+                this.$store.commit("userLogin", res.data);
                 this.$router.go(-1);
 
               }
@@ -257,7 +214,9 @@ export default {
       this.formInline.user = localStorage.getItem("user");
       this.formInline.password = localStorage.getItem("password");
       // 将字符串格式的true转换为boolean模式的true
-      this.checked = eval(localStorage.getItem("statusRecord"));
+      if(localStorage.getItem("statusRecord")){
+         this.checked = eval(localStorage.getItem("statusRecord"));
+      }
     }
   }
 };

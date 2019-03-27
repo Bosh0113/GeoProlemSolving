@@ -1,54 +1,34 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Navigation from '@/components/Navigation.vue'
-import Home from '@/components/NavigationContent/Home.vue'
-// import Project from '@/components/NavigationContent/Project.vue'
-import ProjectDetail from '@/components/NavigationContent/ProjectDetail.vue'
-import NewProject from '@/components/createNew/NewProject.vue'
-import Participants from '@/components/NavigationContent/Participants.vue'
-import Community from '@/components/Community/Community.vue'
-import Communityreply from '@/components/Community/CommunityReply'
-import Help from '@/components/NavigationContent/Help.vue'
-import Login from '@/components/UsersState/Login.vue'
-import Register from '@/components/UsersState/Register.vue'
-import PersonalPage from '@/components/UsersState/PersonalPage.vue'
-import Notifications from '@/components/UsersState/Notifications.vue'
-import chatUtil from '@/components/utils/chatroom.vue'
-import drawUtil from '@/components/utils/drawBoard.vue'
-import mapTool from '@/components/utils/mapTool.vue'
-import projectworkspace from '@/components/NavigationContent/ProjectWorkspace.vue'
-import mavonEditor from 'mavon-editor'
 import 'mavon-editor/dist/css/index.css'
-import projectList from '@/components/Projects/ProjectList.vue'
-import MemberDetailPage from '@/components/UserPage/memberDetailPage.vue'
-import ResourceList from '@/components/Resource/ResourceList.vue'
+import mavonEditor from 'mavon-editor'
 Vue.use(Router)
 Vue.use(mavonEditor)
 
 
 const routes = [{
-  path: '/', name: 'Navigation', component: Navigation, children: [
-    { path: '', redirect: 'home', component: Home },
-    { path: 'home', name: 'Home', component: Home },
-    { path: 'project', name: 'Project', component: projectList },
-    { path: 'project/:id',name:'ProjectDetail',component:ProjectDetail},
-    { path: 'project/:id/workspace', name:'projectworkspace', component:projectworkspace},
-    { path: 'newproject',name:'NewProject',component:NewProject},
-    { path: 'participants', name: 'Participants', component: Participants },
-    { path: 'community', name: 'Community', component: Community },
-    { path: 'community/:id', name: 'Communityreply', component:Communityreply},
-    { path: 'help', name: 'Help', component: Help },
-    { path: 'personalPage', name: 'PersonalPage', component: PersonalPage },
-    { path: 'notifications', name: 'Notifications', component:Notifications},
-    { path: 'memberPage/:id', name: 'MemberDetailPage', component:MemberDetailPage},
-    { path: 'resourceList', name:'resourceList', component:ResourceList},
+  path: '/', name: 'Navigation', component: resolve=>(require(["@/components/Navigation"],resolve)), children: [
+    { path: '', redirect: 'home', component: resolve=>(require(["@/components/NavigationContent/Home"],resolve)) },
+    { path: 'home', name: 'Home', component: resolve=>(require(["@/components/NavigationContent/Home"],resolve)) },
+    { path: 'projectlist', name: 'Project', component: resolve=>(require(["@/components/Projects/ProjectList"],resolve)) },
+    { path: 'project/:id', name: 'ProjectDetail', component: resolve=>(require(["@/components/NavigationContent/ProjectDetail"],resolve)) },
+    { path: 'project/:id/workspace', name: 'projectworkspace', component: resolve=>(require(["@/components/NavigationContent/ProjectWorkspace"],resolve)) },
+    { path: 'newproject', name: 'NewProject', component: resolve=>(require(["@/components/createNew/NewProject"],resolve)) },
+    { path: 'participants', name: 'Participants', component: resolve=>(require(["@/components/NavigationContent/Participants"],resolve)) },
+    { path: 'community', name: 'Community', component: resolve=>(require(["@/components/Community/Community"],resolve)) },
+    { path: 'community/:id', name: 'Communityreply', component: resolve=>(require(["@/components/Community/CommunityReply"],resolve)) },
+    { path: 'help', name: 'Help', component: resolve=>(require(["@/components/NavigationContent/Help"],resolve)) },
+    { path: 'personalPage', name: 'PersonalPage', component: resolve=>(require(["@/components/UsersState/PersonalPage"],resolve)) },
+    { path: 'notifications', name: 'Notifications', component: resolve=>(require(["@/components/UsersState/Notifications"],resolve)) },
+    { path: 'memberPage/:id', name: 'MemberDetailPage', component: resolve=>(require(["@/components/UserPage/memberDetailPage"],resolve)) },
+    { path: 'resourceList', name: 'resourceList', component: resolve=>(require(["@/components/Resource/ResourceList"],resolve)) },
   ]
 },
-    { path: '/login', name: 'Login', component: Login },
-    { path: '/register', name: 'Register', component: Register },
-    { path: '/chat' ,name :'chatUtil',component: chatUtil},
-    { path: '/draw', name: 'drawUtil', component:drawUtil},
-    { path: '/map', name: 'mapTool', component:mapTool},
+{ path: '/login', name: 'Login', component: resolve=>(require(["@/components/UsersState/Login"],resolve)) },
+{ path: '/register', name: 'Register', component: resolve=>(require(["@/components/UsersState/Register"],resolve)) },
+{ path: '/chat', name: 'chatUtil', component: resolve=>(require(["@/components/utils/chatroom"],resolve)) },
+{ path: '/draw', name: 'drawUtil', component: resolve=>(require(["@/components/utils/drawBoard"],resolve)) },
+{ path: '/map', name: 'mapTool', component: resolve=>(require(["@/components/utils/mapTool"],resolve)) },
 ]
 export default new Router({
   routes,

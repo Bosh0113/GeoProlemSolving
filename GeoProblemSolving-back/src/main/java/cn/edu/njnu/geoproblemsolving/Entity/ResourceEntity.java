@@ -15,7 +15,17 @@ public class ResourceEntity {
     private String fileSize;
     private String pathURL;
     private String uploaderId;
+    private String uploaderName;
     private String uploadTime;
+    private String organization;
+
+    public void setOrganization(String organization) {
+        this.organization = organization;
+    }
+
+    public void setUploaderName(String uploaderName) {
+        this.uploaderName = uploaderName;
+    }
 
     public void setBelong(String belong) {
         this.belong = belong;
@@ -95,5 +105,13 @@ public class ResourceEntity {
 
     public String getFileSize() {
         return fileSize;
+    }
+
+    public String getUploaderName() {
+        return uploaderName;
+    }
+
+    public String getOrganization() {
+        return organization;
     }
 }

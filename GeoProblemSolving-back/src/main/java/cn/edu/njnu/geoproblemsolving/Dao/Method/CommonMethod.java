@@ -1,11 +1,8 @@
 package cn.edu.njnu.geoproblemsolving.Dao.Method;
 
-import cn.edu.njnu.geoproblemsolving.Entity.UserEntity;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
 import javax.servlet.http.HttpServletRequest;
@@ -24,7 +21,7 @@ public class CommonMethod {
         return update;
     }
 
-    public Object joinGroup(JSONArray members, String managerId, String userId, MongoTemplate mongoTemplate){
+    public Object joinGroup(JSONArray members, String managerId, String userId, String userName,MongoTemplate mongoTemplate){
         Boolean exist=false;
         if(members.size()>0){
             if (userId.equals(managerId)){
@@ -44,11 +41,9 @@ public class CommonMethod {
             return "Exist";
         }
         else {
-            Query query=new Query(Criteria.where("userId").is(userId));
-            UserEntity user=mongoTemplate.findOne(query,UserEntity.class);
             JSONObject newMember=new JSONObject();
-            newMember.put("userId",user.getUserId());
-            newMember.put("userName",user.getUserName());
+            newMember.put("userId",userId);
+            newMember.put("userName",userName);
             members.add(newMember);
 
             return members;

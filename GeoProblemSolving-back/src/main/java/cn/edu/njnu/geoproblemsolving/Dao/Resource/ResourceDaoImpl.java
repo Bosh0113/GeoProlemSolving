@@ -2,6 +2,7 @@ package cn.edu.njnu.geoproblemsolving.Dao.Resource;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Method.EncodeUtil;
 import cn.edu.njnu.geoproblemsolving.Entity.ResourceEntity;
+import cn.edu.njnu.geoproblemsolving.Entity.UserEntity;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
@@ -19,10 +20,7 @@ import java.io.InputStream;
 import java.net.InetAddress;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Component
 public class ResourceDaoImpl implements IResourceDao {
@@ -35,7 +33,8 @@ public class ResourceDaoImpl implements IResourceDao {
     }
 
     @Override
-    public String saveResource(HttpServletRequest request) {
+    public Object saveResource(HttpServletRequest request) {
+        ArrayList<String> fileTitles=new ArrayList<>();
         try {
             InetAddress address = InetAddress.getLocalHost();
             String ip = address.getHostAddress();
@@ -68,8 +67,8 @@ public class ResourceDaoImpl implements IResourceDao {
                         for (int i = 0; i < 5; i++) {
                             randomNum = randomNum * 10 + (int) (Math.random() * 10 + 1);
                         }
-
-                        String localPath = temp + "\\" + saveName + randomNum + "." + suffix;
+                        String newFileTitle=saveName + randomNum + "." + suffix;
+                        String localPath = temp + "\\" + newFileTitle;
                         System.out.println("localPath: " + localPath);
 
                         File file = new File(localPath);
@@ -84,7 +83,7 @@ public class ResourceDaoImpl implements IResourceDao {
                         inputStream.close();
 
                         String reqPath = request.getRequestURL().toString();
-                        String pathURL = reqPath.replaceAll("localhost", ip) + "/" + saveName + randomNum + "." + suffix;
+                        String pathURL = reqPath.replaceAll("localhost", ip) + "/" + newFileTitle;
                         System.out.println("downloadURL: " + pathURL);
 
                         String resourceId = UUID.randomUUID().toString();
@@ -105,6 +104,8 @@ public class ResourceDaoImpl implements IResourceDao {
                             String sid = new String(EncodeUtil.decode(projectId));
                             projectId = sid.substring(0, sid.length() - 2);
                         }
+                        Query queryUser=Query.query(Criteria.where("userId").is(request.getParameter("uploaderId")));
+                        UserEntity uploader=mongoTemplate.findOne(queryUser,UserEntity.class);
                         scope.put("projectId", projectId);
                         resourceEntity.setScope(scope);
                         resourceEntity.setName(fileNames);
@@ -113,17 +114,20 @@ public class ResourceDaoImpl implements IResourceDao {
                         resourceEntity.setType(request.getParameter("type"));
                         resourceEntity.setFileSize(fileSize);
                         resourceEntity.setPathURL(pathURL);
-                        resourceEntity.setUploaderId(request.getParameter("uploaderId"));
+                        resourceEntity.setUploaderId(uploader.getUserId());
+                        resourceEntity.setUploaderName(uploader.getUserName());
+                        resourceEntity.setOrganization(uploader.getOrganization());
                         resourceEntity.setUploadTime(uploadTime);
                         mongoTemplate.save(resourceEntity);
+                        fileTitles.add(newFileTitle);
                     } else {
                         return "Size over";
                     }
                 }
             }
-            return "Success";
+            return fileTitles;
         } catch (Exception e) {
-            return "Fail";
+            return fileTitles;
         }
     }
 

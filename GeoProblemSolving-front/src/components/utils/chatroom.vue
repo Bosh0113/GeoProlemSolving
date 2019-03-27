@@ -423,8 +423,8 @@ export default {
       let current_time = myDate.toLocaleString(); //获取日期与时间
 
       this.send_msg = {
-        from: this.$store.state.userName,
-        fromid: this.$store.state.userId,
+        from: this.$store.getters.userName,
+        fromid: this.$store.getters.userId,
         content: this.message,
         time: current_time
       };
@@ -446,7 +446,7 @@ export default {
         //判断消息的发出者
         var uid = chatMsg.fromid;
         if (
-          uid !== this.$store.state.userId &&
+          uid !== this.$store.getters.userId &&
           uid !== undefined
           // uid !== ""
         ) {
@@ -461,7 +461,7 @@ export default {
 
       this.send_msg = {
         from: "Test",
-        fromid: this.$store.state.userId,
+        fromid: this.$store.getters.userId,
         content: "TestChat"
       };
       this.socketApi.sendSock(this.send_msg, this.getSocketConnect);
@@ -516,8 +516,8 @@ export default {
       msglist: [],
       send_msg: [],
       query_date: "",
-      thisUserName: this.$store.state.userName,
-      thisUserId: this.$store.state.userId
+      thisUserName: this.$store.getters.userName,
+      thisUserId: this.$store.getters.userId
     };
   }
 };

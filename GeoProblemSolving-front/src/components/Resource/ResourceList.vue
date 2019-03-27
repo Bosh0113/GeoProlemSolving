@@ -164,7 +164,7 @@ export default {
         },
         {
           title: "Belong",
-          key: "belong",
+          key: "belong"
         },
         {
           title: "Type",
@@ -181,17 +181,16 @@ export default {
           sortable: true
         }
       ],
-      specifiedResourceListPre: [],
       uploaderArray: [],
       specifiedResourceList: [],
       // 上传文件的模态框
       uploadModal: false,
       file: "",
       fileDescription: "",
-      fileType: "",
+      fileType: ""
     };
   },
-  created() {
+  mounted() {
     this.initLayout();
     this.onMenuSelect("image");
   },
@@ -208,61 +207,19 @@ export default {
         )
         .then(res => {
           if (res.data != "None") {
-            this.specifiedResourceListPre = res.data;
-            // console.table(this.specifiedResourceListPre);
-            let userIdList = this.specifiedResourceListPre.map(function(
-              resource
-            ) {
-              return resource.uploaderId;
-            });
-            // console.log(userIdList);
-            var that = this;
-            if (userIdList.length != 0) {
-              userIdList.forEach(function(value, k) {
-                that.axios
-                  .get(
-                    "/GeoProblemSolving/user/inquiry" +
-                      "?key=userId" +
-                      "&value=" +
-                      value
-                  )
-                  .then(res => {
-                    var userInfoArray = [];
-                    that.uploaderArray.push(res.data);
-                    if (
-                      that.specifiedResourceListPre.length ==
-                      that.uploaderArray.length
-                    ) {
-                      // this.getList(that.uploaderArray);
-                      that.uploaderArray.forEach(function(item) {
-                        userInfoArray.push({
-                          id: item.userId,
-                          name: item.userName,
-                          organization: item.organization
-                        });
-                      });
-                      console.log(userInfoArray);
-                      that.specifiedResourceListPre.forEach(function(list) {
-                        userInfoArray.forEach(item => {
-                          if (list.uploaderId == item.id) {
-                            list["uploader"] = item.name + "(" +item.organization + ")";
-                          }
-                        });
-                      });
-                      that.specifiedResourceList = that.specifiedResourceListPre;                    }
-                  })
-                  .catch(err => {});
+            let specifiedResourceListPre = res.data;
+              specifiedResourceListPre.forEach(function(list) {
+                list["uploader"] = list.uploaderName + "(" + list.organization + ")";
               });
-            }
+              this.$set(this,"specifiedResourceList",specifiedResourceListPre);
           }
         });
     },
     handleSelectAll(status) {
       this.$refs.selection.selectAll(status);
     },
-    fileUploadModalShow(){
+    fileUploadModalShow() {
       this.uploadModal = true;
-      // alert(this.$store.state.userId);
     },
     //上传文件
     submitFile() {
@@ -271,15 +228,15 @@ export default {
       formData.append("file", this.file);
       formData.append("description", this.fileDescription);
       formData.append("type", this.fileType);
-      formData.append("uploaderId", this.$store.state.userId);
+      formData.append("uploaderId", this.$store.getters.userId);
       // 添加字段属于那个项目
-      formData.append("belong",this.$store.state.userName);
+      formData.append("belong", this.$store.getters.userName);
       let scopeObject = {
-        projectId:"",
-        subprojectId:"",
-        moduleId:"",
+        projectId: "",
+        subprojectId: "",
+        moduleId: ""
       };
-      formData.append("scope",JSON.stringify(scopeObject));
+      formData.append("scope", JSON.stringify(scopeObject));
       //这里还要添加其他的字段
       console.log(formData.get("file"));
       this.axios
@@ -303,7 +260,7 @@ export default {
     getFile(event) {
       this.file = event.target.files[0];
       console.log(this.file);
-    },
+    }
   }
 };
 </script>

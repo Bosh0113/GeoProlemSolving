@@ -322,28 +322,23 @@
 <script>
 import Avatar from "vue-avatar";
 export default {
-  created() {
+  mounted() {
     this.getUserProfile();
     this.getManagerProjectList();
     this.readPersonalEvent();
     this.getUserResource();
     this.detailSidebarHeight = window.innerHeight - 60 + "px";
-    // this.rightContentWidth = window.innerWidth - 270 + "px";
   },
   computed: {
     username() {
-      return this.$store.state.userName;
+      return this.$store.getters.userName;
     },
     avatar() {
-      return this.$store.state.avatar;
+      return this.$store.getters.avatar;
     },
     userId() {
-      return this.$store.state.userId;
+      return this.$store.getters.userId;
     }
-  },
-  mounted() {
-    this.getUserProfile();
-    this.getManagerProjectList();
   },
   components: {
     Avatar
@@ -418,8 +413,8 @@ export default {
       //编辑项目专用的字段结束
       item: "",
       projectMemberList: [],
-      selectManager: this.$store.state.userName,
-      selectManagerId: this.$store.state.userId,
+      selectManager: this.$store.getters.userName,
+      selectManagerId: this.$store.getters.userId,
       //当前项目的id
       currentProjectId: "",
       //当前用户信息的表单
@@ -460,24 +455,10 @@ export default {
   methods: {
     // 获取用户的详细信息
     getUserProfile() {
-      this.axios
-        .get(
-          "/GeoProblemSolving/user/inquiry" +
-            "?key=userId" +
-            "&value=" +
-            this.userId
-        )
-        .then(res => {
-          this.userDetail = res.data;
-          //打印用户的具体信息
-          // console.log(this.userDetail);
-          this.joinedProjectsNameArray = this.userDetail.joinedProjects;
-          this.getParticipatoryList(this.joinedProjectsNameArray);
-          // console.log("joinedProjectsList是" + this.joinedProjectsList);
-        })
-        .catch(err => {
-          console.log(err.data);
-        });
+      this.userDetail = this.$store.getters.userInfo;
+      //打印用户的具体信息
+      this.joinedProjectsNameArray = this.userDetail.joinedProjects;
+      this.getParticipatoryList(this.joinedProjectsNameArray);
     },
     //获取用户参与的所有项目列表
     //获取用户参与的项目列表
@@ -487,7 +468,7 @@ export default {
       for (let i = 0; i < projectIds.length; i++) {
         this.axios
           .get(
-            "http://localhost:8081/GeoProblemSolving/project/inquiry" +
+            "/GeoProblemSolving/project/inquiry" +
               "?key=projectId" +
               "&value=" +
               projectIds[i].projectId
@@ -528,7 +509,7 @@ export default {
       let quitData = new URLSearchParams();
       //包含项目id与用户名字段
       quitData.append("ProjectID", "");
-      quitData.append("UserName", this.$store.state.username);
+      quitData.append("UserName", this.$store.getters.username);
       this.axios
         .post("/GeoProblemSolving/TeamModeling/QuitProjectServlet", quitData)
         .then(res => {
@@ -550,7 +531,7 @@ export default {
         .get(
           "/GeoProblemSolving/user/remove?" +
             "userId=" +
-            this.$store.state.userId
+            this.$store.getters.userId
         )
         .then(res => {
           // 打印注销之后的结果返回值
@@ -638,7 +619,7 @@ export default {
     submitProfileEdit(data) {
       // var changedProfile = {};
       var changedProfile = new URLSearchParams();
-      changedProfile.append("userId", this.$store.state.userId);
+      changedProfile.append("userId", this.$store.getters.userId);
       //筛选出需要修改的信息
       for (var item in data) {
         if (data[item] != "") {
@@ -679,12 +660,11 @@ export default {
           "/GeoProblemSolving/history/inquiry?" +
             "key=userId" +
             "&value=" +
-            this.$store.state.userId
+            this.$store.getters.userId
         )
         .then(res => {
           if(res.data!="None"){
             this.userEventList = res.data;
-            console.table(result);
           }
         })
         .catch(err => {
@@ -697,12 +677,11 @@ export default {
           "/GeoProblemSolving/resource/inquiry" +
             "?key=uploaderId" +
             "&value=" +
-            this.$store.state.userId
+            this.$store.getters.userId
         )
         .then(res => {
           if(res.data!="None"){
             this.userResourceList = res.data;
-            console.table(this.userResourceList)
           }
         })
         .catch(err => {

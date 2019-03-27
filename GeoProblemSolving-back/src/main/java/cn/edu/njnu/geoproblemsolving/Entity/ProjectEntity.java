@@ -1,10 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.Entity;
 
-import cn.edu.njnu.geoproblemsolving.Dao.Method.EncodeUtil;
 import com.alibaba.fastjson.JSONArray;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import java.util.UUID;
 
 
 @Document(collection = "Project")
@@ -15,6 +12,7 @@ public class ProjectEntity {
     private String description;
     private String category;
     private String managerId;
+    private String managerName;
     private String introduction;
     private JSONArray members;
     private String privacy;
@@ -22,6 +20,10 @@ public class ProjectEntity {
     private String picture;
     private String createTime;
     private String endTime;
+
+    public String getManagerName() {
+        return managerName;
+    }
 
     public String getCategory() {
         return category;
@@ -117,5 +119,9 @@ public class ProjectEntity {
 
     public void setManagerId(String managerId) {
         this.managerId = managerId;
+    }
+
+    public void setManagerName(String managerName) {
+        this.managerName = managerName;
     }
 }

@@ -1,7 +1,98 @@
+<style scoped>
+h1 {
+  text-align: center;
+  margin-top: 2.5%;
+}
+.projectForm {
+  width: 60%;
+  margin-top: 0.5%;
+  margin-left: 20%;
+  margin-right: 20%;
+}
+.inline_style {
+  display: flex;
+}
+.hintTitle {
+  text-align: center;
+  width: 20%;
+}
+.create {
+  width: 20%;
+  margin-right: 40%;
+  margin-left: 40%;
+  margin-top: 10%;
+}
+#editor {
+  /* position:fixed; */
+  margin: 20px auto;
+  bottom: 0;
+  width: 80%;
+  /* height: 200px; */
+}
+/* 上传图片 */
+.demo-upload-list {
+  display: inline-block;
+  width: 60px;
+  height: 60px;
+  text-align: center;
+  line-height: 60px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  /* overflow-x: hidden; */
+  /* overflow-y: scroll; */
+  background: #fff;
+  position: relative;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+  margin-right: 4px;
+}
+.demo-upload-list img {
+  width: 100%;
+  height: 100%;
+}
+.demo-upload-list-cover {
+  display: none;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.6);
+}
+.demo-upload-list:hover .demo-upload-list-cover {
+  display: block;
+}
+.demo-upload-list-cover i {
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+  margin: 0 2px;
+}
+.uploadAvatar {
+  position: relative;
+  width: 58px;
+  height: 58px;
+  top: 0;
+  left: 0;
+  outline: none;
+  background-color: transparent;
+  opacity: 0;
+}
+.uploadBox {
+  display: inline-block;
+  width: 58px;
+  height: 58px;
+  line-height: 58px;
+  border-width: 0.75px;
+  border-style: dashed;
+  border-color: lightslategray;
+}
+
+/* 结束 */
+</style>
 <template>
   <div class="project form">
     <h1>New Project</h1>
-    <Form ref="formInline" :model="formInline" class="projectForm">
+    <Form ref="formInline" :model="formInline" :rules="newProjectRule" class="projectForm">
       <!-- 选择类别 -->
       <FormItem prop="category">
         <div style="display:flex" class="inline_style">
@@ -102,114 +193,24 @@
         <div class="inline_style">
           <div class="hintTitle">Introduction</div>
           <div id="editor">
-            <mavon-editor
+            <!-- <mavon-editor
               style="height: 100%"
               v-model="formInline.introduction"
               :toolbars="toolbars"
               @keydown
-            ></mavon-editor>
+            ></mavon-editor> -->
+            <Input v-model="formInline.introduction" type="textarea" placeholder="Enter introduction..." style="height:100%;width:100%"/>
           </div>
         </div>
       </FormItem>
       <FormItem>
         <div class="inline_style">
-          <Button type="success" @click="createProject()" class="create">Create</Button>
+          <Button type="success" @click='createProject("formInline")' class="create">Create</Button>
         </div>
       </FormItem>
     </Form>
   </div>
 </template>
-<style scoped>
-h1 {
-  text-align: center;
-  margin-top: 2.5%;
-}
-.projectForm {
-  width: 60%;
-  margin-top: 0.5%;
-  margin-left: 20%;
-  margin-right: 20%;
-}
-.inline_style {
-  display: flex;
-}
-.hintTitle {
-  text-align: center;
-  width: 20%;
-}
-.create {
-  width: 20%;
-  margin-right: 40%;
-  margin-left: 40%;
-  margin-top: 10%;
-}
-#editor {
-  /* position:fixed; */
-  margin: 20px auto;
-  bottom: 0;
-  width: 80%;
-  height: 200px;
-}
-/* 上传图片 */
-.demo-upload-list {
-  display: inline-block;
-  width: 60px;
-  height: 60px;
-  text-align: center;
-  line-height: 60px;
-  border: 1px solid transparent;
-  border-radius: 4px;
-  /* overflow-x: hidden; */
-  /* overflow-y: scroll; */
-  background: #fff;
-  position: relative;
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
-  margin-right: 4px;
-}
-.demo-upload-list img {
-  width: 100%;
-  height: 100%;
-}
-.demo-upload-list-cover {
-  display: none;
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: rgba(0, 0, 0, 0.6);
-}
-.demo-upload-list:hover .demo-upload-list-cover {
-  display: block;
-}
-.demo-upload-list-cover i {
-  color: #fff;
-  font-size: 20px;
-  cursor: pointer;
-  margin: 0 2px;
-}
-.uploadAvatar {
-  position: relative;
-  width: 58px;
-  height: 58px;
-  top: 0;
-  left: 0;
-  outline: none;
-  background-color: transparent;
-  opacity: 0;
-}
-.uploadBox {
-  display: inline-block;
-  width: 58px;
-  height: 58px;
-  line-height: 58px;
-  border-width: 0.75px;
-  border-style: dashed;
-  border-color: lightslategray;
-}
-
-/* 结束 */
-</style>
 <script>
 export default {
   data() {
@@ -222,6 +223,36 @@ export default {
         description: "",
         //tag列表
         tagList: []
+      },
+      newProjectRule: {
+        title: [
+          {
+            required: true,
+            message: "The title cannot be empty",
+            trigger: "blur"
+          }
+        ],
+        category: [
+          {
+            required: true,
+            message: "Please select category",
+            trigger: "change"
+          }
+        ],
+        privacy: [
+          {
+            required: true,
+            message: "Please select privacy",
+            trigger: "change"
+          }
+        ],
+        introduction:[
+          {
+            required: true,
+            message: "The introduction cannot be empty",
+            trigger: "blur"
+          }
+        ]
       },
       //这是操控mavon-editor上工具条的配置列表
       toolbars: {
@@ -252,56 +283,74 @@ export default {
       visible: false,
       //表示图片
       img: "",
-      createProjectId:"",
+      createProjectId: ""
     };
   },
 
   methods: {
-    createProject() {
-      let createProjectForm = {};
-      createProjectForm["category"] = this.formInline.category;
-      createProjectForm["title"] = this.formInline.title;
-      createProjectForm["tag"] = this.formInline.tagList.toString();
-      createProjectForm["privacy"] = this.formInline.privacy;
-      createProjectForm["picture"] = this.img;
-      createProjectForm["introduction"] = this.formInline.introduction;
-      createProjectForm["description"] = this.formInline.description;
-      createProjectForm["managerId"] = this.$store.state.userId;
-      console.log(createProjectForm);
+    createProject(name) {
+      this.$refs[name].validate(valid => {
+        if(valid){
+          let createProjectForm = {};
+          createProjectForm["category"] = this.formInline.category;
+          createProjectForm["title"] = this.formInline.title;
+          createProjectForm["tag"] = this.formInline.tagList.toString();
+          createProjectForm["privacy"] = this.formInline.privacy;
+          createProjectForm["picture"] = this.img;
+          createProjectForm["introduction"] = this.formInline.introduction;
+          createProjectForm["description"] = this.formInline.description;
+          createProjectForm["managerId"] = this.$store.getters.userId;
+          console.log(createProjectForm);
+          this.axios
+            .post("/GeoProblemSolving/project/create", createProjectForm)
+            .then(res => {
+              if (res.data === "Fail") {
+                this.$Message.success("Fail");
+              } else {
+                this.createProjectId = res.data;
+                this.$Message.success("Success");
+                this.addHistoryEvent(this.createProjectId);
+              }
+            })
+            .catch(err => {
+              console.log(err);
+            });
+        }else{
+          
+        }
+      });
+    },
+    //创建历史纪录的函数
+    addHistoryEvent(scopeId) {
+      // console.log("scopeId是"+scopeId);
+      let form = {};
+      let description =
+        this.$store.getters.userName +
+        " created a " +
+        this.formInline.category +
+        " project called " +
+        this.formInline.title;
+      form["description"] = description;
+      form["scopeId"] = scopeId;
       this.axios
-        .post("/GeoProblemSolving/project/create", createProjectForm)
+        .post(
+          "/GeoProblemSolving/history/save?",
+          "description=" +
+            description +
+            "&scopeId=" +
+            scopeId +
+            "&userId=" +
+            this.$store.getters.userId
+        )
         .then(res => {
-          if (res.data === "Fail") {
-            this.$Message.success("Fail");
-          } else {
-            console.log(res.data);
-            this.createProjectId = res.data;
-            // console.log(this.createProjectId);
-            this.$Message.success("Success");
-            this.addHistoryEvent(this.createProjectId);
+          console.log(res.data);
+          if (res.data === "Success") {
+            this.$router.push({ name: "Project" });
           }
         })
         .catch(err => {
-          console.log(err);
+          console.log(err.data);
         });
-    },
-    //创建历史纪录的函数
-    addHistoryEvent(scopeId){
-      // console.log("scopeId是"+scopeId);
-      let form = {};
-      let description = this.$store.state.userName + ' created a ' + this.formInline.category + ' project called ' + this.formInline.title;
-      form["description"] = description;
-      form["scopeId"] = scopeId;
-      this.axios.post("/GeoProblemSolving/history/save?", "description="+ description + "&scopeId=" + scopeId + "&userId=" + this.$store.state.userId)
-          .then(res=> {
-            console.log(res.data);
-            if(res.data === 'Success'){
-              this.$router.push({name: "Project"});
-            }
-          })
-          .catch(err=> {
-            console.log(err.data);
-          })
     },
     addTag(tag) {
       this.formInline.tagList.push(tag);
@@ -336,10 +385,10 @@ export default {
       this.img = "";
     }
   },
-  created(){
+  created() {
     // 加入判断，如果未登录自动跳转登录页面
-    if(this.$store.state.userId == ''){
-      this.$router.push({name:"Login"});
+    if (!this.$store.getters.userState) {
+      this.$router.push({ name: "Login" });
     }
   }
 };

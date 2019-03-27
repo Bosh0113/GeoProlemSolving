@@ -6,56 +6,85 @@ export default new Vuex.Store({
     // strict:true,
     state: {
         //data
-        userState: false,
-        userName: "visitor",
-        userId: "",
-        avatar: '',
-        projectImg: ''
+        userInfo: {
+            userState: false,
+            userName: 'visitor',
+            userId: '',
+            avatar: '',
+        },
+        projectImg: '',
+        project: {},
+        subProject: {},
     },
     getters: {
         userState: state => {
-            return state.userState;
+            return state.userInfo.userState;
         },
         userName: state => {
-            return state.userName;
+            return state.userInfo.userName;
         },
         userId: state => {
-            return state.userId;
+            return state.userInfo.userId;
+        },
+        avatar: state => {
+            return state.userInfo.avatar;
+        },
+        userInfo: state => {
+            return state.userInfo;
+        },
+        project: state => {
+            return state.project;
+        },
+        subProject: state => {
+            return state.subProject;
         }
     },
     mutations: {
         getUserInfo: state => {
-            $.ajax({
-                url: "/GeoProblemSolving/user/state",
-                type: "GET",
-                async: false,
-                success: function (data) {
-                    if (data) {
-                        var userInfo = data;
-                        state.userName = userInfo.userName;
-                        state.avatar = userInfo.avatar;
-                        state.userId = userInfo.userId;
-                        state.userState = true;
+            if (sessionStorage.getItem("userInfo") != null) {
+                state.userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
+            }
+            else {
+                $.ajax({
+                    url: "/GeoProblemSolving/user/state",
+                    type: "GET",
+                    async: false,
+                    success: function (data) {
+                        if (data) {
+                            var userInfo = data;
+                            userInfo.userState = true;
+                            state.userInfo = userInfo;
+                        }
+                    },
+                    error: function (err) {
+                        console.log("Get user info fail.");
                     }
-                },
-                error: function (err) {
-                    console.log("Get user info fail.");
-                }
-            });
+                });
+            }
         },
         userLogin: (state, data) => {
-            state.userState = true;
-            state.userName = data.userName;
-            state.avatar = data.avatar;
-            state.userId = data.userId;
+            let userInfo = data;
+            userInfo.userState = true;
+            state.userInfo = userInfo;
+            sessionStorage.setItem("userInfo", JSON.stringify(state.userInfo));
         },
         userLogout: (state) => {
-            state.userState = false;
-            state.userName = 'visitor';
-            state.userId = '';
+            state.userInfo = {
+                userState: false,
+                userName: 'visitor',
+                userId: '',
+                avatar: '',
+            };
+            sessionStorage.removeItem("userInfo");
         },
         uploadAvatar: (state, avatar) => {
             state.avatar = avatar;
+        },
+        setProjectInfo: (state,project) => {
+            state.project = project;
+        },
+        setSubProjectInfo: (state,subProject) => {
+            state.subProject = subProject;
         }
     }
 })
