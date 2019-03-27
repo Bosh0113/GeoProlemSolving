@@ -1071,7 +1071,6 @@ export default {
             that.subProjectList = res.data;
             that.identity(that.subProjectList);
             that.cutString(that.subProjectList, 200);
-            console.table(that.subProjectList);
           }
         })
         .catch(err => {
@@ -1093,8 +1092,6 @@ export default {
           return false;
         }
       });
-      // if(data.userId)
-      // members[i].userId === this.$store.getters.userId
     },
     showDetail(data) {
       alert(data);
