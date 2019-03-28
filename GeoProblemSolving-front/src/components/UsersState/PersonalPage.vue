@@ -13,7 +13,7 @@
                 <br>
               </div>
               <div class="user-desc" style="min-hieght:60px;padding:0 10px;border:1px dotted gray">
-                <p>{{this.userDetail.introduction}}</p>
+                <p class="userDescription">{{this.userDetail.introduction}}</p>
               </div>
               <div class="user-info">
                 <div class="single-info">
@@ -283,7 +283,7 @@
                           type="default"
                           slot="extra"
                           style="margin:-5px 5px 0 5px"
-                          @click="deleteProjectModalShow(index)"
+                          @click="deleteProjectModalShow(mProject.projectId)"
                           icon="md-close"
                           title="remove"
                         ></Button>
@@ -339,6 +339,7 @@ export default {
     this.getUserResource();
     // 获取用户管理列表
     this.getManagerProjectList();
+    this.getParticipatoryList(this.joinedProjectsNameArray);
     // 获取用户的历史event
     this.readPersonalEvent();
     this.detailSidebarHeight = window.innerHeight - 60 + "px";
@@ -476,12 +477,16 @@ export default {
     //获取用户的详细信息
     getUserProfile() {
       this.userDetail = this.$store.getters.userInfo;
+      // console.log()
       //打印用户的具体信息
       this.joinedProjectsNameArray = this.userDetail.joinedProjects;
-      this.getParticipatoryList(this.joinedProjectsNameArray);
+      console.table(this.joinedProjectsNameArray);
+      // this.getParticipatoryList(this.joinedProjectsNameArray);
+
     },
     //获取用户参与的项目列表
     getParticipatoryList(projectIds) {
+      console.table("id是："+ projectIds);
       var count = projectIds.length;
       let participatoryProjectListTemp = [];
       for (let i = 0; i < projectIds.length; i++) {
@@ -501,6 +506,7 @@ export default {
                 participatoryProjectListTemp
               );
             }
+            console.table(participatoryProjectListTemp);
           })
           .catch(err => {
             console.log(err.data);
@@ -562,7 +568,19 @@ export default {
       this.authorizeProjectModal = true;
       this.projectMemberList = this.userManagerProjectList[index].members;
     },
-    deleteProjectModalShow(index) {},
+    deleteProjectModalShow(pid) {
+      this.axios.get(
+        "/GeoProblemSolving/project/delete?" +
+            "projectId=" +
+            pid
+      )
+      .then(res=> {
+        alert(res.data);
+      })
+      .catch(err=> {
+        alert(err.data);
+      })
+    },
     authorize() {
       this.axios
         .get(
@@ -641,12 +659,14 @@ export default {
       // var changedProfile = {};
       var changedProfile = new URLSearchParams();
       changedProfile.append("userId", this.$store.getters.userId);
+      console.log(changedProfile);
       //筛选出需要修改的信息
       for (var item in data) {
         if (data[item] != "") {
           changedProfile.append(item, data[item]);
         }
-      }
+      };
+      console.table(changedProfile);
       this.axios
         .post("/GeoProblemSolving/user/update", changedProfile)
         .then(res => {
@@ -703,7 +723,7 @@ export default {
         .then(res => {
           if (res.data != "None" && res.data != "Fail") {
             this.userResourceList = res.data;
-            console.table(this.userResourceList);
+            // console.table(this.userResourceList);
           }
         })
         .catch(err => {
@@ -758,6 +778,16 @@ body {
   height: 20px;
   font-size: 10px;
   line-height: 20px;
+}
+.userDescription{
+  height: auto;
+  line-height: 10px;
+  font-size: 10px;
+  /* max-width: 200px; */
+  /* display: inline-block; */
+  overflow: hidden;
+  word-wrap: break-word;
+  word-break: break-all
 }
 .user-project {
   margin-top: 20px;
