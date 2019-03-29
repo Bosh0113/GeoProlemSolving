@@ -41,10 +41,7 @@ export default new Vuex.Store({
     },
     mutations: {
         getUserInfo: state => {
-            if (sessionStorage.getItem("userInfo") != null) {
-                state.userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
-            }
-            else {
+            if (!state.userInfo.userState){
                 $.ajax({
                     url: "/GeoProblemSolving/user/state",
                     type: "GET",

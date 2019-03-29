@@ -1120,7 +1120,7 @@ export default {
       let formData = new FormData();
       // 向 formData 对象中添加文件
       formData.append("file", this.file);
-      formData.append("description", this.fileDescription);
+      formData.append("description", "");
       formData.append("type", this.fileType);
       formData.append("uploaderId", this.$store.getters.userId);
       // 添加字段属于那个项目
@@ -1132,7 +1132,6 @@ export default {
       };
       formData.append("scope", JSON.stringify(scopeObject));
       //这里还要添加其他的字段
-      // console.log(formData.get("file"));
       this.axios
         .post("/GeoProblemSolving/resource/upload", formData)
         .then(res => {

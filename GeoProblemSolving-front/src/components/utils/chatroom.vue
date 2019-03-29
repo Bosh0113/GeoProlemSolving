@@ -1,38 +1,33 @@
-<style scoped>
-.outer-style {
-  max-height: 600px;
-  background-color: lightgray;
-  margin-top: 5%;
-}
-.main_part {
+<style>
+.chatPanel {
+  margin-top: 60px;
   display: flex;
-  height:600px;
-}
-.members_panel {
-  width: 20%;
-  height: 600px;
-  background-color: #515a6e;
-  color: white;
-  font-weight: bold;
-}
-/* .message_panel {
-  width: 60%;
-  background-color: cornsilk;
-} */
-
-.search_panel {
-  width: 30%;
-  background-color: white;
-  border: 1px solid lightgray;
+  min-height: 500px;
   max-height: 600px;
 }
-.member_search {
-  margin-top: 2.5%;
-  padding-left: 2.5%;
+/* member部分样式 */
+.memberPanel {
+  width: 200px;
+  background-color: #515a6e;
 }
-.member_search button {
-  margin-left: 5%;
+.panelHeader {
+  height: 40px;
 }
+.participants h4,
+.panelHeader h4 {
+  padding: 10px;
+  font-size: 20px;
+  line-height: 20px;
+  text-align: center;
+  color: white;
+}
+/* .memberListPanel {
+  height: auto;
+} */
+.participants {
+  height: auto;
+}
+
 .f_list {
   display: flex;
   padding-left: 10%;
@@ -50,98 +45,70 @@
   font-size: 18px;
   font-family: Helvetica;
 }
-.friends_title,
-.group_title {
-  padding-left: 20px;
-  padding-top: 20px;
+/* member杨式布局结束 */
+/* 关于右侧的布局 */
+.searchPanel {
+  width: 300px;
+  background-color: white;
 }
-.message_navbar {
+.date_pick {
+  padding: 10px;
+  width: 60%;
+  margin-left: 2.5%;
+  margin-right: 2.5%;
+}
+.date_pick_btn {
+  width: 20%;
+  margin-left: 5%;
+  margin-right: 5%;
+  height: 32px;
+  margin-top: 10px;
+}
+.search_msg {
+  padding: 10px;
+  /* background-color: lightblue; */
+  width: 90%;
+  margin-left: 2.5%;
+}
+.searchHeader {
+  height: 40px;
+}
+.searchHeader p {
+  height: 20px;
+  padding: 10px;
+  line-height: 15px;
+  font-size: 15px;
+  text-align: center;
+}
+.message_record_board {
+  margin-left: 5%;
+  margin-right: 5%;
+  max-height: 496px;
+  overflow-y: auto;
+}
+.single_record {
+  padding: 5px;
+}
+/* 右侧布局结束 */
+.contentPanel {
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  flex: auto;
+}
+.contentHeader {
   background-color: lightgray;
   height: 50px;
   display: flex;
 }
-.view-btn {
-  width: 15%;
+/* 信息主题列表显示窗口 */
+.contentBody {
+  flex: auto;
+  overflow: auto;
+  max-height: 500px;
+  min-height: 400px;
 }
-.select_name {
-  width: 60%;
-  margin-left: 15%;
-  margin-right: 5%;
-}
-.top_btn {
-  margin: 10px;
-  height: 30px;
-}
-.s_name {
-  height: 30px;
-  margin-top: 10px;
-  margin-bottom: 10px;
-  width: 20%;
-  margin-left: 40%;
-  line-height: 30px;
-  font-size: 18px;
-}
-.message_list_panel {
-  padding: 25px;
-  height: 490px;
-  overflow-y: auto;
-  background-color: white;
-}
-.message_send_panel {
-  /* overflow-y:hidden; */
-  height: 60px;
-  padding: 4px 20px 4px 10px;
-  background-color: lightgray;
-}
-.message_bar {
-  display: flex;
-}
-.send_panel {
-  display: flex;
-}
-.u_avater {
-  padding-top:5px;
-  width: 2.5%;
-  margin-right: 5%;
-}
-.send_message_btn {
-  height: 32px;
-  margin-top: 10px;
-  margin-bottom: 18px;
-}
-.message_input {
-  height: 40px;
-  margin-top: 10px;
-  margin-bottom: 10px;
-  margin-right: 15px;
-  margin-left: 15px;
-}
-.input_panel {
-  width: 75%;
-  margin-right: 5%;
-}
-.me {
-  background-color: lightcoral;
-  height: 32px;
-  width: 32px;
-  margin-top: 10px;
-  margin-bottom: 18px;
-}
-.message_style {
-  height: 40px;
-  margin: 5px;
-  /* background-color:lightgray; */
-  display: flex;
-}
-
-.user_img {
-  background-color: lightblue;
-  margin-top: 2px;
-  height: 32px;
-  width: 32px;
-  margin-left: 5px;
-}
-
 .chat-bubble-r {
   position: relative;
   margin: 12px;
@@ -170,11 +137,15 @@
   float: left;
 }
 .user_detail {
-  height: 48px;
+  height: 60px;
 }
 .u_name {
-  height: 6px;
-  margin-left: 10px;
+  height: 20px;
+  margin-top:5px;
+  /* margin-left: 10px; */
+  text-align: center;
+  font-size: 10px;
+  line-height: 10px;
 }
 
 .chat-bubble-left:before {
@@ -218,142 +189,195 @@
   border: 8px solid;
   border-color: transparent transparent transparent lightgray;
 }
-.search_msg {
-  padding: 10px;
-  /* background-color: lightblue; */
-  width: 90%;
-  margin-left: 2.5%;
+/* 信息主体结束 */
+/* 发送信息部分 */
+.contentFooter {
+  height: 60px;
+  padding: 4px 20px 4px 10px;
+  background-color: lightgray;
 }
-.date_pick {
-  padding: 10px;
-  width: 60%;
-  margin-left: 2.5%;
-  margin-right: 2.5%;
+.message_bar {
+  display: flex;
+  height:52px;
 }
-.date_pick_btn {
-  width: 20%;
-  margin-left: 5%;
+.send_panel {
+  display: flex;
+}
+.u_avater {
+  padding: 10px;
+  width: 2.5%;
   margin-right: 5%;
+}
+.user_img {
+  background-color: lightblue;
+  margin-top: 2px;
+  height: 32px;
+  width: 32px;
+  margin-left: 5px;
+}
+.input_panel {
+  width: 75%;
+  margin-right: 5%;
+}
+.message_input {
+  height: 40px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  margin-right: 15px;
+  margin-left: 15px;
+}
+.send_panel {
+  display: flex;
+}
+.send_message_btn {
   height: 32px;
   margin-top: 10px;
+  margin-bottom: 18px;
 }
-.message_record_board {
-  margin-left: 5%;
-  margin-right: 5%;
-  max-height: 496px;
-  overflow-y: auto;
+/* 发送信息部分结束 */
+.chatObject {
+  height: 50px;
+  padding: 10px;
+  line-height: 20px;
+  font-size: 20px;
+  width: 80%;
+  text-align: center;
 }
-.single_record {
-  padding: 5px;
+.chatOperate {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 20%;
+}
+.recordsButton {
+  height: 40px;
+  line-height: 15px;
+  font-size: 15px;
+  padding: 5px 10px 10px 5px;
+  /* float:right; */
 }
 </style>
 <template>
-  <div>
-    <Row>
-      <Col span="18" offset="3" class="outer-style">
-        <div class="main_part">
-          <div class="members_panel">
-            <div class="group">
-              <h3 class="group_title">Groups</h3>
-              <div v-for="(group,index) in groups" :key="index" class="f_list" >
-                <div>
-                  <avatar :username= group.scope :size="35" :rounded="false" :title= group.title></avatar>
-                </div>
-                <div class="name" :title= group.scope style="cursor:pointer" @click="changeChatroom(index)">{{group.name}}</div>
-              </div>
+  <Row>
+    <Col span="24">
+      <div class="chatPanel">
+        <div class="memberPanel">
+          <div class="panelHeader">
+            <h4>Groups</h4>
+          </div>
+          <div v-for="(group,index) in groups" :key="index" class="f_list">
+            <div>
+              <avatar :username="group.scope" :size="35" :rounded="false" :title="group.title"></avatar>
             </div>
-            <div class="participants">
-              <h3 class="friends_title">Participants</h3>
-              <div v-for="(participant,index) in participants" :key="index" class="f_list">
-                <div>
-                  <img v-if="participant.avatar != '' && participant.avatar!='undefined'" :src="participant.avatar" style="width:auto;height:100%">
-                  <avatar v-else :username= participant.userName :size="35" :rounded="false"></avatar>
-                </div>
-                <div class="name">{{participant.userName}}</div>
+            <div
+              class="name"
+              :title="group.scope"
+              style="cursor:pointer"
+              @click="changeChatroom(index)"
+            >{{group.name}}</div>
+          </div>
+          <div class="participants">
+            <h4>Participants</h4>
+            <div v-for="(participant,index) in participants" :key="index" class="f_list">
+              <div>
+                <img
+                  v-if="participant.avatar != '' && participant.avatar!='undefined'"
+                  :src="participant.avatar"
+                  style="width:35px;height:35px"
+                >
+                <avatar v-else :username="participant.userName" :size="35" :rounded="false"></avatar>
               </div>
+              <div class="name">{{participant.userName}}</div>
             </div>
           </div>
-          <div class="message_panel" :style="message_panelObj">
-            <div class="message_navbar">
-              <div class="select_name">
+        </div>
+        <div class="contentPanel">
+          <div class="contentHeader">
+            <!-- <div class="chatObject">
+              <h4>111</h4>
+            </div> -->
+            <div class="chatObject">
                 <div class="s_name" v-show="this.select_group!==''">{{this.select_group}}</div>
               </div>
-              <div class="view-btn">
-                <Button class="top_btn" @click="showRecords">Records</Button>
-              </div>
-            </div>
-            <div class="message_list_panel" >
-              <!-- 这里设计聊天的信息窗口 -->
-              <div style="display:flex" v-for="(list,index) in msglist" :key="index">
-                <template v-if="list.fromid === thisUserId">
-                  <div style="width:95%">
-                    <div class="chat-bubble-r chat-bubble-right">{{list.content}}</div>
-                  </div>
-                  <div class="user_detail">
-                    <div class="u_img">
-                      <avatar class="user_img" :username= list.from :size="35"></avatar>
-                    </div>
-                    <div class="u_name">{{list.from}}</div>
-                  </div>
-                </template>
-                <template v-else>
-                  <div class="user_detail">
-                    <div class="u_img">
-                      <avatar class="user_img" :username= list.from :size="35"></avatar>
-                    </div>
-                    <div class="u_name">{{list.from}}</div>
-                  </div>
-                  <div style="width:95%">
-                    <div class="chat-bubble-l chat-bubble-left">{{list.content}}</div>
-                  </div>
-                </template>
-              </div>
-            </div>
-            <div class="message_send_panel">
-              <div class="message_bar">
-                <div class="u_avater">
-                  <avatar class="user_img" username="Me" :size="40"></avatar>
-                </div>
-                <div class="input_panel">
-                  <Input
-                    placeholder="Enter message..."
-                    icon="ios-link"
-                    class="message_input"
-                    v-model="message"
-                  />
-                </div>
-                <div class="send_panel">
-                  <Button class="send_message_btn" @click="send(message)">Send</Button>
-                </div>
-              </div>
+            <div class="chatOperate">
+              <Button type="default" class="recordsButton" @click="showRecords">Records</Button>
             </div>
           </div>
-          <div class="search_panel" v-show="recordsPanel">
-            <div style="display:flex">
-              <DatePicker
-                type="date"
-                placeholder="Select date"
-                class="date_pick"
-                v-model="query_date"
-              ></DatePicker>
-              <Button class="date_pick_btn" type="success" @click="find(query_date)">ok</Button>
-            </div>
-            <div class="search_msg">
-              <Input search placeholder="Enter something..."/>
-            </div>
-            <div class="message_record_board">
-              <div style="display:flex" v-for="(list,index) in msglist" :key="index">
-                <div class="single_record">
-                  <span style="color:red;margin-right:2%">{{list.from}}:</span>
-                  {{list.content}}
+          <div class="contentBody" :style="message_panelObj">
+            <div style="display:flex" v-for="(list,index) in msglist" :key="index">
+              <template v-if="list.fromid === thisUserId">
+                <div style="width:95%">
+                  <div class="chat-bubble-r chat-bubble-right">{{list.content}}</div>
                 </div>
+                <div class="user_detail">
+                  <div class="u_img">
+                    <avatar class="user_img" :username="list.from" :size="35"></avatar>
+                  </div>
+                  <div class="u_name">{{list.from}}</div>
+                </div>
+              </template>
+              <template v-else>
+                <div class="user_detail" style="margin-left:2.5%;margin-top:5px;">
+                  <div class="u_img">
+                    <avatar class="user_img" :username="list.from" :size="35"></avatar>
+                  </div>
+                  <div class="u_name">
+                    <span style="font-size:3px;">{{list.from}}</span>
+                  </div>
+                </div>
+                <div style="width:95%">
+                  <div class="chat-bubble-l chat-bubble-left">{{list.content}}</div>
+                </div>
+              </template>
+            </div>
+          </div>
+          <div class="contentFooter">
+            <div class="message_bar">
+              <div class="u_avater">
+                <avatar class="user_img" username="Me" :size="40" style="margin-top: -4px;"></avatar>
+              </div>
+              <div class="input_panel">
+                <Input
+                  placeholder="Enter message..."
+                  icon="ios-link"
+                  class="message_input"
+                  v-model="message"
+                />
+              </div>
+              <div class="send_panel">
+                <Button class="send_message_btn" @click="send(message)">Send</Button>
               </div>
             </div>
           </div>
         </div>
-      </Col>
-    </Row>
-  </div>
+        <div class="searchPanel" v-show="searchPanelShow" style="border:1px solid lightgray">
+          <div class="searchHeader">
+            <p>Message Records</p>
+          </div>
+          <div style="display:flex">
+            <DatePicker
+              type="date"
+              placeholder="Select date"
+              class="date_pick"
+              v-model="query_date"
+            ></DatePicker>
+            <Button class="date_pick_btn" type="success" @click="find(query_date)">ok</Button>
+          </div>
+          <div class="search_msg">
+            <Input search placeholder="Enter something..."/>
+          </div>
+          <div class="message_record_board">
+            <div style="display:flex" v-for="(list,index) in msglist" :key="index">
+              <div class="single_record">
+                <span style="color:red;margin-right:2%">{{list.from}}:</span>
+                {{list.content}}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Col>
+  </Row>
 </template>
 <script>
 import * as socketApi from "./../../api/socket.js";
@@ -361,9 +385,9 @@ import Avatar from "vue-avatar";
 export default {
   components: {
     Avatar
-  },
+  }, 
   methods: {
-    init(){
+    init() {
       this.moduleId = sessionStorage.getItem("moduleId");
       this.subProjectId = sessionStorage.getItem("subProjectId");
       this.projectId = sessionStorage.getItem("projectId");
@@ -372,9 +396,24 @@ export default {
       this.projectName = sessionStorage.getItem("projectName");
       //groups
       this.groups = [
-        { name: this.moduleName, id: this.moduleId, scope:"Module", title: "Chat in the module"},
-        { name: this.subProjectName, id:this.subProjectId, scope:"Subproject", title:"Chat in the subproject"},
-        { name: this.projectName, id:this.projectId, scope:"Project", title:"Chat in the project"}
+        {
+          name: this.moduleName,
+          id: this.moduleId,
+          scope: "Module",
+          title: "Chat in the module"
+        },
+        {
+          name: this.subProjectName,
+          id: this.subProjectId,
+          scope: "Subproject",
+          title: "Chat in the subproject"
+        },
+        {
+          name: this.projectName,
+          id: this.projectId,
+          scope: "Project",
+          title: "Chat in the project"
+        }
       ];
       //participants
       this.getParticipants(this.moduleId,"module");
@@ -385,23 +424,19 @@ export default {
         this.getParticipants(this.moduleId,"module");
         this.select_group = this.moduleName;
         this.startWebSocket(this.moduleId);
-      }
-      else if(index == 1){
+      }else if(index == 1){
         this.getParticipants(this.subProjectId,"subproject");
         this.select_group = this.subProjectName;
         this.startWebSocket(this.subProjectId);
-      }
-      else if(index == 2){
+      } else if (index == 2) {
         this.getParticipants(this.projectId,"project");
         this.select_group = this.projectName;
         this.startWebSocket(this.projectId);
       }
     },
-    getParticipants(id,scope) {
-      if(scope == "module"){
-
-      }
-      else if(scope=="subproject"){
+    getParticipants(id, scope) {
+      if (scope == "module") {
+      } else if (scope == "subproject") {
         let that = this;
         $.ajax({
           url:
@@ -439,8 +474,7 @@ export default {
             console.log("Get manager name fail.");
           }
         });
-      }
-      else if(scope=="project"){
+      } else if (scope == "project") {
         let that = this;
         let queryObject = { key: "projectId", value: that.projectId };
         try {
@@ -489,10 +523,9 @@ export default {
         }
       }
     },
-    showRecords(){
-      this.recordsPanel = !this.recordsPanel;
-      this.message_panelObj.width= '80%';
-      this.message_panelObj['borderRight']='1px solid lightgray';
+    showRecords() {
+      this.searchPanelShow = !this.searchPanelShow;
+      this.message_panelObj["right"] = 0;
     },
     send(msg) {
       // console.log(msg);
@@ -520,9 +553,8 @@ export default {
       var chatMsg = data;
       if (chatMsg.from === "Test") {
         console.log(chatMsg.content);
-      }
-      else if (data.type === "members"){} 
-      else {
+      } else if (data.type === "members") {
+      } else {
         //判断消息的发出者
         this.other_msglist.push(chatMsg);
         this.msglist.push(chatMsg);
@@ -544,8 +576,6 @@ export default {
     },
     sortMsglist() {}
   },
-  created() {
-  },
   mounted(){
     this.init();
     this.startWebSocket(this.moduleId);
@@ -559,13 +589,20 @@ export default {
       if (!vm.$store.getters.userState || vm.$store.getters.userId == "") {
         vm.$router.push({name:"Login"});
       } else {
-
       }
     });
   },
   data() {
     return {
-      recordsPanel: false,
+      chatPanelHeight: window.innerHeight + "px",
+      searchPanelShow: false,
+      message_panelObj: {
+        // grid:1,
+        right: "300px",
+        borderRight: "0px",
+        searchPanelShow: false
+      },
+      // 原有的变量字段
       projectId: "",
       subProjectId: "",
       moduleId: "",
@@ -579,16 +616,8 @@ export default {
       send_msg: [],
       query_date: "",
       thisUserName: this.$store.getters.userName,
-      thisUserId: this.$store.getters.userId,
-      // 关于折叠栏
-      // collapsePanel:true,
-      message_panelObj: {
-        width: "80%" ,
-        borderRight:'1px solid lightgray',
-        // backgroundColor:'cornsilk'
-      }
+      thisUserId: this.$store.getters.userId
     };
   }
 };
 </script>
-

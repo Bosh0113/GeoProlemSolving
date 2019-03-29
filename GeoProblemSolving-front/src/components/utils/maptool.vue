@@ -64,6 +64,8 @@
 import minimap from "../../../static/js/Control.MiniMap.min.js";
 import pm from "../../../static/js/leaflet.pm.min.js";
 import * as socketApi from "./../../api/socket.js";
+import imIcon from "../../../static/Images/import.png";
+import exIcon from "../../../static/Images/export.png";
 //leaflet
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -192,7 +194,7 @@ export default {
               importData.title = 'Import GeoJSON';
               importData.onclick = this._importData;
               let iconImport = document.createElement('img');
-              iconImport.src="../../../static/Images/import.png";
+              iconImport.src = imIcon;
               iconImport.style='margin-left: 3.5px;margin-top: 3px';
               importData.appendChild(iconImport);
       
@@ -201,7 +203,7 @@ export default {
               exportData.title = 'Export GeoJSON';
               exportData.onclick = this._exportData;
               let iconExport = document.createElement('img');
-              iconExport.src="../../../static/Images/export.png";
+              iconExport.src = exIcon;
               iconExport.style='margin-left: 3.5px;margin-top: 3px';
               exportData.appendChild(iconExport);
 
