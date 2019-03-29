@@ -259,6 +259,15 @@ window.setInterval(function () {
     }
 }, 1000);
 
+window.setInterval(function(){
+    if(mxGraphSocket){
+        var messageObject={
+            type:"ping"
+        }
+        mxGraphSocket.send(JSON.stringify(messageObject));
+    }
+},20000);
+
 $("body").mousemove(function () {
     window.time = 0;
 });
