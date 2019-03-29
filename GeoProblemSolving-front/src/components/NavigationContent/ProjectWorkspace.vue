@@ -1029,6 +1029,7 @@ export default {
     openModuleSocket(moduleId) {
       var moduleSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + moduleId;
       // var moduleSocketURL = "ws://202.195.237.252:8082/GeoProblemSolving/Module/" + moduleId;
+      // var moduleSocketURL = "ws://172.21.212.7:8082/GeoProblemSolving/Module/" + moduleId;
       this.moduleSocket = new WebSocket(moduleSocketURL);
       this.moduleSocket.onopen = this.onOpen;
       this.moduleSocket.onmessage = this.onMessage;
@@ -1361,17 +1362,17 @@ export default {
       this.editModuleType = "";
     },
     show() {
-      let mId = sessionStorage.getItem("moduleId");
-      sessionStorage.setItem("username","123");
-      window.open("http://localhost:8081/GeoProblemSolving/Collaborative/ConceptualModel/index.html?groupID=" +
-        mId +
-        "-ConceptualModel") ;
+      // let mId = sessionStorage.getItem("moduleId");
+      // sessionStorage.setItem("username","123");
+      // window.open("http://localhost:8081/GeoProblemSolving/Collaborative/ConceptualModel/index.html?groupID=" +
+      //   mId +
+      //   "-ConceptualModel") ;
     },
     excel(){
-      let mId = sessionStorage.getItem("moduleId");
-      console.log("mid是"+ mId);
-      window.location.href =
-        "../../../static/html/excelTool.html"
+      // let mId = sessionStorage.getItem("moduleId");
+      // console.log("mid是"+ mId);
+      // window.location.href =
+      //   "../../../static/html/excelTool.html"
     },
     createModuleSuccess(title) {
       this.$Notice.success({

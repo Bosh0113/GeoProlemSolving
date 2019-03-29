@@ -650,13 +650,17 @@ export default {
       this.axios
         .post("/GeoProblemSolving/user/update", changedProfile)
         .then(res => {
-          if (res.data === "Success") {
+          if (res.data !== "Fail") {
             // this.drawerClose = true;
             this.$Notice.success({
               title: "notification",
               desc: "Profile update successfully"
             });
-            this.getUserProfile();
+            let userInfo=res.data;
+            userInfo.userState=true;
+            this.$store.commit("setUserInfo",userInfo);
+            this.$set(this,"userDetail",userInfo);
+            sessionStorage.setItem("userInfo", JSON.stringify(userInfo));
           }
         })
         .catch(err => {});

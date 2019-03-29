@@ -107,7 +107,8 @@
     </nav>
 </div>
 <script type="text/javascript">
-    $('#userNameLabel').html(sessionStorage.getItem("username"));
+    var userInfo=JSON.parse(sessionStorage.getItem("userInfo"));
+    $('#userNameLabel').html(userInfo.userName);
     if(url.search(reg)!=-1){
         let groupID=url.match(reg)[1];
         $('#groupIDLabel').html("CID: "+groupID);

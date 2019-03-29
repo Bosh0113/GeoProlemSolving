@@ -41,10 +41,7 @@ export default new Vuex.Store({
     },
     mutations: {
         getUserInfo: state => {
-            if (sessionStorage.getItem("userInfo") != null) {
-                state.userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
-            }
-            else {
+            if (!state.userInfo.userState) {
                 $.ajax({
                     url: "/GeoProblemSolving/user/state",
                     type: "GET",
@@ -80,11 +77,14 @@ export default new Vuex.Store({
         uploadAvatar: (state, avatar) => {
             state.avatar = avatar;
         },
-        setProjectInfo: (state,project) => {
+        setUserInfo: (state, userInfo) => {
+            state.userInfo = userInfo;
+        },
+        setProjectInfo: (state, project) => {
             state.project = project;
         },
-        setSubProjectInfo: (state,subProject) => {
+        setSubProjectInfo: (state, subProject) => {
             state.subProject = subProject;
         }
-    },  
+    },
 })
