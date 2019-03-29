@@ -3,23 +3,42 @@
 </style>
 <template>
   <Row>
-    <Col span="24" >
+    <Col span="24">
       <Col span="4" style="padding:30px" :style="{height:sidebarHeight}">
-        <input type="file" ref="upload" accept=".xls, .xlsx .csv" class="outputlist_upload" style="padding:20px 0 20px 0">
+        <Upload :before-upload="handleUpload" action="-">
+          <Button icon="ios-cloud-upload-outline">Upload data</Button>
+        </Upload>
+        <RadioGroup v-model="SelectAxis">
+          <Radio label="X-Axis" style="padding:20px 0 10px 0"></Radio>
+          <Input v-model="SelectX" style="width:200px" readonly/>
+          <Radio label="Y-Axis" style="padding:20px 0 10px 0"></Radio>
+          <Input v-model="SelectY" style="width:200px" readonly/>
+        </RadioGroup>
         <h3 style="padding-top:20px">Type of chart:</h3>
-        <Select v-model="chooseType" style="width:200px;padding:20px 0 20px 0" :placeholder="chartTypePlaceholder">
+        <Select
+          v-model="chooseType"
+          style="width:200px;padding-top:10px"
+          :placeholder="chartTypePlaceholder"
+        >
           <Option v-for="item in normalChart" :value="item.value" :key="item.value">{{ item.label }}</Option>
         </Select>
-        <Button>Visualization</Button>
-        
+        <Button @click="Visualize" style="margin-top:30px">Visualization</Button>
+        <Button v-if="visulization" @click="back2Table" style="margin-top:30px">Select data</Button>
       </Col>
       <Col span="19" offset="1" style="padding-top:30px" :style="{height:sidebarHeight}">
-        <div id="mytable" style="height:400px"></div>
+        <div v-if="visulization" title="Data visulization" style="padding-right:20px">
+          <ve-scatter v-if="chooseType == 'scatter'" :data="chartData"></ve-scatter>
+          <ve-chart v-else :data="chartData" :settings="chartSettings"></ve-chart>
+        </div>
+        <div v-show="!visulization">
+          <div id="mytable" style="height:400px"></div>
+        </div>
       </Col>
     </Col>
   </Row>
 </template>
 <script>
+import * as socketApi from "./../../api/socket.js";
 import csv from "../../../static/js/jquery.csv.min.js";
 import jexcel from "../../../static/js/jquery.jexcel.js";
 import XLSX from "xlsx";
@@ -27,13 +46,13 @@ export default {
   data() {
     return {
       sidebarHeight: "",
-      testData: [
-      ],
+      visulization: false,
+      testData: [],
       columnHeader: [],
       excelData: [],
       columnNameList: [],
       // 选中的参考值
-      selectName: [],  
+      selectName: [],
       normalChart: [
         { value: "line", label: "line" },
         { value: "histogram", label: "histogram" },
@@ -45,8 +64,17 @@ export default {
         { value: "funnel", label: "funnel" },
         { value: "scatter", label: "scatter" }
       ],
+      chartTypePlaceholder: "Choose one type of charts",
+      DataX: [],
+      DataY: [],
+      SelectX: "",
+      SelectY: "",
+      SelectAxis: "",
+      chartData: [],
       chooseType: "",
-      chartTypePlaceholder: "Choose one type of charts"
+      chartSettings: {},
+      //协同消息
+      socket_content: {}
     };
   },
   methods: {
@@ -57,31 +85,49 @@ export default {
         minDimensions: [20, 20]
       });
     },
-    download() {
-      $("#mytable").jexcel("download");
-    },
-    destroy() {
-      $("#mytable").jexcel({
-        data: $.fn.jexcel("helper", {
-          action: "createEmptyData",
-          cols: 10,
-          rows: 10
-        })
-      });
-    },
-    readExcel(e) {
-      //表格导入
-      var that = this;
-      const files = e.target.files;
-      if (files.length <= 0) {
-        //如果没有文件名
-        return false;
-      } else if (!/\.(xls|xlsx|csv)$/.test(files[0].name.toLowerCase())) {
+    handleUpload(file) {
+      if (!/\.(xls|xlsx|csv)$/.test(file.name.toLowerCase())) {
         this.$Message.error("上传格式不正确，请上传xls或者xlsx格式");
         return false;
       }
 
-      const fileReader = new FileReader();
+      //上传数据
+      let formData = new FormData();
+      let userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
+      formData.append("file", file);
+      formData.append("description", "Data chart tool");
+      formData.append("type", "data");
+      formData.append("uploaderId", userInfo.userId);
+      formData.append("belong", userInfo.userName);
+      let scopeObject = {
+        projectId: sessionStorage.getItem("projectId"),
+        subprojectId: sessionStorage.getItem("subprojectId"),
+        moduleId: sessionStorage.getItem("moduleId")
+      };
+      formData.append("scope", JSON.stringify(scopeObject));
+      this.axios
+        .post("/GeoProblemSolving/resource/upload", formData)
+        .then(res => {
+          if (res.data != "Size over" && res.data.length > 0) {
+            let dataName = res.data[0];
+
+            this.socket_content["dataName"] = dataName;
+            this.socket_content["operate"] = "dataupload";
+            this.socketApi.sendSock(this.socket_content, this.getSocketConnect);
+            this.socket_content = {};
+          }
+        })
+        .catch(err => {});
+
+      // 渲染表格
+      this.fillTable(file);
+
+      return false;
+    },
+    fillTable(file){
+      var that = this;
+      var fileReader = new FileReader();
+      fileReader.readAsBinaryString(file);
       fileReader.onload = ev => {
         try {
           const data = ev.target.result;
@@ -91,7 +137,7 @@ export default {
           const wsname = workbook.SheetNames[0]; //取第一张表
           const ws = XLSX.utils.sheet_to_json(workbook.Sheets[wsname]);
           let arr = Object.keys(ws[0]);
-          this.columnNameList = arr;
+          that.columnNameList = arr;
           //生成json表格内容
           let list1 = [];
           let list2 = [];
@@ -104,76 +150,277 @@ export default {
           }
           that.columnHeader = arr;
           that.excelData = list2;
+
           $("#mytable").jexcel({
             data: that.excelData,
-            colHeaders: arr,
+            colHeaders: that.columnHeader,
             tableOverflow: false,
             minDimensions: [20, 20],
             csvHeaders: true,
+            onselection: that.selectData
           });
-          this.$refs.upload.value = "";
+          that.$refs.upload.value = "";
         } catch (e) {
           return false;
         }
       };
-      fileReader.readAsBinaryString(files[0]);
+      fileReader.onerror = function() {
+        alert("Input data error.");
+        that.showFile = false;
+        that.uploadGeoJson = null;
+      };
     },
-    showChart() {
-      var xDataString = this.xData.join("");
-      var yDataString = this.yData.join("");
-      if (this.chooseType === "waterfall") {
-        this.chartSettings = {
-          type: this.chooseType,
-          metrics: yDataString,
-          dimension: xDataString
-        };
-        this.chartData = {
-          columns: [xDataString,yDataString],
-          rows: this.cellValue
-        };
-        console.log(this.chartSettings);
-      } else if (this.chooseType == "scatter") {
-        this.chartSettings = {
-          type: this.chooseType,
-          metrics: [this.columnsShow[0],this.columnsShow[1]],
-          dimension: xDataString
-        };
-        this.chartData = {
-        columns: this.columnsShow,
-        rows: this.cellValue
-      };
-      console.log(this.chartSettings);
-      }else if(this.chooseType == "funnel"){
-        this.chartSettings = {
-          type: this.chooseType,
-          metrics: yDataString,
-          dimension: xDataString,
-          ascending: true,
-          useDefaultOrder:true,
-        };
-        this.chartData = {
-        columns: this.columnsShow,
-        rows: this.cellValue
+    selectData(obj, startCell, endCell) {
+      let start = startCell[0].id;
+      let end = endCell[0].id;
+      let startXY = start.split("-");
+      let endXY = end.split("-");
+      if (this.SelectAxis == "") {
+        return;
       }
-      }else {
-        this.chartSettings = {
-          type: this.chooseType,
-          metrics: this.yData,
-          dimension: this.xData
-        };
-        this.chartData = {
-        columns: this.columnsShow,
-        rows: this.cellValue
-      };
+
+      try {
+        start =
+          String.fromCharCode(parseInt(startXY[0]) + "A".charCodeAt()) +
+          (parseInt(startXY[1]) + 1);
+        end =
+          String.fromCharCode(parseInt(endXY[0]) + "A".charCodeAt()) +
+          (parseInt(endXY[1]) + 1);
+      } catch (e) {}
+
+      if (this.SelectAxis == "X-Axis") {
+        this.socket_content["startX"] = startXY;
+        this.socket_content["endX"] = endXY;
+        this.SelectX = start + "->" + end;
+        this.DataX = this.getData(startXY, endXY);
+      } else if (this.SelectAxis == "Y-Axis") {
+        this.socket_content["startY"] = startXY;
+        this.socket_content["endY"] = endXY;
+        this.SelectY = start + "->" + end;
+        this.DataY = this.getData(startXY, endXY);
       }
+    },
+    getData(start, end) {
+      //取值
+      let data = [];
+      let minx =
+        parseInt(start[0]) <= parseInt(end[0])
+          ? parseInt(start[0])
+          : parseInt(end[0]);
+      let maxx =
+        parseInt(start[0]) >= parseInt(end[0])
+          ? parseInt(start[0])
+          : parseInt(end[0]);
+      let miny =
+        parseInt(start[1]) <= parseInt(end[1])
+          ? parseInt(start[1])
+          : parseInt(end[1]);
+      let maxy =
+        parseInt(start[1]) >= parseInt(end[1])
+          ? parseInt(start[1])
+          : parseInt(end[1]);
+      for (let i = minx; i <= maxx; i++) {
+        let colData = [];
+        for (let j = miny; j <= maxy; j++) {
+          let value = $("#mytable").jexcel("getValue", i + "-" + j);
+          colData.push(value);
+        }
+        data.push(colData);
+      }
+      for (let i = 0; i < data.length; i++) {
+        let header = $("#mytable").jexcel("getHeader", i + minx);
+        data[i].unshift(header);
+      }
+      return data;
+    },
+    back2Table() {
+      this.visulization = false;
+    },
+    showCharts() {      
+      this.visulization = true;
+
+      //数据标准化
+      let dimension = [],
+        metrics = [],
+        columns = [],
+        rows = [];
+      dimension.push(this.DataX[0][0]);
+      columns.push(this.DataX[0][0]);
+      let dataLength =
+        this.DataX[0].length <= this.DataY[0].length
+          ? this.DataX[0].length
+          : this.DataY[0].length;
+
+      if (
+        this.chooseType === "pie" ||
+        this.chooseType === "ring" ||
+        this.chooseType === "waterfall"
+      ) {
+        metrics.push(this.DataY[0][0]);
+        columns.push(this.DataY[0][0]);
+        for (let i = 1; i < dataLength; i++) {
+          let row = {};
+          row[this.DataX[0][0]] = this.DataX[0][i];
+          row[this.DataY[0][0]] = this.DataY[0][i];
+          rows.push(row);
+        }
+        //排序
+        var that = this;
+        rows.sort(function(a, b) {
+          return a[that.DataX[0][0]] - b[that.DataX[0][0]];
+        });
+
+        if (this.chooseType == "funnel") {
+          this.chartSettings = {
+            type: this.chooseType,
+            metrics: metrics,
+            dimension: dimension,
+            ascending: true,
+            useDefaultOrder: true
+          };
+          this.chartData = {
+            columns: columns,
+            rows: rows
+          };
+        } else {
+          this.chartSettings = {
+            type: this.chooseType,
+            metrics: metrics,
+            dimension: dimension
+          };
+          this.chartData = {
+            columns: columns,
+            rows: rows
+          };
+        }
+      } else {
+        for (let i = 0; i < this.DataY.length; i++) {
+          metrics.push(this.DataY[i][0]);
+        }
+        for (let i = 0; i < this.DataY.length; i++) {
+          columns.push(this.DataY[i][0]);
+        }
+        for (let i = 1; i < dataLength; i++) {
+          let row = {};
+          row[this.DataX[0][0]] = this.DataX[0][i];
+          for (let j = 0; j < this.DataY.length; j++) {
+            row[this.DataY[j][0]] = this.DataY[j][i];
+          }
+          rows.push(row);
+        }
+        //排序
+        var that = this;
+        rows.sort(function(a, b) {
+          return a[that.DataX[0][0]] - b[that.DataX[0][0]];
+        });
+
+        if (this.chooseType == "scatter") {
+          this.chartSettings = {
+            type: this.chooseType,
+            metrics: metrics,
+            dimension: dimension
+          };
+          this.chartData = {
+            columns: columns,
+            rows: rows
+          };
+        } else {
+          this.chartSettings = {
+            type: this.chooseType,
+            metrics: metrics,
+            dimension: dimension
+          };
+          this.chartData = {
+            columns: columns,
+            rows: rows
+          };
+        }
+      }
+    },
+    Visualize() {
+      if (this.DataX.length == 0 || this.DataY.length == 0) {
+        return;
+      }
+      this.socket_content["chartType"] = this.chooseType;
+      this.socket_content["operate"] = "visualize";
+      this.socketApi.sendSock(this.socket_content, this.getSocketConnect);
+      this.socket_content = {};
+
+      this.showCharts();      
+    },
+    getSocketConnect(data) {
+      let socketData = data;
+
+      if (socketData.from === "Test") {
+        console.log(socketData.content);
+      } else if (socketData.type === "members") {
+      } else {
+        if (socketData.operate === "visualize") {
+
+          this.chooseType = socketData.chartType;
+          try {
+            let start =
+              String.fromCharCode(
+                parseInt(socketData.startX[0]) + "A".charCodeAt()
+              ) +
+              (parseInt(socketData.startX[1]) + 1);
+            let end =
+              String.fromCharCode(
+                parseInt(socketData.endX[0]) + "A".charCodeAt()
+              ) +
+              (parseInt(socketData.endX[1]) + 1);
+            this.SelectX = start + "->" + end;
+            this.DataX = this.getData(socketData.startX, socketData.endX);
+
+            start =
+              String.fromCharCode(
+                parseInt(socketData.startY[0]) + "A".charCodeAt()
+              ) +
+              (parseInt(socketData.startY[1]) + 1);
+            end =
+              String.fromCharCode(
+                parseInt(socketData.endY[0]) + "A".charCodeAt()
+              ) +
+              (parseInt(socketData.endY[1]) + 1);
+            this.SelectY = start + "->" + end;
+            this.DataY = this.getData(socketData.startY, socketData.endY);
+          } 
+          catch (e) {}
+          this.showCharts();  
+          
+        } else if (socketData.operate === "dataupload") {
+          var that = this;
+          var xhr = new XMLHttpRequest(); 
+          xhr.open("GET", "/GeoProblemSolving/resource/upload/" + socketData.dataName, true);
+          xhr.responseType = "blob";
+          xhr.onload = function(e) {
+            if (this.status == 200) {
+              var file = this.response;              
+              that.fillTable(file);
+            }
+          };
+          xhr.send();
+        }
+      }
+    },
+    startWebSocket() {
+      let roomId = sessionStorage.getItem("moduleId");
+      this.socketApi.initWebSocket("ChartsServer/" + roomId);
+
+      this.send_msg = {
+        type: "test",
+        from: "Test",
+        content: "TestChat"
+      };
+      this.socketApi.sendSock(this.send_msg, this.getSocketConnect);
     }
   },
+  beforeDestroy() {
+    // this.socketApi.close();
+  },
   mounted() {
-    this.$refs.upload.addEventListener("change", e => {
-      //绑定监听表格导入事件
-      this.readExcel(e);
-    });
     this.init();
+    this.startWebSocket();
   }
 };
 </script>
