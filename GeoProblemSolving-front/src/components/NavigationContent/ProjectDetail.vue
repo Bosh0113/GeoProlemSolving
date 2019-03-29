@@ -282,7 +282,7 @@
           <div class="form_style">
             <span>Reciver</span>
             <!-- <Tag v-for="item in count" :key="item" :name="item" closable @on-close="handleClose2">标签{{ item + 1 }}</Tag> -->
-            <Input v-model="inputEmail" style="width:200px"/>
+            <Input v-model="inputEmail" style="width:200px" :rules="emailValidate"/>
             <Button
               icon="ios-add"
               type="dashed"
@@ -404,6 +404,22 @@
                           @click="joinSubProject(subProject)"
                         >
                           <Icon type="md-add"/>
+                        </Button>
+                        <Button
+                          type="default"
+                          style="margin-left:10px"
+                          v-show="subProject['isManager'] == true"
+                          @click="editSubProjectShow(index)"
+                        >
+                          <Icon type="md-brush"/>
+                        </Button>
+                        <Button
+                          type="default"
+                          style="margin-left:10px"
+                          v-show="subProject['isManager'] == true"
+                          @click="deleteSubProjectShow(index)"
+                        >
+                          <Icon type="md-close"/>
                         </Button>
                       </div>
                       <p class="subProjectDescription">{{subProject["description"]}}</p>
@@ -787,7 +803,28 @@ export default {
       ],
       // 关于控制项目编辑的模态框
       editProjectModal: false,
-      removeProjectModal: false
+      removeProjectModal: false,
+      // 邮箱验证
+      emailValidate:[
+        { required: true,
+          message: 'The email is not allowed empty',
+          pattern: /.+/,
+          // validator:(rule, value, callback) => {
+          //   if (value === '') {
+          //     callback(new Error('请正确填写邮箱'));
+          //   } else {
+          //     if (value !== '') {
+          //       var reg=/^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
+          //       if(!reg.test(value)){
+          //         callback(new Error('请输入有效的邮箱'));
+          //       }
+          //     }
+          //     callback();
+          //   }
+          // },
+          trigger: 'blur'
+        }
+      ],
     };
   },
   created(){
@@ -974,6 +1011,10 @@ export default {
     },
     invite() {
       var emailFormBody = {};
+      // this.inputEmail
+      if(this.inputEmail!=""){
+        this.inviteEmailList.push(this.inputEmail);
+      }
       emailFormBody["recipient"] = this.inviteEmailList.toString();
       emailFormBody["mailTitle"] = this.emailTitle;
       emailFormBody["mailContent"] = this.emailContent;

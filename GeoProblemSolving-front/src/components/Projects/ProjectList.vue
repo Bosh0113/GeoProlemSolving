@@ -7,15 +7,15 @@ img {
 .whitespace {
   height: 20px;
 }
-.projectTitle{
-  height:40px;
-  line-height:40px;
-  font-size:20px;
-  max-width:200px;
-  display:inline-block;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
+.projectTitle {
+  height: 40px;
+  line-height: 40px;
+  font-size: 20px;
+  max-width: 200px;
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 /* title标题悬浮时出现下划线且变色 */
 .projectTitle:hover {
@@ -52,18 +52,18 @@ img {
   <div>
     <Row>
       <Col span="22" offset="1">
-      <div style="display:flex;height:60px;justify-content:center">
-        <div style="width:70%;display:flex;justify-content:center;align-items:center">
-          <div style="width:80%">
-            <Input
-              v-model="search"
-              placeholder="Enter something to find project quickly"
-              style="width: 80%"
-            />
+        <div style="display:flex;height:60px;justify-content:center">
+          <div style="width:70%;display:flex;justify-content:center;align-items:center">
+            <div style="width:80%">
+              <Input
+                v-model="search"
+                placeholder="Enter something to find project quickly"
+                style="width: 80%"
+              />
+            </div>
           </div>
-        </div>
-        <div style="width:30%;display:flex;justify-content:flex-end;align-items:center">
-          <Button
+          <div style="width:30%;display:flex;justify-content:flex-end;align-items:center">
+            <Button
               @click="newProject"
               type="default"
               class="btnCreate"
@@ -77,8 +77,8 @@ img {
               class="btnJoin"
               @click="joinModal=true"
             >Join</Button>
+          </div>
         </div>
-      </div>
 
         <br>
         <div class="Tabpane">
@@ -121,7 +121,12 @@ img {
             </Card>
           </Col>
         </div>
-        <div v-for="(item,index) in filteredBlogs" :data="currentProjectList" :key="item.index" style="width:95%;margin-right:5%">
+        <div
+          v-for="(item,index) in filteredBlogs"
+          :data="currentProjectList"
+          :key="item.index"
+          style="width:95%;margin-right:5%"
+        >
           <Col
             :xs="{ span: 21, offset: 1 }"
             :md="{ span: 11, offset: 1 }"
@@ -134,11 +139,7 @@ img {
                 @click="goSingleProject(item.projectId)"
                 class="projectTitle"
               >{{item.title}}</span>
-              <div
-                class="operate"
-                slot="extra"
-                style="height:40px;display:flex;align-items:center"
-              >
+              <div class="operate" slot="extra" style="height:40px;display:flex;align-items:center">
                 <Button
                   type="success"
                   v-show="item.isMember===false&&item.isManager===false"
@@ -152,7 +153,7 @@ img {
                   v-show="item.isMember===true||item.isManager===true"
                   :id="item.projectId"
                 >
-                <Icon type="md-person" />
+                  <Icon type="md-person"/>
                 </Button>
               </div>
 
@@ -312,10 +313,10 @@ export default {
         });
       return this.currentProjectList;
     },
-    newProject(){
+    newProject() {
       if (!this.$store.getters.userState) {
         this.$router.push({ name: "Login" });
-      }else{
+      } else {
         this.$router.push({ name: "NewProject" });
       }
     },
@@ -346,8 +347,8 @@ export default {
       this.$Message.info("Clicked cancel");
     },
     joinedRefresh() {
-      let projectList=this.currentProjectList;
-      let length=this.currentProjectList.length;
+      let projectList = this.currentProjectList;
+      let length = this.currentProjectList.length;
       for (var i = 0; i < length; i++) {
         if (projectList[i].projectId === this.joinProjectId) {
           this.currentProjectList[i]["isMember"] = true;
@@ -389,7 +390,7 @@ export default {
       let isManager, isMember;
       for (let i = 0; i < this.currentProjectList.length; i++) {
         if (this.currentProjectList[i]["projectId"] === id) {
-          let projectInfo=this.currentProjectList[i];
+          let projectInfo = this.currentProjectList[i];
           isManager = projectInfo["isManager"];
           isMember = projectInfo["isMember"];
           this.$store.commit("setProjectInfo", projectInfo);
@@ -407,33 +408,38 @@ export default {
       }
     },
     joinApply(data) {
-      let joinForm = {};
-      joinForm["recipientId"] = data.managerId;
-      joinForm["type"] = "apply";
-      joinForm["content"] = {
-        userName: this.$store.getters.userName,
-        userId: this.$store.getters.userId,
-        title: "Group application",
-        description:
-          "User " +
-          this.$store.getters.userName +
-          " apply to join in your project: " +
-          data.title +
-          " .",
-        projectId: data.projectId,
-        projectTitle: data.title,
-        scope:"project",
-        approve: "unknow"
-      };
-      this.axios
-        .post("/GeoProblemSolving/notice/save", joinForm)
-        .then(res => {
-          this.$Message.info("Apply Successfully");
-          this.$emit("sendNotice", data.managerId);
-        })
-        .catch(err => {
-          console.log("申请失败的原因是：" + err.data);
-        });
+      if (this.$store.getters.userState) {
+        let joinForm = {};
+        joinForm["recipientId"] = data.managerId;
+        joinForm["type"] = "apply";
+        joinForm["content"] = {
+          userName: this.$store.getters.userName,
+          userId: this.$store.getters.userId,
+          title: "Group application",
+          description:
+            "User " +
+            this.$store.getters.userName +
+            " apply to join in your project: " +
+            data.title +
+            " .",
+          projectId: data.projectId,
+          projectTitle: data.title,
+          scope: "project",
+          approve: "unknow"
+        };
+        this.axios
+          .post("/GeoProblemSolving/notice/save", joinForm)
+          .then(res => {
+            this.$Message.info("Apply Successfully");
+            this.$emit("sendNotice", data.managerId);
+          })
+          .catch(err => {
+            console.log("申请失败的原因是：" + err.data);
+          });
+      } else {
+        this.$Message.error("you must have an account before you apply");
+        this.$router.push({ name: "Login" });
+      }
     }
   }
 };

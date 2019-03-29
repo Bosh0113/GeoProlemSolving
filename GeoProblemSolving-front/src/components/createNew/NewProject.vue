@@ -12,10 +12,10 @@ h1 {
 .inline_style {
   display: flex;
 }
-.hintTitle {
+/* .hintTitle {
   text-align: center;
   width: 20%;
-}
+} */
 .create {
   width: 20%;
   margin-right: 40%;
@@ -92,11 +92,10 @@ h1 {
 <template>
   <div class="project form">
     <h1>New Project</h1>
-    <Form ref="formInline" :model="formInline" :rules="newProjectRule" class="projectForm">
+    <div>
+      <Form ref="formInline" :model="formInline" :rules="newProjectRule" class="projectForm">
       <!-- 选择类别 -->
-      <FormItem prop="category">
-        <div style="display:flex" class="inline_style">
-          <div class="hintTitle">Category</div>
+      <FormItem prop="category" label="category" :label-width="100">
           <RadioGroup v-model="formInline.category" style="width:80%">
             <Radio label="Water"></Radio>
             <Radio label="Soil"></Radio>
@@ -105,28 +104,18 @@ h1 {
             <Radio label="Society"></Radio>
             <Radio label="Others"></Radio>
           </RadioGroup>
-        </div>
       </FormItem>
-      <FormItem prop="title">
-        <div class="inline_style">
-          <div class="hintTitle">Title</div>
-          <Input v-model="formInline.title" placeholder="Enter Title..." style="width:80%"/>
-        </div>
+      <FormItem prop="title" label="title" :label-width="100">
+          <Input v-model="formInline.title" placeholder="Enter Title..."/>
       </FormItem>
-      <FormItem prop="desc">
-        <div class="inline_style">
-          <div class="hintTitle">Description</div>
+      <FormItem prop="description" label="description" :label-width="100">
           <Input
             v-model="formInline.description"
             placeholder="Enter a brief introduction ..."
-            style="width:80%"
           />
-        </div>
       </FormItem>
-      <FormItem prop="Privacy">
-        <div class="inline_style">
-          <div class="hintTitle">Privacy</div>
-          <RadioGroup v-model="formInline.privacy" style="width:80%" >
+      <FormItem prop="privacy" label="Privacy" :label-width="100">
+          <RadioGroup v-model="formInline.privacy" style="width:80%;margin-left:10px" >
             <Radio
               label="Public"
               title="Other users can find the group and see who has membership."
@@ -137,11 +126,9 @@ h1 {
             ></Radio>
             <Radio label="Private" title="Other users can not find this group."></Radio>
           </RadioGroup>
-        </div>
+
       </FormItem>
-      <FormItem prop="Tag">
-        <div class="inline_style">
-          <div class="hintTitle">Tag</div>
+      <FormItem prop="tag" label="tag" :label-width="100">
           <Input
             v-model="inputTag"
             placeholder="Enter some tag to introduce the project"
@@ -164,11 +151,9 @@ h1 {
               @on-close="deleteTag(index)"
             >{{item}}</Tag>
           </div>
-        </div>
       </FormItem>
-      <FormItem prop="image">
+      <FormItem prop="image" label="image" :label-width="100">
         <div class="inline_style">
-          <div class="hintTitle">Image</div>
           <div class="demo-upload-list" v-if="img!=''">
             <template>
               <img v-bind:src="img">
@@ -189,18 +174,9 @@ h1 {
           </Modal>
         </div>
       </FormItem>
-      <FormItem prop="introduction">
+      <FormItem prop="introduction" label="introduction" :label-width="100">
         <div class="inline_style">
-          <div class="hintTitle">Introduction</div>
-          <div id="editor">
-            <!-- <mavon-editor
-              style="height: 100%"
-              v-model="formInline.introduction"
-              :toolbars="toolbars"
-              @keydown
-            ></mavon-editor> -->
             <Input v-model="formInline.introduction" type="textarea" placeholder="Enter introduction..." style="height:100%;width:100%"/>
-          </div>
         </div>
       </FormItem>
       <FormItem>
@@ -209,6 +185,8 @@ h1 {
         </div>
       </FormItem>
     </Form>
+    </div>
+
   </div>
 </template>
 <script>
@@ -249,34 +227,17 @@ export default {
         introduction:[
           {
             required: true,
-            message: "The introduction cannot be empty",
+            message: "give a detailed introduction about this project",
+            trigger: "blur"
+          }
+        ],
+        description:[
+          {
+            required: true,
+            message: "The description cannot be empty and no more than 40 words",
             trigger: "blur"
           }
         ]
-      },
-      //这是操控mavon-editor上工具条的配置列表
-      toolbars: {
-        bold: true, // 粗体
-        italic: true, // 斜体
-        header: true, // 标题
-        underline: true, // 下划线
-        mark: true, // 标记
-        superscript: true, // 上角标
-        quote: true, // 引用
-        ol: true, // 有序列表
-        link: true, // 链接
-        imagelink: true, // 图片链接
-        help: true, // 帮助
-        code: true, // code
-        subfield: true, // 是否需要分栏
-        fullscreen: true, // 全屏编辑
-        readmodel: true, // 沉浸式阅读
-        /* 1.3.5 */
-        undo: true, // 上一步
-        trash: true, // 清空
-        save: true, // 保存（触发events中的save事件）
-        /* 1.4.2 */
-        navigation: true // 导航目录
       },
       //用来存储输入的单个标签变量
       inputTag: "",
@@ -316,7 +277,7 @@ export default {
               console.log(err);
             });
         }else{
-          
+
         }
       });
     },

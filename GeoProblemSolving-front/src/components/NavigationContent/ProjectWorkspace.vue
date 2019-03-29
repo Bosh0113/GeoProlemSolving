@@ -308,6 +308,8 @@
                 width="400px"
                 title="Invite group member join in the subProject"
                 @on-ok="inviteMembers"
+                ok-text="ok"
+                cancel-text="cancel"
                 @on-cancel="cancel"
               >
                 <div>
@@ -338,7 +340,7 @@
             <div :style="{height:sidebarHeight-140+'px'}">{{subProjectInfo.description}}</div>
           </div>
           <div style="display:flex;align-items:center;justify-content:center;height:60px">
-            <Button type="error" style="margin:auto">Quit this sub-project ?</Button>
+            <Button type="error" style="margin:auto" v-show="subProjectInfo.managerId == this.$store.getters.userId">Delete this sub-project ?</Button>
           </div>
         </Col>
       </Row>
@@ -544,8 +546,8 @@
         </template>
         <Col span="1" class="util-panel">
           <div class="util-btn-group">
-            <Button type="info" class="util-btn" shape="circle">
-              <Icon type="md-contacts" size="20" class="util-btn-icon"/>
+            <Button type="info" class="util-btn" shape="circle" @click="toolPanel('chat')">
+              <Icon type="md-contacts" size="20" class="util-btn-icon" />
             </Button>
             <Button type="info" class="util-btn" shape="circle" @click="drawerOpen = true">
               <Icon type="ios-albums" size="20" class="util-btn-icon"/>
@@ -563,21 +565,21 @@
                 </div>
                 <!-- <Icon type="md-brush" /> -->
                 <div class="singl_tool_style">
-                  <Icon type="md-brush" size="60" @click.native="excel" title="DrawBoard" color="green"/>
+                  <Icon type="md-brush" size="60" @click.native="toolPanel('draw')" title="DrawBoard" color="green"/>
                   <br>
                   <span style="display:flex;justify-content:center">Draw</span>
                 </div>
                 <!-- <Icon type="md-map" /> -->
                 <div class="singl_tool_style">
-                  <Icon type="md-map" size="60" @click.native="show" title="DrawBoard" color="lightblue"/>
+                  <Icon type="md-map" size="60" @click.native="toolPanel('map')" title="Map" color="lightblue"/>
                   <br>
                   <span style="display:flex;justify-content:center">Map</span>
                 </div>
                 <!-- <Icon type="ios-book-outline" /> -->
                 <div class="singl_tool_style">
-                  <Icon type="ios-book-outline" size="60" @click.native="show" title="DrawBoard" color="greenyellow"/>
+                  <Icon type="md-grid" size="60" @click.native="toolPanel('chart')" title="chart" color="darkgreen"/>
                   <br>
-                  <span style="display:flex;justify-content:center">Previewer</span>
+                  <span style="display:flex;justify-content:center">Chart</span>
                 </div>
                 <!-- <Icon type="md-analytics" size="60" @click.native="show" title="Modeling Tools"/>
                 <Icon type="md-analytics" size="60" @click.native="show" title="Modeling Tools"/> -->
@@ -843,7 +845,7 @@ export default {
       // web socket for module
       moduleSocket: null,
       timer: null,
-      // 动态记录相关      
+      // 动态记录相关
       // 所有module的记录
       allRecords: [],
       // 当前参与者
@@ -1090,7 +1092,7 @@ export default {
           .replace(/\s/g, "")
           .split(",");
 
-        this.olParticipantChange(members, this.ofParticipant);       
+        this.olParticipantChange(members, this.ofParticipant);
       }
     },
     onClose(e) {
@@ -1183,7 +1185,7 @@ export default {
               } else if (res.data == "None") {
               }
             });
-            
+
         } else if (members.length < this.olParticipants.length) {
           for (var i = 0; i < this.olParticipants.length; i++) {
             for (var j = 0; j < members.length; j++) {
@@ -1302,8 +1304,8 @@ export default {
     },
     // 召集参与者
     conveneWork(){
-      for(let i = 0;i<this.participants.length;i++){  
-        if(this.participants[i].userId != this.$store.getters.userId) {     
+      for(let i = 0;i<this.participants.length;i++){
+        if(this.participants[i].userId != this.$store.getters.userId) {
           let notice = {};
           notice["recipientId"] = this.participants[i].userId;
           notice["type"] = "Work";
@@ -1419,6 +1421,7 @@ export default {
       this.inviteModal = true;
     },
     inviteMembers() {
+      console.log(this.inviteList);
       for (let i = 0; i < this.inviteList.length; i++) {
         $.ajax({
           url:
@@ -1436,6 +1439,34 @@ export default {
               this.$Message.error("None!");
             } else if (data == "Fail") {
               this.$Message.error("Fail!");
+            }else{
+              // 告诉拉进去的人已经进项目
+              // 把通知存库里
+               //reply to applicant
+            let replyNotice = {};
+            // 改apply.content.userId
+            replyNotice["recipientId"] = this.inviteList[i];// 改apply.content.userId
+            replyNotice["type"] = "notice";
+            replyNotice["content"] = {// 改
+              title: "Result for invitation",
+              description:
+                "You have been invited by " + this.subProjectInfo.managerName +  " to join in the sub project: " +
+                this.subProjectInfo.title + " , and now you are a member in this sub project."
+            };
+            this.axios
+              .post("/GeoProblemSolving/notice/save", replyNotice)
+              .then(result => {
+                if (result.data == "Success") {
+                  this.$emit("sendNotice", this.inviteList[i]);// 改apply.content.userId
+                } else {
+                  this.$Message.danger("reply fail.");
+                }
+              })
+              .catch(err => {
+                this.$Message.danger("reply fail.");
+              });
+              // this.$emit("sendNotice", this.subProjectInfo.managerId);
+              //发给子项目的管理者
             }
           }
         });
@@ -1690,6 +1721,32 @@ export default {
       } else {
         this.$router.push({ name: "MemberDetailPage", params: { id: id } });
       }
+    },
+    // jspanel工具
+    toolPanel(type){
+      var toolURL ="";
+      if(type=="map"){
+        toolURL = '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/map" style="width: 100%;height:100%"></iframe>';
+      }else if(type=="chatroom"){
+        toolURL = '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/chat" style="width: 90%;height:90%"></iframe>';
+      }else if(type=="draw"){
+        toolURL = '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/draw" style="width: 90%;height:90%"></iframe>';
+      }else if(type=="chart"){
+        toolURL = '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/charts" style="width: 90%;height:90%"></iframe>';
+      }else if(type=="chat"){
+        toolURL = '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/chat" style="width: 90%;height:90%"></iframe>';
+      }
+      var panel = jsPanel.create({
+        theme: "primary",
+        headerTitle: "Tools",
+        contentSize: "800 600",
+        content: toolURL,
+        disableOnMaximized: true,
+        callback: function() {
+          this.content.style.padding = "20px";
+        },
+      });
+      panel.resizeit('disable');
     }
   }
 };
