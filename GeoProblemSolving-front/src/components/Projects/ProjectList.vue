@@ -142,7 +142,7 @@ img {
               <div class="operate" slot="extra" style="height:40px;display:flex;align-items:center">
                 <Button
                   type="success"
-                  v-show="item.isMember===false&&item.isManager===false"
+                  v-show="showJoinApplyBtn(item)"
                   @click="joinApply(item)"
                 >
                   <Icon type="md-add"/>
@@ -150,7 +150,7 @@ img {
                 <br>
                 <Button
                   type="default"
-                  v-show="item.isMember===true||item.isManager===true"
+                  v-show="item.isMember||item.isManager"
                   :id="item.projectId"
                 >
                   <Icon type="md-person"/>
@@ -342,7 +342,15 @@ export default {
           this.$Message.danger("Join fail");
         });
     },
-
+    showJoinApplyBtn(item){
+      var state=this.$store.getters.userState;
+      if(!item.isMember&&!item.isManager&&state){
+        return true;
+      }
+      else{
+        return false;
+      }
+    },
     cancel() {
       this.$Message.info("Clicked cancel");
     },
