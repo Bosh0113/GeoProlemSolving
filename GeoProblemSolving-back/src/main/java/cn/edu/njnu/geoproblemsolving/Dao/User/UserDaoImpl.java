@@ -67,13 +67,13 @@ public class UserDaoImpl implements IUserDao {
     }
 
     @Override
-    public String updateUser(HttpServletRequest request){
+    public Object updateUser(HttpServletRequest request){
         try {
             Query query=new Query(Criteria.where("userId").is(request.getParameter("userId")));
             CommonMethod method=new CommonMethod();
             Update update=method.setUpdate(request);
             mongoTemplate.updateFirst(query,update,UserEntity.class);
-            return "Success";
+            return mongoTemplate.findOne(query,UserEntity.class);
         }catch (Exception  e){
             return "Fail";
         }

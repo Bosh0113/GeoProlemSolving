@@ -55,7 +55,7 @@ public class UserController {
     }
 
     @RequestMapping(value = "/update", produces = {"application/json;charset=UTF-8"}, method = RequestMethod.POST)
-    public String updateUser(HttpServletRequest request) {
+    public Object updateUser(HttpServletRequest request) {
         UserDaoImpl userDao = new UserDaoImpl(mongoTemplate);
         try {
             return userDao.updateUser(request);

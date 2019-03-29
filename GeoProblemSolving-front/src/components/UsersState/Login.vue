@@ -70,13 +70,12 @@
               <div class="login-content">
                 <Form ref="formInline" :model="formInline" :rules="ruleInline" style="margin:25px">
                   <div>
-                    <FormItem prop="user" label="User Name" :label-width="100">
+                    <FormItem prop="user" label="Email" :label-width="100">
                       <Input
                         placeholder="Please input your username"
                         style="width: 90%"
                         v-model="formInline.user"
                         type="text"
-
                       />
                     </FormItem>
                   </div>

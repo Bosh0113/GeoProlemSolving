@@ -12,7 +12,7 @@ public interface IUserDao {
 
     void removeUser(String key,String value);
 
-    String updateUser(HttpServletRequest request);
+    Object updateUser(HttpServletRequest request);
 
     Object login(String email,String password);
 }
