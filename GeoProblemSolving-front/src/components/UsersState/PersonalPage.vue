@@ -6,7 +6,15 @@
           <Col :lg="5" :md="8" :sm="10" :xs="12">
             <div class="detailSidebar" :style="{height:detailSidebarHeight}">
               <div class="user-img">
-                <img v-bind:src="userDetail.avatar" class="u_img">
+                <img v-bind:src="userDetail.avatar" class="u_img"
+                  v-if="userDetail.avatar!=''&&userDetail.avatar!='undefined'">
+                <avatar
+                  style="width:100%"
+                  :username="userDetail.userName"
+                  :size="200"
+                  :rounded="false"
+                  v-else>
+                </avatar>
               </div>
               <div style="text-align:center">
                 <div class="single-info">{{userDetail.userName}}</div>
@@ -482,11 +490,10 @@ export default {
       this.joinedProjectsNameArray = this.userDetail.joinedProjects;
       console.table(this.joinedProjectsNameArray);
       // this.getParticipatoryList(this.joinedProjectsNameArray);
-
     },
     //获取用户参与的项目列表
     getParticipatoryList(projectIds) {
-      console.table("id是："+ projectIds);
+      console.table("id是：" + projectIds);
       var count = projectIds.length;
       let participatoryProjectListTemp = [];
       for (let i = 0; i < projectIds.length; i++) {
@@ -569,17 +576,14 @@ export default {
       this.projectMemberList = this.userManagerProjectList[index].members;
     },
     deleteProjectModalShow(pid) {
-      this.axios.get(
-        "/GeoProblemSolving/project/delete?" +
-            "projectId=" +
-            pid
-      )
-      .then(res=> {
-        alert(res.data);
-      })
-      .catch(err=> {
-        alert(err.data);
-      })
+      this.axios
+        .get("/GeoProblemSolving/project/delete?" + "projectId=" + pid)
+        .then(res => {
+          alert(res.data);
+        })
+        .catch(err => {
+          alert(err.data);
+        });
     },
     authorize() {
       this.axios
@@ -665,7 +669,7 @@ export default {
         if (data[item] != "") {
           changedProfile.append(item, data[item]);
         }
-      };
+      }
       console.table(changedProfile);
       this.axios
         .post("/GeoProblemSolving/user/update", changedProfile)
@@ -676,10 +680,10 @@ export default {
               title: "notification",
               desc: "Profile update successfully"
             });
-            let userInfo=res.data;
-            userInfo.userState=true;
-            this.$store.commit("setUserInfo",userInfo);
-            this.$set(this,"userDetail",userInfo);
+            let userInfo = res.data;
+            userInfo.userState = true;
+            this.$store.commit("setUserInfo", userInfo);
+            this.$set(this, "userDetail", userInfo);
             sessionStorage.setItem("userInfo", JSON.stringify(userInfo));
           }
         })
@@ -734,7 +738,7 @@ export default {
           console.log(err.data);
         });
     },
-    download(index){
+    download(index) {
       window.open(this.userResourceList[index].pathURL);
     }
   }
@@ -783,7 +787,7 @@ body {
   font-size: 10px;
   line-height: 20px;
 }
-.userDescription{
+.userDescription {
   height: auto;
   line-height: 10px;
   font-size: 10px;
@@ -791,7 +795,7 @@ body {
   /* display: inline-block; */
   overflow: hidden;
   word-wrap: break-word;
-  word-break: break-all
+  word-break: break-all;
 }
 .user-project {
   margin-top: 20px;

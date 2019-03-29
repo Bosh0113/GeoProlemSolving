@@ -4,7 +4,15 @@
       <div class="mainPanel">
         <div class="detailSidebar2" :style="{height:detailSidebarHeight}">
           <div class="user-img">
-            <img v-bind:src="userDetail.avatar" class="u_img">
+            <img v-bind:src="userDetail.avatar" class="u_img"
+            v-if="userDetail.avatar!=''&&userDetail.avatar!='undefined'">
+            <avatar
+              style="width:100%"
+              :username="userDetail.userName"
+              :size="200"
+              :rounded="false"
+              v-else>
+            </avatar>
           </div>
           <div style="text-align:center">
             <div class="single-info">{{userDetail.userName}}</div>
