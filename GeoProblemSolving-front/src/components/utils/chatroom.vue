@@ -140,7 +140,6 @@
   text-align: center;
   color: white;
 }
-
 .participants {
   height: auto;
 }

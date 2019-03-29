@@ -129,7 +129,7 @@
                     </Input>
                   </FormItem>
                   <!-- confimPassword -->
-                  <FormItem label="ConfimPassword" prop="confimPassword">
+                  <FormItem label="Confim password" prop="confimPassword">
                     <Input
                       v-model="formValidate.confimPassword"
                       placeholder="Plase enter password again"
@@ -138,7 +138,7 @@
                     >
                     </Input>
                   </FormItem>
-                  <FormItem label="Job Title" prop="jobTitle">
+                  <FormItem label="Job title" prop="jobTitle">
                     <Input
                       v-model="formValidate.jobTitle"
                       placeholder="Plase enter your job title"
@@ -152,7 +152,7 @@
                       :class="{InputStyle: inputstyle}"
                     ></Input>
                   </FormItem>
-                  <FormItem label="MobilePhone" prop="mobilePhone">
+                  <FormItem label="Mobile phone" prop="mobilePhone">
                     <Input
                       v-model="formValidate.mobilePhone"
                       placeholder="Plase enter your mobilePhone"
@@ -166,28 +166,28 @@
                       :class="{InputStyle: inputstyle}"
                     ></Input>
                   </FormItem>
-                  <FormItem label="CityName" prop="city">
+                  <FormItem label="City" prop="city">
                     <Input
                       v-model="formValidate.city"
                       placeholder="Plase enter your city"
                       :class="{InputStyle: inputstyle}"
                     ></Input>
                   </FormItem>
-                  <FormItem label="Organization" prop="organization">
+                  <FormItem label="Affiliation" prop="organization">
                     <Input
                       v-model="formValidate.organization"
-                      placeholder="Plase enter your organization"
+                      placeholder="Plase enter your affiliation"
                       :class="{InputStyle: inputstyle}"
                     ></Input>
                   </FormItem>
-                  <FormItem label="Direction" prop="direction">
+                  <FormItem label="Field" prop="field">
                     <Input
-                      v-model="formValidate.direction"
-                      placeholder="Plase enter your research direction"
+                      v-model="formValidate.field"
+                      placeholder="Plase enter your research field"
                       :class="{InputStyle: inputstyle}"
                     ></Input>
                   </FormItem>
-                  <FormItem label="HomePage" prop="homePage">
+                  <FormItem label="Home page" prop="homePage">
                     <Input
                       v-model="formValidate.homePage"
                       placeholder="Plase enter your homepage url"
@@ -286,7 +286,7 @@ export default {
         city: "",
         organization: "",
         introduction: "",
-        direction: "",
+        field: "",
         homePage: "",
         avatar: ""
       },
@@ -318,7 +318,13 @@ export default {
             trigger: "blur"
           }
         ],
-        confimPassword: [{ validator: validatePass, trigger: "blur" }],
+        confimPassword: [
+          { 
+            required: true,
+            validator: validatePass,
+            trigger: "blur" 
+          }
+        ],
         jobTitle: [
           {
             required: true,
@@ -335,35 +341,35 @@ export default {
         ],
         mobilePhone: [
           {
-            required: true,
-            message: "mobilePhone cannot be empty",
+            required: false,
+            message: "Please enter your phone number",
             trigger: "blur"
           }
         ],
         country: [
           {
-            required: true,
-            message: "country cannot be empty",
+            required: false,
+            message: "Please enter your country",
             trigger: "blur"
           }
         ],
         city: [
           {
-            required: true,
-            message: "city cannot be empty",
+            required: false,
+            message: "Please enter your city",
             trigger: "blur"
           }
         ],
         organization: [
           {
-            required: true,
-            message: "organization cannot be empty",
+            required: false,
+            message: "Please enter your affiliation",
             trigger: "blur"
           }
         ],
         introduction: [
           {
-            required: true,
+            required: false,
             message: "Please enter a personal introduction",
             trigger: "blur"
           },
@@ -374,10 +380,10 @@ export default {
             trigger: "blur"
           }
         ],
-        direction: [
+        field: [
           {
-            required: true,
-            message: "Please enter your research direction",
+            required: false,
+            message: "Please enter your research field",
             trigger: "blur"
           }
         ],
@@ -410,7 +416,7 @@ export default {
           userJson["city"] = this.formValidate.city;
           userJson["organization"] = this.formValidate.organization;
           userJson["introduction"] = this.formValidate.introduction;
-          userJson["direction"] = this.formValidate.direction;
+          userJson["direction"] = this.formValidate.field;
           userJson["homePage"] = this.formValidate.homePage;
           userJson["avatar"] = this.formValidate.avatar;
           this.axios
