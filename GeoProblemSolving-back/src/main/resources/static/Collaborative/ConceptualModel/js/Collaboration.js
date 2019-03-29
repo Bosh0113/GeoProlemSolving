@@ -7,6 +7,8 @@ var ConceptualScene = "";
 var GraphUi = null;
 var waitingList = [];
 var graph;
+var userInfo=JSON.parse(sessionStorage.getItem("userInfo"));
+var userName=userInfo.userName;
 (function () {
     var editorUiInit = EditorUi.prototype.init;
 
@@ -44,11 +46,11 @@ var graph;
 
         // Main
         var editorUi = new EditorUi(new Editor(urlParams['chrome'] === '0', themes));
-        var memberList = '<div id="members" style="float: right;margin-right: 50px;width: 120px;text-align: right;overflow-x: scroll;overflow-y: hidden;"></div>';
+        var memberList = '<div id="members" style="float: right;margin-right: 50px;width: 120px;text-align: right;overflow-x: auto;overflow-y: hidden;"></div>';
         $(".geToolbar").append(memberList);
         //定时信息发送器
         var timer = window.setInterval(function () {
-            if (Controller === sessionStorage.getItem("username")) {//判断是否有权发送演示信息
+            if (Controller === userName) {//判断是否有权发送演示信息
                 var Integration = getContentXML();
                 ConceptualScene = graph.getConceptualSceneStr();
                 var messageObject = {};
@@ -77,7 +79,7 @@ var graph;
             //连接建立成功后，向服务器发送消息
             var messageObject = {};
             messageObject["messageType"] = "Join";
-            messageObject["message"] = sessionStorage.getItem("username");
+            messageObject["message"] = userName;
             wsMxgraph.send(JSON.stringify(messageObject));
         };
         //接收来自服务器的消息后，触发该方法
@@ -149,8 +151,8 @@ var graph;
 })();
 //演示权限转交
 function pTransfer(newController) {
-    if (Controller === sessionStorage.getItem("username")) {
-        if (newController === sessionStorage.getItem("username")) {
+    if (Controller === userName) {
+        if (newController === userName) {
             confirm("You already have demo authority.");
         }
         else {
@@ -173,7 +175,7 @@ function demoRequire() {
     var messageObject = {};
     messageObject["messageType"] = "Authority";
     messageObject["message"] = "Require";
-    messageObject["userName"] = sessionStorage.getItem("username");
+    messageObject["userName"] = userName;
     if (wsMxgraph) {
         wsMxgraph.send(JSON.stringify(messageObject));
     }
@@ -182,14 +184,14 @@ function demoRelease() {
     var messageObject = {};
     messageObject["messageType"] = "Authority";
     messageObject["message"] = "Release";
-    messageObject["userName"] = sessionStorage.getItem("username");
+    messageObject["userName"] = userName;
     if (wsMxgraph) {
         wsMxgraph.send(JSON.stringify(messageObject));
     }
 }
 
 function checkIdentity() {
-    if (Controller == sessionStorage.getItem("username") && waitingList.length < 1) {//若为演示者且不存在申请者
+    if (Controller == userName && waitingList.length < 1) {//若为演示者且不存在申请者
         $('#release').show();
         $('#waiting').hide();
         $('#waitingNum').show();
@@ -201,7 +203,7 @@ function checkIdentity() {
             graph.setEnabled(true);
         }
     }
-    else if (Controller == sessionStorage.getItem("username") && waitingList.length > 0) {//若为演示者且存在申请者
+    else if (Controller == userName && waitingList.length > 0) {//若为演示者且存在申请者
         $('#release').show();
         $('#waiting').show();
         $('#waitingNum').show();
@@ -213,20 +215,20 @@ function checkIdentity() {
         }
         var num = 0;
         for (var i = 0; i < waitingList.length; i++) {
-            if (waitingList[i] == sessionStorage.getItem("username")) {
+            if (waitingList[i] == userName) {
                 continue;
             }
             num++;
         }
         $('#waitingNum').html(num);
-    } else if (Controller != sessionStorage.getItem("username")) { //观众
+    } else if (Controller != userName) { //观众
         var apply = 0;
         num = 0;
         for (i = 0; i < waitingList.length; i++) {
             if (Controller == waitingList[i]) {//若演示者在队列中，则跳过计数
                 continue;
             }
-            if (waitingList[i] == sessionStorage.getItem("username")) {
+            if (waitingList[i] == userName) {
                 apply = 1;//已申请
                 break;
             }
@@ -254,7 +256,7 @@ window.time = 0;
 window.setInterval(function () {
     window.time++;
     if (window.time >= 60) {//60秒无动作则触发
-        if (Controller == sessionStorage.getItem("username")) {//若为演示者则释放权限
+        if (Controller == userName) {//若为演示者则释放权限
             demoRelease();
         }
     }
