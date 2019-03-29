@@ -110,9 +110,11 @@ export default {
         .then(res => {
           if (res.data != "Size over" && res.data.length > 0) {
             let dataName = res.data[0];
+
             this.socket_content["dataName"] = dataName;
             this.socket_content["operate"] = "dataupload";
             this.socketApi.sendSock(this.socket_content, this.getSocketConnect);
+            this.socket_content = {};
           }
         })
         .catch(err => {});
@@ -342,6 +344,7 @@ export default {
       this.socket_content["chartType"] = this.chooseType;
       this.socket_content["operate"] = "visualize";
       this.socketApi.sendSock(this.socket_content, this.getSocketConnect);
+      this.socket_content = {};
 
       this.showCharts();      
     },
