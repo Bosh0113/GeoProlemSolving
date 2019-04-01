@@ -52,9 +52,9 @@
                 return item.label + '(' + item.description + ')';
             },
             handleChange1 (newTargetKeys, direction, moveKeys) {
-                console.log(newTargetKeys);
-                console.log(direction);
-                console.log(moveKeys);
+                 
+                 
+                 
                 this.targetKeys1 = newTargetKeys;
             }
         }

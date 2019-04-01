@@ -263,7 +263,7 @@ export default {
           this.joinedProjectsNameArray = this.userDetail.joinedProjects;
           this.getParticipatoryList(this.joinedProjectsNameArray);
           //打印用户的具体信息
-          console.log(this.userDetail);
+           
         })
         .catch(err => {
           console.log(err.data);
@@ -279,7 +279,7 @@ export default {
         )
         .then(res => {
           this.userEventList = res.data;
-          console.table(result);
+           
         })
         .catch(err => {
           console.log(err.data);
@@ -295,7 +295,7 @@ export default {
         )
         .then(res => {
           this.userResourceList = res.data;
-          console.table(this.userResourceList);
+           
         })
         .catch(err => {
           console.log(err.data);
@@ -311,7 +311,7 @@ export default {
         )
         .then(res => {
           // 打印用户所管理的项目
-          // console.log(res.data);
+           
           this.userManagerProjectList = res.data;
         })
         .catch(err => {});

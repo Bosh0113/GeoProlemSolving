@@ -96,7 +96,7 @@ public class ProjectDaoImpl implements IProjectDao {
     }
 
     @Override
-    public String updateProject(HttpServletRequest request) {
+    public Object updateProject(HttpServletRequest request) {
         try {
             // decode
             String projectId = request.getParameter("projectId");
@@ -110,7 +110,7 @@ public class ProjectDaoImpl implements IProjectDao {
             Update update = method.setUpdate(request);
             update.set("projectId", projectId);
             mongoTemplate.updateFirst(query, update, ProjectEntity.class);
-            return "Success";
+            return mongoTemplate.findOne(query,ProjectEntity.class);
         } catch (Exception e) {
             return "Fail";
         }

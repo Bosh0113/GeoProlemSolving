@@ -121,11 +121,11 @@ export default {
       formData.append("createTime",new Date());
       formData.append("uid","lyc");
       // formData.append("module",this.formInline.module);
-      console.log(formData.get("category"));
-      console.log(formData.get("title"));
-      console.log(formData.get("introduction"));
-      console.log(formData.get("privacy"));
-      console.log(formData.get("participants"));
+       
+       
+       
+       
+       
       this.axios.post("/GeoProblemSolving/TeamModeling/newProjectServlet", formData)
       .then(function (res) {
         if(res.data === "ok"){

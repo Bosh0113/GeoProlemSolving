@@ -174,7 +174,7 @@ img {
               <div class="whitespace"></div>
               <div style="height:40px;align-items:center;display:flex;padding:0 20px 0 20px">
                 <span style="height:20px;width:45%;color:white;text-align:left;">
-                  <Tag color="primary" style="width:78.2px;text-align:center">Creator</Tag>
+                  <Tag color="primary" style="width:78.2px;text-align:center">Manager</Tag>
                 </span>
                 <span style="height:20px;margin-left:5%">{{item.managerName}}</span>
               </div>
@@ -291,6 +291,7 @@ export default {
       }
     },
     getSpecificTypeProjects(data) {
+      //显示等待
       this.axios
         .get(
           "/GeoProblemSolving/project/inquiry" +
@@ -300,6 +301,7 @@ export default {
             data["value"]
         )
         .then(res => {
+          //结束等待
           if (res.data === "None") {
             this.currentProjectList = [];
             this.currentProjectsStatus = 0;
@@ -322,18 +324,20 @@ export default {
     },
     //项目成员的id和name都要加进去
     joinProject() {
+      var projectId=this.joinProjectId;
       this.axios
         .get(
           "/GeoProblemSolving/project/join?" +
             "projectId=" +
-            this.joinProjectId +
+            projectId +
             "&userId=" +
             this.$store.getters.userId
         )
         .then(res => {
           if (res.data === "Success") {
-            this.$Message.info("Join success");
-            joinedRefresh();
+            this.$Message.info("Join Success");
+            //跳转
+            this.$router.push({ path: `project/${projectId}` });
           } else if (res.data === "Exist") {
             this.$Message.info("you have already be a member in project");
           }

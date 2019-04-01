@@ -52,9 +52,8 @@ public class ResourceDaoImpl implements IResourceDao {
                 if (part.getName().equals("file")) {
                     if (part.getSize() < 100 * 1024 * 1024) {
                         String fileNames = part.getSubmittedFileName();
-                        String[] fileInfo = fileNames.split("\\.");
-                        String fileName = fileInfo[0];
-                        String suffix = fileInfo[1];
+                        String fileName = fileNames.substring(0, fileNames.lastIndexOf("."));
+                        String suffix = fileNames.substring(fileNames.lastIndexOf(".") + 1);
                         String regexp = "[^A-Za-z_0-9\\u4E00-\\u9FA5]";
                         String saveName = fileName.replaceAll(regexp, "");
                         String folderPath = servicePath + "resource\\upload";

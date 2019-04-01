@@ -431,8 +431,24 @@ export default {
               } else if (res.data == "MobilePhone") {
                 this.$Message.success("Phone number has been used!");
               } else {
-                this.$Message.success("Success!");
-                this.$router.push({ path: "/" });
+                this.axios
+                  .get(
+                    "/GeoProblemSolving/user/login" +
+                      "?email=" +
+                      this.formValidate.email +
+                      "&password=" +
+                      this.formInline.password
+                  )
+                  .then(res => {
+                    if (res.data === "Fail") {
+                      this.$Message.error("Invalid account or password.");
+                    } else {
+                      this.$Message.success("Success!");
+                      this.$store.commit("userLogin", res.data);
+                      this.$router.push({ path: "/" });
+
+                    }
+                  });
               }
             }),
             function(res) {
@@ -462,7 +478,7 @@ export default {
       reader.onload = e => {
         // 读取到的图片base64 数据编码 将此编码字符串传给后台即可
         imgcode = e.target.result;
-        console.log(imgcode);
+         
         this.$store.commit("uploadAvatar", imgcode);
       };
     },

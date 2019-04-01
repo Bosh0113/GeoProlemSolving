@@ -96,7 +96,8 @@ function uploadFun() {
 $(document).ready(function() {
 
     if (WebSocket) {
-        wsTModel = new WebSocket("ws://localhost:8081/GeoProblemSolving/3DviewerTool/");
+        // wsTModel = new WebSocket("ws://localhost:8081/GeoProblemSolving/3DviewerTool/");
+        wsTModel = new WebSocket("ws://172.21.212.7:8082/GeoProblemSolving/3DviewerTool/");
         wsTModel.binaryType = "arraybuffer";
     }
     else {

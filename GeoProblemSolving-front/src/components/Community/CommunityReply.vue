@@ -210,7 +210,7 @@ export default {
   methods: {
     setMainStyle() {
       this.mainstyle.height = window.innerHeight - 60 + "px";
-      console.log(this.mainHeight);
+       
     },
     getTopicDetail() {
       let title = this.$route.params.id;

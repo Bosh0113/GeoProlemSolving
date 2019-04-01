@@ -252,13 +252,13 @@ export default {
             this.getAllResource();
             // 创建一个函数根据pid去后台查询该项目下的资源
           }
-          // console.log(res.data);
+           
         })
         .catch(err => {});
     },
     getFile(event) {
       this.file = event.target.files[0];
-      console.log(this.file);
+       
     }
   }
 };

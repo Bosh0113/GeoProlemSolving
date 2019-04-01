@@ -47,7 +47,7 @@ public class ProjectController {
     }
 
     @RequestMapping(value = "/update", produces = {"application/json;charset=UTF-8"}, method = RequestMethod.POST)
-    public String updateProject(HttpServletRequest request) {
+    public Object updateProject(HttpServletRequest request) {
         ProjectDaoImpl projectDao = new ProjectDaoImpl(mongoTemplate);
         try {
             return projectDao.updateProject(request);

@@ -286,6 +286,7 @@
                 type="success"
                 style="text-align:center;width:100px"
                 @click="inviteMembersModalShow()"
+                :disabled="inviteAble"
                 v-if="this.subProjectInfo.isManager"
               >Invite</Button>
               <Button
@@ -577,9 +578,14 @@
                 </div>
                 <!-- <Icon type="ios-book-outline" /> -->
                 <div class="singl_tool_style">
-                  <Icon type="md-grid" size="60" @click.native="toolPanel('chart')" title="chart" color="darkgreen"/>
+                  <Icon type="md-grid" size="60" @click.native="toolPanel('chart')" title="Chart" color="darkgreen"/>
                   <br>
                   <span style="display:flex;justify-content:center">Chart</span>
+                </div>
+                <div class="singl_tool_style">
+                  <Icon type="ios-create" size="60" @click.native="toolPanel('graphEditor')" title="Graph Editor" color="gray"/>
+                  <br>
+                  <span style="display:flex;justify-content:center">Graph Editor</span>
                 </div>
                 <!-- <Icon type="md-analytics" size="60" @click.native="show" title="Modeling Tools"/>
                 <Icon type="md-analytics" size="60" @click.native="show" title="Modeling Tools"/> -->
@@ -789,6 +795,7 @@ export default {
       participants: [],
       candidates: [],
       inviteList: [],
+      inviteAble: true,
       // current: 0,
       addModal: false,
       delModal: false,
@@ -913,34 +920,38 @@ export default {
         subProjectInfo.subProjectId == subProjectId
       ) {
         this.$set(this, "subProjectInfo", subProjectInfo);
+        this.inviteAble = false;
         this.showMembers();
       } else {
-      }
-      $.ajax({
-        url:
-          "/GeoProblemSolving/subProject/inquiry" +
-          "?key=subProjectId" +
-          "&value=" +
-          subProjectId,
-        type: "GET",
-        async: false,
-        success: data => {
-          if (data != "None") {
-            subProjectInfo = data[0];
-            this.$set(this, "subProjectInfo", subProjectInfo);
-            sessionStorage.setItem("subProjectId",subProjectInfo.subProjectId);
-            sessionStorage.setItem("subProjectName",subProjectInfo.title)
-
-            this.managerIdentity(subProjectInfo.managerId);
-            this.memberIdentity(subProjectInfo.members);
-            this.$store.commit("setSubProjectInfo", subProjectInfo);
-            this.showMembers();
+        $.ajax({
+          url:
+            "/GeoProblemSolving/subProject/inquiry" +
+            "?key=subProjectId" +
+            "&value=" +
+            subProjectId,
+          type: "GET",
+          async: false,
+          success: data => {
+            if (data != "None") {
+              subProjectInfo = data[0];
+              this.$set(this, "subProjectInfo", subProjectInfo);
+              sessionStorage.setItem(
+                "subProjectId",
+                subProjectInfo.subProjectId
+              );
+              sessionStorage.setItem("subProjectName", subProjectInfo.title);
+              this.managerIdentity(subProjectInfo.managerId);
+              this.memberIdentity(subProjectInfo.members);
+              this.$store.commit("setSubProjectInfo", subProjectInfo);
+              this.inviteAble = false;
+              this.showMembers();
+            }
+          },
+          error: function(err) {
+            console.log("Get manager name fail.");
           }
-        },
-        error: function(err) {
-          console.log("Get manager name fail.");
-        }
-      });
+        });
+      }
     },
     managerIdentity(managerId) {
       if (managerId === this.$store.getters.userId) {
@@ -958,26 +969,40 @@ export default {
     showMembers() {
       let membersList = this.subProjectInfo.members;
       let manager = { userId: this.subProjectInfo.managerId };
-      membersList.unshift(manager);
-      let participantsTemp = [];
-      let index = membersList.length;
-      for (let i = 0; i < membersList.length; i++) {
-        this.axios
-          .get(
-            "/GeoProblemSolving/user/inquiry" +
-              "?key=" +
-              "userId" +
-              "&value=" +
-              membersList[i].userId
-          )
-          .then(res => {
-            participantsTemp.push(res.data);
-            if (index-- == 1) {
-              this.$set(this, "participants", participantsTemp);
-            }
-          })
-          .catch(err => {});
+      if (membersList[0].userId != this.subProjectInfo.managerId) {
+        membersList.unshift(manager);
       }
+      let participantsTemp = [];
+      let index = membersList.length - 1;
+      this.axios
+        .get(
+          "/GeoProblemSolving/user/inquiry" +
+            "?key=" +
+            "userId" +
+            "&value=" +
+            membersList[0].userId
+        )
+        .then(res => {
+          participantsTemp.push(res.data);
+          for (let i = 1; i < membersList.length; i++) {
+            this.axios
+              .get(
+                "/GeoProblemSolving/user/inquiry" +
+                  "?key=" +
+                  "userId" +
+                  "&value=" +
+                  membersList[i].userId
+              )
+              .then(res => {
+                participantsTemp.push(res.data);
+                if (index-- == 1) {
+                  this.$set(this, "participants", participantsTemp);
+                }
+              })
+              .catch(err => {});
+          }
+        })
+        .catch(err => {});
     },
     getProjectInfo() {
       let projectInfo = this.$store.getters.project;
@@ -997,6 +1022,7 @@ export default {
           .then(res => {
             if (res.data != "None" && res.data != "Fail") {
               this.projectInfo = res.data[0];
+              this.$store.commit("setProjectInfo", res.data[0]);
             } else {
               console.log(res.data);
             }
@@ -1015,8 +1041,8 @@ export default {
       } else {
         this.currentModuleIndex = item - 1;
         this.currentModule = this.moduleList[this.currentModuleIndex];
-        sessionStorage.setItem("moduleId",this.currentModule.moduleId);
-        sessionStorage.setItem("moduleName",this.currentModule.title);
+        sessionStorage.setItem("moduleId", this.currentModule.moduleId);
+        sessionStorage.setItem("moduleName", this.currentModule.title);
         this.inquiryTask();
         this.order = item;
         this.openModuleSocket(this.currentModule.moduleId);
@@ -1029,9 +1055,13 @@ export default {
       }
     },
     openModuleSocket(moduleId) {
-      var moduleSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + moduleId;
+      if (this.moduleSocket != null) {
+        this.moduleSocket = null;
+      }
+      // var moduleSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + moduleId;
       // var moduleSocketURL = "ws://202.195.237.252:8082/GeoProblemSolving/Module/" + moduleId;
-      // var moduleSocketURL = "ws://172.21.212.7:8082/GeoProblemSolving/Module/" + moduleId;
+      var moduleSocketURL =
+        "ws://172.21.212.7:8082/GeoProblemSolving/Module/" + moduleId;
       this.moduleSocket = new WebSocket(moduleSocketURL);
       this.moduleSocket.onopen = this.onOpen;
       this.moduleSocket.onmessage = this.onMessage;
@@ -1104,11 +1134,14 @@ export default {
       console.log("ModuleSocket连接错误！");
     },
     setTimer() {
+      var that = this;
       this.timer = setInterval(() => {
         var messageJson = {};
         messageJson["type"] = "ping";
         messageJson["message"] = "ping";
-        this.moduleSocket.send(JSON.stringify(messageJson));
+        if (that.moduleSocket != null && that.moduleSocket != undefined) {
+          that.moduleSocket.send(JSON.stringify(messageJson));
+        }
       }, 20000);
     },
     removeTimer() {
@@ -1185,7 +1218,6 @@ export default {
               } else if (res.data == "None") {
               }
             });
-
         } else if (members.length < this.olParticipants.length) {
           for (var i = 0; i < this.olParticipants.length; i++) {
             for (var j = 0; j < members.length; j++) {
@@ -1200,7 +1232,7 @@ export default {
           }
           record.who = this.olParticipants[userIndex].userName;
           record.content = "leave this module.";
-          this.olParticipants.splice(userIndex,1);
+          this.olParticipants.splice(userIndex, 1);
         }
       }
       //records 更新
@@ -1303,9 +1335,9 @@ export default {
       this.$router.push(`../${id}`);
     },
     // 召集参与者
-    conveneWork(){
-      for(let i = 0;i<this.participants.length;i++){
-        if(this.participants[i].userId != this.$store.getters.userId) {
+    conveneWork() {
+      for (let i = 0; i < this.participants.length; i++) {
+        if (this.participants[i].userId != this.$store.getters.userId) {
           let notice = {};
           notice["recipientId"] = this.participants[i].userId;
           notice["type"] = "Work";
@@ -1324,9 +1356,9 @@ export default {
             .then(res => {
               this.$Message.info("Apply Successfully");
               this.$emit("sendNotice", data.managerId);
-              })
-              .catch(err => {
-                console.log("申请失败的原因是：" + err.data);
+            })
+            .catch(err => {
+              console.log("申请失败的原因是：" + err.data);
             });
         }
       }
@@ -1415,7 +1447,6 @@ export default {
       this.inviteModal = true;
     },
     inviteMembers() {
-      console.log(this.inviteList);
       for (let i = 0; i < this.inviteList.length; i++) {
         $.ajax({
           url:
@@ -1433,32 +1464,36 @@ export default {
               this.$Message.error("None!");
             } else if (data == "Fail") {
               this.$Message.error("Fail!");
-            }else{
+            } else {
               // 告诉拉进去的人已经进项目
               // 把通知存库里
-               //reply to applicant
-            let replyNotice = {};
-            // 改apply.content.userId
-            replyNotice["recipientId"] = this.inviteList[i];// 改apply.content.userId
-            replyNotice["type"] = "notice";
-            replyNotice["content"] = {// 改
-              title: "Result for invitation",
-              description:
-                "You have been invited by " + this.subProjectInfo.managerName +  " to join in the sub project: " +
-                this.subProjectInfo.title + " , and now you are a member in this sub project."
-            };
-            this.axios
-              .post("/GeoProblemSolving/notice/save", replyNotice)
-              .then(result => {
-                if (result.data == "Success") {
-                  this.$emit("sendNotice", this.inviteList[i]);// 改apply.content.userId
-                } else {
+              //reply to applicant
+              let replyNotice = {};
+              // 改apply.content.userId
+              replyNotice["recipientId"] = this.inviteList[i]; // 改apply.content.userId
+              replyNotice["type"] = "notice";
+              replyNotice["content"] = {
+                // 改
+                title: "Result for invitation",
+                description:
+                  "You have been invited by " +
+                  this.subProjectInfo.managerName +
+                  " to join in the sub project: " +
+                  this.subProjectInfo.title +
+                  " , and now you are a member in this sub project."
+              };
+              this.axios
+                .post("/GeoProblemSolving/notice/save", replyNotice)
+                .then(result => {
+                  if (result.data == "Success") {
+                    this.$emit("sendNotice", this.inviteList[i]); // 改apply.content.userId
+                  } else {
+                    this.$Message.danger("reply fail.");
+                  }
+                })
+                .catch(err => {
                   this.$Message.danger("reply fail.");
-                }
-              })
-              .catch(err => {
-                this.$Message.danger("reply fail.");
-              });
+                });
               // this.$emit("sendNotice", this.subProjectInfo.managerId);
               //发给子项目的管理者
             }
@@ -1518,7 +1553,7 @@ export default {
       this.axios
         .post("/GeoProblemSolving/task/save", taskForm)
         .then(res => {
-          if(res.data=="Success"){
+          if (res.data == "Success") {
             // 任务更新socket
             this.socketMsg.whoid = this.$store.getters.userId;
             this.socketMsg.who = this.$store.getters.userName;
@@ -1530,7 +1565,6 @@ export default {
           }
         })
         .catch(err => {});
-
     },
     //打开task编辑器
     editOneTask(index, taskList) {
@@ -1569,7 +1603,7 @@ export default {
         .post("/GeoProblemSolving/task/update", taskForm)
         .then(res => {
           if (res.data != "None" && res.data != "Fail") {
-            this.inquiryTask();      // 任务更新socket
+            this.inquiryTask(); // 任务更新socket
             this.socketMsg.whoid = this.$store.getters.userId;
             this.socketMsg.who = this.$store.getters.userName;
             this.socketMsg.type = "tasks";
@@ -1583,8 +1617,6 @@ export default {
         .catch(err => {
           console.log(err.data);
         });
-
-
     },
     //查询task
     inquiryTask() {
@@ -1638,19 +1670,19 @@ export default {
           console.log(err.data);
         });
     },
-    setMoveCount(){
-      this.MoveCount=2;
+    setMoveCount() {
+      this.MoveCount = 2;
     },
-    addMoveTask(taskList, type){
+    addMoveTask(taskList, type) {
       this.MoveCount--;
       this.taskOrderUpdate(taskList, type);
     },
-    removeMoveTask(taskList, type){
+    removeMoveTask(taskList, type) {
       this.MoveCount--;
       this.taskOrderUpdate(taskList, type);
     },
-    updateMoveTask(taskList, type){
-      this.MoveCount-=2;
+    updateMoveTask(taskList, type) {
+      this.MoveCount -= 2;
       this.taskOrderUpdate(taskList, type);
     },
     taskOrderUpdate(taskList, type) {
@@ -1663,8 +1695,8 @@ export default {
         this.axios
           .post("/GeoProblemSolving/task/update", taskUpdateObj)
           .then(res => {
-            if(res.data!="Fail"){
-              if(this.MoveCount==0){
+            if (res.data != "Fail") {
+              if (this.MoveCount == 0) {
                 this.endMove();
               }
             }
@@ -1707,7 +1739,6 @@ export default {
         .catch(err => {
           this.$Message.error("Fail!");
         });
-
     },
     gotoPersonalSpace(id) {
       if (id == this.$store.getters.userId) {
@@ -1717,30 +1748,39 @@ export default {
       }
     },
     // jspanel工具
-    toolPanel(type){
-      var toolURL ="";
-      if(type=="map"){
-        toolURL = '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/map" style="width: 100%;height:100%"></iframe>';
-      }else if(type=="chatroom"){
-        toolURL = '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/chat" style="width: 90%;height:90%"></iframe>';
-      }else if(type=="draw"){
-        toolURL = '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/draw" style="width: 90%;height:90%"></iframe>';
-      }else if(type=="chart"){
-        toolURL = '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/charts" style="width: 90%;height:90%"></iframe>';
-      }else if(type=="chat"){
-        toolURL = '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/chat" style="width: 90%;height:90%"></iframe>';
+    toolPanel(type) {
+      var toolURL = "";
+      if (type == "map") {
+        toolURL =
+          '<iframe src="/GeoProblemSolving/map" style="width: 100%;height:100%"></iframe>';
+      } else if (type == "chatroom") {
+        toolURL =
+          '<iframe src="/GeoProblemSolving/chat" style="width: 100%;height:100%"></iframe>';
+      } else if (type == "draw") {
+        toolURL =
+          '<iframe src="/GeoProblemSolving/draw" style="width: 100%;height:100%"></iframe>';
+      } else if (type == "chart") {
+        toolURL =
+          '<iframe src="/GeoProblemSolving/charts" style="width: 100%;height:100%"></iframe>';
+      } else if (type == "chat") {
+        toolURL =
+          '<iframe src="/GeoProblemSolving/chat" style="width: 100%;height:100%"></iframe>';
+      } else if (type == "graphEditor") {
+        toolURL =
+          '<iframe src="/GeoProblemSolving/Collaborative/GraphEditor/index.html' +
+          "?groupID=" +
+          this.currentModule.moduleId +
+          '" style="width: 100%;height:100%"></iframe>';
       }
       var panel = jsPanel.create({
         theme: "primary",
         headerTitle: "Tools",
-        contentSize: "800 600",
+        contentSize: "800 800",
         content: toolURL,
-        disableOnMaximized: true,
-        callback: function() {
-          this.content.style.padding = "20px";
-        },
+        disableOnMaximized: true
       });
-      panel.resizeit('disable');
+      panel.resizeit("disable");
+      $(".jsPanel-content").css("font-size", "0");
     }
   }
 };

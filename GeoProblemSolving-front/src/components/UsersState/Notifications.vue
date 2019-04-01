@@ -256,7 +256,7 @@ export default {
         });
     },
     deleteNotice(notice) {
-      console.log("notice :" + notice.noticeId + " has been deleted.");
+      // console.log("notice :" + notice.noticeId + " has been deleted.");
       this.axios
         .get("/GeoProblemSolving/notice/delete" + "?noticeId=" + notice.noticeId)
         .then(res => {
@@ -307,7 +307,7 @@ export default {
       this.$router.push( `./project/${id}/workspace`);
     },
     refuseApply(apply) {
-      console.log(apply.content.title + " has been refused.");
+      // console.log(apply.content.title + " has been refused.");
       let updateApply = new URLSearchParams();
       updateApply.append("noticeId", apply.noticeId);
       updateApply.append("content.approve", "false");
@@ -349,7 +349,7 @@ export default {
         });
     },
     approveApply(apply) {
-      console.log(apply.content.title + " has been passed.");
+      // console.log(apply.content.title + " has been passed.");
       let updateApply = new URLSearchParams();
       updateApply.append("noticeId", apply.noticeId);
       updateApply.append("content.approve", "true");
