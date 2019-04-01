@@ -32,7 +32,7 @@
   font-size: 16px;
   overflow-y: auto;
   word-break: break-all;
-  padding: 0 10px;
+  padding: 30px 20px 30px 20px;
 }
 .projectEditPanel {
   display: block;
@@ -74,6 +74,7 @@
 .subProjectDescription {
   text-indent: 25px;
   min-height: 60px;
+  word-break: break-all;
 }
 .subProjectCreate button {
   height: 40px;
@@ -385,23 +386,25 @@
                 <div class="whitespace"></div>
                 <div v-for="(subProject,index) in subProjectList" :key="subProject.index" style>
                   <Col :lg="12" :md="24" :sm="24" :xs="24">
+                  <div @click="goWorkspace(subProject.subProjectId,subProject.members,subProject.isManager)" style="cursor:pointer">
                     <Card class="subProjectStyle">
                       <span
                         slot="title"
-                        @click="goWorkspace(subProject.subProjectId,subProject.members,subProject.isManager)"
                         class="subProjectTitle"
                       >{{subProject["title"]}}</span>
                       <div slot="extra" style="height:auto;display:flex;align-items:center">
                         <Button
                           type="default"
-                          v-show="subProject['isMember'] == true||subProject['isManager'] == true"
+                          v-show="subProject['isManager'] == true"
+                          @click.stop="handOverSubProjectShow(index)"
                         >
-                          <Icon type="md-person"/>
+                          <Icon type="md-person" />
                         </Button>
+                        <Icon type="md-person" v-show="subProject['isMember'] == true" :size="30" style="margin-top:5px"/>
                         <Button
                           type="success"
                           v-show="subProject['isMember'] == false&&subProject['isManager'] == false"
-                          @click="joinSubProject(subProject)"
+                          @click.stop="joinSubProject(subProject)"
                         >
                           <Icon type="md-add"/>
                         </Button>
@@ -409,7 +412,7 @@
                           type="default"
                           style="margin-left:10px"
                           v-show="subProject['isManager'] == true"
-                          @click="editSubProjectShow(index)"
+                          @click.stop="editSubProjectShow(index)"
                         >
                           <Icon type="md-brush"/>
                         </Button>
@@ -417,7 +420,7 @@
                           type="default"
                           style="margin-left:10px"
                           v-show="subProject['isManager'] == true"
-                          @click="deleteSubProjectShow(index)"
+                          @click.stop="deleteSubProjectShow(index)"
                         >
                           <Icon type="md-close"/>
                         </Button>
@@ -425,24 +428,21 @@
                       <p class="subProjectDescription">{{subProject["description"]}}</p>
                       <!-- <hr> -->
                       <br>
-                      <div>
-                        <span
-                          style="float:left;color:white;background-color:#2d8cf0;padding:2.5px;min-width:100px;text-align:center"
-                        >manager</span>
-                        <span style="float:right;padding:2.5px">{{subProject.managerName}}</span>
-                      </div>
-                      <br>
-                      <div class="whitespace"></div>
-                      <div>
-                        <span
-                          style="float:left;;color:white;background-color:#2d8cf0;padding:2.5px;min-width:100px;text-align:center"
-                        >createtime</span>
-                        <span
-                          style="float:right;padding:2.5px"
-                        >{{subProject["createTime"].split(" ")[0]}}</span>
-                      </div>
+                      <div style="height:30px;align-items:center;display:flex;justify-content:center">
+                            <Icon type="md-body" :size="40"/>Manager
+                            <span style="height:20px;margin-left:5%">
+                              {{subProject.managerName}}
+                            </span>
+                          </div>
+                          <div style="height:30px;margin-top:10px;align-items:center;display:flex;justify-content:center">
+                            <Icon type="md-clock" :size="40"/>Creation Time
+                            <span style="height:20px;margin-left:5%">
+                              {{subProject.createTime.split(' ')[0]}}
+                            </span>
+                          </div>
                       <div class="whitespace"></div>
                     </Card>
+                  </div>
                   </Col>
                 </div>
               </div>
@@ -459,7 +459,7 @@
                 <div style="height:100px;background:azure">
                   <RadioGroup v-model="newManagerId">
                     <Radio
-                      v-for="(member,index) in projectMembers"
+                      v-for="(member,index) in subProjectMembers"
                       :key="member.index"
                       :label="member.userId"
                     >
@@ -619,6 +619,8 @@
       title="Edit Project"
       @on-ok="editProjectSubmit()"
       @on-cancel="cancel"
+      ok-text="assure"
+      cancel-text="cancel"
       :mask-closable="false"
       width="900px"
     >
@@ -719,7 +721,8 @@ export default {
       //编辑项目的字段
       /*编辑项目专用的字段*/
       editType: "",
-      editTags: "",
+      // tag为array类型
+      editTags: [],
       inputTag: "",
       editDescription: "",
       editTitle: "",
@@ -825,6 +828,9 @@ export default {
           trigger: 'blur'
         }
       ],
+      authorizeModal:false,
+      // 子项目成员数组
+      subProjectMembers:[],
     };
   },
   created(){
@@ -911,9 +917,8 @@ export default {
         that.currentProjectDetail.projectId
       );
       //将tag进行分割
-      that.currentProjectDetail.tag = that.currentProjectDetail.tag.split(
-        ","
-      );
+      // var arr = that.currentProjectDetail.tag.split(',');
+      // that.currentProjectDetail.tag = arr;
     },
     managerIdentity(managerId) {
       if (managerId === this.$store.getters.userId) {
@@ -997,14 +1002,18 @@ export default {
     handOverSubProjectShow(index) {
       this.editSubProjectindex = index;
       this.subProjectMembers = this.subProjectList[index].members;
+      console.table(this.subProjectMembers);
       // if it is the member of the sub-project
       this.isSubMember = this.memberIdentity(this.subProjectMembers);
       this.handOverSubProjectModal = true;
     },
     addEmail(email) {
-      this.inviteEmailList.push(email);
-      this.inputEmail = "";
-      console.log("邀请的成员邮箱数组如下:" + this.inviteEmailList);
+      if(email!=""){
+        this.inviteEmailList.push(email);
+        // 还剩下一个验证邮箱的东西没有写
+        this.inputEmail = "";
+        console.log("邀请的成员邮箱数组如下:" + this.inviteEmailList);
+      }
     },
     delEmail(index) {
       this.inviteEmailList.splice(index, 1);
@@ -1254,7 +1263,7 @@ export default {
       return data;
     },
     gotoPersonalPage(id) {
-      console.log({ id });
+      // console.log({ id });
       if (id == this.$store.getters.userId) {
         this.$router.push({ name: "PersonalPage" });
       } else {
@@ -1265,13 +1274,14 @@ export default {
       // this.
       this.editProjectModal = true;
       let editProjectInfo = this.currentProjectDetail;
-      console.log(typeof editProjectInfo["tag"]);
+      // console.log(typeof editProjectInfo["tag"]);
       this.editTitle = editProjectInfo.title;
       this.editIntroduction = editProjectInfo.introduction;
       this.editDescription = editProjectInfo.description;
       this.editType = editProjectInfo.category;
-      this.editTags = editProjectInfo["tag"];
-      console.log("权限是：" + editProjectInfo.privacy);
+      this.editTags = editProjectInfo["tag"].split(',');
+      // console.log(Array.from(this.editTags.split(',')));
+      // console.log("权限是：" + editProjectInfo.privacy);
       this.editPrivacy = editProjectInfo.privacy;
       this.editProjectId = editProjectInfo.projectId;
     },
@@ -1369,7 +1379,7 @@ export default {
       // let selectProjectId = this.userManagerProjectList[
       //   this.DelelteProjectIndex
       // ].projectId;
-      console.log(this.currentProjectDetail.projectId);
+      // console.log(this.currentProjectDetail.projectId);
       this.axios
         .get(
           "/GeoProblemSolving/project/delete?" +
@@ -1417,7 +1427,13 @@ export default {
         .catch(err => {
           console.log("申请失败的原因是：" + err.data);
         });
-    }
+    },
+    authorizeModalShow(){
+      this.authorizeModal = true;
+    },
+    // authorizeSubproject(data){
+    //   console.log(data);
+    // }
   }
 };
 </script>

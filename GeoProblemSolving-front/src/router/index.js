@@ -30,6 +30,7 @@ const routes = [{
 { path: '/draw', name: 'drawUtil', component: resolve=>(require(["@/components/utils/drawBoard"],resolve)) },
 { path: '/map', name: 'mapTool', component: resolve=>(require(["@/components/utils/mapTool"],resolve)) },
 { path: '/charts', name: 'dataCharts', component: resolve=>(require(["@/components/utils/charts"],resolve)) },
+{ path: '/task', name: 'taskList', component: resolve=>(require(["@/components/Projects/task"],resolve)) },
 ]
 export default new Router({
   routes,

@@ -17,12 +17,6 @@ img {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-/* title标题悬浮时出现下划线且变色 */
-.projectTitle:hover {
-  text-decoration: underline;
-  color: #c20c0c;
-  cursor: pointer;
-}
 .operateBtnGroup {
   --btnSize: 15px;
 }
@@ -53,7 +47,7 @@ img {
     <Row>
       <Col span="22" offset="1">
         <div style="display:flex;height:60px;justify-content:center">
-          <div style="width:70%;display:flex;justify-content:center;align-items:center">
+          <!-- <div style="width:70%;display:flex;justify-content:center;align-items:center">
             <div style="width:80%">
               <Input
                 v-model="search"
@@ -61,28 +55,10 @@ img {
                 style="width: 80%"
               />
             </div>
-          </div>
-          <div style="width:30%;display:flex;justify-content:flex-end;align-items:center">
-            <Button
-              @click="newProject"
-              type="default"
-              class="btnCreate"
-              style="margin-right:2.5%;font-size:15px"
-              icon="md-add"
-            >Create</Button>
-            <Button
-              type="default"
-              style="margin-right:2.5%;font-size:15px"
-              icon="md-person-add"
-              class="btnJoin"
-              @click="joinModal=true"
-            >Join</Button>
-          </div>
+          </div> -->
         </div>
-
-        <br>
-        <div class="Tabpane">
-          <Tabs v-model="currentTab" @click.native="chooseCurrentType(currentTab)">
+        <div class="Tabpane" style="display:flex">
+          <Tabs v-model="currentTab" @click.native="chooseCurrentType(currentTab)" style="width:60%">
             <TabPane label="Water" name="Water" icon="ios-water"></TabPane>
             <TabPane label="Soil" name="Soil" icon="md-grid"></TabPane>
             <TabPane label="Ecology" name="Ecology" icon="md-leaf"></TabPane>
@@ -90,6 +66,23 @@ img {
             <TabPane label="Society" name="Society" icon="md-bus"></TabPane>
             <TabPane label="Others" name="Others" icon="md-globe"></TabPane>
           </Tabs>
+          <div style="width:40%;display:flex;justify-content:flex-end">
+            <Button
+              @click="newProject"
+              type="default"
+              class="btnCreate"
+              style="margin-right:2.5%;font-size:15px;height:40px"
+              icon="md-add"
+            >Create</Button>
+            <Button
+              type="default"
+              style="margin-right:2.5%;font-size:15px;height:40px"
+              icon="md-person-add"
+              class="btnJoin"
+              @click="joinModal=true"
+            >Join</Button>
+
+          </div>
         </div>
       </Col>
       <div class="ProjectList">
@@ -133,86 +126,89 @@ img {
             :lg="{ span: 7,  offset: 1 }"
             v-if="item.privacy=='Public'"
           >
-            <Card style="height:auto;margin:20px 0 20px 0">
-              <span
-                slot="title"
-                @click="goSingleProject(item.projectId)"
-                class="projectTitle"
-              >{{item.title}}</span>
-              <div class="operate" slot="extra" style="height:40px;display:flex;align-items:center">
-                <Button
-                  type="success"
-                  v-show="item.isMember===false&&item.isManager===false"
-                  @click="joinApply(item)"
+            <div @click="goSingleProject(item.projectId)" style="cursor:pointer">
+              <Card style="height:auto;margin:20px 0 20px 0">
+                <span slot="title" class="projectTitle">{{item.title}}</span>
+                <div
+                  class="operate"
+                  slot="extra"
+                  style="height:40px;display:flex;align-items:center"
                 >
-                  <Icon type="md-add"/>
-                </Button>
-                <br>
-                <Button
-                  type="default"
-                  v-show="item.isMember===true||item.isManager===true"
-                  :id="item.projectId"
-                >
-                  <Icon type="md-person"/>
-                </Button>
-              </div>
-
-              <div style="display:flex;align-items:center;height:60px">
-                <Tag color="primary">Description</Tag>
-                <p style="padding: 0 10px;word-break:break-word">{{item.description}}</p>
-              </div>
-              <div style="height:300px;display:flex;justify-content:center">
-                <img :src="item.picture" v-if="item.picture!=''&&item.picture!='undefined'">
-                <avatar
-                  :username="item.title"
-                  :size="300"
-                  :title="item.title"
-                  :rounded="false"
-                  v-else
-                ></avatar>
-              </div>
-              <div class="whitespace"></div>
-              <div style="height:40px;align-items:center;display:flex;padding:0 20px 0 20px">
-                <span style="height:20px;width:45%;color:white;text-align:left;">
-                  <Tag color="primary" style="width:78.2px;text-align:center">Creator</Tag>
-                </span>
-                <span style="height:20px;margin-left:5%">{{item.managerName}}</span>
-              </div>
-              <div style="height:40px;align-items:center;display:flex;padding:0 20px 0 20px">
-                <span style="height:20px;width:45%;color:white;text-align:left;">
-                  <Tag color="primary">Create time</Tag>
-                </span>
-                <span style="height:20px;margin-left:5%">{{item.createTime.split(' ')[0]}}</span>
-              </div>
-              <div class="whitespace"></div>
-              <Modal
-                v-model="joinModal"
-                title="Join in project"
-                ok-text="Submit"
-                cancel-text="Cancel"
-                @on-ok="joinProject()"
-                @on-cancel="cancel"
-              >
-                <div style="display:flex;align-items:center">
-                  <span style="margin-right:5%">ProjectId:</span>
-                  <input
-                    v-model="joinProjectId"
-                    placeholder="Enter ProjectId you want to participate ..."
-                    style="width: 400px"
+                  <Button
+                    type="success"
+                    v-show="item.isMember===false&&item.isManager===false"
+                    @click.stop="joinApply(item)"
                   >
+                    <Icon type="md-add"/>
+                  </Button>
+                  <br>
+                  <Icon
+                    type="md-person"
+                    :size="30"
+                    v-show="item.isMember===true||item.isManager===true"
+                    :id="item.projectId"
+                  />
                 </div>
-              </Modal>
-              <Modal
-                v-model="quitModal"
-                title="Quit Project"
-                ok-text="Assure"
-                cancel-text="cancel"
-                @on-ok="quitProject()"
-                @on-cancel="cancel"
-              >
-                <p>Once you exit the project, you will not be able to participate in the collaborative process, confirm the exit?</p>
-              </Modal>
-            </Card>
+                <div style="display:flex;align-items:center;height:60px">
+                  <strong>Description</strong>
+                  <span style="padding: 0 10px;word-break:break-word;overflow: hidden;
+                        white-space: nowrap;
+                        text-overflow: ellipsis;
+                        max-width: 400px;">
+                  {{item.description}}</span>
+                </div>
+                <div style="height:300px;display:flex;justify-content:center">
+                  <img :src="item.picture" v-if="item.picture!=''&&item.picture!='undefined'">
+                  <avatar
+                    :username="item.title"
+                    :size="300"
+                    :title="item.title"
+                    :rounded="false"
+                    v-else
+                  ></avatar>
+                </div>
+                <div class="whitespace"></div>
+                <div style="height:30px;align-items:center;display:flex;justify-content:center">
+                  <Icon type="md-body" :size="40"/>Manager
+                  <span style="height:20px;margin-left:5%">
+                    <strong>{{item.managerName}}</strong>
+                  </span>
+                </div>
+                <div style="height:30px;align-items:center;display:flex;justify-content:center;margin-top:10px">
+                  <Icon type="md-clock" :size="40"/>Creation Time
+                  <span style="height:20px;margin-left:5%">
+                    <strong>{{item.createTime.split(' ')[0]}}</strong>
+                  </span>
+                </div>
+                <Modal
+                  v-model="joinModal"
+                  title="Join in project"
+                  ok-text="Submit"
+                  cancel-text="Cancel"
+                  @on-ok="joinProject()"
+                  @on-cancel="cancel"
+                >
+                  <div style="display:flex;align-items:center">
+                    <span style="margin-right:5%">ProjectId:</span>
+                    <input
+                      v-model="joinProjectId"
+                      placeholder="Enter ProjectId you want to participate ..."
+                      style="width: 400px"
+                    >
+                  </div>
+                </Modal>
+                <Modal
+                  v-model="quitModal"
+                  title="Quit Project"
+                  ok-text="Assure"
+                  cancel-text="cancel"
+                  @on-ok="quitProject()"
+                  @on-cancel="cancel"
+                >
+                  <p>Once you exit the project, you will not be able to participate in the collaborative process, confirm the exit?</p>
+                </Modal>
+              </Card>
+            </div>
           </Col>
         </div>
       </div>
@@ -257,7 +253,9 @@ export default {
       joinProjectId: "",
       //搜索的输入框
       search: "",
-      currentProjectsStatus: 2
+      currentProjectsStatus: 2,
+      // 记录已经申请的情况
+      haveApplied: false
     };
   },
   methods: {
@@ -401,44 +399,63 @@ export default {
         if (isManager || isMember) {
           this.$router.push({ path: `project/${id}` });
         } else {
-          alert("No access.");
+          this.$Notice.error({
+            title: "No access",
+            desc:
+              "You need to click + button at the north right corner to apply join in the project",
+            duration: 5
+          });
         }
       } else {
         this.$router.push({ path: "/login" });
       }
     },
     joinApply(data) {
-      if (this.$store.getters.userState) {
-        let joinForm = {};
-        joinForm["recipientId"] = data.managerId;
-        joinForm["type"] = "apply";
-        joinForm["content"] = {
-          userName: this.$store.getters.userName,
-          userId: this.$store.getters.userId,
-          title: "Group application",
-          description:
-            "User " +
-            this.$store.getters.userName +
-            " apply to join in your project: " +
-            data.title +
-            " .",
-          projectId: data.projectId,
-          projectTitle: data.title,
-          scope: "project",
-          approve: "unknow"
-        };
-        this.axios
-          .post("/GeoProblemSolving/notice/save", joinForm)
-          .then(res => {
-            this.$Message.info("Apply Successfully");
-            this.$emit("sendNotice", data.managerId);
-          })
-          .catch(err => {
-            console.log("申请失败的原因是：" + err.data);
-          });
-      } else {
-        this.$Message.error("you must have an account before you apply");
-        this.$router.push({ name: "Login" });
+      if (this.haveApplied == true && data.projectId == sessionStorage.getItem("applyId")) {
+        this.$Notice.warning({
+          title: "repeat apply warning",
+          desc: "You have apply success, no need to click again!"
+        });
+      } else{
+        if (this.$store.getters.userState) {
+          let joinForm = {};
+          sessionStorage.setItem("applyId",data.projectId);
+          joinForm["recipientId"] = data.managerId;
+          joinForm["type"] = "apply";
+          joinForm["content"] = {
+            userName: this.$store.getters.userName,
+            userId: this.$store.getters.userId,
+            title: "Group application",
+            description:
+              "User " +
+              this.$store.getters.userName +
+              " apply to join in your project: " +
+              data.title +
+              " .",
+            projectId: data.projectId,
+            projectTitle: data.title,
+            scope: "project",
+            approve: "unknow"
+          };
+          this.axios
+            .post("/GeoProblemSolving/notice/save", joinForm)
+            .then(res => {
+              this.$Notice.open({
+                title: "Apply Successfully",
+                desc:
+                  "The project's manager will process your apply in time,you can get a notification later to tell you the result.",
+                duration: 5
+              });
+              this.$emit("sendNotice", data.managerId);
+              this.haveApplied = true;
+            })
+            .catch(err => {
+              console.log("申请失败的原因是：" + err.data);
+            });
+        } else {
+          this.$Message.error("you must have an account before you apply");
+          this.$router.push({ name: "Login" });
+        }
       }
     }
   }

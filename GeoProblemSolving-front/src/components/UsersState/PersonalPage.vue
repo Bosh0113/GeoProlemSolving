@@ -222,8 +222,26 @@
                             <strong>{{ row.name }}</strong>
                           </template>
                           <template slot-scope="{ row, index }" slot="action">
-                            <Button type="success" size="small" style="margin-right: 5px" :href="userResourceList[index].pathURL" title="download" @click="download(index)"><Icon type="md-download"/></Button>
-                            <Button type="warning" size="small"><Icon type="md-eye"/></Button>
+                            <Button
+                              type="success"
+                              size="small"
+                              style="margin-right: 5px"
+                              :href="userResourceList[index].pathURL"
+                              title="download"
+                              @click="download(index)"
+                            >
+                              <Icon type="md-download"/>
+                            </Button>
+                            <Button type="warning" size="small">
+                              <Icon type="md-eye"/>
+                            </Button>
+                            <Button
+                              type="error"
+                              size="small"
+                              @click="deleteResource(userResourceList[index].resourceId)"
+                            >
+                              <Icon type="md-close"/>
+                            </Button>
                           </template>
                         </Table>
                       </Card>
@@ -234,7 +252,7 @@
                   <div
                     v-for="(item,index) in joinedProjectsList"
                     :key="index"
-                    v-show="joinedProjectsList!='None'"
+                    v-show="joinedProjectsList!=[]"
                   >
                     <Col :lg="{span:11, offset:1}" :md="{span:22, offset:1}">
                       <Card style="height:320px;margin-top:20px;">
@@ -244,6 +262,7 @@
                           class="projectsTitle"
                           @click="goSingleProject(item.projectId)"
                         >{{item.title}}</p>
+                        <Button slot="extra" @click="quitModalShow(item.projectId)">Quit</Button>
                         <p
                           style="height:200px;text-indent:2em;overflow-y:auto;word-break:break-word"
                         >{{item.introduction}}</p>
@@ -326,6 +345,16 @@
         <!-- 用radio将用户表示出来 -->
         <!-- <tag v-for="(member,index) in projectMemberList" @click="choose(index)" :key="member.index">{{member.userName}}</tag> -->
       </div>
+    </Modal>
+    <Modal
+      title="Quit Project"
+      v-model="quitModal"
+      @on-ok="quitProject()"
+      @on-cancel="cancel()"
+      ok-text="ok"
+      cancel-text="cancel"
+    >
+      <p>Once you exit the project, you will not be able to participate in the collaborative process, confirm the exit?</p>
     </Modal>
   </div>
 </template>
@@ -469,24 +498,30 @@ export default {
       detailSidebarHeight: "",
       // 用户event列表
       userEventList: [],
-      userResourceList: []
+      userResourceList: [],
       // rightContentWidth:"",
+      // 退出项目的modal
+      quitModal: false,
+      quitPid: ""
     };
   },
   methods: {
     //获取用户的详细信息
     getUserProfile() {
       this.userDetail = this.$store.getters.userInfo;
+      console.table(this.userDetail);
       // console.log()
       //打印用户的具体信息
       this.joinedProjectsNameArray = this.userDetail.joinedProjects;
       console.table(this.joinedProjectsNameArray);
       // this.getParticipatoryList(this.joinedProjectsNameArray);
-
     },
     //获取用户参与的项目列表
     getParticipatoryList(projectIds) {
-      console.table("id是："+ projectIds);
+      projectIds.forEach(element => {
+        console.log(element);
+      });
+      console.table("id是：" + projectIds);
       var count = projectIds.length;
       let participatoryProjectListTemp = [];
       for (let i = 0; i < projectIds.length; i++) {
@@ -498,7 +533,9 @@ export default {
               projectIds[i].projectId
           )
           .then(res => {
-            participatoryProjectListTemp.push(res.data[0]);
+            if (res.data != "None") {
+              participatoryProjectListTemp.push(res.data[0]);
+            }
             if (--count == 0) {
               this.$set(
                 this,
@@ -506,7 +543,7 @@ export default {
                 participatoryProjectListTemp
               );
             }
-            console.table(participatoryProjectListTemp);
+            console.table(this.joinedProjectsList);
           })
           .catch(err => {
             console.log(err.data);
@@ -529,12 +566,16 @@ export default {
     },
     //退出项目的函数
     quitProject() {
-      let quitData = new URLSearchParams();
-      //包含项目id与用户名字段
-      quitData.append("ProjectID", "");
-      quitData.append("UserName", this.$store.getters.username);
+      console.log(this.quitPid);
+      console.log(this.$store.getters.userId);
       this.axios
-        .post("/GeoProblemSolving/TeamModeling/QuitProjectServlet", quitData)
+        .get(
+          "/GeoProblemSolving/project/quit" +
+            "?projectId=" +
+            this.quitPid +
+            "&userId=" +
+            this.$store.getters.userId
+        )
         .then(res => {
           if (res.data === "Success") {
             this.$Message.success("Quit Success");
@@ -569,17 +610,14 @@ export default {
       this.projectMemberList = this.userManagerProjectList[index].members;
     },
     deleteProjectModalShow(pid) {
-      this.axios.get(
-        "/GeoProblemSolving/project/delete?" +
-            "projectId=" +
-            pid
-      )
-      .then(res=> {
-        alert(res.data);
-      })
-      .catch(err=> {
-        alert(err.data);
-      })
+      this.axios
+        .get("/GeoProblemSolving/project/delete?" + "projectId=" + pid)
+        .then(res => {
+          alert(res.data);
+        })
+        .catch(err => {
+          alert(err.data);
+        });
     },
     authorize() {
       this.axios
@@ -665,7 +703,7 @@ export default {
         if (data[item] != "") {
           changedProfile.append(item, data[item]);
         }
-      };
+      }
       console.table(changedProfile);
       this.axios
         .post("/GeoProblemSolving/user/update", changedProfile)
@@ -676,10 +714,10 @@ export default {
               title: "notification",
               desc: "Profile update successfully"
             });
-            let userInfo=res.data;
-            userInfo.userState=true;
-            this.$store.commit("setUserInfo",userInfo);
-            this.$set(this,"userDetail",userInfo);
+            let userInfo = res.data;
+            userInfo.userState = true;
+            this.$store.commit("setUserInfo", userInfo);
+            this.$set(this, "userDetail", userInfo);
             sessionStorage.setItem("userInfo", JSON.stringify(userInfo));
           }
         })
@@ -734,8 +772,29 @@ export default {
           console.log(err.data);
         });
     },
-    download(index){
+    download(index) {
       window.open(this.userResourceList[index].pathURL);
+    },
+    quitModalShow(pId) {
+      this.quitModal = true;
+      this.quitPid = pId;
+    },
+    deleteResource(id) {
+      if (id != "") {
+        this.axios
+          .get("/GeoProblemSolving/resource/delete?" + "resourceId=" + id)
+          .then(res => {
+            if (res.data == "Success") {
+              this.$Message.info("Delete successfully");
+              this.getUserResource();
+            } else if (res.data == "Fail") {
+              this.$Message.info("Failure");
+            }
+          })
+          .catch(err => {
+            console.log(err.data);
+          });
+      }
     }
   }
 };
@@ -783,7 +842,7 @@ body {
   font-size: 10px;
   line-height: 20px;
 }
-.userDescription{
+.userDescription {
   height: auto;
   line-height: 10px;
   font-size: 10px;
@@ -791,7 +850,7 @@ body {
   /* display: inline-block; */
   overflow: hidden;
   word-wrap: break-word;
-  word-break: break-all
+  word-break: break-all;
 }
 .user-project {
   margin-top: 20px;
