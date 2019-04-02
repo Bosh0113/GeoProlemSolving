@@ -111,6 +111,8 @@
 </template>
 <script>
 import axios from "axios";
+import CryptoJS from "crypto-js";
+
 export default {
   components: {},
   computed: {
@@ -178,6 +180,13 @@ export default {
             localStorage.setItem("password",'');
             localStorage.setItem("statusRecord",false);
           }
+          // 对密码进行md5加密处理
+          var cipherText = CryptoJS.AES.encrypt(
+            this.formInline.password,
+            "secretkey123"
+          ).toString();
+          console.log("加密后的密文是：" + cipherText);
+          // md5加密结束
           this.axios
             .get(
               "/GeoProblemSolving/user/login" +

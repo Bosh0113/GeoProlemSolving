@@ -8,47 +8,49 @@
               <div class="user-img">
                 <img v-bind:src="userDetail.avatar" class="u_img">
               </div>
-              <div style="text-align:center">
-                <div class="single-info">{{userDetail.userName}}</div>
-                <br>
-              </div>
-              <div class="user-desc" style="min-hieght:60px;padding:0 10px;border:1px dotted gray">
-                <p class="userDescription">{{this.userDetail.introduction}}</p>
+              <div class="single-info">
+                <Icon type="ios-contact-outline" :size="20"/>
+                <span>{{userDetail.userName}}</span>
               </div>
               <div class="user-info">
-                <div class="single-info">
-                  <span>email:</span>
-                  <span style="float:right">{{userDetail.email}}</span>
+                <div class="single-info" >
+                  <!-- <span>email:</span> -->
+                  <Icon type="ios-mail-outline" :size="20"/>
+                  <span>{{userDetail.email}}</span>
                 </div>
                 <div class="single-info">
-                  <span>phone</span>
-                  <span style="float:right">{{userDetail.mobilePhone}}</span>
+                  <Icon type="ios-call-outline" :size="20"/>
+                  <span>{{userDetail.mobilePhone}}</span>
                 </div>
                 <div class="single-info">
-                  <span>job:</span>
-                  <span style="float:right">{{userDetail.jobTitle}}</span>
+                  <Icon type="ios-hammer-outline" :size="20"/>
+                  <span>{{userDetail.jobTitle}}</span>
                 </div>
                 <div class="single-info">
-                  <span>location:</span>
-                  <span style="float:right">{{userDetail.country}}&nbsp{{userDetail.city}}</span>
+                  <Icon type="ios-compass-outline" :size="20"/>
+                  <span>{{userDetail.country}}&nbsp{{userDetail.city}}</span>
                 </div>
                 <div class="single-info">
-                  <span>organization</span>
-                  <span style="float:right">{{userDetail.organization}}</span>
+                  <Icon type="ios-home-outline" :size="20"/>
+                  <span>{{userDetail.organization}}</span>
                 </div>
                 <div class="single-info">
-                  <span>direction</span>
-                  <span style="float:right">{{userDetail.direction}}</span>
+                  <Icon type="ios-contract" :size="20"/>
+                  <span>{{userDetail.direction}}</span>
                 </div>
                 <div class="single-info">
-                  <span>homepage</span>
-                  <span style="float:right">{{userDetail.homePage}}</span>
+                  <Icon type="md-link" :size="20"/>
+                  <span>{{userDetail.homePage}}</span>
+                </div>
+                <br>
+                <div style="padding:20px 20px 0 20px;font-size:12px;text-indent:2em;border:1px dotted lightgray">
+                  {{this.userDetail.introduction}}
                 </div>
                 <div class="whitespace"></div>
-                <div class="display:flex">
+                <div style="display:flex;justify-content:center">
                   <Button
                     type="success"
-                    style="height:40px;float:left"
+                    style="height:40px"
                     @click="editModalShow()"
                   >Update</Button>
                   <Drawer
@@ -167,14 +169,14 @@
                       </FormItem>
                     </Form>
                   </Drawer>
-                  <Button
+                  <!-- <Button
                     type="error"
                     style="height:40px;float:right"
                     @click="logOutModalShow()"
-                  >logOut</Button>
+                  >logOut</Button> -->
                 </div>
 
-                <Modal
+                <!-- <Modal
                   v-model="logOutProfileModal"
                   title="Logout Warning"
                   @on-ok="logOutAccount()"
@@ -185,7 +187,7 @@
                   <p
                     style="font-size:20px"
                   >If you choose logout your account,the personal information you have filled will be removed.</p>
-                </Modal>
+                </Modal> -->
               </div>
             </div>
           </Col>
@@ -255,14 +257,14 @@
                     v-show="joinedProjectsList!=[]"
                   >
                     <Col :lg="{span:11, offset:1}" :md="{span:22, offset:1}">
-                      <Card style="height:320px;margin-top:20px;">
+                      <div class="participatoryProjectCard" @click="goSingleProject(item.projectId)">
+                        <Card style="height:320px;margin-top:20px;">
                         <p
                           slot="title"
                           style="height:40x"
-                          class="projectsTitle"
-                          @click="goSingleProject(item.projectId)"
+                          class="projectsTitle"                          
                         >{{item.title}}</p>
-                        <Button slot="extra" @click="quitModalShow(item.projectId)">Quit</Button>
+                        <Button slot="extra" @click.stop="quitModalShow(item.projectId)">Quit</Button>
                         <p
                           style="height:200px;text-indent:2em;overflow-y:auto;word-break:break-word"
                         >{{item.introduction}}</p>
@@ -272,6 +274,8 @@
                           <span style="float:right">{{item.createTime}}</span>
                         </div>
                       </Card>
+                      </div>
+                      
                     </Col>
                   </div>
                 </TabPane>
@@ -282,11 +286,11 @@
                     :key="index"
                   >
                     <Col :lg="{span:11, offset:1}" :md="{span:22, offset:1}">
+                    <div class="manageProjectsCard" @click="goSingleProject(mProject.projectId)">
                       <Card style="height:320px;margin-top:20px">
                         <p
                           slot="title"
                           class="projectsTitle"
-                          @click="goSingleProject(mProject.projectId)"
                         >{{mProject.title}}</p>
                         <Button
                           class="authorBtn"
@@ -294,7 +298,7 @@
                           slot="extra"
                           title="Privilege change"
                           style="margin:-5px 5px 0 5px"
-                          @click="authorizeModalShow(index)"
+                          @click.stop="authorizeModalShow(index)"
                           icon="md-happy"
                         ></Button>
                         <Button
@@ -302,7 +306,7 @@
                           type="default"
                           slot="extra"
                           style="margin:-5px 5px 0 5px"
-                          @click="deleteProjectModalShow(mProject.projectId)"
+                          @click.stop="deleteProjectModalShow(mProject.projectId)"
                           icon="md-close"
                           title="remove"
                         ></Button>
@@ -317,6 +321,8 @@
                           <span style="float:right">{{mProject.createTime}}</span>
                         </div>
                       </Card>
+                    </div>
+                      
                     </Col>
                   </div>
                 </TabPane>
@@ -613,7 +619,15 @@ export default {
       this.axios
         .get("/GeoProblemSolving/project/delete?" + "projectId=" + pid)
         .then(res => {
-          alert(res.data);
+          this.$store.commit("getUserInfo");
+          var newJoinedProjects =[]; 
+          var oldJoinedProjects=this.joinedProjectsList;
+          for(var i=0;i<oldJoinedProjects.length;i++){
+            if(oldJoinedProjects[i].projectId!=pid){
+              newJoinedProjects.push(oldJoinedProjects[i]);
+            }
+          }
+          this.$set(this,"joinedProjectsList",newJoinedProjects);
         })
         .catch(err => {
           alert(err.data);
@@ -629,42 +643,35 @@ export default {
             this.selectManagerId
         )
         .then(res => {
-          console.log(res.data);
+          let notice = {};
+          notice["recipientId"] = this.selectManagerId;
+          notice["type"] = "Notice";
+          notice["content"] = {
+            title: "Manager change",
+            description:
+              "You have been the manager of project " +
+              this.userManagerProjectList[index].title +
+              " !"
+          };
+          this.axios
+            .post("/GeoProblemSolving/notice/save", notice)
+            .then(res => {
+              this.$Message.info("Apply Successfully");
+              this.$emit("sendNotice", data.managerId);
+            })
+            .catch(err => {
+              console.log("申请失败的原因是：" + err.data);
+            });
         })
         .catch(err => {});
 
-      let notice = {};
-      notice["recipientId"] = this.selectManagerId;
-      notice["type"] = "Notice";
-      notice["content"] = {
-        title: "Manager change",
-        description:
-          "You have been the manager of project " +
-          this.userManagerProjectList[index].title +
-          " !"
-      };
-      this.axios
-        .post("/GeoProblemSolving/notice/save", notice)
-        .then(res => {
-          this.$Message.info("Apply Successfully");
-          this.$emit("sendNotice", data.managerId);
-        })
-        .catch(err => {
-          console.log("申请失败的原因是：" + err.data);
-        });
+
     },
     cancel() {
       this.$Message.info("cancel");
     },
-
-    //更改个人信息的函数
-    changeProfile() {},
     editModalShow() {
       this.editProfileModal = true;
-    },
-    //不用该方法的话就使用placeholder
-    useDefault() {
-      alert(111);
     },
     //处理修改用户头像信息相关的函数
     uploadPhoto(e) {
@@ -949,7 +956,7 @@ body {
 }
 /* 2-25 add 实现的效果是旋浮上去出现下划线且变红 */
 .projectsTitle:hover {
-  color: red;
+  /* color: red; */
   cursor: pointer;
 }
 
@@ -969,5 +976,11 @@ body {
 .table table {
   table-layout: auto;
   width: 100% !important;
+}
+.participatoryProjectCard:hover,{
+  cursor:pointer;
+}
+.manageProjectsCard:hover{
+  cursor:pointer;
 }
 </style>

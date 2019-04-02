@@ -192,7 +192,7 @@
             <Col span="22" offset="1" style="margin-top:10px;background-color:white;">
               <Steps :current="order">
                 <Step title="start" icon="ios-home" @click.native="showDetail(0)" :order="0"></Step>
-                <Step title="tasks" icon="md-list"  @click.native="goToTask()" :order="1"></Step>
+                <!-- <Step title="tasks" icon="md-list"  @click.native="" :order="1"></Step> -->
                 <Step
                   v-for="(list,index) in moduleList"
                   :key="index+1"
@@ -485,7 +485,7 @@
                               <Icon type="ios-trash" />
                             </span>
                           </div>
-                          <span style="word-break:break-word;">{{item.description}}</span>
+                          <p style="word-break:break-word;padding:5px">{{item.description}}</p>
                         </Card>
                       </draggable>
                     </Card>
@@ -548,7 +548,7 @@
                               <Icon type="ios-trash" />
                             </span>
                           </div>
-                          <span style="word-break:break-word;">{{item.description}}</span>
+                          <p style="word-break:break-word;padding:5px">{{item.description}}</p>
                         </Card>
                       </draggable>
                     </Card>
@@ -1465,7 +1465,7 @@ export default {
             replyNotice["recipientId"] = this.inviteList[i];// 改apply.content.userId
             replyNotice["type"] = "notice";
             replyNotice["content"] = {// 改
-              title: "Result for invitation",
+              title: "Join subProject",
               description:
                 "You have been invited by " + this.subProjectInfo.managerName +  " to join in the sub project: " +
                 this.subProjectInfo.title + " , and now you are a member in this sub project."

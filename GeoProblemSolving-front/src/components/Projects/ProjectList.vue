@@ -59,8 +59,10 @@ img {
         </div>
         <div class="Tabpane" style="display:flex">
           <Tabs v-model="currentTab" @click.native="chooseCurrentType(currentTab)" style="width:60%">
-            <TabPane label="Water" name="Water" icon="ios-water"></TabPane>
-            <TabPane label="Soil" name="Soil" icon="md-grid"></TabPane>
+            <TabPane label="Water" name="Water" icon="ios-water">
+            </TabPane>
+            <TabPane label="Soil" name="Soil" icon="md-grid">
+            </TabPane>
             <TabPane label="Ecology" name="Ecology" icon="md-leaf"></TabPane>
             <TabPane label="Atmosphere" name="Atmosphere" icon="md-cloud"></TabPane>
             <TabPane label="Society" name="Society" icon="md-bus"></TabPane>
@@ -95,6 +97,10 @@ img {
           </Col>
         </div>
         <div v-show="currentProjectsStatus==0">
+          <Spin fix v-show="getFinish">
+              <Icon type="ios-loading" size="100" class="demo-spin-icon-load" color="yellowgreen"></Icon>
+              <div>Loading</div>
+          </Spin>
           <Col span="22" offset="1">
             <Card :bordered="false">
               <!-- <p slot="title">No Projects in this category</p> -->
@@ -168,18 +174,26 @@ img {
                   ></avatar>
                 </div>
                 <div class="whitespace"></div>
-                <div style="height:30px;align-items:center;display:flex;justify-content:center">
-                  <Icon type="md-body" :size="40"/>Manager
+                <div style="height:30px;align-items:center;display:flex;justify-content:flex-start">
+
+                  <Icon type="md-body" :size="20"/>Manager
                   <span style="height:20px;margin-left:5%">
                     <strong>{{item.managerName}}</strong>
                   </span>
                 </div>
-                <div style="height:30px;align-items:center;display:flex;justify-content:center;margin-top:10px">
-                  <Icon type="md-clock" :size="40"/>Creation Time
+                <div style="height:30px;align-items:center;display:flex;justify-content:flex-start;margin-top:10px">
+                  <Icon type="md-clock" :size="20"/>Creation Time
                   <span style="height:20px;margin-left:5%">
                     <strong>{{item.createTime.split(' ')[0]}}</strong>
                   </span>
                 </div>
+                <div style="height:30px;align-items:center;display:flex;justify-content:flex-start;margin-top:10px">
+                  <Icon type="md-pricetags" :size="20"/>Tag
+                  <span style="height:20px;margin-left:5%">
+                    <strong v-for="tag in item.tag">{{tag}}</strong>
+                  </span>
+                </div>
+
                 <Modal
                   v-model="joinModal"
                   title="Join in project"
@@ -242,6 +256,8 @@ export default {
     return {
       //Tab栏当前选中的信息
       currentTab: "water",
+      //上一次点击选中的类别
+      justChooseTab:false,
       currentProjectList: [],
       isMember: false,
       isManager: false,
@@ -255,38 +271,55 @@ export default {
       search: "",
       currentProjectsStatus: 2,
       // 记录已经申请的情况
-      haveApplied: false
+      haveApplied: false,
+      getFinish:false,
     };
   },
   methods: {
     //该方法负责将选中的类别传递给显示的div
     chooseCurrentType(data) {
-      switch (data) {
+      if(data === this.justChooseTab){
+      }else{
+        switch (data) {
         case "Water":
           let waterObject = { key: "category", value: "Water" };
           this.getSpecificTypeProjects(waterObject);
+          this.justChooseTab = "Water";
+          this.getFinish = false;
           break;
         case "Soil":
           let soilObject = { key: "category", value: "Soil" };
           this.getSpecificTypeProjects(soilObject);
+          this.justChooseTab = "Soil";
+          this.getFinish = false;
           break;
         case "Ecology":
           let ecologyObject = { key: "category", value: "Ecology" };
           this.getSpecificTypeProjects(ecologyObject);
+          this.justChooseTab = "Ecology";
+          this.getFinish = false;
           break;
         case "Atmosphere":
           let atmosphereObject = { key: "category", value: "Atmosphere" };
           this.getSpecificTypeProjects(atmosphereObject);
+          this.justChooseTab = "Atmosphere";
+          this.getFinish = false;
           break;
         case "Society":
           let societyObject = { key: "category", value: "Society" };
           this.getSpecificTypeProjects(societyObject);
+          this.justChooseTab = "Society";
+          this.getFinish = false;
           break;
         case "Others":
           let othersObject = { key: "category", value: "Others" };
           this.getSpecificTypeProjects(othersObject);
+          this.justChooseTab = "Others";
+          this.getFinish = false;
           break;
       }
+      }
+
     },
     getSpecificTypeProjects(data) {
       this.axios
@@ -301,9 +334,11 @@ export default {
           if (res.data === "None") {
             this.currentProjectList = [];
             this.currentProjectsStatus = 0;
+            this.getFinish = false;
           } else {
             this.judgeMember(res.data);
             this.currentProjectsStatus = 1;
+            this.getFinish = true;
           }
         })
         .catch(err => {

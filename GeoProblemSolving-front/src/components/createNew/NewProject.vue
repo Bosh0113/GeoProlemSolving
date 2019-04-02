@@ -142,7 +142,7 @@ h1 {
             @click="addTag(inputTag)"
             style="margin-left:2.5%"
           >Add Tag</Button>
-          <div style="margin-left:5%">
+          <div >
             <Tag
               color="primary"
               v-for="(item,index) in this.formInline.tagList"

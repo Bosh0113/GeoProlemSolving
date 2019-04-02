@@ -282,8 +282,8 @@
           <!-- <br> -->
           <div class="form_style">
             <span>Reciver</span>
-            <!-- <Tag v-for="item in count" :key="item" :name="item" closable @on-close="handleClose2">标签{{ item + 1 }}</Tag> -->
-            <Input v-model="inputEmail" style="width:200px" :rules="emailValidate"/>
+           <Input v-model="inputEmail" style="width:90%" placeholder="input email and press enter button the email will be added below" @keyup.enter.native="addEmail(inputEmail)"/>
+            <!-- <Input v-model="inputEmail" style="width:100%" :rules="emailValidate" placeholder="input email and press enter button the email will be added below"/> -->
             <Button
               icon="ios-add"
               type="dashed"
@@ -303,7 +303,7 @@
           <br>
           <div class="form_style">
             <span>Title</span>
-            <Input style="width:75%" v-model="emailTitle"/>
+            <Input style="width:75%" v-model="emailTitle" placeholder="set the email title to recivers by your self"/>
           </div>
           <br>
           <div class="form_style">
@@ -317,22 +317,6 @@
             />
           </div>
           <br>
-          <div style="display:flex" class="emailOperate">
-            <Button @click="copyDefault()" type="success">Use default</Button>
-            <!-- <Button type="primary" v-clipboard="copydata">Copy Project ID</Button> -->
-            <Button
-              type="primary"
-              v-clipboard="copyProjectId"
-              @success="handleSuccess('id')"
-              @error="handleError('id')"
-            >Copy Project ID</Button>
-            <Button
-              type="default"
-              v-clipboard="copyProjectTitle"
-              @success="handleSuccess('title')"
-              @error="handleError('title')"
-            >Copy Project Name</Button>
-          </div>
         </Modal>
         <div class="whitespace"></div>
         <div style="padding: 20px">
@@ -383,9 +367,8 @@
             </div>
             <div class="subprojectPanel">
               <div class="subProjectListStyle">
-                <div class="whitespace"></div>
-                <div v-for="(subProject,index) in subProjectList" :key="subProject.index" style>
-                  <Col :lg="12" :md="24" :sm="24" :xs="24">
+                <div v-for="(subProject,index) in subProjectList" :key="subProject.index">
+                  <Col :lg="{span:11,offset:1}" :md="24" :sm="24" :xs="24">
                   <div @click="goWorkspace(subProject.subProjectId,subProject.members,subProject.isManager)" style="cursor:pointer">
                     <Card class="subProjectStyle">
                       <span
@@ -428,14 +411,14 @@
                       <p class="subProjectDescription">{{subProject["description"]}}</p>
                       <!-- <hr> -->
                       <br>
-                      <div style="height:30px;align-items:center;display:flex;justify-content:center">
-                            <Icon type="md-body" :size="40"/>Manager
+                      <div style="height:30px;align-items:center;display:flex;justify-content:flex-start">
+                            <Icon type="md-body" :size="20"/>Manager
                             <span style="height:20px;margin-left:5%">
                               {{subProject.managerName}}
                             </span>
                           </div>
-                          <div style="height:30px;margin-top:10px;align-items:center;display:flex;justify-content:center">
-                            <Icon type="md-clock" :size="40"/>Creation Time
+                          <div style="height:30px;margin-top:10px;align-items:center;display:flex;justify-content:flex-start">
+                            <Icon type="md-clock" :size="20"/>Creation Time
                             <span style="height:20px;margin-left:5%">
                               {{subProject.createTime.split(' ')[0]}}
                             </span>
@@ -768,7 +751,7 @@ export default {
       inviteEmailList: [],
       //邮件格式
       emailTitle: "",
-      emailContent: "",
+      emailContent: `Hello,it's my pleasure to invite you join in the project,if you agree to join us you can click this url to visit it,the url is <br> http://172.21.212.7:8082/GeoProblemSolving/${sessionStorage.getItem("projectId")}/join`,
       emailFormat:
         "hello,it's my pleasure to invite you join in the project called ",
       //上传文件相关的
@@ -1143,17 +1126,7 @@ export default {
         }
       });
     },
-    showDetail(data) {
-      alert(data);
-    },
-    copyDefault() {
-      this.emailContent =
-        this.emailFormat +
-        this.currentProjectDetail.title +
-        ", you can copy the projectId " +
-        this.currentProjectDetail.projectId +
-        "and apply for join in it";
-    },
+
     //上传文件的模态框打开
     uploadFileModalShow() {
       this.uploadFileModal = true;
@@ -1230,33 +1203,8 @@ export default {
     show(index) {
       window.open(this.projectResourceList[index].pathURL);
     },
-    handleSuccess(data) {
-      if (data == "id") {
-        this.copyProjectIdStatus = true;
-        // alert("success");
-      } else if (data == "title") {
-        this.copyProjectTitleStatus = true;
-      }
-      this.$Notice.success({
-        title: "Notification title",
-        desc: `Copy project ${data} success`,
-        duration: 1
-      });
-    },
-    handleError(data) {
-      if (data == "id") {
-        this.copyProjectIdStatus = false;
-      } else if (data == "title") {
-        this.copyProjectTitleStatus = false;
-      }
-      this.$Notice.error({
-        title: "Notification title",
-        desc: `Copy project ${data} fail`,
-        duration: 1
-      });
-    },
+
     cutString(data, len) {
-      // console.table(data);
       for (var i = 0; i < data.length; i++) {
         data[i].description = data[i].description.substring(0, len) + "...";
       }
@@ -1319,9 +1267,10 @@ export default {
     },
     // 编辑项目的添加tag标签
     addTag(tag) {
-      this.editTags.push(tag);
+      if(tag!=""){
+        this.editTags.push(tag);
+      }
       this.inputTag = "";
-      // console.log("增添后的数组是：" + this.editTags);
     },
     // 删除指定的标签
     deleteTag(index) {
