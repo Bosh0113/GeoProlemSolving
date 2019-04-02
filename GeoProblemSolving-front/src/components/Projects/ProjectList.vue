@@ -375,7 +375,15 @@ export default {
           this.$Message.danger("Join fail");
         });
     },
-
+    showJoinApplyBtn(item){
+      var state=this.$store.getters.userState;
+      if(!item.isMember&&!item.isManager&&state){
+        return true;
+      }
+      else{
+        return false;
+      }
+    },
     cancel() {
       this.$Message.info("Clicked cancel");
     },

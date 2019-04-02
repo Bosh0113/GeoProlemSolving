@@ -70,7 +70,7 @@
               <div class="login-content">
                 <Form ref="formInline" :model="formInline" :rules="ruleInline" style="margin:25px">
                   <div>
-                    <FormItem prop="user" label="Email" :label-width="100">
+                    <FormItem prop="user" label="E-mail" :label-width="100">
                       <Input
                         placeholder="Please input your username"
                         style="width: 90%"

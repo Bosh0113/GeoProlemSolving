@@ -6,7 +6,15 @@
           <Col :lg="5" :md="8" :sm="10" :xs="12">
             <div class="detailSidebar" :style="{height:detailSidebarHeight}">
               <div class="user-img">
-                <img v-bind:src="userDetail.avatar" class="u_img">
+                <img v-bind:src="userDetail.avatar" class="u_img"
+                  v-if="userDetail.avatar!=''&&userDetail.avatar!='undefined'">
+                <avatar
+                  style="width:100%"
+                  :username="userDetail.userName"
+                  :size="200"
+                  :rounded="false"
+                  v-else>
+                </avatar>
               </div>
               <div class="single-info">
                 <Icon type="ios-contact-outline" :size="20"/>
@@ -262,7 +270,7 @@
                         <p
                           slot="title"
                           style="height:40x"
-                          class="projectsTitle"                          
+                          class="projectsTitle"
                         >{{item.title}}</p>
                         <Button slot="extra" @click.stop="quitModalShow(item.projectId)">Quit</Button>
                         <p
@@ -275,7 +283,7 @@
                         </div>
                       </Card>
                       </div>
-                      
+
                     </Col>
                   </div>
                 </TabPane>
@@ -322,7 +330,7 @@
                         </div>
                       </Card>
                     </div>
-                      
+
                     </Col>
                   </div>
                 </TabPane>
@@ -524,9 +532,6 @@ export default {
     },
     //获取用户参与的项目列表
     getParticipatoryList(projectIds) {
-      projectIds.forEach(element => {
-        console.log(element);
-      });
       console.table("id是：" + projectIds);
       var count = projectIds.length;
       let participatoryProjectListTemp = [];
@@ -620,7 +625,7 @@ export default {
         .get("/GeoProblemSolving/project/delete?" + "projectId=" + pid)
         .then(res => {
           this.$store.commit("getUserInfo");
-          var newJoinedProjects =[]; 
+          var newJoinedProjects =[];
           var oldJoinedProjects=this.joinedProjectsList;
           for(var i=0;i<oldJoinedProjects.length;i++){
             if(oldJoinedProjects[i].projectId!=pid){

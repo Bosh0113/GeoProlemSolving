@@ -1387,12 +1387,6 @@ export default {
       //   mId +
       //   "-ConceptualModel") ;
     },
-    excel(){
-      // let mId = sessionStorage.getItem("moduleId");
-      // console.log("mid是"+ mId);
-      // window.location.href =
-      //   "../../../static/html/excelTool.html"
-    },
     createModuleSuccess(title) {
       this.$Notice.success({
         title: "Create Notification",
