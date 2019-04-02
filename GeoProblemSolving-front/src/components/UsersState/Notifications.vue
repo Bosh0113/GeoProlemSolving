@@ -280,6 +280,7 @@ export default {
         .then(res => {
           if (res.data == "Success") {
             this.$emit("readNotification");
+            this.$store.commit("getUserInfo");
             this.loadNotifications();
           } else {
             this.$Message.danger("update notification fail.");

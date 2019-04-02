@@ -24,7 +24,7 @@
   --loginContentColor: white;
   --loginFontColor: white;
   --loginTitleColor: #57a3f3;
-  width: 30%;
+  width: 60%;
   --loginBtnFontSize: 15px;
 }
 .login_title {
@@ -111,6 +111,8 @@
 </template>
 <script>
 import axios from "axios";
+import CryptoJS from "crypto-js";
+
 export default {
   components: {},
   computed: {
@@ -178,6 +180,13 @@ export default {
             localStorage.setItem("password",'');
             localStorage.setItem("statusRecord",false);
           }
+          // 对密码进行md5加密处理
+          var cipherText = CryptoJS.AES.encrypt(
+            this.formInline.password,
+            "secretkey123"
+          ).toString();
+          console.log("加密后的密文是：" + cipherText);
+          // md5加密结束
           this.axios
             .get(
               "/GeoProblemSolving/user/login" +

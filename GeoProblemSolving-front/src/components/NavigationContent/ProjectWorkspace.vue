@@ -108,6 +108,11 @@
   border: 1px solid lightgray;
   transition: all 1s;
 }
+.subProjectDesc{
+  text-indent:2em;
+  padding:10px;
+  word-break:break-all;
+}
 /* .member-panel:hover,
 .resource:hover {
   box-shadow: 1px 1px 2px 2px rgba(0, 0, 0, 0.2);
@@ -187,6 +192,7 @@
             <Col span="22" offset="1" style="margin-top:10px;background-color:white;">
               <Steps :current="order">
                 <Step title="start" icon="ios-home" @click.native="showDetail(0)" :order="0"></Step>
+                <!-- <Step title="tasks" icon="md-list"  @click.native="" :order="1"></Step> -->
                 <Step
                   v-for="(list,index) in moduleList"
                   :key="index+1"
@@ -337,7 +343,7 @@
           <div style="background-color:white;padding:20px">
             <h2 style="margin-bottom:5px">Description</h2>
             <hr style="margin-bottom:10px">
-            <div :style="{height:sidebarHeight-140+'px'}">{{subProjectInfo.description}}</div>
+            <div :style="{height:sidebarHeight-140+'px'}" class="subProjectDesc">{{subProjectInfo.description}}</div>
           </div>
           <div style="display:flex;align-items:center;justify-content:center;height:60px">
             <Button type="error" style="margin:auto" v-show="subProjectInfo.managerId == this.$store.getters.userId">Delete this sub-project ?</Button>
@@ -402,7 +408,11 @@
             <div style="width:45%;height:100%;float:left;background-color:white">
               <h2 style="width:100%;padding:10px 10px 0 10px">{{currentModule.title}}</h2>
               <hr>
-              <div style="width:100%;padding:10px">{{currentModule.description}}</div>
+              <div style="width:100%;padding:10px">
+                <span style="word-break: break-all;text-indent:2em;padding:10px">
+                  {{currentModule.description}}
+                </span>
+              </div>
             </div>
             <div
               style="width:50%;height:100%;float:right;border:1px solid lightgray;background-color:white;overflow-y:scroll"
@@ -470,12 +480,12 @@
                               @click="editOneTask(index,taskTodo)"
                               class="taskName"
                             >{{item.taskName}}</strong>
-                            <span
-                              style="float:right;margin-right:3px;cursor: pointer;color:gray;"
-                              @click="taskRemove(index,taskTodo)"
-                            >×</span>
+                            <span style="float:right;margin-right:3px;cursor: pointer;color:gray;"
+                              @click="taskRemove(index,taskTodo)">
+                              <Icon type="ios-trash" />
+                            </span>
                           </div>
-                          <span style="word-break:break-word;">{{item.description}}</span>
+                          <p style="word-break:break-word;padding:5px">{{item.description}}</p>
                         </Card>
                       </draggable>
                     </Card>
@@ -499,12 +509,17 @@
                               @click="editOneTask(index,taskDoing)"
                               class="taskName"
                             >{{item.taskName}}</strong>
+                            <span style="float:right;margin-right:3px;cursor: pointer;color:gray;"
+                              @click="taskRemove(index,taskDoing)">
+                              <Icon type="ios-trash" />
+                            </span>
+<!--
                             <span
                               style="float:right;margin-right:3px;cursor: pointer;color:gray;"
                               @click="taskRemove(index,taskDoing)"
-                            >×</span>
+                            >×</span> -->
                           </div>
-                          <span style="word-break:break-word;">{{item.description}}</span>
+                          <p style="word-break:break-word;padding:5px">{{item.description}}</p>
                         </Card>
                       </draggable>
                     </Card>
@@ -528,12 +543,12 @@
                               @click="editOneTask(index,taskDone)"
                               class="taskName"
                             >{{item.taskName}}</strong>
-                            <span
-                              style="float:right;margin-right:3px;cursor: pointer;color:gray;"
-                              @click="taskRemove(index,taskDone)"
-                            >×</span>
+                            <span style="float:right;margin-right:3px;cursor: pointer;color:gray;"
+                              @click="taskRemove(index,taskDone)">
+                              <Icon type="ios-trash" />
+                            </span>
                           </div>
-                          <span style="word-break:break-word;">{{item.description}}</span>
+                          <p style="word-break:break-word;padding:5px">{{item.description}}</p>
                         </Card>
                       </draggable>
                     </Card>
@@ -626,6 +641,8 @@
       title="Create task panel"
       @on-ok="createTask()"
       @on-cancel="cancel()"
+      ok-text="ok"
+      cancel-text="cancel"
       width="800px"
     >
       <div class="taskFormItem">
@@ -1442,7 +1459,7 @@ export default {
             replyNotice["recipientId"] = this.inviteList[i];// 改apply.content.userId
             replyNotice["type"] = "notice";
             replyNotice["content"] = {// 改
-              title: "Result for invitation",
+              title: "Join subProject",
               description:
                 "You have been invited by " + this.subProjectInfo.managerName +  " to join in the sub project: " +
                 this.subProjectInfo.title + " , and now you are a member in this sub project."
@@ -1492,8 +1509,7 @@ export default {
         });
     },
     //创建任务
-    createTaskModalShow() {
-      //定义一个控制创建任务模态框开启的函数
+    createTaskModalShow(){
       let taskDefult = {
         taskName: "",
         description: "",
@@ -1741,7 +1757,12 @@ export default {
         },
       });
       panel.resizeit('disable');
+    },
+    //task独立页面
+    goToTask(){
+      this.$router.push({name:"taskList"}) ;
     }
+
   }
 };
 </script>

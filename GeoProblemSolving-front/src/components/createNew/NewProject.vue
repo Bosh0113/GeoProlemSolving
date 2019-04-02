@@ -132,7 +132,7 @@ h1 {
           <Input
             v-model="inputTag"
             placeholder="Enter some tag to introduce the project"
-            style="width: 200px"
+            style="width: 400px"
             @keyup.enter.native="addTag(inputTag)"
           />
           <Button
@@ -142,7 +142,7 @@ h1 {
             @click="addTag(inputTag)"
             style="margin-left:2.5%"
           >Add Tag</Button>
-          <div style="margin-left:5%">
+          <div >
             <Tag
               color="primary"
               v-for="(item,index) in this.formInline.tagList"
@@ -176,12 +176,12 @@ h1 {
       </FormItem>
       <FormItem prop="introduction" label="introduction" :label-width="100">
         <div class="inline_style">
-            <Input v-model="formInline.introduction" type="textarea" placeholder="Enter introduction..." style="height:100%;width:100%"/>
+            <Input v-model="formInline.introduction" type="textarea" placeholder="Enter detailed introduction about this problem..." style="height:100%;width:100%"/>
         </div>
       </FormItem>
       <FormItem>
         <div class="inline_style">
-          <Button type="success" @click='createProject("formInline")' class="create">Create</Button>
+          <Button type="success" @click='createProject("formInline")' class="create" :disabled="clickForbidden">Create</Button>
         </div>
       </FormItem>
     </Form>
@@ -193,6 +193,8 @@ h1 {
 export default {
   data() {
     return {
+      // 控制按钮禁用的
+      clickForbidden:false,
       formInline: {
         title: "",
         category: "",
@@ -252,6 +254,7 @@ export default {
     createProject(name) {
       this.$refs[name].validate(valid => {
         if(valid){
+          this.clickForbidden = true;
           let createProjectForm = {};
           createProjectForm["category"] = this.formInline.category;
           createProjectForm["title"] = this.formInline.title;
@@ -314,9 +317,10 @@ export default {
         });
     },
     addTag(tag) {
-      this.formInline.tagList.push(tag);
-      this.inputTag = "";
-      // alert(111);
+      if(tag!=""){
+        this.formInline.tagList.push(tag);
+        this.inputTag = "";
+      }
     },
     deleteTag(index) {
       this.formInline.tagList.splice(index, 1);
@@ -350,7 +354,7 @@ export default {
     // 加入判断，如果未登录自动跳转登录页面
     if (!this.$store.getters.userState) {
       this.$router.push({ name: "Login" });
-    }
+    };
   }
 };
 </script>
