@@ -1728,13 +1728,13 @@ export default {
       if(type=="map"){
         toolURL = '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/map" style="width: 100%;height:100%"></iframe>';
       }else if(type=="chatroom"){
-        toolURL = '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/chat" style="width: 90%;height:90%"></iframe>';
+        toolURL = '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/chat" style="width: 100%;height:100%"></iframe>';
       }else if(type=="draw"){
-        toolURL = '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/draw" style="width: 90%;height:90%"></iframe>';
+        toolURL = '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/draw" style="width: 100%;height:100%"></iframe>';
       }else if(type=="chart"){
-        toolURL = '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/charts" style="width: 90%;height:90%"></iframe>';
+        toolURL = '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/charts" style="width: 100%;height:100%"></iframe>';
       }else if(type=="chat"){
-        toolURL = '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/chat" style="width: 90%;height:90%"></iframe>';
+        toolURL = '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/chat" style="width: 100%;height:100%"></iframe>';
       }
       var panel = jsPanel.create({
         theme: "primary",
@@ -1743,7 +1743,7 @@ export default {
         content: toolURL,
         disableOnMaximized: true,
         callback: function() {
-          this.content.style.padding = "20px";
+          // this.content.style.padding = "20px";
         },
       });
       panel.resizeit('disable');

@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @CrossOrigin(origins = "*",allowCredentials = "true")
 @RestController
@@ -30,5 +31,11 @@ public class ResourceController {
     public String deleteResource(@RequestParam("resourceId") String resourceId){
         ResourceDaoImpl resourceDao=new ResourceDaoImpl(mongoTemplate);
         return resourceDao.deleteResource("resourceId",resourceId);
+    }
+
+    @RequestMapping(value = "/operateZip", method = RequestMethod.GET)
+    public void getZipResource(HttpServletRequest request, HttpServletResponse response, @RequestParam("key") String key, @RequestParam("value") String value){
+        ResourceDaoImpl resourceDao=new ResourceDaoImpl(mongoTemplate);
+        resourceDao.getZipResource(request, response,key, value);
     }
 }

@@ -42,6 +42,7 @@ import * as socketApi from "./../../api/socket.js";
 import csv from "../../../static/js/jquery.csv.min.js";
 import jexcel from "../../../static/js/jquery.jexcel.js";
 import XLSX from "xlsx";
+import VCharts from "./../../utils/VCharts";
 export default {
   data() {
     return {
@@ -82,7 +83,8 @@ export default {
       // this.sidebarHeight = window.innerHeight - 100 + "px";
       $("#mytable").jexcel({
         data: this.testData,
-        minDimensions: [20, 20]
+        minDimensions: [20, 20],
+        onselection: this.selectData
       });
     },
     handleUpload(file) {
@@ -109,7 +111,7 @@ export default {
         .post("/GeoProblemSolving/resource/upload", formData)
         .then(res => {
           if (res.data != "Size over" && res.data.length > 0) {
-            let dataName = res.data[0];
+            let dataName = res.data[0].fileName;
 
             this.socket_content["dataName"] = dataName;
             this.socket_content["operate"] = "dataupload";
@@ -413,6 +415,7 @@ export default {
         content: "TestChat"
       };
       this.socketApi.sendSock(this.send_msg, this.getSocketConnect);
+      this.socket_content = {};
     }
   },
   beforeDestroy() {
