@@ -619,15 +619,8 @@ export default {
     cancel() {
       this.$Message.info("cancel");
     },
-
-    //更改个人信息的函数
-    changeProfile() {},
     editModalShow() {
       this.editProfileModal = true;
-    },
-    //不用该方法的话就使用placeholder
-    useDefault() {
-      alert(111);
     },
     //处理修改用户头像信息相关的函数
     uploadPhoto(e) {
@@ -640,14 +633,16 @@ export default {
       if (filesize > 2101440) {
         // 图片大于2MB
         this.$Message.error("size > 2MB");
+      }else{
+        var reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = e => {
+          // 读取到的图片base64 数据编码 将此编码字符串传给后台即可
+          imgcode = e.target.result;
+          this.$store.commit("uploadAvatar", imgcode);
+        };
       }
-      var reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = e => {
-        // 读取到的图片base64 数据编码 将此编码字符串传给后台即可
-        imgcode = e.target.result;
-        this.$store.commit("uploadAvatar", imgcode);
-      };
+      
     },
     handleView() {
       this.visible = true;
