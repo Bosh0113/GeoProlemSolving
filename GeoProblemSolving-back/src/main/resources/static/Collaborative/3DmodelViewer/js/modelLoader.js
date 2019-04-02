@@ -1,38 +1,49 @@
-var model = null, material = null, texture = [];
+var modeldata = null;
 var modelType = "";
-var modelURL = "", materialURL = "";
+
 
 var wsTModel = null;
 var socket_content = null;
 
 var reader = new FileReader();
 
-$("#modelPath").change(function () {
+$("#modelType").change(function () {
 
-    model = document.getElementById("modelPath").files[0];
-
-    modelType = model.name.split('.').pop().toLowerCase();
+    var typeValue = $("#modelType").val();
+    switch (typeValue) {
+        case "*.obj model" :
+            modelType = "obj";
+            break;
+        case "*.stl model" :
+            modelType = "stl";
+            break;
+        case "*.json model" :
+            modelType = "json";
+            break;
+        case "*.3ds model" :
+            modelType = "3ds";
+            break;
+        case "*.x model" :
+            modelType = "x";
+            break;
+    }
 });
 
-$("#materialPath").change(function () {
+$("#modelFile").change(function () {
 
-
-    material = document.getElementById("materialPath").files[0];
+    modeldata = $("#modelFile")[0].files[0];
 });
 
-$("#texturePath").change(function () {
-
-    texture = document.getElementById("texturePath").files;
-
-});
 
 function uploadFun() {
 
+    sessionStorage.setItem("projectId","NWU4ZDA2ZjktZTk2OC00YjkzLWI1NTMtZDNjM2IxMDQ1N2Q2OTI=");
+    sessionStorage.setItem("subprojectId","21aee7ab-d004-4203-a687-64076e4d93f5");
+    sessionStorage.setItem("moduleId","f99e1aa9-311d-4e8f-9f19-de479f4d9d4a");
+
     var formData = new FormData();
-    var file = texture;
-    file.unshift(model);
-    file.unshift(material);
-    formData.append("file", file);
+    var userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
+    formData.append("file", modeldata);
     formData.append("description", "3D viewer tool");
     formData.append("type", "data");
     formData.append("uploaderId", userInfo.userId);
@@ -48,56 +59,57 @@ function uploadFun() {
         type: "POST",
         url: "/GeoProblemSolving/resource/upload",
         data: formData,
-        // enctype: text / plain,
-        cache: false,         //不设置缓存
+        cache: false,        //不设置缓存
         processData: false,  // 不处理数据
         contentType: false,  // 不设置内容类型
         success: function (data) {
-
-            socket_content = {"from":[],"ModelType":[],"modelDataName":[],"MaterialUrl":[]};
             if (data != "Size over" && data.length > 0) {
 
-                for(var i = 0;i <data.length;i++){
-
-                }
-
-
-                var dataName = data[0];
-                socket_content["dataName"] = dataName;
-                socket_content["operate"] = "dataupload";
-                wsTModel.send(socket_content);
+                socket_content= {
+                    "dataName":data[0].fileName,
+                    "dataFiles":data[0].zipFiles,
+                    "modelType":modelType,
+                    "operate":"dataupload"
+                };
+                wsTModel.send(JSON.stringify(socket_content));
 
 
-
+                // 加载模型
+                addModelFun(data[0].fileName, data[0].zipFiles);
             }
-
-
-            var urlJson = JSON.parse(path);
-            modelURL = urlJson.model;
-            materialURL = urlJson.material;
-
-
-            //定义路径Json字符串
-            var urlJson = {"from":[],"ModelType":[],"ModelUrl":[],"MaterialUrl":[]};
-            // urlJson.ModelType.push(modelType.replace(/localhost/g,"223.2.46.117"));
-            // urlJson.ModelUrl.push(modelURL.replace(/localhost/g,"223.2.46.117"));
-            // urlJson.MaterialUrl.push(materialURL.replace(/localhost/g,"223.2.46.117"));
-
-            //发送路径
-            wsTModel.send(JSON.stringify(urlJson));
         },
         error: function () {
             alert("fail");
         }
     });
 
+
 }
 
 $(document).ready(function() {
 
+    var typeValue = $("#modelType").val();
+    switch (typeValue) {
+        case "*.obj model" :
+            modelType = "obj";
+            break;
+        case "*.stl model" :
+            modelType = "stl";
+            break;
+        case "*.json model" :
+            modelType = "json";
+            break;
+        case "*.3ds model" :
+            modelType = "3ds";
+            break;
+        case "*.x model" :
+            modelType = "x";
+            break;
+    }
+
+    var roomId = sessionStorage.getItem("moduleId");
     if (WebSocket) {
-        wsTModel = new WebSocket("ws://localhost:8081/GeoProblemSolving/3DviewerTool/");
-        wsTModel.binaryType = "arraybuffer";
+        wsTModel = new WebSocket("ws://localhost:8081/GeoProblemSolving/3DviewerServer/"+roomId);
     }
     else {
         alert("浏览器不支持websocket！");
@@ -107,52 +119,207 @@ $(document).ready(function() {
     };
 
     wsTModel.onmessage = function (ev) {
-        var urlReceived = JSON.parse(ev.data);
 
-        //........
-        if(localStorage.getItem("username") !== urlReceived.from[0]){
+        var msgJson = JSON.parse(ev.data);
 
-            modelType = urlReceived.ModelType[0];
-            modelURL = urlReceived.ModelUrl[0];
-            materialURL = urlReceived.MaterialUrl[0];
+        if(msgJson.operate === "dataupload") {
+            var files = msgJson.dataFiles;
+            var fileName = msgJson.dataName;
+            modelType = msgJson.modelType;
+
+            addModelFun(fileName, files);
         }
-
-        addModelFun();
-    }
+    };
+    wsTModel.onclose = function () {
+    };
+    wsTModel.onerror = function () {
+    };
 });
 
-var actions = [];
-var Models = [];
-var manager;
-
-function addModelFun() {
+function addModelFun(fileName, files) {
 
     if (modelType !== "") {
 
         if (modelType === "3ds") {
-            loadTDSmodel();
+            loadTDSmodel(fileName, files);
         }
         else if (modelType === "obj") {
-            loadOBJmodel();
+            loadOBJmodel(fileName, files);
         }
         else if (modelType === "x") {
-            loadXmodel();
+            loadXmodel(fileName, files);
         }
         else if (modelType === "stl") {
-            loadSTLmodel();
+            loadSTLmodel(fileName, files);
+        }
+        else if (modelType === "json") {
+            loadJSONmodel(fileName, files);
         }
         else {
             alert("The type of " + modelType + " is not supported!");
         }
-        // editor.loader.loadFile(model);
     }
     else {
         alert("Please input model!");
     }
+}
 
-    if(materialURL === "" || modelURL === "") {
-        alert("Please upload model!");
+function loadTDSmodel(fileName, files) {
+
+    var textureName = "", modelName = "";
+    for(var i = 0; i< files.length; i++){
+        var type = files[i].substring(files[i].lastIndexOf(".") + 1);
+        if(type === "3ds"){
+            modelName = files[i];
+        } else if (type === "jpg" || type === "png") {
+            textureName = files[i];
+        }
     }
+    var filePath = "/GeoProblemSolving/resource/upload/" + fileName;
+
+    if(modelName !== "") {
+        var texture;
+        if (textureName !== "") {
+
+            var loader = new THREE.TextureLoader();
+            texture = loader.load(filePath + '/' +textureName);
+
+        }
+        var loader = new THREE.TDSLoader();
+        loader.setResourcePath(filePath + '/');
+        loader.load(filePath + '/' + modelName, function (object) {
+            object.traverse(function (child) {
+                if (child instanceof THREE.Mesh) {
+                    child.material.normalMap = texture;
+                }
+            });
+            scene.add(object);
+        });
+    }
+
+}
+
+function loadSTLmodel(fileName, files) {
+
+    var modelName = "";
+    for(var i = 0; i< files.length; i++){
+        var type = files[i].substring(files[i].lastIndexOf(".") + 1);
+        if(type === "stl"){
+            modelName = files[i];
+        }
+    }
+    var filePath = "/GeoProblemSolving/resource/upload/" + fileName;
+
+    if(modelName !== "") {
+        var loader = new THREE.STLLoader();
+        loader.load(filePath + "/" +modelName, function (geometry) {
+            //创建纹理
+            var mat = new THREE.MeshLambertMaterial({color: 0xCCCCCC});
+            var mesh = new THREE.Mesh(geometry, mat);
+            mesh.rotation.x = -0.5 * Math.PI; //将模型摆正
+            geometry.center(); //居中显示
+            scene.add(mesh);
+        })
+    }
+
+}
+
+function loadOBJmodel(fileName, files) {
+
+    var mtlName = "", modelName = "";
+    for(var i = 0; i< files.length; i++){
+        var type = files[i].substring(files[i].lastIndexOf(".") + 1);
+        if(type === "obj"){
+            modelName = files[i];
+        } else if (type === "mtl") {
+            mtlName = files[i];
+        }
+    }
+    var filePath = "/GeoProblemSolving/resource/operateZip?key=" + fileName+"&value=";
+
+    if(modelName !== "") {
+        if (mtlName !== "") {
+
+            var mtlLoader = new THREE.MTLLoader();
+            mtlLoader.setPath(filePath);
+            mtlLoader.load(mtlName, function (materials) {
+
+                materials.preload();
+                materials.transparent = true;
+
+                var objLoader = new THREE.OBJLoader();
+                objLoader.setMaterials(materials);
+                objLoader.setPath(filePath);
+                objLoader.load(modelName, function (object) {
+
+                    scene.add(object);
+
+                }, onProgress, onError);
+
+            });
+        }
+        else {
+            var loader = new THREE.OBJLoader();
+            loader.load(filePath + "/" +modelName, function (obj) {
+                var material = new THREE.MeshLambertMaterial({color: 0xCCCCCC});
+                obj.traverse(function (child) {
+                    if (child instanceof THREE.Mesh) {
+                        // child.material.side = THREE.DoubleSide;
+                        child.material = material;
+                    }
+                });
+                scene.add(obj);
+            });
+        }
+    }
+}
+
+function loadJSONmodel(fileName, files) {
+
+    var modelName = "";
+    for(var i = 0; i< files.length; i++){
+        var type = files[i].substring(files[i].lastIndexOf(".") + 1);
+        if(type === "json"){
+            modelName = files[i];
+        }
+    }
+    var filePath = "/GeoProblemSolving/resource/upload/" + fileName;
+
+    if(modelName !== "") {
+        var loader = new THREE.JSONLoader();
+        loader.load( filePath + "/" +modelName, function( geometry, materials ) {
+
+            materials[0].shading = THREE.FlatShading;
+            var mesh = new THREE.Mesh( geometry, new THREE.MultiMaterial( materials ) );
+            scene.add( mesh );
+        });
+    }
+
+}
+
+function loadXmodel(fileName, files) {
+
+    var modelName = "";
+    for(var i = 0; i< files.length; i++){
+        var type = files[i].substring(files[i].lastIndexOf(".") + 1);
+        if(type === "x"){
+            modelName = files[i];
+        }
+    }
+    var filePath = "/GeoProblemSolving/resource/upload/" + fileName;
+
+    var manager = new THREE.LoadingManager();
+    var Texloader = new THREE.TextureLoader();
+    var loader = new THREE.XLoader(manager, Texloader);
+
+    var Models = [];
+    loader.load([filePath + '/' +modelName], function (object) {
+        for (var i = 0; i < object.models.length; i++) {
+            Models.push(object.models[i]);
+            scene.add(Models[i]);
+        }
+        object = null;
+    }, onProgress, onError);
 }
 
 var onProgress = function (xhr) {
@@ -169,170 +336,3 @@ var onProgress = function (xhr) {
 var onError = function (xhr) {
 };
 
-var onLoad = function (object) {
-    for (var i = 0; i < object.models.length; i++) {
-
-        var model = object.models[i];
-
-        model.scale.x *= -1;
-
-        Models.push(model);
-
-    }
-    //
-    // loadAnimation("", 0, function () {
-    //
-    //     scene.add(Models[0]);
-    //
-    //     if (Models[0] instanceof THREE.SkinnedMesh) {
-    //
-    //         skeletonHelper = new THREE.SkeletonHelper(Models[0]);
-    //         scene.add(skeletonHelper);
-    //
-    //     }
-    //
-    //     actions[0]['stand'].play();
-    //
-    // });
-    //
-    // object = null;
-};
-
-function loadTDSmodel() {
-    var loader = new THREE.TDSLoader();
-
-}
-
-function loadSTLmodel() {
-
-    reader.addEventListener('load', function (event) {
-
-        var contents = event.target.result;
-
-        var object = new THREE.STLLoader().parse(contents);
-        // object.name = filename;
-
-        var material = new THREE.MeshPhongMaterial();
-
-        var mesh = new THREE.Mesh(object, material);
-
-        scene.add(mesh);
-
-    }, false);
-    reader.readAsText(model);
-
-}
-
-function loadOBJmodel() {
-
-    // var loader = new THREE.OBJLoader();
-    // loader.load(modelURL, function (obj) {
-    //     obj.traverse(function (child) {
-    //         if (child instanceof THREE.Mesh) {
-    //             child.material.side = THREE.DoubleSide;
-    //         }
-    //     });
-    //     scene.add(obj);
-    // });
-
-    var mtlLoader = new THREE.MTLLoader();
-    var index = materialURL.lastIndexOf('/');
-    var mtlPath = materialURL.substring(0, index + 1);
-    var mtlName = materialURL.substring(index + 1);
-    mtlLoader.setPath(mtlPath);
-    mtlLoader.load(mtlName, function (materials) {
-
-        materials.preload();
-        materials.transparent = true;
-
-        var objLoader = new THREE.OBJLoader();
-        objLoader.setMaterials(materials);
-        index = modelURL.lastIndexOf('/');
-        var objPath = modelURL.substring(0, index + 1);
-        var objName = modelURL.substring(index + 1);
-        objLoader.setPath(objPath);
-        objLoader.load(objName, function (object) {
-
-            // object.rotateX(-Math.PI/2);
-            scene.add(object);
-
-        },onProgress,onError);
-
-    });
-}
-
-function loadXmodel() {
-
-    // model loading
-
-    manager = new THREE.LoadingManager();
-    manager.onProgress = function (item, loaded, total) {
-
-        console.log(item, loaded, total);
-
-    };
-
-    var Texloader = new THREE.TextureLoader();
-    var loader = new THREE.XLoader(manager, Texloader);
-
-    reader.addEventListener('load', function (event) {
-
-        var contents = event.target.result;
-
-        var object = loader._parse(contents, onLoad);
-        // object.name = filename;
-
-        scene.add(object);
-
-    }, false);
-    reader.readAsText(model);
-}
-
-function loadAnimation(animeName, modelId, _callback) {
-
-    if (actions[modelId][animeName]) {
-
-        if (_callback) {
-
-            _callback();
-
-        }
-
-    } else {
-
-        var loader2 = new THREE.XLoader(manager, Texloader);
-        loader2.load(['models/xfile/' + animeName + '.x', {putPos: false, putScl: false}], function () {
-
-            // !! important!
-            // associate divided model and animation.
-            loader2.assignAnimation(Models[modelId]);
-            if (!animates[modelId]) {
-
-                animates[modelId] = Models[modelId].animationMixer;
-
-            }
-
-            actions[modelId][animeName] = Models[modelId].animationMixer.clipAction(animeName);
-
-            if (animeName == 'stand') {
-
-                actions[modelId][animeName].setLoop(THREE.LoopOnce);
-
-            }
-
-            actions[modelId][animeName].clampWhenFinished = true;
-
-            if (_callback) {
-
-                _callback();
-                return;
-
-            }
-
-            actions[modelId][animeName].play();
-
-        }, onProgress, onError);
-
-    }
-
-}

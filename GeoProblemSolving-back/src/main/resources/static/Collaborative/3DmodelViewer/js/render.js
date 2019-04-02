@@ -46,7 +46,7 @@ function initScene() {
 }
 
 function initCamera() {
-    camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 400);
+    camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 2000);
     camera.position.z = 100;
     camera.position.y = 50;
     camera.lookAt(new THREE.Vector3(0, 0, 0));
@@ -64,7 +64,7 @@ function initOrbitCtrl(){
     controls.screenSpacePanning = false;
 
     controls.minDistance = 10;
-    controls.maxDistance = 200;
+    controls.maxDistance = 2000;
 
     controls.maxPolarAngle = Math.PI;
 

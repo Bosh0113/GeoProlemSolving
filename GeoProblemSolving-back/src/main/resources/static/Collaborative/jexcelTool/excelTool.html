@@ -101,7 +101,7 @@
 
             <el-row>
                 <el-col :span="2">
-                    <el-upload action="http://172.21.213.235:8060/geodata?type=file" :on-success="uploadFileSuccess"
+                    <el-upload action="-" :before-upload="beforeUpload"
                                multiple="false"
                                ref="upload" limit="1" name="myfile">
                         <el-button>open</el-button>
@@ -226,17 +226,54 @@
                 this.outputHas = false;
                 this.activeTab = "tablePanel";
             },
-            uploadFileSuccess(response, file, fileList) {
-                this.$refs.upload.clearFiles();
-                var id = response.data;
-                this.uploadData(file.name, id);
+            beforeUpload(file){
+                if (!/\.(xls|xlsx|csv)$/.test(file.name.toLowerCase())) {
+                    this.$Message.error("上传格式不正确，请上传xls或者xlsx格式");
+                    return false;
+                }
+                this.uploadData(file.name);
 
-                var socket_content = {
-                    type: "upload",
-                    DataId: id,
-                    fileName: file.name
+                //上传数据
+                var formData = new FormData();
+                var userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
+                formData.append("file", file);
+                formData.append("description", "Data chart tool");
+                formData.append("type", "data");
+                formData.append("uploaderId", userInfo.userId);
+                formData.append("belong", userInfo.userName);
+                var scopeObject = {
+                    projectId: sessionStorage.getItem("projectId"),
+                    subprojectId: sessionStorage.getItem("subprojectId"),
+                    moduleId: sessionStorage.getItem("moduleId")
                 };
-                this.excelSocket.send(JSON.stringify(socket_content));
+                formData.append("scope", JSON.stringify(scopeObject));
+
+                $.ajax({
+                    type: "POST",
+                    url: "/GeoProblemSolving/resource/upload",
+                    data: formData,
+                    cache: false,        //不设置缓存
+                    processData: false,  // 不处理数据
+                    contentType: false,  // 不设置内容类型
+                    success: function (data) {
+                        if (data != "Size over" && data.length > 0) {
+
+                            this.$refs.upload.clearFiles();
+                            var dataName = data[0].fileName;
+
+                            var socket_content = {
+                                type: "upload",
+                                fileName: dataName
+                            };
+                            this.excelSocket.send(JSON.stringify(socket_content));
+
+                        }
+                    },
+                    error: function () {
+                        alert("fail");
+                    }
+                });
+                return false;
             },
             onopen() {
                 console.log("TableSocket连接成功！");
@@ -282,12 +319,12 @@
             removeTimer() {
                 clearInterval(this.timer);
             },
-            uploadData(filename, id){
+            uploadData(name){
                 var inThis = this;
-                if (/\S*.csv/.test(filename)) {
+                if (/\S*.csv/.test(name)) {
                     $("#tablePanel").jexcel({
                         // Full CSV URL
-                        csv: "http://172.21.213.235:8060/geodata/" + id,
+                        csv: "/GeoProblemSolving/resource/upload/" + name,
                         // // Use the first row of your CSV as the headers
                         csvHeaders: true,
                         // Headers
@@ -314,7 +351,7 @@
                 else if (/\S*.xls/.test(filename) || /\S*.xlsx/.test(filename)) {
                     // 获取数据
                     var xhr = new XMLHttpRequest();
-                    xhr.open("GET", "http://172.21.213.235:8060/geodata/" + id, true);
+                    xhr.open("GET", "/GeoProblemSolving/resource/upload/" + name, true);
                     xhr.responseType = 'blob';
                     xhr.onload = function(e) {
                         if (this.status == 200) {
@@ -377,7 +414,7 @@
                     xhr.send();
                 }
             },
-            insertrow(obj, mixed, rowNumber) {
+            insertrow(obj, mixed, rowNumber){
                 if (!this.boolCollaborate) {
                     var socket_content = {
                         type: "insert_row",
@@ -388,7 +425,7 @@
                 }
                 this.boolCollaborate = false;
             },
-            insertcol(obj, mixed, properties, columnNumber) {
+            insertcol(obj, mixed, properties, columnNumber){
                 if (!this.boolCollaborate) {
                     var socket_content = {
                         type: "insert_col",
@@ -455,11 +492,11 @@
                 }
                 this.boolCollaborate = false;
             },
-            getSocketContent(data) {
+            getSocketContent(data){
                 this.boolCollaborate = true;
                 switch (data.type) {
                     case "upload" : {
-                        this.uploadData(data.fileName, data.DataId);
+                        this.uploadData(data.fileName);
                         break;
                     }
                     case "insert_row" : {

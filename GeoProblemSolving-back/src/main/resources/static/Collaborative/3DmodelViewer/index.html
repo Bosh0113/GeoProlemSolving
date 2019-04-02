@@ -40,10 +40,20 @@
                 </button>
             </div>
             <div class="modal-body">
+                <div style="margin-bottom: 20px">
+                    <label class="Uinfo">Model type:</label>
+                    <select class="form-control" id="modelType">
+                        <option>*.obj model</option>
+                        <option>*.stl model</option>
+                        <option>*.json model</option>
+                        <!--<option>*.3ds model</option>-->
+                        <!--<option>*.x model</option>-->
+                    </select>
+                </div>
                 <form>
                     <div class="form-group">
-                        <label class="Uinfo">Model (*.zip)</label>
-                        <input id="modelPath" type="file" class="model file" data-show-preview="false" data-show-upload="false">
+                        <label class="Uinfo">Model data (*.zip)</label>
+                        <input id="modelFile" type="file" accept="application/zip" class="model file" data-show-preview="false" data-show-upload="false">
                     </div>
                 </form>
             </div>
@@ -61,13 +71,12 @@
 <div id="canvas" style="float: left"></div>
 </body>
 <script src="js/jquery-1.9.1.js"></script>
-<!-- <script src="js/popper.js"></script> -->
+ <script src="js/popper.js"></script>
 <script src="js/bootstrap.min.js"></script>
 <script src="js/fileinput.min.js"></script>
 <!--<script src="js/bootstrap-select.min.js"></script>-->
 <script src="js/three.js"></script>
 <script src="js/controls/OrbitControls.js"></script>
-<script src="js/loaders/OBJLoader.js"></script>
 <!--<script src="js/Projector.js"></script>-->
 <!--<script src="js/CanvasRenderer.js"></script>-->
 <script src="js/Detector.js"></script>
