@@ -171,7 +171,7 @@
         <Card>
           <p
             slot="title"
-            style="height:40px;line-height:40px;font-size:20px;"
+            style="height:40px;line-height:40px;font-size:20px;display: inline-block;cursor: pointer;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;max-width: 50%;"
           >{{subProjectInfo.title}}</p>
           <div
             slot="extra"
@@ -407,7 +407,7 @@
             style="margin-bottom:20px;margin-left:50px;"
           >
             <div style="width:45%;height:100%;float:left;background-color:white">
-              <h2 style="width:100%;padding:10px 10px 0 10px">{{currentModule.title}}</h2>
+              <h2 style="width:100%;padding:10px 10px 0 10px;display: inline-block;cursor: pointer;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;max-width: 80%;">{{currentModule.title}}</h2>
               <hr>
               <div style="width:100%;padding:10px">
                 <span style="word-break: break-all;text-indent:2em;padding:10px">
@@ -790,6 +790,11 @@ import Avatar from "vue-avatar";
 export default {
   updated() {
     $(".userAvatar sup").css("margin", "15px 15px 0 0");
+    $(".ivu-steps-title").css("cursor", "pointer");
+    $(".ivu-steps-title").css("overflow", "hidden");
+    $(".ivu-steps-title").css("white-space", "nowrap");
+    $(".ivu-steps-title").css("text-overflow", "ellipsis");
+    $(".ivu-steps-title").css("max-width", "120px");
   },
   components: {
     VueFlowy,
@@ -892,7 +897,6 @@ export default {
   mounted() {
     window.addEventListener("resize", this.initSize);
     this.getAllModules();
-    // this.inquiryTask();
   },
   // add by mzy for navigation guards
   beforeRouteEnter: (to, from, next) => {

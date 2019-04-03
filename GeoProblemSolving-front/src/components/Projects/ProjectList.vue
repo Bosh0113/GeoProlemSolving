@@ -81,7 +81,7 @@ img {
               style="margin-right:2.5%;font-size:15px;height:40px"
               icon="md-person-add"
               class="btnJoin"
-              @click="joinModal=true"
+              @click="joinModalShow"
             >Join</Button>
 
           </div>
@@ -356,6 +356,14 @@ export default {
       }
     },
     //项目成员的id和name都要加进去
+    joinModalShow(){
+      if(this.$store.getters.userId!=""){
+        this.joinModal=true;
+      }
+      else{
+        this.$Message.info("please login.");
+      }
+    },
     joinProject() {
       var projectId=this.joinProjectId;
       this.axios

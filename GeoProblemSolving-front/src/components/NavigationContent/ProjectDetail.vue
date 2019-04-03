@@ -73,8 +73,12 @@
 }
 .subProjectDescription {
   text-indent: 25px;
-  min-height: 60px;
-  word-break: break-all;
+    height: 100px;
+    word-break: break-all;
+    display: -webkit-box;
+    -webkit-box-orient: block-axis;
+    -webkit-line-clamp: 5;
+    overflow: hidden;
 }
 .subProjectCreate button {
   height: 40px;
@@ -418,7 +422,7 @@
                             </span>
                           </div>
                           <div style="height:30px;margin-top:10px;align-items:center;display:flex;justify-content:flex-start">
-                            <Icon type="md-clock" :size="20"/>Creation Time
+                            <Icon type="md-clock" :size="20"/>Created Time
                             <span style="height:20px;margin-left:5%">
                               {{subProject.createTime.split(' ')[0]}}
                             </span>
@@ -1102,7 +1106,6 @@ export default {
             //改变this的指向，此时this需要赋值给其他变量
             that.subProjectList = res.data;
             that.identity(that.subProjectList);
-            that.cutString(that.subProjectList, 200);
           }
         })
         .catch(err => {
@@ -1200,13 +1203,6 @@ export default {
     },
     show(index) {
       window.open(this.projectResourceList[index].pathURL);
-    },
-
-    cutString(data, len) {
-      for (var i = 0; i < data.length; i++) {
-        data[i].description = data[i].description.substring(0, len) + "...";
-      }
-      return data;
     },
     gotoPersonalPage(id) {
       // console.log({ id });
