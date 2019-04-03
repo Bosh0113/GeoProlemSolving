@@ -805,6 +805,7 @@ export default {
       // chart适用
       chart: new FlowChart(),
       //现在点击的module
+      foreModuleId: "",
       currentModule: {},
       //typeList是选择模块种类的列表，select从这里渲染
       typeList: [
@@ -1033,9 +1034,8 @@ export default {
       }
     },
     showDetail(item) {
-      this.closeModuleSocket();
-
       if (item <= 0) {
+        this.closeModuleSocket();
         this.order = item;
         this.currentModuleIndex = item - 1;
       } else {
@@ -1043,10 +1043,15 @@ export default {
         this.currentModule = this.moduleList[this.currentModuleIndex];
         sessionStorage.setItem("moduleId", this.currentModule.moduleId);
         sessionStorage.setItem("moduleName", this.currentModule.title);
-        this.inquiryTask();
-        this.order = item;
-        this.openModuleSocket(this.currentModule.moduleId);
-        this.olParticipants = [];
+
+        if (this.currentModule.moduleId != this.foreModuleId) {
+          this.closeModuleSocket();
+          this.foreModuleId = this.currentModule.moduleId;
+          this.inquiryTask();
+          this.order = item;
+          this.openModuleSocket(this.currentModule.moduleId);
+          this.olParticipants = [];
+        }
       }
     },
     closeModuleSocket() {
@@ -1264,10 +1269,10 @@ export default {
         .then(res => {
           if (res.data != "None") {
             this.moduleList = res.data;
-            this.currentModule = this.moduleList[0];
-            if (this.currentModule != "") {
-              this.inquiryTask();
-            }
+            // this.currentModule = this.moduleList[0];
+            // if (this.currentModule != "") {
+            //   this.inquiryTask();
+            // }
             // init allRecords
             for (let i = 0; i < this.moduleList.length; i++) {
               let records = [];
@@ -1775,7 +1780,7 @@ export default {
       var panel = jsPanel.create({
         theme: "primary",
         headerTitle: "Tools",
-        contentSize: "800 800",
+        contentSize: "1000 600",
         content: toolURL,
         disableOnMaximized: true
       });
