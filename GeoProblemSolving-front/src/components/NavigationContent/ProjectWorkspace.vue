@@ -1507,11 +1507,12 @@ export default {
                   this.$emit("sendNotice", this.inviteList[i]);// 改apply.content.userId
                 } else {
                   this.$Message.danger("reply fail.");
-                });
+                }
               // this.$emit("sendNotice", this.subProjectInfo.managerId);
               //发给子项目的管理者
-            }
+            });
           }
+        }
         });
       }
       this.init();
@@ -1801,7 +1802,5 @@ export default {
         disableOnMaximized: true
       }
     }
-
-  }
 };
 </script>
