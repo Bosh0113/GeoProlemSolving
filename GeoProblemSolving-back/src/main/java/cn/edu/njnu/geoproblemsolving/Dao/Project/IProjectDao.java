@@ -11,7 +11,7 @@ public interface IProjectDao {
 
     void deleteProject(String key,String value);
 
-    String updateProject(HttpServletRequest request);
+    Object updateProject(HttpServletRequest request);
 
     Object joinProject(String projectId,String userId);
 

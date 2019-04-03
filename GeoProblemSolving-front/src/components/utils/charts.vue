@@ -354,7 +354,7 @@ export default {
       let socketData = data;
 
       if (socketData.from === "Test") {
-        console.log(socketData.content);
+         
       } else if (socketData.type === "members") {
       } else {
         if (socketData.operate === "visualize") {

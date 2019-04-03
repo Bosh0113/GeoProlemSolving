@@ -40,7 +40,7 @@ export default {
       showdata(){
         this.axios.get('/users')
         .then((res) =>{
-          console.log(res.data.data);
+           
           this.datalist2 = res.data.data;
           this.dataCount = this.datalist2.length
           if(this.dataCount<this.pageSize){

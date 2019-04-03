@@ -963,13 +963,13 @@ export default {
       SubProject["title"] = this.subProjectTitle;
       SubProject["projectId"] = this.currentProjectDetail.projectId;
       SubProject["managerId"] = this.$store.getters.userId;
-      console.log(SubProject);
+       
       this.axios
         .post("/GeoProblemSolving/subProject/create", SubProject)
         .then(res => {
           if (res.data != "Fail") {
             this.$Message.info("create success");
-            // console.log(res.data);
+             
             this.subProjectTitle = "";
             this.subProjectDescription = "";
             this.getAllSubProject();
@@ -995,7 +995,6 @@ export default {
         this.inviteEmailList.push(email);
         // 还剩下一个验证邮箱的东西没有写
         this.inputEmail = "";
-        console.log("邀请的成员邮箱数组如下:" + this.inviteEmailList);
       }
     },
     delEmail(index) {
@@ -1010,7 +1009,7 @@ export default {
       emailFormBody["recipient"] = this.inviteEmailList.toString();
       emailFormBody["mailTitle"] = this.emailTitle;
       emailFormBody["mailContent"] = this.emailContent;
-      console.log(emailFormBody);
+       
       this.axios
         .post("/GeoProblemSolving/email/send", emailFormBody)
         .then(res => {
@@ -1030,7 +1029,7 @@ export default {
             this.newManagerId
         )
         .then(res => {
-          console.log(res.data);
+           
           this.getAllSubProject();
         })
         .catch(err => {
@@ -1042,7 +1041,7 @@ export default {
       this.editSubProjectModal = true;
       this.subProjectTitleEdit = this.subProjectList[index].title;
       this.subProjectDescriptionEdit = this.subProjectList[index].description;
-      // console.log(this.subProjectList[editSubProjectindex].projectId);
+       
     },
     editSubProject() {
       this.editSubProjectModal = false;
@@ -1053,11 +1052,11 @@ export default {
       );
       obj.append("title", this.subProjectTitleEdit);
       obj.append("description", this.subProjectDescriptionEdit);
-      // console.log(obj.get("title"));
+       
       this.axios
         .post("/GeoProblemSolving/subProject/update", obj)
         .then(res => {
-          console.log(res.data);
+           
           this.getAllSubProject();
         })
         .catch(err => {
@@ -1076,7 +1075,7 @@ export default {
             this.subProjectList[this.editSubProjectindex].subProjectId
         )
         .then(res => {
-          console.log(res.data);
+           
           this.getAllSubProject();
         })
         .catch(err => {
@@ -1133,7 +1132,7 @@ export default {
     },
     getFile(event) {
       this.file = event.target.files[0];
-      // console.log(this.file);
+       
     },
     //上传文件
     submitFile() {
@@ -1169,7 +1168,7 @@ export default {
             this.getAllResource();
             // 创建一个函数根据pid去后台查询该项目下的资源
           }
-          // console.log(res.data);
+           
         })
         .catch(err => {});
     },
@@ -1227,8 +1226,6 @@ export default {
       this.editDescription = editProjectInfo.description;
       this.editType = editProjectInfo.category;
       this.editTags = editProjectInfo["tag"].split(',');
-      // console.log(Array.from(this.editTags.split(',')));
-      // console.log("权限是：" + editProjectInfo.privacy);
       this.editPrivacy = editProjectInfo.privacy;
       this.editProjectId = editProjectInfo.projectId;
     },
@@ -1247,10 +1244,14 @@ export default {
       this.axios
         .post("/GeoProblemSolving/project/update ", projectEditForm)
         .then(res => {
-          // console.log(res.data);
-          // alert(res.data);
-          this.getProjectDetail();
-          // this.getManagerProjectList();
+          if(res.data!="Fail"){
+            let projectInfo = data[0];
+            projectInfo.isManager=this.managerIdentity(projectInfo.managerId);
+            projectInfo.isMember=this.memberIdentity(projectInfo.members);
+            this.currentProjectDetail = projectInfo;
+            this.$store.commit("setProjectInfo", projectInfo);
+            this.updateRelatedInfo();
+          }
         })
         .catch(err => {
           console.log(err.data);
@@ -1327,7 +1328,7 @@ export default {
       // let selectProjectId = this.userManagerProjectList[
       //   this.DelelteProjectIndex
       // ].projectId;
-      // console.log(this.currentProjectDetail.projectId);
+       
       this.axios
         .get(
           "/GeoProblemSolving/project/delete?" +
@@ -1347,7 +1348,7 @@ export default {
     },
     joinSubProject(project){
       // alert(id);
-      console.table(project);
+       
       let joinSubPForm = {};
       joinSubPForm["recipientId"] = project.managerId;
       joinSubPForm["type"] = "apply";

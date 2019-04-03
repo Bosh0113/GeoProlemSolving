@@ -111,7 +111,6 @@
 </template>
 <script>
 import axios from "axios";
-import CryptoJS from "crypto-js";
 
 export default {
   components: {},
@@ -152,48 +151,45 @@ export default {
         ]
       },
       clientHeight: "",
-      loginStyle:{
-        marginTop:""
+      loginStyle: {
+        marginTop: ""
       },
-      contentStyle:{
-        height:""
+      contentStyle: {
+        height: ""
       },
-      checked:false,
+      checked: false
     };
   },
   mounted() {
     this.contentStyle.height = window.innerHeight - 60 + "px";
-    this.loginStyle.marginTop = window.innerHeight/5+ "px";
+    this.loginStyle.marginTop = window.innerHeight / 5 + "px";
     this.getlocalStorage();
   },
   methods: {
     login(name) {
       this.$refs[name].validate(valid => {
         if (valid) {
-          if(this.checked == true){
-             localStorage.setItem("user",this.formInline.user);
-             localStorage.setItem("password",this.formInline.password);
-             localStorage.setItem("statusRecord",this.checked);
+          if (this.checked == true) {
+            localStorage.setItem("user", this.formInline.user);
+            var password = this.formInline.password
+            password=this.encrypto(password);
+            localStorage.setItem("password", password);
+            localStorage.setItem("statusRecord", this.checked);
             //  statusRecord
-          }else if(this.checked == false){
-            localStorage.setItem("user",'');
-            localStorage.setItem("password",'');
-            localStorage.setItem("statusRecord",false);
+          } else if (this.checked == false) {
+            localStorage.setItem("user", "");
+            localStorage.setItem("password", "");
+            localStorage.setItem("statusRecord", false);
           }
-          // 对密码进行md5加密处理
-          var cipherText = CryptoJS.AES.encrypt(
-            this.formInline.password,
-            "secretkey123"
-          ).toString();
-          console.log("加密后的密文是：" + cipherText);
-          // md5加密结束
+          var passwordFro = this.formInline.password;
+          var passwordAES = this.encrypto(passwordFro);
           this.axios
             .get(
               "/GeoProblemSolving/user/login" +
                 "?email=" +
                 this.formInline.user +
                 "&password=" +
-                this.formInline.password
+                passwordAES
             )
             .then(res => {
               if (res.data === "Fail") {
@@ -202,7 +198,6 @@ export default {
                 this.$Message.success("Success!");
                 this.$store.commit("userLogin", res.data);
                 this.$router.go(-1);
-
               }
             });
         } else {
@@ -218,13 +213,42 @@ export default {
     goHome() {
       this.$router.push({ name: "Home" });
     },
-    getlocalStorage(){
+    getlocalStorage() {
       this.formInline.user = localStorage.getItem("user");
-      this.formInline.password = localStorage.getItem("password");
+      this.formInline.password = this.decrypto(localStorage.getItem("password"));
       // 将字符串格式的true转换为boolean模式的true
-      if(localStorage.getItem("statusRecord")){
-         this.checked = eval(localStorage.getItem("statusRecord"));
+      if (localStorage.getItem("statusRecord")) {
+        this.checked = eval(localStorage.getItem("statusRecord"));
       }
+    },
+    encrypto(context) {
+      var CryptoJS = require("crypto-js");
+      var key = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
+      var iv = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
+      var encrypted = "";
+      if (typeof context == "string") {
+      } else if (typeof context == "object") {
+        context = JSON.stringify(context);
+      }
+      var srcs = CryptoJS.enc.Utf8.parse(context);
+      encrypted = CryptoJS.AES.encrypt(srcs, key, {
+        iv: iv,
+        mode: CryptoJS.mode.CBC,
+        padding: CryptoJS.pad.Pkcs7
+      });
+      return encrypted.toString();
+    },
+    decrypto(context) {
+      var CryptoJS = require("crypto-js");
+      var key = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
+      var iv = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
+      var decrypt = CryptoJS.AES.decrypt(context, key, {
+          iv: iv,
+          mode: CryptoJS.mode.CBC,
+          padding: CryptoJS.pad.Pkcs7
+      });
+      var decryptedStr = decrypt.toString(CryptoJS.enc.Utf8);
+      return decryptedStr.toString();
     }
   }
 };

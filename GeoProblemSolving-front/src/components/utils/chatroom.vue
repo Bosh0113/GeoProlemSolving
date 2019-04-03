@@ -120,7 +120,7 @@
     </Col>
   </Row>
 </template>
-<style>
+<style scoped>
 .chatPanel {
   display: flex;
 }
@@ -559,7 +559,7 @@ export default {
       this.message_panelObj["right"] = 0;
     },
     send(msg) {
-      // console.log(msg);
+       
       this.message = msg;
       let myDate = new Date();
       let current_time = myDate.toLocaleString(); //获取日期与时间
