@@ -440,7 +440,7 @@ export default {
       let image = new Image(); //创建一个image对象
       if (graphType != "rubber") {
         image.src = this.canvas_bak.toDataURL(); //方法返回一个包含图片展示的data URI.参数是type与encoderOptions，分别表示图片格式与图片质量，0到1之间
-        // console.log(image);
+         
         // 相当于给浏览器缓存了一张图片
         // iamge onload事件在图片加载完后立即执行
         image.onload = () => {
@@ -644,7 +644,7 @@ export default {
       };
       this.lines.push(this.send_line);
 
-      // console.log(JSON.stringify(this.send_line));
+       
       this.socketApi.sendSock(this.send_line, this.getSocketConnect);
     },
     getSocketConnect(data) {

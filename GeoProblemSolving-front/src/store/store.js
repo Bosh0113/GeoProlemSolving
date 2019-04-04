@@ -72,6 +72,8 @@ export default new Vuex.Store({
                 userId: '',
                 avatar: '',
             };
+            state.project = {};
+            state.subProject = {};
             sessionStorage.removeItem("userInfo");
         },
         uploadAvatar: (state, avatar) => {

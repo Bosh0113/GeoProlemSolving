@@ -96,21 +96,21 @@ export default {
   name: "Community",
   methods: {
     Support(index) {
-      console.log(typeof index);
+      // console.log(typeof index);
       if (!this.liked) this.topics[index].support++;
       else this.topics[index].support--;
       this.liked = !this.liked;
-      console.log(this.topics[data]);
+       
     },
 
     noSupport(index) {
-      console.log(typeof index);
+      // console.log(typeof index);
       if (!this.liked) this.topics[index].noSupport++;
       //此时将此数据传递到后台进行更新
       else this.topics[index].noSupport--;
       //此时将此数据传递到后台进行更新
       this.liked = !this.liked;
-      console.log(this.topics[data]);
+       
     },
     submit() {
       this.$Message.info("reply success");

@@ -238,11 +238,10 @@ export default {
       };
       formData.append("scope", JSON.stringify(scopeObject));
       //这里还要添加其他的字段
-      console.log(formData.get("file"));
       this.axios
         .post("/GeoProblemSolving/resource/upload", formData)
         .then(res => {
-          if (res != "None") {
+          if (res.data!="Size over" && res.data.length>0) {
             this.$Notice.open({
               title: "Upload notification title",
               desc: "File uploaded successfully",
@@ -253,13 +252,13 @@ export default {
             this.getAllResource();
             // 创建一个函数根据pid去后台查询该项目下的资源
           }
-          // console.log(res.data);
+           
         })
         .catch(err => {});
     },
     getFile(event) {
       this.file = event.target.files[0];
-      console.log(this.file);
+       
     }
   }
 };

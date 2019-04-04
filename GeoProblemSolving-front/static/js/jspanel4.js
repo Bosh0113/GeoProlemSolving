@@ -13,7 +13,7 @@ import { jsPanel } from "jspanel4/es6module/jspanel.min.js"
 
 const jspanel4 = {
     bind(el, binding, vnode) {
-        // console.log('bind');
+         
     },
     inserted(el, binding, vnode) {
         let options = binding.value.panel; // jsPanel options
@@ -46,7 +46,7 @@ const jspanel4 = {
     },
     componentUpdated() {
         // 被绑定元素所在模板完成一次更新周期时调用。
-        // console.log('componentUpdated');
+         
     },
     update(el, binding, vnode, oldVnode) {
         // 被绑定元素所在的模板更新时调用，而不论绑定值是否变化。通过比较更新前后的绑定值，可以忽略不必要的模板更新

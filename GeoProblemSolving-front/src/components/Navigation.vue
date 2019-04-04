@@ -18,14 +18,12 @@
 .userState {
   position: absolute;
   margin-left: 80%;
-  width:20%;
+  width: 20%;
   top: 0px;
   z-index: 1;
-
 }
-.navPart{
-  width:85%;
-
+.navPart {
+  width: 85%;
 }
 </style>
 <template>
@@ -113,7 +111,7 @@ export default {
       unreadNoticeCount: 0,
       timer: null,
       //导航栏宽度
-      headerWidth:"",
+      headerWidth: ""
     };
   },
   mounted() {
@@ -121,8 +119,8 @@ export default {
       this.setTimer();
       this.initWebSocket();
       this.getUnreadNoticeCount();
-    };
-    this.headerWidth = window.innerWidth + 'px';
+    }
+    this.headerWidth = window.innerWidth + "px";
     // alert(this.headerWidth);
   },
   updated() {
@@ -196,9 +194,12 @@ export default {
         });
     },
     initWebSocket() {
-      var noticeSocketURL = "ws://localhost:8081/GeoProblemSolving/NoticeSocket";
+      if (this.noticeSocket != null) {
+        this.noticeSocket = null;
+      }
+      // var noticeSocketURL = "ws://localhost:8081/GeoProblemSolving/NoticeSocket";
       // var noticeSocketURL = "ws://202.195.237.252:8082/GeoProblemSolving/NoticeSocket";
-      // var noticeSocketURL = "ws://172.21.212.7:8082/GeoProblemSolving/NoticeSocket";
+      var noticeSocketURL = "ws://172.21.212.7:8082/GeoProblemSolving/NoticeSocket";
       this.noticeSocket = new WebSocket(noticeSocketURL);
       this.noticeSocket.onopen = this.onOpen;
       this.noticeSocket.onmessage = this.onMessage;
@@ -229,8 +230,11 @@ export default {
       this.noticeSocket.send(recipientId);
     },
     setTimer() {
+      var that = this;
       this.timer = setInterval(() => {
-        this.noticeSocket.send("ping");
+        if (that.noticeSocket != null && that.noticeSocket != undefined) {
+          that.noticeSocket.send("ping");
+        }
       }, 20000);
     },
     removeTimer() {

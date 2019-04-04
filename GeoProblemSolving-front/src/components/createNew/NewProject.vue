@@ -264,7 +264,7 @@ export default {
           createProjectForm["introduction"] = this.formInline.introduction;
           createProjectForm["description"] = this.formInline.description;
           createProjectForm["managerId"] = this.$store.getters.userId;
-          console.log(createProjectForm);
+           
           this.axios
             .post("/GeoProblemSolving/project/create", createProjectForm)
             .then(res => {
@@ -286,7 +286,7 @@ export default {
     },
     //创建历史纪录的函数
     addHistoryEvent(scopeId) {
-      // console.log("scopeId是"+scopeId);
+       
       let form = {};
       let description =
         this.$store.getters.userName +
@@ -307,7 +307,7 @@ export default {
             this.$store.getters.userId
         )
         .then(res => {
-          console.log(res.data);
+           
           if (res.data === "Success") {
             this.$router.push({ name: "Project" });
           }

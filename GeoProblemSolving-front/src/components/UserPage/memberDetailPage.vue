@@ -4,7 +4,15 @@
       <div class="mainPanel">
         <div class="detailSidebar2" :style="{height:detailSidebarHeight}">
           <div class="user-img">
-            <img v-bind:src="userDetail.avatar" class="u_img">
+            <img v-bind:src="userDetail.avatar" class="u_img"
+            v-if="userDetail.avatar!=''&&userDetail.avatar!='undefined'">
+            <avatar
+              style="width:100%"
+              :username="userDetail.userName"
+              :size="200"
+              :rounded="false"
+              v-else>
+            </avatar>
           </div>
           <div style="text-align:center">
             <div class="single-info">{{userDetail.userName}}</div>
@@ -255,7 +263,7 @@ export default {
           this.joinedProjectsNameArray = this.userDetail.joinedProjects;
           this.getParticipatoryList(this.joinedProjectsNameArray);
           //打印用户的具体信息
-          console.log(this.userDetail);
+           
         })
         .catch(err => {
           console.log(err.data);
@@ -271,7 +279,7 @@ export default {
         )
         .then(res => {
           this.userEventList = res.data;
-          console.table(result);
+           
         })
         .catch(err => {
           console.log(err.data);
@@ -287,7 +295,7 @@ export default {
         )
         .then(res => {
           this.userResourceList = res.data;
-          console.table(this.userResourceList);
+           
         })
         .catch(err => {
           console.log(err.data);
@@ -303,7 +311,7 @@ export default {
         )
         .then(res => {
           // 打印用户所管理的项目
-          // console.log(res.data);
+           
           this.userManagerProjectList = res.data;
         })
         .catch(err => {});

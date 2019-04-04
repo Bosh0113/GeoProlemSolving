@@ -6,7 +6,15 @@
           <Col :lg="5" :md="8" :sm="10" :xs="12">
             <div class="detailSidebar" :style="{height:detailSidebarHeight}">
               <div class="user-img">
-                <img v-bind:src="userDetail.avatar" class="u_img">
+                <img v-bind:src="userDetail.avatar" class="u_img"
+                  v-if="userDetail.avatar!=''&&userDetail.avatar!='undefined'">
+                <avatar
+                  style="width:100%"
+                  :username="userDetail.userName"
+                  :size="200"
+                  :rounded="false"
+                  v-else>
+                </avatar>
               </div>
               <div class="single-info">
                 <Icon type="ios-contact-outline" :size="20"/>
@@ -262,7 +270,7 @@
                         <p
                           slot="title"
                           style="height:40x"
-                          class="projectsTitle"                          
+                          class="projectsTitle"
                         >{{item.title}}</p>
                         <Button slot="extra" @click.stop="quitModalShow(item.projectId)">Quit</Button>
                         <p
@@ -275,7 +283,7 @@
                         </div>
                       </Card>
                       </div>
-                      
+
                     </Col>
                   </div>
                 </TabPane>
@@ -322,7 +330,7 @@
                         </div>
                       </Card>
                     </div>
-                      
+
                     </Col>
                   </div>
                 </TabPane>
@@ -519,15 +527,10 @@ export default {
       // console.log()
       //打印用户的具体信息
       this.joinedProjectsNameArray = this.userDetail.joinedProjects;
-      console.table(this.joinedProjectsNameArray);
       // this.getParticipatoryList(this.joinedProjectsNameArray);
     },
     //获取用户参与的项目列表
     getParticipatoryList(projectIds) {
-      projectIds.forEach(element => {
-        console.log(element);
-      });
-      console.table("id是：" + projectIds);
       var count = projectIds.length;
       let participatoryProjectListTemp = [];
       for (let i = 0; i < projectIds.length; i++) {
@@ -549,7 +552,6 @@ export default {
                 participatoryProjectListTemp
               );
             }
-            console.table(this.joinedProjectsList);
           })
           .catch(err => {
             console.log(err.data);
@@ -620,7 +622,7 @@ export default {
         .get("/GeoProblemSolving/project/delete?" + "projectId=" + pid)
         .then(res => {
           this.$store.commit("getUserInfo");
-          var newJoinedProjects =[]; 
+          var newJoinedProjects =[];
           var oldJoinedProjects=this.joinedProjectsList;
           for(var i=0;i<oldJoinedProjects.length;i++){
             if(oldJoinedProjects[i].projectId!=pid){
@@ -643,29 +645,29 @@ export default {
             this.selectManagerId
         )
         .then(res => {
-          let notice = {};
-          notice["recipientId"] = this.selectManagerId;
-          notice["type"] = "Notice";
-          notice["content"] = {
-            title: "Manager change",
-            description:
-              "You have been the manager of project " +
-              this.userManagerProjectList[index].title +
-              " !"
-          };
-          this.axios
-            .post("/GeoProblemSolving/notice/save", notice)
-            .then(res => {
-              this.$Message.info("Apply Successfully");
-              this.$emit("sendNotice", data.managerId);
-            })
-            .catch(err => {
-              console.log("申请失败的原因是：" + err.data);
-            });
+          if(res.data!="Fail"){
+            let notice = {};
+            notice["recipientId"] = this.selectManagerId;
+            notice["type"] = "Notice";
+            notice["content"] = {
+              title: "Manager change",
+              description:
+                "You have been the manager of project " +
+                this.userManagerProjectList[index].title +
+                " !"
+            };
+            this.axios
+              .post("/GeoProblemSolving/notice/save", notice)
+              .then(res => {
+                this.$Message.info("Apply Successfully");
+                this.$emit("sendNotice", data.managerId);
+              })
+              .catch(err => {
+                console.log("申请失败的原因是：" + err.data);
+              });
+          }
         })
         .catch(err => {});
-
-
     },
     cancel() {
       this.$Message.info("cancel");
@@ -684,15 +686,16 @@ export default {
       if (filesize > 2101440) {
         // 图片大于2MB
         this.$Message.error("size > 2MB");
+      }else{
+        var reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = e => {
+          // 读取到的图片base64 数据编码 将此编码字符串传给后台即可
+          imgcode = e.target.result;
+          this.$store.commit("uploadAvatar", imgcode);
+        };
       }
-      var reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = e => {
-        // 读取到的图片base64 数据编码 将此编码字符串传给后台即可
-        imgcode = e.target.result;
-        console.log(imgcode);
-        this.$store.commit("uploadAvatar", imgcode);
-      };
+      
     },
     handleView() {
       this.visible = true;
@@ -704,14 +707,12 @@ export default {
       // var changedProfile = {};
       var changedProfile = new URLSearchParams();
       changedProfile.append("userId", this.$store.getters.userId);
-      console.log(changedProfile);
       //筛选出需要修改的信息
       for (var item in data) {
         if (data[item] != "") {
           changedProfile.append(item, data[item]);
         }
       }
-      console.table(changedProfile);
       this.axios
         .post("/GeoProblemSolving/user/update", changedProfile)
         .then(res => {
@@ -772,7 +773,7 @@ export default {
         .then(res => {
           if (res.data != "None" && res.data != "Fail") {
             this.userResourceList = res.data;
-            // console.table(this.userResourceList);
+             
           }
         })
         .catch(err => {
