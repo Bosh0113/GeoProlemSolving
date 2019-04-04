@@ -11,11 +11,13 @@ public interface IProjectDao {
 
     void deleteProject(String key,String value);
 
-    String updateProject(HttpServletRequest request);
+    Object updateProject(HttpServletRequest request);
 
     Object joinProject(String projectId,String userId);
 
     String quitProject(String projectId,String userId);
 
     Object changeManager(String projectId,String userId);
+
+    String joinByMail(String projectId, String email, String password);
 }

@@ -109,4 +109,10 @@ public class UserController {
             return false;
         }
     }
+
+    @RequestMapping(value = "/isRegistered", method = RequestMethod.GET)
+    public Boolean isRegistered(@RequestParam("email") String email){
+        UserDaoImpl userDao = new UserDaoImpl(mongoTemplate);
+        return userDao.isRegistered(email);
+    }
 }

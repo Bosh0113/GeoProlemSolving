@@ -31,6 +31,7 @@ const routes = [{
 { path: '/map', name: 'mapTool', component: resolve=>(require(["@/components/utils/mapTool"],resolve)) },
 { path: '/charts', name: 'dataCharts', component: resolve=>(require(["@/components/utils/charts"],resolve)) },
 { path: '/task', name: 'taskList', component: resolve=>(require(["@/components/Projects/task"],resolve)) },
+{ path: '/join/:id/:email', name: 'joinProject', component: resolve=>(require(["@/components/createNew/joinNewProject"],resolve)) },
 ]
 export default new Router({
   routes,

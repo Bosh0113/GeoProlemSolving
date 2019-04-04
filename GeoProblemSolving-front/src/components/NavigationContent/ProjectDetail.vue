@@ -282,8 +282,7 @@
           <!-- <br> -->
           <div class="form_style">
             <span>Reciver</span>
-           <Input v-model="inputEmail" style="width:90%" placeholder="input email and press enter button the email will be added below" @keyup.enter.native="addEmail(inputEmail)"/>
-            <!-- <Input v-model="inputEmail" style="width:100%" :rules="emailValidate" placeholder="input email and press enter button the email will be added below"/> -->
+            <Input v-model="inputEmail" style="width:90%" placeholder="input email and press enter button the email will be added below" @on-blur="alert(11)" @keyup.enter.native="addEmail(inputEmail)"/>
             <Button
               icon="ios-add"
               type="dashed"
@@ -291,7 +290,8 @@
               style="margin-left:20px"
             >Add</Button>
           </div>
-          <div style="margin-left:20%;width:80%">
+          <span v-show="this.checkEmail(inputEmail)==false&&inputEmail!=''" style="color:red;font-size:10px;margin-left:160px">{{this.errorHint}}</span>
+          <div style="margin-left:20%;width:80%;margin-top:10px">
             <Tag
               v-for="(item,index) in inviteEmailList"
               :key="index"
@@ -751,7 +751,7 @@ export default {
       inviteEmailList: [],
       //邮件格式
       emailTitle: "",
-      emailContent: `Hello,it's my pleasure to invite you join in the project,if you agree to join us you can click this url to visit it,the url is <br> http://172.21.212.7:8082/GeoProblemSolving/${sessionStorage.getItem("projectId")}/join`,
+      emailContent: `Hello,it's my pleasure to invite you join in the project,if you agree to join us you can click this url to visit it,the url is http://172.21.212.7:8082/GeoProblemSolving/join/${sessionStorage.getItem("projectId")}`,
       emailFormat:
         "hello,it's my pleasure to invite you join in the project called ",
       //上传文件相关的
@@ -791,29 +791,10 @@ export default {
       editProjectModal: false,
       removeProjectModal: false,
       // 邮箱验证
-      emailValidate:[
-        { required: true,
-          message: 'The email is not allowed empty',
-          pattern: /.+/,
-          // validator:(rule, value, callback) => {
-          //   if (value === '') {
-          //     callback(new Error('请正确填写邮箱'));
-          //   } else {
-          //     if (value !== '') {
-          //       var reg=/^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
-          //       if(!reg.test(value)){
-          //         callback(new Error('请输入有效的邮箱'));
-          //       }
-          //     }
-          //     callback();
-          //   }
-          // },
-          trigger: 'blur'
-        }
-      ],
       authorizeModal:false,
       // 子项目成员数组
       subProjectMembers:[],
+      errorHint:"email format is not correct , please check it again"
     };
   },
   created(){
@@ -990,12 +971,28 @@ export default {
       this.isSubMember = this.memberIdentity(this.subProjectMembers);
       this.handOverSubProjectModal = true;
     },
+    checkEmail(email){
+  　　 var myReg=/^[a-zA-Z0-9_-]+@([a-zA-Z0-9]+\.)+(com|cn|net|org)$/;
+  　　 if(myReg.test(email)){
+  　　　　return true;
+  　　 }else{
+  // 　　　　alert("邮箱格式不对");
+  　　　　return false;
+     }
+    },
     addEmail(email) {
-      if(email!=""){
+      this.checkEmail(email);
+      if(this.checkEmail(email) == true){
         this.inviteEmailList.push(email);
-        // 还剩下一个验证邮箱的东西没有写
         this.inputEmail = "";
         console.log("邀请的成员邮箱数组如下:" + this.inviteEmailList);
+      }else if(checkEmail(email)==false){
+         this.$Message.warning('Email format is not correct');
+        // this.$Notice.error({
+        //   title: 'Notification title',
+        //   desc:'Email format is not correct. '
+        // });
+        this.inputEmail = "";
       }
     },
     delEmail(index) {
@@ -1004,8 +1001,13 @@ export default {
     invite() {
       var emailFormBody = {};
       // this.inputEmail
-      if(this.inputEmail!=""){
+      if(checkEmail(this.inputEmail)==true){
         this.inviteEmailList.push(this.inputEmail);
+      }else{
+        this.$Notice.error({
+          title: 'Notification title',
+          desc:'Email format is not correct. '
+        });
       }
       emailFormBody["recipient"] = this.inviteEmailList.toString();
       emailFormBody["mailTitle"] = this.emailTitle;

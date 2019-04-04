@@ -47,7 +47,7 @@ public class ProjectController {
     }
 
     @RequestMapping(value = "/update", produces = {"application/json;charset=UTF-8"}, method = RequestMethod.POST)
-    public String updateProject(HttpServletRequest request) {
+    public Object updateProject(HttpServletRequest request) {
         ProjectDaoImpl projectDao = new ProjectDaoImpl(mongoTemplate);
         try {
             return projectDao.updateProject(request);
@@ -84,5 +84,11 @@ public class ProjectController {
         }catch (Exception e){
             return "Fail";
         }
+    }
+
+    @RequestMapping(value = "/joinByMail", method = RequestMethod.GET)
+    public String joinByMail(@RequestParam("projectId") String projectId,@RequestParam("email") String email,@RequestParam("password") String password) {
+        ProjectDaoImpl projectDao = new ProjectDaoImpl(mongoTemplate);
+        return projectDao.joinByMail(projectId,email,password);
     }
 }

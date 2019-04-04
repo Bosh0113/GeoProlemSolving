@@ -15,4 +15,8 @@ public interface IUserDao {
     Object updateUser(HttpServletRequest request);
 
     Object login(String email,String password);
+
+    Boolean isRegistered(String email);
+
+    Boolean verifyPassword(String email,String password);
 }
