@@ -62,7 +62,7 @@
   <div class="layout">
     <Layout>
       <div class="header">
-        <img src="@/assets/images/OGMS.png" id="logo" class="pic" @click="goHome">
+        <img src="@/assets/images/OGMS.png" id="logo" class="pic" @click="goHome" style="cursor:pointer;">
       </div>
       <div class="content" ref="homePage" v-if="Userstate===false" v-bind:style="contentStyle">
         <div class="loginDiv" v-bind:style="loginStyle">
@@ -185,7 +185,6 @@ export default {
             this.formInline.password,
             "secretkey123"
           ).toString();
-          console.log("加密后的密文是：" + cipherText);
           // md5加密结束
           this.axios
             .get(

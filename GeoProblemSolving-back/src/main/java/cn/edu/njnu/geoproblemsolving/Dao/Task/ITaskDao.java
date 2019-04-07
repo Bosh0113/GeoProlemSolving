@@ -10,11 +10,11 @@ public interface ITaskDao {
 
     Object inquiryTask(String key,String value);
 
-    Object inquiryTodo(String moduleId);
+    Object inquiryTodo(String subprojectId);
 
-    Object inquiryDoing(String moduleId);
+    Object inquiryDoing(String subprojectId);
 
-    Object inquiryDone(String moduleId);
+    Object inquiryDone(String subprojectId);
 
     String deleteTask(String taskId);
 

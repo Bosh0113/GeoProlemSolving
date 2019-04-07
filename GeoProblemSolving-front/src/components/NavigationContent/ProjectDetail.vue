@@ -542,7 +542,7 @@
                   >
                     <Icon type="md-download"/>
                   </Button>
-                  <Button type="warning" size="small" style="margin-right: 5px" @click title="View">
+                  <Button type="warning" size="small" style="margin-right: 5px" title="View">
                     <Icon type="md-eye"/>
                   </Button>
                 </template>
@@ -833,7 +833,7 @@ export default {
       if (!vm.$store.getters.userState) {
         next("/login");
       } else {
-        if (!(vm.currentProjectDetail.isManager || vm.currentProjectDetail.isMember)) {
+        if (!(vm.currentProjectDetail.isManager || vm.currentProjectDetail.isMember||vm.currentProjectDetail.managerId == vm.$store.getters.userId)) {
           alert("No access");
           next("/projectlist");
           // vm.$router.go(-1);
@@ -847,7 +847,7 @@ export default {
       let pid = this.$route.params.id;
       var that = this;
       if(JSON.stringify(projectInfo)!="{}" && projectInfo.projectId==pid){
-        that.currentProjectDetail=projectInfo;
+        this.currentProjectDetail=projectInfo;
         this.updateRelatedInfo();
       }
       else{
@@ -899,6 +899,10 @@ export default {
         "projectId",
         that.currentProjectDetail.projectId
       );
+      sessionStorage.setItem(
+        "projectName",
+        that.currentProjectDetail.title
+      );
       //将tag进行分割
       // var arr = that.currentProjectDetail.tag.split(',');
       // that.currentProjectDetail.tag = arr;
@@ -948,7 +952,7 @@ export default {
       }
       if (this.$store.getters.userState) {
         if (isManager || isMember) {
-          this.$router.push({ path: `${id}/workspace` });
+          this.$router.push({ path: `${id}/subproject` });
         } else {
           this.$Message.error("You have no property to access it");
         }

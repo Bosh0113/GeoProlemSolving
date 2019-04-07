@@ -47,7 +47,7 @@
 <div>
   <Row>
     <Col span="22" offset="1">
-      <h1>Notifications</h1>
+      <h1 style="margin-top:20px">Notifications</h1>
   <Tabs type="card" value="notice" style="margin:20px 0">
     <TabPane :label="noticeTab" name="notice">
       <Card>
@@ -305,7 +305,7 @@ export default {
           this.$Message.danger("update notification fail.");
         });
       
-      this.$router.push( `./project/${id}/workspace`);
+      this.$router.push( `./project/${id}/subproject`);
     },
     refuseApply(apply) {
       console.log(apply.content.title + " has been refused.");
