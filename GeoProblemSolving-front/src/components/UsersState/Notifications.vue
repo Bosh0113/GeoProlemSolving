@@ -57,7 +57,7 @@
             <h1>No Notice Notifications</h1>
           </Card>
           <template v-else-if="this.noticeList.length>0">
-            <div class="noticeDetail" v-for="notice in this.noticeList" :key="notice.index">
+            <div class="noticeDetail" v-for="notice in noticeList" :key="notice.index">
               <template v-if="notice.type =='Work'">
                 <Card style="height:100%">
                   <template v-if="notice.state=='unread'">
@@ -220,7 +220,7 @@ export default {
             let applyUnreadCount = 0;
             let notifications = res.data;
             for (let i = 0; i < notifications.length; i++) {
-              if (notifications[i].type === "notice") {
+              if (notifications[i].type === "notice"|| notifications[i].type === "Work") {
                 noticeListTest.push(notifications[i]);
                 if (notifications[i].state === "unread") {
                   noticeUnreadCount++;
@@ -389,7 +389,7 @@ export default {
             replyNotice["content"] = {
               title: "Result for application",
               description:
-                "Congratulations on joining the project: " +
+                "Congratulations for joining the project: " +
                 apply.content.projectTitle +
                 " ."
             };
