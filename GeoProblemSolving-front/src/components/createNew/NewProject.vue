@@ -142,7 +142,7 @@ h1 {
             @click="addTag(inputTag)"
             style="margin-left:2.5%"
           >Add Tag</Button>
-          <div >
+          <div>
             <Tag
               color="primary"
               v-for="(item,index) in this.formInline.tagList"
@@ -150,6 +150,13 @@ h1 {
               closable
               @on-close="deleteTag(index)"
             >{{item}}</Tag>
+          </div>
+          <div>
+            <span>example:</span>
+            <Tag>anti-smog mask</Tag>
+            <Tag>water</Tag>
+            <Tag>pollution problem</Tag>
+            <Tag>smoggy day</Tag>
           </div>
       </FormItem>
       <FormItem prop="image" label="image" :label-width="100">
@@ -168,7 +175,6 @@ h1 {
             <input @change="uploadPhoto($event)" type="file" class="uploadAvatar">
           </div>
           <br>
-          <!-- <span>{{this.imagename}}</span> -->
           <Modal title="View Image" v-model="visible">
             <img :src="img" v-if="visible" style="width: 100%">
           </Modal>
@@ -264,7 +270,7 @@ export default {
           createProjectForm["introduction"] = this.formInline.introduction;
           createProjectForm["description"] = this.formInline.description;
           createProjectForm["managerId"] = this.$store.getters.userId;
-           
+
           this.axios
             .post("/GeoProblemSolving/project/create", createProjectForm)
             .then(res => {
@@ -286,7 +292,7 @@ export default {
     },
     //创建历史纪录的函数
     addHistoryEvent(scopeId) {
-       
+
       let form = {};
       let description =
         this.$store.getters.userName +
@@ -307,7 +313,7 @@ export default {
             this.$store.getters.userId
         )
         .then(res => {
-           
+
           if (res.data === "Success") {
             this.$router.push({ name: "Project" });
           }

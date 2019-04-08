@@ -17,16 +17,6 @@ img {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.operateBtnGroup {
-  --btnSize: 15px;
-}
-.operateBtnGroup button {
-  font-size: 15px;
-  margin-left: 2.5%;
-}
-.operateBtnGroup button:hover {
-  font-size: var(--btnSize);
-}
 .btnCreate:hover {
   background-color: #19be6b;
   color: white;
@@ -47,15 +37,6 @@ img {
     <Row>
       <Col span="22" offset="1">
         <div style="display:flex;height:60px;justify-content:center">
-          <!-- <div style="width:70%;display:flex;justify-content:center;align-items:center">
-            <div style="width:80%">
-              <Input
-                v-model="search"
-                placeholder="Enter something to find project quickly"
-                style="width: 80%"
-              />
-            </div>
-          </div> -->
         </div>
         <div class="Tabpane" style="display:flex">
           <Tabs v-model="currentTab" @click.native="chooseCurrentType(currentTab)" style="width:60%">
@@ -83,7 +64,6 @@ img {
               class="btnJoin"
               @click="joinModal=true"
             >Join</Button>
-
           </div>
         </div>
       </Col>
@@ -103,7 +83,6 @@ img {
           </Spin>
           <Col span="22" offset="1">
             <Card :bordered="false">
-              <!-- <p slot="title">No Projects in this category</p> -->
               <div style="display:flex;justify-content:center">
                 <Icon type="md-alert" size="40" color="gray"/>
               </div>
@@ -238,11 +217,6 @@ export default {
     this.getSpecificTypeProjects(initObject);
   },
   computed: {
-    //   filteredBlogs:function(){
-    //   return this.blogs.filter((blog)=>{
-    //     return blog.title.match(this.search);
-    //   })
-    // },
     filteredBlogs: function() {
       return this.currentProjectList.filter(item => {
         return item.title.match(this.search);

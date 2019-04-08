@@ -102,6 +102,9 @@
                       >Log in</Button>
                     </div>
                   </FormItem>
+                  <div style="display:flex;text-align:center;justify-content:center">
+                    <span>If you don't hava an account,click <a @click="goRegister">Here</a> to register.</span>
+                  </div>
                 </Form>
               </div>
             </div>
@@ -249,6 +252,9 @@ export default {
       });
       var decryptedStr = decrypt.toString(CryptoJS.enc.Utf8);
       return decryptedStr.toString();
+    },
+    goRegister(){
+      this.$router.push({name:"Register"});
     }
   }
 };

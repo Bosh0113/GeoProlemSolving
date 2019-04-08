@@ -3,12 +3,6 @@
   background-color: rgb(219, 213, 213);
   width: 100%;
 }
-.projectTitle {
-  display: flex;
-  justify-content: center;
-  align-items: cenetr;
-  height: auto;
-}
 .detail {
   height: auto;
 }
@@ -17,22 +11,15 @@
   align-items: center;
   justify-content: center;
   height: 300px;
+  background-color:lightgray;
 }
 .detail_image img {
-  max-width: 100%;
+  max-width: 90%;
   max-height: 300px;
 }
 .detail_description {
   padding: 20px;
   max-height: auto;
-}
-.projectDescription {
-  word-break: break-all;
-  text-indent: 2em;
-  font-size: 16px;
-  overflow-y: auto;
-  word-break: break-all;
-  padding: 30px 20px 30px 20px;
 }
 .projectEditPanel {
   display: block;
@@ -45,15 +32,6 @@
   margin-top: 5px;
   height: 40px;
   float: right;
-}
-.projectMembersPanel {
-  display: flex;
-  /* justify-content: center; */
-  align-items: center;
-  padding: 20px;
-  height: 100px;
-  border: 1px solid gray;
-  /* background-color: lightblue; */
 }
 .memberPanel {
   padding: 20px;
@@ -108,16 +86,6 @@
   min-width: 20%;
   text-align: center;
 }
-.emailOperate {
-  display: flex;
-  padding: 0 10px;
-  justify-content: center;
-}
-.emailOperate button {
-  /* padding:0 10px; */
-  margin-left: 10px;
-  margin-right: 10px;
-}
 /* 按钮样式 */
 .subProjectBtn:hover,
 .inviteBtn:hover,
@@ -129,10 +97,6 @@
   background-color: #ed4014;
   color: white;
 }
-/* .inviteBtn:hover {
-  background-color: #47cb89;
-  color: white;
-} */
 .subProjectBtn,
 .uploadBtn,
 .inviteBtn {
@@ -222,7 +186,7 @@
                     >
                     <avatar
                       :username="currentProjectDetail.title"
-                      :size="300"
+                      :size="260"
                       :title="currentProjectDetail.title"
                       :rounded="false"
                       v-else
@@ -230,11 +194,19 @@
                   </div>
                 </Col>
                 <Col :xs="12" :sm="14" :md="15" :lg="16">
-                  <div style="display:flex;height:250px;">
-                    <span
-                      class="projectDescription"
+                  <div style="height:80px;">
+                    <h3 style="margin-left:5px">Description</h3>
+                    <div
+                      style="height:56px;overflow-y:auto;text-indent:2em;padding:0 5px"
                       v-if="currentProjectDetail"
-                    >{{currentProjectDetail.introduction}}</span>
+                    >{{currentProjectDetail.description}}</div>
+                  </div>
+                  <div style="height:220px;padding-top:10px">
+                    <h3 style="margin-left:5px">Introduction</h3>
+                    <div
+                      style="height:196px;overflow-y: auto;text-indent:2em;padding:0 5px"
+                      v-if="currentProjectDetail"
+                    >{{currentProjectDetail.introduction}}</div>
                   </div>
                 </Col>
               </Row>
@@ -246,7 +218,11 @@
             <p slot="title" style="font-size:25px;height:40px;line-height:40px;">Members</p>
             <div slot="extra" style="height:40px" class="popCenter">
               <Poptip trigger="hover" content="Invite other members" placement="right">
-                <Button class="inviteBtn" v-show="this.currentProjectDetail.isManager" @click="inviteModalShow()">
+                <Button
+                  class="inviteBtn"
+                  v-show="this.currentProjectDetail.isManager"
+                  @click="inviteModalShow()"
+                >
                   <Icon type="md-person-add" size="20"/>
                 </Button>
               </Poptip>
@@ -282,7 +258,13 @@
           <!-- <br> -->
           <div class="form_style">
             <span>Reciver</span>
-            <Input v-model="inputEmail" style="width:90%" placeholder="input email and press enter button the email will be added below" @on-blur="alert(11)" @keyup.enter.native="addEmail(inputEmail)"/>
+            <Input
+              v-model="inputEmail"
+              style="width:90%"
+              placeholder="input email and press enter button the email will be added below"
+              @on-blur="alert(11)"
+              @keyup.enter.native="addEmail(inputEmail)"
+            />
             <Button
               icon="ios-add"
               type="dashed"
@@ -290,7 +272,10 @@
               style="margin-left:20px"
             >Add</Button>
           </div>
-          <span v-show="this.checkEmail(inputEmail)==false&&inputEmail!=''" style="color:red;font-size:10px;margin-left:160px">{{this.errorHint}}</span>
+          <span
+            v-show="this.checkEmail(inputEmail)==false&&inputEmail!=''"
+            style="color:red;font-size:10px;margin-left:160px"
+          >{{this.errorHint}}</span>
           <div style="margin-left:20%;width:80%;margin-top:10px">
             <Tag
               v-for="(item,index) in inviteEmailList"
@@ -303,7 +288,11 @@
           <br>
           <div class="form_style">
             <span>Title</span>
-            <Input style="width:75%" v-model="emailTitle" placeholder="set the email title to recivers by your self"/>
+            <Input
+              style="width:75%"
+              v-model="emailTitle"
+              placeholder="set the email title to recivers by your self"
+            />
           </div>
           <br>
           <div class="form_style">
@@ -369,63 +358,70 @@
               <div class="subProjectListStyle">
                 <div v-for="(subProject,index) in subProjectList" :key="subProject.index">
                   <Col :lg="{span:11,offset:1}" :md="24" :sm="24" :xs="24">
-                  <div @click="goWorkspace(subProject.subProjectId,subProject.members,subProject.isManager)" style="cursor:pointer">
-                    <Card class="subProjectStyle">
-                      <span
-                        slot="title"
-                        class="subProjectTitle"
-                      >{{subProject["title"]}}</span>
-                      <div slot="extra" style="height:auto;display:flex;align-items:center">
-                        <Button
-                          type="default"
-                          v-show="subProject['isManager'] == true"
-                          @click.stop="handOverSubProjectShow(index)"
+                    <div
+                      @click="goWorkspace(subProject.subProjectId,subProject.members,subProject.isManager)"
+                      style="cursor:pointer"
+                    >
+                      <Card class="subProjectStyle">
+                        <span slot="title" class="subProjectTitle">{{subProject["title"]}}</span>
+                        <div slot="extra" style="height:auto;display:flex;align-items:center">
+                          <Button
+                            type="default"
+                            v-show="subProject['isManager'] == true"
+                            @click.stop="handOverSubProjectShow(index)"
+                          >
+                            <Icon type="md-person"/>
+                          </Button>
+                          <Icon
+                            type="md-person"
+                            v-show="subProject['isMember'] == true"
+                            :size="30"
+                            style="margin-top:5px"
+                          />
+                          <Button
+                            type="success"
+                            v-show="subProject['isMember'] == false&&subProject['isManager'] == false"
+                            @click.stop="joinSubProject(subProject)"
+                          >
+                            <Icon type="md-add"/>
+                          </Button>
+                          <Button
+                            type="default"
+                            style="margin-left:10px"
+                            v-show="subProject['isManager'] == true"
+                            @click.stop="editSubProjectShow(index)"
+                          >
+                            <Icon type="md-brush"/>
+                          </Button>
+                          <Button
+                            type="default"
+                            style="margin-left:10px"
+                            v-show="subProject['isManager'] == true"
+                            @click.stop="deleteSubProjectShow(index)"
+                          >
+                            <Icon type="md-close"/>
+                          </Button>
+                        </div>
+                        <p class="subProjectDescription">{{subProject["description"]}}</p>
+                        <!-- <hr> -->
+                        <br>
+                        <div
+                          style="height:30px;align-items:center;display:flex;justify-content:flex-start"
                         >
-                          <Icon type="md-person" />
-                        </Button>
-                        <Icon type="md-person" v-show="subProject['isMember'] == true" :size="30" style="margin-top:5px"/>
-                        <Button
-                          type="success"
-                          v-show="subProject['isMember'] == false&&subProject['isManager'] == false"
-                          @click.stop="joinSubProject(subProject)"
+                          <Icon type="md-body" :size="20"/>Manager
+                          <span style="height:20px;margin-left:5%">{{subProject.managerName}}</span>
+                        </div>
+                        <div
+                          style="height:30px;margin-top:10px;align-items:center;display:flex;justify-content:flex-start"
                         >
-                          <Icon type="md-add"/>
-                        </Button>
-                        <Button
-                          type="default"
-                          style="margin-left:10px"
-                          v-show="subProject['isManager'] == true"
-                          @click.stop="editSubProjectShow(index)"
-                        >
-                          <Icon type="md-brush"/>
-                        </Button>
-                        <Button
-                          type="default"
-                          style="margin-left:10px"
-                          v-show="subProject['isManager'] == true"
-                          @click.stop="deleteSubProjectShow(index)"
-                        >
-                          <Icon type="md-close"/>
-                        </Button>
-                      </div>
-                      <p class="subProjectDescription">{{subProject["description"]}}</p>
-                      <!-- <hr> -->
-                      <br>
-                      <div style="height:30px;align-items:center;display:flex;justify-content:flex-start">
-                            <Icon type="md-body" :size="20"/>Manager
-                            <span style="height:20px;margin-left:5%">
-                              {{subProject.managerName}}
-                            </span>
-                          </div>
-                          <div style="height:30px;margin-top:10px;align-items:center;display:flex;justify-content:flex-start">
-                            <Icon type="md-clock" :size="20"/>Creation Time
-                            <span style="height:20px;margin-left:5%">
-                              {{subProject.createTime.split(' ')[0]}}
-                            </span>
-                          </div>
-                      <div class="whitespace"></div>
-                    </Card>
-                  </div>
+                          <Icon type="md-clock" :size="20"/>Creation Time
+                          <span
+                            style="height:20px;margin-left:5%"
+                          >{{subProject.createTime.split(' ')[0]}}</span>
+                        </div>
+                        <div class="whitespace"></div>
+                      </Card>
+                    </div>
                   </Col>
                 </div>
               </div>
@@ -751,7 +747,9 @@ export default {
       inviteEmailList: [],
       //邮件格式
       emailTitle: "",
-      emailContent: `Hello,it's my pleasure to invite you join in the project,if you agree to join us you can click this url to visit it,the url is http://172.21.212.7:8082/GeoProblemSolving/join/${sessionStorage.getItem("projectId")}`,
+      emailContent: `Hello,it's my pleasure to invite you join in the project,if you agree to join us you can click this url to visit it,the url is http://172.21.212.7:8082/GeoProblemSolving/join/${sessionStorage.getItem(
+        "projectId"
+      )}`,
       emailFormat:
         "hello,it's my pleasure to invite you join in the project called ",
       //上传文件相关的
@@ -791,13 +789,13 @@ export default {
       editProjectModal: false,
       removeProjectModal: false,
       // 邮箱验证
-      authorizeModal:false,
+      authorizeModal: false,
       // 子项目成员数组
-      subProjectMembers:[],
-      errorHint:"email format is not correct , please check it again"
+      subProjectMembers: [],
+      errorHint: "email format is not correct , please check it again"
     };
   },
-  created(){
+  created() {
     this.getAllSubProject();
     this.getAllResource();
   },
@@ -814,7 +812,12 @@ export default {
       if (!vm.$store.getters.userState) {
         next("/login");
       } else {
-        if (!(vm.currentProjectDetail.isManager || vm.currentProjectDetail.isMember)) {
+        if (
+          !(
+            vm.currentProjectDetail.isManager ||
+            vm.currentProjectDetail.isMember
+          )
+        ) {
           alert("No access");
           next("/projectlist");
           // vm.$router.go(-1);
@@ -824,14 +827,13 @@ export default {
   },
   methods: {
     getProjectDetail() {
-      let projectInfo=this.$store.getters.project;
+      let projectInfo = this.$store.getters.project;
       let pid = this.$route.params.id;
       var that = this;
-      if(JSON.stringify(projectInfo)!="{}" && projectInfo.projectId==pid){
-        that.currentProjectDetail=projectInfo;
+      if (JSON.stringify(projectInfo) != "{}" && projectInfo.projectId == pid) {
+        that.currentProjectDetail = projectInfo;
         this.updateRelatedInfo();
-      }
-      else{
+      } else {
         let queryObject = { key: "projectId", value: pid };
         try {
           $.ajax({
@@ -852,8 +854,10 @@ export default {
                 };
               } else {
                 let projectInfo = data[0];
-                projectInfo.isManager=that.managerIdentity(projectInfo.managerId);
-                projectInfo.isMember=that.memberIdentity(projectInfo.members);
+                projectInfo.isManager = that.managerIdentity(
+                  projectInfo.managerId
+                );
+                projectInfo.isMember = that.memberIdentity(projectInfo.members);
                 that.currentProjectDetail = projectInfo;
                 that.$store.commit("setProjectInfo", projectInfo);
                 that.updateRelatedInfo();
@@ -867,19 +871,15 @@ export default {
           console.log(err);
         }
       }
-
     },
-    updateRelatedInfo(){
+    updateRelatedInfo() {
       var that = this;
       // 邀请他人加入项目的form的复制项目id与项目名的按钮
       that.copyProjectId = that.currentProjectDetail.projectId;
       that.copyProjectTitle = that.currentProjectDetail.title;
       that.projectManager.userId = that.currentProjectDetail.managerId;
       that.projectManager.userName = that.currentProjectDetail.managerName;
-      sessionStorage.setItem(
-        "projectId",
-        that.currentProjectDetail.projectId
-      );
+      sessionStorage.setItem("projectId", that.currentProjectDetail.projectId);
       //将tag进行分割
       // var arr = that.currentProjectDetail.tag.split(',');
       // that.currentProjectDetail.tag = arr;
@@ -944,13 +944,13 @@ export default {
       SubProject["title"] = this.subProjectTitle;
       SubProject["projectId"] = this.currentProjectDetail.projectId;
       SubProject["managerId"] = this.$store.getters.userId;
-       
+
       this.axios
         .post("/GeoProblemSolving/subProject/create", SubProject)
         .then(res => {
           if (res.data != "Fail") {
             this.$Message.info("create success");
-             
+
             this.subProjectTitle = "";
             this.subProjectDescription = "";
             this.getAllSubProject();
@@ -971,23 +971,23 @@ export default {
       this.isSubMember = this.memberIdentity(this.subProjectMembers);
       this.handOverSubProjectModal = true;
     },
-    checkEmail(email){
-  　　 var myReg=/^[a-zA-Z0-9_-]+@([a-zA-Z0-9]+\.)+(com|cn|net|org)$/;
-  　　 if(myReg.test(email)){
-  　　　　return true;
-  　　 }else{
-  // 　　　　alert("邮箱格式不对");
-  　　　　return false;
-     }
+    checkEmail(email) {
+      var myReg = /^[a-zA-Z0-9_-]+@([a-zA-Z0-9]+\.)+(com|cn|net|org)$/;
+      if (myReg.test(email)) {
+        return true;
+      } else {
+        // 　　　　alert("邮箱格式不对");
+        return false;
+      }
     },
     addEmail(email) {
       this.checkEmail(email);
-      if(this.checkEmail(email) == true){
+      if (this.checkEmail(email) == true) {
         this.inviteEmailList.push(email);
         this.inputEmail = "";
         console.log("邀请的成员邮箱数组如下:" + this.inviteEmailList);
-      }else if(checkEmail(email)==false){
-         this.$Message.warning('Email format is not correct');
+      } else if (checkEmail(email) == false) {
+        this.$Message.warning("Email format is not correct");
         // this.$Notice.error({
         //   title: 'Notification title',
         //   desc:'Email format is not correct. '
@@ -1001,18 +1001,18 @@ export default {
     invite() {
       var emailFormBody = {};
       // this.inputEmail
-      if(checkEmail(this.inputEmail)==true){
+      if (checkEmail(this.inputEmail) == true) {
         this.inviteEmailList.push(this.inputEmail);
-      }else{
+      } else {
         this.$Notice.error({
-          title: 'Notification title',
-          desc:'Email format is not correct. '
+          title: "Notification title",
+          desc: "Email format is not correct. "
         });
       }
       emailFormBody["recipient"] = this.inviteEmailList.toString();
       emailFormBody["mailTitle"] = this.emailTitle;
       emailFormBody["mailContent"] = this.emailContent;
-       
+
       this.axios
         .post("/GeoProblemSolving/email/send", emailFormBody)
         .then(res => {
@@ -1032,7 +1032,6 @@ export default {
             this.newManagerId
         )
         .then(res => {
-           
           this.getAllSubProject();
         })
         .catch(err => {
@@ -1044,7 +1043,6 @@ export default {
       this.editSubProjectModal = true;
       this.subProjectTitleEdit = this.subProjectList[index].title;
       this.subProjectDescriptionEdit = this.subProjectList[index].description;
-       
     },
     editSubProject() {
       this.editSubProjectModal = false;
@@ -1055,11 +1053,10 @@ export default {
       );
       obj.append("title", this.subProjectTitleEdit);
       obj.append("description", this.subProjectDescriptionEdit);
-       
+
       this.axios
         .post("/GeoProblemSolving/subProject/update", obj)
         .then(res => {
-           
           this.getAllSubProject();
         })
         .catch(err => {
@@ -1078,7 +1075,6 @@ export default {
             this.subProjectList[this.editSubProjectindex].subProjectId
         )
         .then(res => {
-           
           this.getAllSubProject();
         })
         .catch(err => {
@@ -1117,7 +1113,7 @@ export default {
         list[i]["isManager"] = this.managerIdentity(list[i]["managerId"]);
         list[i]["isMember"] = this.memberIdentity(list[i]["members"]);
       }
-      this.$set(this,"subProjectList",list);
+      this.$set(this, "subProjectList", list);
     },
     isMemberJudge(data) {
       data.forEach(item => {
@@ -1135,7 +1131,6 @@ export default {
     },
     getFile(event) {
       this.file = event.target.files[0];
-       
     },
     //上传文件
     submitFile() {
@@ -1160,7 +1155,7 @@ export default {
       this.axios
         .post("/GeoProblemSolving/resource/upload", formData)
         .then(res => {
-          if (res.data!="Size over" && res.data.length>0) {
+          if (res.data != "Size over" && res.data.length > 0) {
             this.$Notice.open({
               title: "Upload notification title",
               desc: "File uploaded successfully",
@@ -1171,7 +1166,6 @@ export default {
             this.getAllResource();
             // 创建一个函数根据pid去后台查询该项目下的资源
           }
-           
         })
         .catch(err => {});
     },
@@ -1190,7 +1184,7 @@ export default {
         .then(res => {
           //写渲染函数，取到所有资源
           if (res.data !== "None") {
-            this.$set(this,"projectResourceList",res.data);
+            this.$set(this, "projectResourceList", res.data);
           } else {
             this.projectResourceList = [];
           }
@@ -1228,7 +1222,7 @@ export default {
       this.editIntroduction = editProjectInfo.introduction;
       this.editDescription = editProjectInfo.description;
       this.editType = editProjectInfo.category;
-      this.editTags = editProjectInfo["tag"].split(',');
+      this.editTags = editProjectInfo["tag"].split(",");
       this.editPrivacy = editProjectInfo.privacy;
       this.editProjectId = editProjectInfo.projectId;
     },
@@ -1247,10 +1241,10 @@ export default {
       this.axios
         .post("/GeoProblemSolving/project/update ", projectEditForm)
         .then(res => {
-          if(res.data!="Fail"){
+          if (res.data != "Fail") {
             let projectInfo = data[0];
-            projectInfo.isManager=this.managerIdentity(projectInfo.managerId);
-            projectInfo.isMember=this.memberIdentity(projectInfo.members);
+            projectInfo.isManager = this.managerIdentity(projectInfo.managerId);
+            projectInfo.isMember = this.memberIdentity(projectInfo.members);
             this.currentProjectDetail = projectInfo;
             this.$store.commit("setProjectInfo", projectInfo);
             this.updateRelatedInfo();
@@ -1270,7 +1264,7 @@ export default {
     },
     // 编辑项目的添加tag标签
     addTag(tag) {
-      if(tag!=""){
+      if (tag != "") {
         this.editTags.push(tag);
       }
       this.inputTag = "";
@@ -1324,14 +1318,14 @@ export default {
       this.removeProjectModal = true;
     },
     //删除项目的函数
-    deleteProjectShow(){
-      this.removeProjectModal=true;
+    deleteProjectShow() {
+      this.removeProjectModal = true;
     },
     deleteProject() {
       // let selectProjectId = this.userManagerProjectList[
       //   this.DelelteProjectIndex
       // ].projectId;
-       
+
       this.axios
         .get(
           "/GeoProblemSolving/project/delete?" +
@@ -1349,9 +1343,9 @@ export default {
         })
         .catch(err => {});
     },
-    joinSubProject(project){
+    joinSubProject(project) {
       // alert(id);
-       
+
       let joinSubPForm = {};
       joinSubPForm["recipientId"] = project.managerId;
       joinSubPForm["type"] = "apply";
@@ -1367,7 +1361,7 @@ export default {
           " .",
         projectId: project.subProjectId,
         projectTitle: project.title,
-        scope:"subProject",
+        scope: "subProject",
         approve: "unknow"
       };
       this.axios
@@ -1380,9 +1374,9 @@ export default {
           console.log("申请失败的原因是：" + err.data);
         });
     },
-    authorizeModalShow(){
+    authorizeModalShow() {
       this.authorizeModal = true;
-    },
+    }
     // authorizeSubproject(data){
     //   console.log(data);
     // }
