@@ -195,7 +195,10 @@ export default {
                 passwordAES
             )
             .then(res => {
-              if (res.data === "Fail") {
+              if (res.data === "Email") {
+                this.$Message.error("Email does not exist.");
+              }
+              else if(res.data === "Password"){
                 this.$Message.error("Invalid account or password.");
               } else {
                 this.$Message.success("Success!");

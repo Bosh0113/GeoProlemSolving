@@ -4,10 +4,10 @@
       <div style="margin-top:100px;bcakground-color:lightblue;height:500px;display:flex;justify-content:center">
         <Form label-position="left" :label-width="100">
           <FormItem label="ProjectId">
-          <Input v-model="projectId"></Input>
+          <Input v-model="projectId" disabled></Input>
         </FormItem>
         <FormItem label="Email">
-          <Input v-model="email"></Input>
+          <Input v-model="email" disabled></Input>
         </FormItem>
         <div v-show="registeredHintShow==true" style="margin-left:100px;display:flex;align-items:center"><Icon type="ios-information-circle-outline" :size="25" color="yellowGreen"/><span style="font-size:15px;">{{this.registeredHint}}</span></div>
           <div v-show="unregisteredHintShow==true" style="margin-left:100px;display:flex;align-items:center"><Icon type="ios-information-circle-outline" :size="25" color="red"/><span style="font-size:15px;">{{this.unregisteredHint}}</span></div>
@@ -62,7 +62,6 @@ export default {
             this.registeredHintShow = true;
             this.$Message.info("This email has been registerd");
             this.passwordInputShow = true;
-            joinedRefresh();
           } else if (res.data === false) {
             this.unregisteredHintShow = true;
             this.$Message.info("you have use your email to register an account");
@@ -70,26 +69,25 @@ export default {
           }
         })
         .catch(err => {
-          this.$Message.danger("Join fail");
+          this.$Message.danger("Judge fail");
         }); 
     },
     joinByMail(){
       this.axios
         .get(
-          "/GeoProblemSolving/project/joinByMail?" +
-            "projectId"+
+          "/GeoProblemSolving/project/joinByMail" +
+            "?projectId="+
             this.projectId+
-            "email=" +
+            "&email=" +
             this.email+
-            "password="+
+            "&password="+
             this.password
         )
         .then(res => {
-          alert(res.data);
           if (res.data === "Success") {
             this.$Message.info("Join successfuly");
             let gotoProjectId = this.projectId
-            this.$router.push({ path: `project/${gotoProjectId}`});
+            this.$router.push({ name: "ProjectDetail", params: { id: gotoProjectId } });
           } else if (res.data === "Fail") {
             this.$Message.info("Fail to join in this project");
           }else if(res.data === "Exist"){
@@ -97,7 +95,7 @@ export default {
           }else if(res.data === "None"){
             this.$Message.info("this group doesn't exist");
           }else if(res.data === "Password"){
-            this.$Message.info("password might input error,try it again");
+            this.$Message.info("password might input error, try it again");
           }
         })
         .catch(err => {
