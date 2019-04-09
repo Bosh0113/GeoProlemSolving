@@ -198,14 +198,12 @@
                     <h3 style="margin-left:5px">Description</h3>
                     <div
                       style="height:56px;overflow-y:auto;text-indent:2em;padding:0 5px"
-                      v-if="currentProjectDetail"
                     >{{currentProjectDetail.description}}</div>
                   </div>
                   <div style="height:220px;padding-top:10px">
                     <h3 style="margin-left:5px">Introduction</h3>
                     <div
                       style="height:196px;overflow-y: auto;text-indent:2em;padding:0 5px"
-                      v-if="currentProjectDetail"
                     >{{currentProjectDetail.introduction}}</div>
                   </div>
                 </Col>
