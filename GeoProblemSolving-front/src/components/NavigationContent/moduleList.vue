@@ -333,14 +333,14 @@
           </Col>
           <template>
             <Col
-              :xs="14"
-              :sm="15"
-              :md="16"
-              :lg="16"
-              :style="{height:sidebarHeight/5*3+'px'}"
-              style="margin-bottom:20px;margin-left:50px;"
+              :xs="{span: 14, offset: 1}"
+              :sm="{span: 15, offset: 1}"
+              :md="{span: 16, offset: 1}"
+              :lg="{span: 16, offset: 1}"
+              :style="{height:sidebarHeight/5*2+'px'}"
+              style="margin-bottom:20px"
             >
-              <div style="width:45%;height:100%;float:left;background-color:white">
+              <div style="height:100%;background-color:white">
                 <h2
                   style="width:100%;padding:10px 10px 0 10px; display: inline-block;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;max-width: 80%;"
                 >{{this.currentModule.title}}</h2>
@@ -351,9 +351,22 @@
                   >{{this.currentModule.description}}</span>
                 </div>
               </div>
-              <div
-                style="width:50%;height:100%;float:right;border:1px solid lightgray;background-color:white;overflow-y:scroll"
+            </Col>
+          </template>
+          <template>
+            <Col :xs="{span: 14, offset: 1}"
+              :sm="{span: 15, offset: 1}"
+              :md="{span: 16, offset: 1}"
+              :lg="{span: 16, offset: 1}"
               >
+              <Col span="12" >
+                <div
+                :style="{height:sidebarHeight/5*3 - 32 + 'px'}"
+                style="border:1px solid lightgray;background-color:white;overflow-y:scroll"
+              >
+              <span
+                  style="height:40px;line-height:40px;margin-left:20px;font-size:1.5em;font-weight: bold"
+                >Timeline</span>
                 <Timeline style="padding:10px">
                   <TimelineItem v-for="(item,index) in allRecords" :key="index">
                     <template v-if="item.type == 'participants'">
@@ -383,15 +396,13 @@
                   </TimelineItem>
                 </Timeline>
               </div>
-            </Col>
-          </template>
-          <template>
-            <Col :xs="14" :sm="15" :md="16" :lg="16" style="margin-left:50px;">
-              <div style="background-color:white">
+              </Col>
+              <Col span="11" offset="1">
+                <div style="background-color:white" :style="{height:sidebarHeight/5*3 - 32 + 'px'}" class="resourcePanel">
                 <span
                   style="height:40px;line-height:40px;margin-left:20px;font-size:1.5em;font-weight: bold"
                 >Resource</span>
-                <div style="float:right;margin:4px 10px 0 0" class="popCenter">
+                <div style="float:right;margin:4px 10px 0 0" class="popCenter" >
                   <Button
                     id="upload"
                     type="default"
@@ -411,8 +422,9 @@
                     <Icon type="md-more"/>
                   </Button>
                 </div>
-                <div style="overflow-y:scroll;padding:0px 10px 10px 10px">
+                <div style="padding:0px 10px 10px 10px">
                   <Table
+                    style="overflow:auto"
                     :columns="projectTableColName"
                     :data="this.projectResourceList"
                     v-show="this.projectResourceList!=[] && this.projectResourceList!='None'"
@@ -438,6 +450,8 @@
                   </Table>
                 </div>
               </div>
+              </Col>
+
             </Col>
           </template>
           <div class="util-panel" @mousedown="toolContainerMove">
@@ -546,8 +560,8 @@
       <template v-else>
         <Row style="margin-top:20px" :style="{height:sidebarHeight+6+'px'}">
           <template>
-            <Col span="22" offset="1" :style="{height:sidebarHeight/5*3+'px'}">
-              <div style="width:45%;height:100%;float:left;background-color:white">
+            <Col span="22" offset="1" :style="{height:sidebarHeight/5*2+'px'}">
+              <div style="width:100%;height:100%;float:left;background-color:white">
                 <h2
                   style="width:100%;padding:10px 10px 0 10px; display: inline-block;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;max-width: 80%;"
                 >{{currentModule.title}}</h2>
@@ -558,9 +572,18 @@
                   >{{currentModule.description}}</span>
                 </div>
               </div>
+            </Col>
+          </template>
+          <template>
+            <Col span="22" offset="1" style="margin-top:20px;">
+            <Col span="11">
               <div
-                style="width:50%;height:100%;float:right;border:1px solid lightgray;background-color:white;overflow-y:scroll"
+                style="border:1px solid lightgray;background-color:white;overflow-y:scroll"
+                :style="{height:sidebarHeight/5*3 - 32 + 'px'}"
               >
+              <span
+                  style="height:40px;line-height:40px;margin-left:20px;font-size:1.5em;font-weight: bold"
+                >Timeline</span>
                 <Timeline style="padding:10px">
                   <TimelineItem v-for="(item,index) in historyRecords" :key="index">
                     <template v-if="item.type == 'participants'">
@@ -591,14 +614,12 @@
                 </Timeline>
               </div>
             </Col>
-          </template>
-          <template>
-            <Col span="22" offset="1" style="margin-top:20px;">
-              <div style="background-color:white">
-                <span
-                  style="height:40px;line-height:40px;margin-left:20px;font-size:1.5em;font-weight: bold"
+            <Col span="12" offset="1">
+              <div style="background-color:white" class="unique" :style="{height:sidebarHeight/5*3 - 32 + 'px'}">
+                <span style="height:40px;line-height:40px;margin-left:20px;font-size:1.5em;font-weight: bold"
                 >Resource</span>
                 <div style="float:right;margin:4px 10px 0 0" class="popCenter">
+
                   <Button
                     id="upload"
                     type="default"
@@ -645,6 +666,7 @@
                   </Table>
                 </div>
               </div>
+              </Col>
             </Col>
           </template>
         </Row>
@@ -853,7 +875,7 @@ export default {
       projectTableColName: [
         {
           title: "Name",
-          key: "name"
+          key: "name",
         },
         {
           title: "type",
@@ -863,17 +885,18 @@ export default {
         {
           title: "Action",
           slot: "action",
-          width: 250,
           align: "center"
         }
       ],
       fileType: "",
       fileDescription: "",
+      resourceHeight:400,
     };
   },
   created() {
     this.init();
     this.getAllModules("init");
+    this.getAllResource();
   },
   mounted() {
     window.addEventListener("resize", this.reSize);    
@@ -906,6 +929,7 @@ export default {
     initSize() {
       //侧边栏的高度随着屏幕的高度自适应
       this.sidebarHeight = window.innerHeight - 227;
+      this.resourceHeight = this.sidebarHeight - 358;
       //通知栏的属性设置，top表示距离顶部的距离，duration表示持续的时间
       this.$Notice.config({
         top: 50,
@@ -1443,12 +1467,15 @@ export default {
       formData.append("description", "");
       formData.append("type", this.fileType);
       formData.append("uploaderId", this.$store.getters.userId);
+      // currentModule.title;
+      // currentModule.moduleId
       // 添加字段属于那个项目
-      formData.append("belong", this.currentProjectDetail.title);
+      formData.append("belong", this.currentModule.title);
+
       let scopeObject = {
-        projectId: this.currentProjectDetail.projectId,
-        subprojectId: "",
-        moduleId: ""
+        projectId: window.sessionStorage.getItem("projectId"),
+        subprojectId: window.sessionStorage.getItem("subProjectId"),
+        moduleId: this.currentModule.moduleId,
       };
       formData.append("scope", JSON.stringify(scopeObject));
       //这里还要添加其他的字段
@@ -1478,14 +1505,15 @@ export default {
       this.axios
         .get(
           "/GeoProblemSolving/resource/inquiry" +
-            "?key=scope.projectId" +
+            "?key=scope.moduleId" +
             "&value=" +
-            this.$route.params.id
+            window.sessionStorage.getItem("moduleId")
         )
         .then(res => {
           // 写渲染函数，取到所有资源
           if (res.data !== "None") {
             this.$set(this, "projectResourceList", res.data);
+            console.log(this.projectResourceList);
           } else {
             this.projectResourceList = [];
           }
@@ -1516,15 +1544,9 @@ export default {
       this.$Message.info("Clicked ok");
     },
     cancel() {
-      // this.$Message.info("Clicked cancel");
-      // this.moduleTitle = "";
-      // this.moduleDescription = "";
-      // this.moduleType = "";
-      // this.editModuleTitle = "";
-      // this.editModuleDescription = "";
-      // this.editModuleType = "";
+
     },
-    show() {
+    show(index) {
       window.open(this.projectResourceList[index].pathURL);
     },
     toolContainerMove(e) {
