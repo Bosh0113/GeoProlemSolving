@@ -462,7 +462,6 @@ export default {
       authorizeProjectModal: false,
       authorizeProjectIndex: "",
       // 删除项目在项目列表中的索引值
-      DelelteProjectIndex: "",
       // 编辑的项目在项目列表中的索引值
       editProjectIndex: "",
       //编辑项目专用的字段
@@ -523,8 +522,6 @@ export default {
     //获取用户的详细信息
     getUserProfile() {
       this.userDetail = this.$store.getters.userInfo;
-      console.table(this.userDetail);
-      // console.log()
       //打印用户的具体信息
       this.joinedProjectsNameArray = this.userDetail.joinedProjects;
       // this.getParticipatoryList(this.joinedProjectsNameArray);
@@ -574,8 +571,6 @@ export default {
     },
     //退出项目的函数
     quitProject() {
-      console.log(this.quitPid);
-      console.log(this.$store.getters.userId);
       this.axios
         .get(
           "/GeoProblemSolving/project/quit" +
@@ -618,22 +613,24 @@ export default {
       this.projectMemberList = this.userManagerProjectList[index].members;
     },
     deleteProjectModalShow(pid) {
-      this.axios
-        .get("/GeoProblemSolving/project/delete?" + "projectId=" + pid)
-        .then(res => {
-          this.$store.commit("getUserInfo");
-          var newJoinedProjects =[];
-          var oldJoinedProjects=this.joinedProjectsList;
-          for(var i=0;i<oldJoinedProjects.length;i++){
-            if(oldJoinedProjects[i].projectId!=pid){
-              newJoinedProjects.push(oldJoinedProjects[i]);
+      if(confirm("Are you sure to delete this project?")){
+        this.axios
+          .get("/GeoProblemSolving/project/delete?" + "projectId=" + pid)
+          .then(res => {
+            this.$store.commit("getUserInfo");
+            var newManageProjects =[];
+            var oldManageProjects=this.userManagerProjectList;
+            for(var i=0;i<oldManageProjects.length;i++){
+              if(oldManageProjects[i].projectId!=pid){
+                newManageProjects.push(oldManageProjects[i]);
+              }
             }
-          }
-          this.$set(this,"joinedProjectsList",newJoinedProjects);
-        })
-        .catch(err => {
-          alert(err.data);
-        });
+            this.$set(this,"userManagerProjectList",newManageProjects);
+          })
+          .catch(err => {
+            alert(err.data);
+          });
+      }
     },
     authorize() {
       this.axios

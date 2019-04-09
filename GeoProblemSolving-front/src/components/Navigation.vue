@@ -264,7 +264,7 @@ export default {
       } else if (name == "personalPage") {
         this.$router.push({ name: "PersonalPage" });
       }
-    }
+    },
   }
 };
 </script>

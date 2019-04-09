@@ -245,7 +245,7 @@
         <!-- 关于邀请其他成员的modal,禁用点击其他空白处误关模态框 -->
         <Modal
           v-model="inviteModal"
-          @on-ok="invite()"
+          @on-ok="invite('emailInfo')"
           @on-cancel="cancel()"
           ok-text="Assure"
           cancel-text="Cancel"
@@ -253,57 +253,30 @@
           :mask-closable="false"
           width="800"
         >
-          <!-- <br> -->
-          <div class="form_style">
-            <span>Reciver</span>
+        <Form
+          ref="emailInfo"
+          :model="emailInfo"
+          :rules="emailInfoRule"
+          :label-width="200"
+          inline
+        >
+          <FormItem label="Recipient" prop="inputEmail" style="width:100%">
+            <Input v-model="emailInfo.inputEmail" placeholder="input email and press enter button the email will be added below" style="width:70%"/>
+          </FormItem>
+          <FormItem label="Title" prop="emailTitle" style="width:100%">
+            <Input v-model="emailInfo.emailTitle" placeholder="set the email title to recivers by your self" style="width:70%"/>
+          </FormItem>
+          <FormItem label="Content" prop="emailContent" style="width:100%">
             <Input
-              v-model="inputEmail"
-              style="width:90%"
-              placeholder="input email and press enter button the email will be added below"
-              @on-blur="alert(11)"
-              @keyup.enter.native="addEmail(inputEmail)"
-            />
-            <Button
-              icon="ios-add"
-              type="dashed"
-              @click="addEmail(inputEmail)"
-              style="margin-left:20px"
-            >Add</Button>
-          </div>
-          <span
-            v-show="this.checkEmail(inputEmail)==false&&inputEmail!=''"
-            style="color:red;font-size:10px;margin-left:160px"
-          >{{this.errorHint}}</span>
-          <div style="margin-left:20%;width:80%;margin-top:10px">
-            <Tag
-              v-for="(item,index) in inviteEmailList"
-              :key="index"
-              color="success"
-              @on-close="delEmail(index)"
-              closable
-            >{{item}}</Tag>
-          </div>
-          <br>
-          <div class="form_style">
-            <span>Title</span>
-            <Input
-              style="width:75%"
-              v-model="emailTitle"
-              placeholder="set the email title to recivers by your self"
-            />
-          </div>
-          <br>
-          <div class="form_style">
-            <span>Content</span>
-            <Input
-              type="textarea"
+              type="textarea" style="width:70%"
               :rows="4"
-              style="width:75%"
-              :placeholder="this.emailFormat + this.currentProjectDetail.title + ', you can copy the projectId ' + this.currentProjectDetail.projectId +'and apply for join in it'"
-              v-model="emailContent"
+              v-model="emailInfo.emailContent"
             />
-          </div>
-          <br>
+          </FormItem>
+          <!-- <FormItem>
+            <Button type="primary" @click="invite('emailInfo')">Submit</Button>
+          </FormItem> -->
+        </Form>
         </Modal>
         <div class="whitespace"></div>
         <div style="padding: 20px">
@@ -741,15 +714,45 @@ export default {
       editSubProjectindex: 0,
       //邀请的modal
       inviteModal: false,
-      inputEmail: "",
-      inviteEmailList: [],
+      emailInfo: {
+        inputEmail: "",
+        emailTitle: "",
+        emailContent: ""
+      },
+      emailInfoRule: {
+        inputEmail: [
+          {
+            required: true,
+            message: "Mailbox cannot be empty",
+            trigger: "blur"
+          },
+          {
+            type: "email",
+            message: "Incorrect email format",
+            trigger: "blur"
+          }
+        ],
+        emailTitle: [
+          {
+            required: true,
+            message: "The title cannot be empty",
+            trigger: "blur"
+          }
+        ],
+        emailContent: [
+          {
+            required: true,
+            message: "The content cannot be empty",
+            trigger: "blur"
+          }
+        ]
+      },
       //邮件格式
-      emailTitle: "",
-      emailContent: `Hello,it's my pleasure to invite you join in the project,if you agree to join us you can click this url to visit it,the url is http://172.21.212.7:8082/GeoProblemSolving/join/${sessionStorage.getItem(
-        "projectId"
-      )}`,
-      emailFormat:
-        "hello,it's my pleasure to invite you join in the project called ",
+      emailAddStr:
+        "please click the url and join us: " +
+        "http://172.21.212.7:8082/GeoProblemSolving/join/" +
+        this.$route.params.id +
+        "/",
       //上传文件相关的
       uploadFileModal: false,
       file: "",
@@ -810,7 +813,12 @@ export default {
       if (!vm.$store.getters.userState) {
         next("/login");
       } else {
-        if (!(vm.currentProjectDetail.isManager || vm.currentProjectDetail.isMember||vm.currentProjectDetail.managerId == vm.$store.getters.userId)) {
+        if (
+          !(
+            vm.currentProjectDetail.isManager ||
+            vm.currentProjectDetail.isMember
+          )
+        ) {
           alert("No access");
           next("/projectlist");
           // vm.$router.go(-1);
@@ -872,14 +880,7 @@ export default {
       that.copyProjectTitle = that.currentProjectDetail.title;
       that.projectManager.userId = that.currentProjectDetail.managerId;
       that.projectManager.userName = that.currentProjectDetail.managerName;
-      sessionStorage.setItem(
-        "projectId",
-        that.currentProjectDetail.projectId
-      );
-      sessionStorage.setItem(
-        "projectName",
-        that.currentProjectDetail.title
-      );
+      sessionStorage.setItem("projectId", that.currentProjectDetail.projectId);
       //将tag进行分割
       // var arr = that.currentProjectDetail.tag.split(',');
       // that.currentProjectDetail.tag = arr;
@@ -944,13 +945,11 @@ export default {
       SubProject["title"] = this.subProjectTitle;
       SubProject["projectId"] = this.currentProjectDetail.projectId;
       SubProject["managerId"] = this.$store.getters.userId;
-
       this.axios
         .post("/GeoProblemSolving/subProject/create", SubProject)
         .then(res => {
           if (res.data != "Fail") {
             this.$Message.info("create success");
-
             this.subProjectTitle = "";
             this.subProjectDescription = "";
             this.getAllSubProject();
@@ -962,65 +961,38 @@ export default {
     },
     inviteModalShow() {
       this.inviteModal = true;
+      this.emailInfo.emailContent =
+        "hello, it's my pleasure to invite you join in the project called " +
+        this.currentProjectDetail.title +
+        ".";
     },
     handOverSubProjectShow(index) {
       this.editSubProjectindex = index;
       this.subProjectMembers = this.subProjectList[index].members;
-      console.table(this.subProjectMembers);
       // if it is the member of the sub-project
       this.isSubMember = this.memberIdentity(this.subProjectMembers);
       this.handOverSubProjectModal = true;
     },
-    checkEmail(email) {
-      var myReg = /^[a-zA-Z0-9_-]+@([a-zA-Z0-9]+\.)+(com|cn|net|org)$/;
-      if (myReg.test(email)) {
-        return true;
-      } else {
-        // 　　　　alert("邮箱格式不对");
-        return false;
-      }
-    },
-    addEmail(email) {
-      this.checkEmail(email);
-      if (this.checkEmail(email) == true) {
-        this.inviteEmailList.push(email);
-        this.inputEmail = "";
-        console.log("邀请的成员邮箱数组如下:" + this.inviteEmailList);
-      } else if (checkEmail(email) == false) {
-        this.$Message.warning("Email format is not correct");
-        // this.$Notice.error({
-        //   title: 'Notification title',
-        //   desc:'Email format is not correct. '
-        // });
-        this.inputEmail = "";
-      }
-    },
-    delEmail(index) {
-      this.inviteEmailList.splice(index, 1);
-    },
-    invite() {
-      var emailFormBody = {};
-      // this.inputEmail
-      if (checkEmail(this.inputEmail) == true) {
-        this.inviteEmailList.push(this.inputEmail);
-      } else {
-        this.$Notice.error({
-          title: "Notification title",
-          desc: "Email format is not correct. "
-        });
-      }
-      emailFormBody["recipient"] = this.inviteEmailList.toString();
-      emailFormBody["mailTitle"] = this.emailTitle;
-      emailFormBody["mailContent"] = this.emailContent;
-
-      this.axios
-        .post("/GeoProblemSolving/email/send", emailFormBody)
-        .then(res => {
-          console.log(res.data);
-        })
-        .catch(err => {
-          console.log(err.data);
-        });
+    invite(name) {
+      this.$refs[name].validate(valid => {
+        if (valid) {
+          var emailFormBody = {};
+          emailFormBody["recipient"] = this.emailInfo.inputEmail;
+          emailFormBody["mailTitle"] = this.emailInfo.emailTitle;
+          emailFormBody["mailContent"] =
+            this.emailInfo.emailContent + this.emailAddStr;
+          this.axios
+            .post("/GeoProblemSolving/email/send", emailFormBody)
+            .then(res => {
+              console.log(res.data);
+            })
+            .catch(err => {
+              console.log(err.data);
+            });
+        } else {
+          this.$Message.info("Form check!");
+        }
+      });
     },
     handOverSubProject() {
       this.axios
@@ -1053,7 +1025,6 @@ export default {
       );
       obj.append("title", this.subProjectTitleEdit);
       obj.append("description", this.subProjectDescriptionEdit);
-
       this.axios
         .post("/GeoProblemSolving/subProject/update", obj)
         .then(res => {
@@ -1140,7 +1111,7 @@ export default {
       let formData = new FormData();
       // 向 formData 对象中添加文件
       formData.append("file", this.file);
-      formData.append("description", "");
+      formData.append("description", this.fileDescription);
       formData.append("type", this.fileType);
       formData.append("uploaderId", this.$store.getters.userId);
       // 添加字段属于那个项目
@@ -1166,6 +1137,7 @@ export default {
             this.getAllResource();
             // 创建一个函数根据pid去后台查询该项目下的资源
           }
+          // console.log(res.data);
         })
         .catch(err => {});
     },
@@ -1206,7 +1178,6 @@ export default {
       return data;
     },
     gotoPersonalPage(id) {
-      // console.log({ id });
       if (id == this.$store.getters.userId) {
         this.$router.push({ name: "PersonalPage" });
       } else {
@@ -1217,7 +1188,6 @@ export default {
       // this.
       this.editProjectModal = true;
       let editProjectInfo = this.currentProjectDetail;
-      // console.log(typeof editProjectInfo["tag"]);
       this.editTitle = editProjectInfo.title;
       this.editIntroduction = editProjectInfo.introduction;
       this.editDescription = editProjectInfo.description;
@@ -1241,14 +1211,8 @@ export default {
       this.axios
         .post("/GeoProblemSolving/project/update ", projectEditForm)
         .then(res => {
-          if (res.data != "Fail") {
-            let projectInfo = data[0];
-            projectInfo.isManager = this.managerIdentity(projectInfo.managerId);
-            projectInfo.isMember = this.memberIdentity(projectInfo.members);
-            this.currentProjectDetail = projectInfo;
-            this.$store.commit("setProjectInfo", projectInfo);
-            this.updateRelatedInfo();
-          }
+          this.getProjectDetail();
+          // this.getManagerProjectList();
         })
         .catch(err => {
           console.log(err.data);
@@ -1322,10 +1286,6 @@ export default {
       this.removeProjectModal = true;
     },
     deleteProject() {
-      // let selectProjectId = this.userManagerProjectList[
-      //   this.DelelteProjectIndex
-      // ].projectId;
-
       this.axios
         .get(
           "/GeoProblemSolving/project/delete?" +
@@ -1344,8 +1304,6 @@ export default {
         .catch(err => {});
     },
     joinSubProject(project) {
-      // alert(id);
-
       let joinSubPForm = {};
       joinSubPForm["recipientId"] = project.managerId;
       joinSubPForm["type"] = "apply";
@@ -1377,9 +1335,6 @@ export default {
     authorizeModalShow() {
       this.authorizeModal = true;
     }
-    // authorizeSubproject(data){
-    //   console.log(data);
-    // }
   }
 };
 </script>

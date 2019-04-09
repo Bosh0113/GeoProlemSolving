@@ -21,6 +21,8 @@ import java.net.InetAddress;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
@@ -72,7 +74,7 @@ public class ResourceDaoImpl implements IResourceDao {
                         }
                         String newFileTitle=saveName + randomNum + "." + suffix;
                         String localPath = temp + "\\" + newFileTitle;
-
+                        System.out.println("资源上传到本地路径："+localPath);
                         File file = new File(localPath);
                         FileOutputStream fileOutputStream = new FileOutputStream(file);
                         InputStream inputStream = part.getInputStream();
@@ -86,6 +88,12 @@ public class ResourceDaoImpl implements IResourceDao {
 
                         String reqPath = request.getRequestURL().toString();
                         String pathURL = reqPath.replaceAll("localhost", ip) + "/" + newFileTitle;
+                        String regexGetUrl="(/GeoProblemSolving[\\S]*)";
+                        Pattern regexPattern=Pattern.compile(regexGetUrl);
+                        Matcher matcher=regexPattern.matcher(pathURL);
+                        if (matcher.find()){
+                            pathURL=matcher.group(1);
+                        }
                         uploadInfo.setFileName(newFileTitle);
 
                         // 如果是zip文件

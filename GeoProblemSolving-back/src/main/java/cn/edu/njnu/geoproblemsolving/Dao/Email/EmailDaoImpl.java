@@ -86,10 +86,10 @@ public class EmailDaoImpl implements IEmailDao{
         message.setFrom(new InternetAddress(sendMail,"OpenGMS","utf-8"));
 
         // 3  收件人，可以增加多个收件人，抄送，密送
-        String[] recipients=receiveMail.split(",");
-        for (String recipient : recipients) {
-            message.setRecipient(MimeMessage.RecipientType.TO, new InternetAddress(recipient,"Recipient","utf-8"));
-        }
+//        String[] recipients=receiveMail.split(",");
+//        for (String recipient : recipients) {
+            message.setRecipient(MimeMessage.RecipientType.TO, new InternetAddress(receiveMail,"Recipient","utf-8"));
+//        }
 //        // 增加收件人
 //        message.addRecipient(MimeMessage.RecipientType.TO, new InternetAddress("xuheng_z@126.com", "USER_DD", "UTF-8"));
 //        // Cc: 抄送（可选）
@@ -101,7 +101,7 @@ public class EmailDaoImpl implements IEmailDao{
         message.setSubject(mailTitle,"utf-8");
 
         // 5  邮件正文
-        message.setContent(mailContent, "text/html;charset=UTF-8");
+        message.setContent(mailContent+receiveMail, "text/html;charset=UTF-8");
 
         // 6  设置邮件发送的时间
         message.setSentDate(new Date());

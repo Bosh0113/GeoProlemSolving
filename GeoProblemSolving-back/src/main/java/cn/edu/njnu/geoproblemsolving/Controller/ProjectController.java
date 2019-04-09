@@ -91,4 +91,10 @@ public class ProjectController {
         ProjectDaoImpl projectDao = new ProjectDaoImpl(mongoTemplate);
         return projectDao.joinByMail(projectId,email,password);
     }
+
+    @RequestMapping(value = "/picture",method = RequestMethod.POST)
+    public String uploadPicture(HttpServletRequest request){
+        ProjectDaoImpl projectDao = new ProjectDaoImpl(mongoTemplate);
+        return projectDao.uploadPicture(request);
+    }
 }
