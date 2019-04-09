@@ -20,4 +20,6 @@ public interface IProjectDao {
     Object changeManager(String projectId,String userId);
 
     String joinByMail(String projectId, String email, String password);
+
+    String uploadPicture(HttpServletRequest request);
 }

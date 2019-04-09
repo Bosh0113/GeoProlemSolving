@@ -58,7 +58,7 @@ img {
           </div> -->
         </div>
         <div class="Tabpane" style="display:flex">
-          <Tabs v-model="currentTab" @click.native="chooseCurrentType(currentTab)" style="width:60%">
+          <Tabs v-model="currentTab" @click.native="chooseCurrentType(currentTab)">
             <TabPane label="Water" name="Water" icon="ios-water">
             </TabPane>
             <TabPane label="Soil" name="Soil" icon="md-grid">

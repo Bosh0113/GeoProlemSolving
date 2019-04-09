@@ -165,7 +165,7 @@ h1 {
           </div>
           <div class="uploadBox">
             <Icon type="ios-camera" size="20" style="position:absolute;margin:18px;"></Icon>
-            <input @change="uploadPhoto($event)" type="file" class="uploadAvatar">
+            <input @change="uploadPhoto($event)" type="file" class="uploadAvatar" accept="image/*">
           </div>
           <br>
           <!-- <span>{{this.imagename}}</span> -->
@@ -246,6 +246,7 @@ export default {
       visible: false,
       //表示图片
       img: "",
+      pictureUrl:"",
       createProjectId: ""
     };
   },
@@ -260,7 +261,7 @@ export default {
           createProjectForm["title"] = this.formInline.title;
           createProjectForm["tag"] = this.formInline.tagList.toString();
           createProjectForm["privacy"] = this.formInline.privacy;
-          createProjectForm["picture"] = this.img;
+          createProjectForm["picture"] = this.pictureUrl;
           createProjectForm["introduction"] = this.formInline.introduction;
           createProjectForm["description"] = this.formInline.description;
           createProjectForm["managerId"] = this.$store.getters.userId;
@@ -329,25 +330,40 @@ export default {
       // 利用fileReader对象获取file
       var file = e.target.files[0];
       var filesize = file.size;
-      var imgcode = "";
       // 2,621,440   2M
       if (filesize > 2101440) {
         // 图片大于2MB
         this.$Message.error("size > 2MB");
       }
-      var reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = e => {
-        // 读取到的图片base64 数据编码 将此编码字符串传给后台即可
-        imgcode = e.target.result;
-        this.img = imgcode;
-      };
+      else{
+        var reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = e => {
+          // 读取到的图片base64 数据编码 将此编码字符串传给后台即可
+          let formData = new FormData();
+          formData.append("picture", file);
+          this.axios
+          .post("/GeoProblemSolving/project/picture", formData)
+          .then(res=>{
+            if(res.data!="Fail"){
+              this.pictureUrl=res.data;
+              var imgcode = e.target.result;
+              this.img = imgcode;
+            }
+            else{
+              this.$Message.error("upload picture Fail!");
+            }
+          })
+          .catch();
+        };
+      }
     },
     handleView() {
       this.visible = true;
     },
     handleRemove() {
       this.img = "";
+      this.pictureUrl="";
     }
   },
   created() {
