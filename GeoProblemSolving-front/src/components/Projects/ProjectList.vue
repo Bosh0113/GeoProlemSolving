@@ -3,6 +3,9 @@ img {
   /* padding:10px; */
   max-width: 100%;
   max-height: 100%;
+  /* 用css替代图片，使图片显示为其灰度版本 */
+  /* filter: grayscale(100%); */
+
 }
 .whitespace {
   height: 20px;
