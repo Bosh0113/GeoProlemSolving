@@ -76,13 +76,13 @@ img {
               style="margin-right:2.5%;font-size:15px;height:40px"
               icon="md-add"
             >Create</Button>
-            <Button
+            <!-- <Button
               type="default"
               style="margin-right:2.5%;font-size:15px;height:40px"
               icon="md-person-add"
               class="btnJoin"
               @click="joinModalShow"
-            >Join</Button>
+            >Join</Button> -->
 
           </div>
         </div>
@@ -136,7 +136,7 @@ img {
                     >
                       <Button
                         type="success"
-                        v-show="item.isMember===false&&item.isManager===false"
+                        v-show="!item.isMember&&!item.isManager&&UserState"
                         @click.stop="joinApply(item)"
                       >
                         <Icon type="md-add"/>
@@ -145,7 +145,7 @@ img {
                       <Icon
                         type="md-person"
                         :size="30"
-                        v-show="item.isMember===true||item.isManager===true"
+                        v-show="item.isMember||item.isManager"
                         :id="item.projectId"
                       />
                     </div>
@@ -188,7 +188,7 @@ img {
                       </span>
                     </div>
 
-                    <Modal
+                    <!-- <Modal
                       v-model="joinModal"
                       title="Join in project"
                       ok-text="Submit"
@@ -204,7 +204,7 @@ img {
                           style="width: 400px"
                         >
                       </div>
-                    </Modal>
+                    </Modal> -->
                     <Modal
                       v-model="quitModal"
                       title="Quit Project"
@@ -242,7 +242,10 @@ export default {
       return this.currentProjectList.filter(item => {
         return item.title.match(this.search);
       });
-    }
+    },
+    UserState() {
+      return this.$store.getters.userState;
+    },
   },
   components: {
     Avatar
@@ -257,7 +260,7 @@ export default {
       isMember: false,
       isManager: false,
       // join按钮点击后模态框
-      joinModal: false,
+      // joinModal: false,
       //quit按钮点击后弹出的模态框
       quitModal: false,
       //加入项目的Id号
@@ -341,36 +344,36 @@ export default {
       }
     },
     //项目成员的id和name都要加进去
-    joinModalShow() {
-      if (this.$store.getters.userId != "") {
-        this.joinModal = true;
-      } else {
-        this.$Message.info("please login.");
-      }
-    },
-    joinProject() {
-      var projectId = this.joinProjectId;
-      this.axios
-        .get(
-          "/GeoProblemSolving/project/join?" +
-            "projectId=" +
-            projectId +
-            "&userId=" +
-            this.$store.getters.userId
-        )
-        .then(res => {
-          if (res.data === "Success") {
-            this.$Message.info("Join Success");
-            //跳转
-            this.$router.push({ path: `project/${projectId}` });
-          } else if (res.data === "Exist") {
-            this.$Message.info("you have already be a member in project");
-          }
-        })
-        .catch(err => {
-          this.$Message.danger("Join fail");
-        });
-    },
+    // joinModalShow() {
+    //   if (this.$store.getters.userId != "") {
+    //     this.joinModal = true;
+    //   } else {
+    //     this.$Message.info("please login.");
+    //   }
+    // },
+    // joinProject() {
+    //   var projectId = this.joinProjectId;
+    //   this.axios
+    //     .get(
+    //       "/GeoProblemSolving/project/join?" +
+    //         "projectId=" +
+    //         projectId +
+    //         "&userId=" +
+    //         this.$store.getters.userId
+    //     )
+    //     .then(res => {
+    //       if (res.data === "Success") {
+    //         this.$Message.info("Join Success");
+    //         //跳转
+    //         this.$router.push({ path: `project/${projectId}` });
+    //       } else if (res.data === "Exist") {
+    //         this.$Message.info("you have already be a member in project");
+    //       }
+    //     })
+    //     .catch(err => {
+    //       this.$Message.danger("Join fail");
+    //     });
+    // },
     showJoinApplyBtn(item) {
       var state = this.$store.getters.userState;
       if (!item.isMember && !item.isManager && state) {

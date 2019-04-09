@@ -18,4 +18,6 @@ public interface IProjectDao {
     String quitProject(String projectId,String userId);
 
     Object changeManager(String projectId,String userId);
+
+    String joinByMail(String projectId, String email, String password);
 }

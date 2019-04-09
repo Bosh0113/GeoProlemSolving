@@ -77,6 +77,7 @@ public class UserController {
                 session.setAttribute("userName",user.getUserName());
                 session.setAttribute("avatar",user.getAvatar());
                 session.setAttribute("email",user.getEmail());
+                session.setMaxInactiveInterval(30*60);
                 System.out.println("User login. UserName: "+user.getUserName());
             }
             return object;
@@ -108,5 +109,11 @@ public class UserController {
         }catch (Exception e){
             return false;
         }
+    }
+
+    @RequestMapping(value = "/isRegistered", method = RequestMethod.GET)
+    public Boolean isRegistered(@RequestParam("email") String email){
+        UserDaoImpl userDao = new UserDaoImpl(mongoTemplate);
+        return userDao.isRegistered(email);
     }
 }

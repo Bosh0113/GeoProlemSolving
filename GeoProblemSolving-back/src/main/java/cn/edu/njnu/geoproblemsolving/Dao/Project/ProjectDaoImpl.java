@@ -1,5 +1,6 @@
 package cn.edu.njnu.geoproblemsolving.Dao.Project;
 
+import cn.edu.njnu.geoproblemsolving.Dao.User.UserDaoImpl;
 import cn.edu.njnu.geoproblemsolving.Entity.ProjectEntity;
 import cn.edu.njnu.geoproblemsolving.Dao.Method.CommonMethod;
 import cn.edu.njnu.geoproblemsolving.Dao.Method.EncodeUtil;
@@ -225,4 +226,41 @@ public class ProjectDaoImpl implements IProjectDao {
             return "Fail";
         }
     }
+
+    @Override
+    public String joinByMail(String projectId, String email, String password){
+        try {
+            // decode
+            if (projectId.length() > 36) {
+                String pId = new String(EncodeUtil.decode(projectId));
+                projectId = pId.substring(0, pId.length() - 2);
+            }
+            UserDaoImpl userDao=new UserDaoImpl(mongoTemplate);
+            UserEntity userEntity=new UserEntity();
+            if (userDao.isRegistered(email)){
+                if (userDao.verifyPassword(email,password)){
+                    Query query = new Query(Criteria.where("email").is(email));
+                    userEntity=mongoTemplate.findOne(query,UserEntity.class);
+                }else {
+                    return "Password";
+                }
+            }else {
+                userEntity.setUserId(UUID.randomUUID().toString());
+                userEntity.setUserName(email);
+                userEntity.setEmail(email);
+                userEntity.setPassword(password);
+                userEntity.setJoinedProjects(new JSONArray());
+                userDao.saveUser(userEntity);
+            }
+            String userId=userEntity.getUserId();
+            String result=joinProject(projectId,userId).toString();
+            if (!result.equals("Success")){
+                return result;
+            }
+            return "Success";
+        }catch (Exception e){
+            return "Fail";
+        }
+    }
+
 }

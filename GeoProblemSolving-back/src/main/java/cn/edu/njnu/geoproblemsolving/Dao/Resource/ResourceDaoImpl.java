@@ -72,7 +72,7 @@ public class ResourceDaoImpl implements IResourceDao {
                         }
                         String newFileTitle=saveName + randomNum + "." + suffix;
                         String localPath = temp + "\\" + newFileTitle;
-
+                        System.out.println("资源上传到本地路径："+localPath);
                         File file = new File(localPath);
                         FileOutputStream fileOutputStream = new FileOutputStream(file);
                         InputStream inputStream = part.getInputStream();

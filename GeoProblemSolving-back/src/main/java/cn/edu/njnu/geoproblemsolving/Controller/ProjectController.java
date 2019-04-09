@@ -85,4 +85,10 @@ public class ProjectController {
             return "Fail";
         }
     }
+
+    @RequestMapping(value = "/joinByMail", method = RequestMethod.GET)
+    public String joinByMail(@RequestParam("projectId") String projectId,@RequestParam("email") String email,@RequestParam("password") String password) {
+        ProjectDaoImpl projectDao = new ProjectDaoImpl(mongoTemplate);
+        return projectDao.joinByMail(projectId,email,password);
+    }
 }

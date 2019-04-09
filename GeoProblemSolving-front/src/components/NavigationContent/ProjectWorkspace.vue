@@ -1059,6 +1059,7 @@ export default {
         this.closeModuleSocket();
         this.order = item;
         this.currentModuleIndex = item - 1;
+        this.foreModuleId="";
       } else {
         this.currentModuleIndex = item - 1;
         this.currentModule = this.moduleList[this.currentModuleIndex];

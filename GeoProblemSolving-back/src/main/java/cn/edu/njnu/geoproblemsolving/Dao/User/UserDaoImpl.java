@@ -27,11 +27,11 @@ public class UserDaoImpl implements IUserDao {
     @Override
     public String saveUser(UserEntity user) {
         Query queryEmail = Query.query(Criteria.where("email").is(user.getEmail()));
-        Query queryPhone = Query.query(Criteria.where("mobilePhone").is(user.getMobilePhone()));
+//        Query queryPhone = Query.query(Criteria.where("mobilePhone").is(user.getMobilePhone()));
         if (!mongoTemplate.find(queryEmail, UserEntity.class).isEmpty()) {
             return "Email";
-        } else if (!mongoTemplate.find(queryPhone, UserEntity.class).isEmpty()) {
-            return "MobilePhone";
+//        } else if (!mongoTemplate.find(queryPhone, UserEntity.class).isEmpty()) {
+//            return "MobilePhone";
         } else {
             mongoTemplate.save(user);
             return user.getUserId();
@@ -73,15 +73,33 @@ public class UserDaoImpl implements IUserDao {
 
     @Override
     public Object login(String email, String password) {
-        AESUtils aesUtils=new AESUtils();
-        password=aesUtils.decrypt(password);
-        Query query = new Query(Criteria.where("email").is(email).and("password").is(password));
-        if (!mongoTemplate.find(query, UserEntity.class).isEmpty()) {
-            UserEntity user = mongoTemplate.findOne(query, UserEntity.class);
-            user.setPassword("");
-            return user;
-        } else {
-            return "Fail";
+        if(isRegistered(email)){
+            AESUtils aesUtils=new AESUtils();
+            password=aesUtils.decrypt(password);
+            if (verifyPassword(email,password)){
+                Query query = new Query(Criteria.where("email").is(email));
+                UserEntity user = mongoTemplate.findOne(query, UserEntity.class);
+                user.setPassword("");
+                return user;
+            }
+            else {
+                return "Password";
+            }
         }
+        else {
+            return "Email";
+        }
+    }
+
+    @Override
+    public Boolean isRegistered(String email){
+        Query query = new Query(Criteria.where("email").is(email));
+        return !mongoTemplate.find(query, UserEntity.class).isEmpty();
+    }
+
+    @Override
+    public Boolean verifyPassword(String email,String password){
+        Query query = new Query(Criteria.where("email").is(email).and("password").is(password));
+        return !mongoTemplate.find(query, UserEntity.class).isEmpty();
     }
 }
