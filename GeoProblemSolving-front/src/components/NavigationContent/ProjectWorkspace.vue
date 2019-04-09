@@ -108,10 +108,10 @@
   border: 1px solid lightgray;
   transition: all 1s;
 }
-.subProjectDesc{
-  text-indent:2em;
-  padding:10px;
-  word-break:break-all;
+.subProjectDesc {
+  text-indent: 2em;
+  padding: 10px;
+  word-break: break-all;
 }
 /* .member-panel:hover,
 .resource:hover {
@@ -131,6 +131,7 @@
 /* 工具库中抽屉的工具样式*/
 .singl_tool_style {
   padding: 10px;
+  cursor: pointer;
 }
 .singl_tool_style span {
   display: flex;
@@ -178,15 +179,43 @@
             style="height:40px;display:flex;align-items:center"
             class="operatePanel"
           >
-          <Button type="default" @click="addModal = true" icon="md-add" class="addBtn" title="Add a new module">Add</Button>
-          <template v-if="moduleList.length <= 0 || currentModuleIndex == -1 || order == 0">
-            <Button type="default" @click="conveneWork()" icon="md-mail" title="Start to work">Convene</Button>
-            <Button type="default" @click="backProject()" icon="md-arrow-back" title="Back to project page">Back</Button>
-          </template>
-          <template v-else>
-            <Button type="default" @click="delModal = true" icon="md-remove" class="removeBtn" title="Remove this module">Remove</Button>
-            <Button type="default" @click="editModalShow()" icon="md-brush" class="editBtn" title="Edit this module">Edit</Button>
-          </template>
+            <Button
+              type="default"
+              @click="addModal = true"
+              icon="md-add"
+              class="addBtn"
+              title="Add a new module"
+            >Add</Button>
+            <template v-if="moduleList.length <= 0 || currentModuleIndex == -1 || order == 0">
+              <Button
+                type="default"
+                @click="conveneWork()"
+                icon="md-mail"
+                title="Start to work"
+              >Convene</Button>
+              <Button
+                type="default"
+                @click="backProject()"
+                icon="md-arrow-back"
+                title="Back to project page"
+              >Back</Button>
+            </template>
+            <template v-else>
+              <Button
+                type="default"
+                @click="delModal = true"
+                icon="md-remove"
+                class="removeBtn"
+                title="Remove this module"
+              >Remove</Button>
+              <Button
+                type="default"
+                @click="editModalShow()"
+                icon="md-brush"
+                class="editBtn"
+                title="Edit this module"
+              >Edit</Button>
+            </template>
           </div>
           <Row>
             <Col span="22" offset="1" style="margin-top:10px;background-color:white;">
@@ -219,7 +248,11 @@
           >
             <div class="title">Participants</div>
             <div :style="{height:sidebarHeight-100+'px'}">
-              <div class="member-desc" v-for="(member,index) in this.participants" :key="member.index">
+              <div
+                class="member-desc"
+                v-for="(member,index) in this.participants"
+                :key="member.index"
+              >
                 <template v-if="index==0">
                   <Badge text="♔" type="warning" class="userAvatar">
                     <div
@@ -344,10 +377,17 @@
           <div style="background-color:white;padding:20px">
             <h2 style="margin-bottom:5px">Description</h2>
             <hr style="margin-bottom:10px">
-            <div :style="{height:sidebarHeight-140+'px'}" class="subProjectDesc">{{subProjectInfo.description}}</div>
+            <div
+              :style="{height:sidebarHeight-140+'px'}"
+              class="subProjectDesc"
+            >{{subProjectInfo.description}}</div>
           </div>
           <div style="display:flex;align-items:center;justify-content:center;height:60px">
-            <Button type="error" style="margin:auto" v-show="subProjectInfo.managerId == this.$store.getters.userId">Delete this sub-project ?</Button>
+            <Button
+              type="error"
+              style="margin:auto"
+              v-show="subProjectInfo.managerId == this.$store.getters.userId"
+            >Delete this sub-project ?</Button>
           </div>
         </Col>
       </Row>
@@ -410,9 +450,9 @@
               <h2 style="width:100%;padding:10px 10px 0 10px">{{currentModule.title}}</h2>
               <hr>
               <div style="width:100%;padding:10px">
-                <span style="word-break: break-all;text-indent:2em;padding:10px">
-                  {{currentModule.description}}
-                </span>
+                <span
+                  style="word-break: break-all;text-indent:2em;padding:10px"
+                >{{currentModule.description}}</span>
               </div>
             </div>
             <div
@@ -481,9 +521,11 @@
                               @click="editOneTask(index,taskTodo)"
                               class="taskName"
                             >{{item.taskName}}</strong>
-                            <span style="float:right;margin-right:3px;cursor: pointer;color:gray;"
-                              @click="taskRemove(index,taskTodo)">
-                              <Icon type="ios-trash" />
+                            <span
+                              style="float:right;margin-right:3px;cursor: pointer;color:gray;"
+                              @click="taskRemove(index,taskTodo)"
+                            >
+                              <Icon type="ios-trash"/>
                             </span>
                           </div>
                           <p style="word-break:break-word;padding:5px">{{item.description}}</p>
@@ -510,15 +552,17 @@
                               @click="editOneTask(index,taskDoing)"
                               class="taskName"
                             >{{item.taskName}}</strong>
-                            <span style="float:right;margin-right:3px;cursor: pointer;color:gray;"
-                              @click="taskRemove(index,taskDoing)">
-                              <Icon type="ios-trash" />
-                            </span>
-<!--
                             <span
                               style="float:right;margin-right:3px;cursor: pointer;color:gray;"
                               @click="taskRemove(index,taskDoing)"
-                            >×</span> -->
+                            >
+                              <Icon type="ios-trash"/>
+                            </span>
+                            <!--
+                            <span
+                              style="float:right;margin-right:3px;cursor: pointer;color:gray;"
+                              @click="taskRemove(index,taskDoing)"
+                            >×</span>-->
                           </div>
                           <p style="word-break:break-word;padding:5px">{{item.description}}</p>
                         </Card>
@@ -544,9 +588,11 @@
                               @click="editOneTask(index,taskDone)"
                               class="taskName"
                             >{{item.taskName}}</strong>
-                            <span style="float:right;margin-right:3px;cursor: pointer;color:gray;"
-                              @click="taskRemove(index,taskDone)">
-                              <Icon type="ios-trash" />
+                            <span
+                              style="float:right;margin-right:3px;cursor: pointer;color:gray;"
+                              @click="taskRemove(index,taskDone)"
+                            >
+                              <Icon type="ios-trash"/>
                             </span>
                           </div>
                           <p style="word-break:break-word;padding:5px">{{item.description}}</p>
@@ -563,50 +609,115 @@
         <Col span="1" class="util-panel">
           <div class="util-btn-group">
             <Button type="info" class="util-btn" shape="circle" @click="toolPanel('chat')">
-              <Icon type="md-contacts" size="20" class="util-btn-icon" />
+              <Icon type="md-contacts" size="20" class="util-btn-icon"/>
             </Button>
             <Button type="info" class="util-btn" shape="circle" @click="drawerOpen = true">
               <Icon type="ios-albums" size="20" class="util-btn-icon"/>
             </Button>
-            <!-- <Button type="info" class="util-btn" shape="circle" @click="resourcedrawerOpen = true">
-              <Icon type="md-cloud-upload" size="20" class="util-btn-icon"/>
-            </Button>-->
             <Drawer :closable="false" v-model="drawerOpen" width="640" style="font-size:30px">
-              <h1>General Tools</h1>
-              <div class="tool-panel">
-                <div class="singl_tool_style">
-                  <Icon type="md-analytics" size="60" @click.native="show" title="Modeling Tools" color="orange"/>
+              <!-- tab contains collaborative and non-collaborative -->
+              <Tabs value="General">
+                <TabPane label="General" name="General">
+                  <h2>Collaborative Tools</h2>
+                  <div style="display:flex;align-items:center">
+                    <Icon type="ios-information-circle-outline"/>
+                    <span>Provide real-time collaboration for multiplayer online use</span>
+                  </div>
+                  <div class="tool-panel">
+                    <div class="singl_tool_style">
+                      <Icon
+                        type="md-analytics"
+                        size="60"
+                        @click.native="show"
+                        title="Modeling Tools"
+                        color="orange"
+                      />
+                      <br>
+                      <span style="display:flex;justify-content:center">Analyze</span>
+                    </div>
+                    <!-- <Icon type="md-brush" /> -->
+                    <div class="singl_tool_style">
+                      <Icon
+                        type="md-brush"
+                        size="60"
+                        @click.native="toolPanel('draw')"
+                        title="DrawBoard"
+                        color="green"
+                      />
+                      <br>
+                      <span style="display:flex;justify-content:center">Draw</span>
+                    </div>
+                    <!-- <Icon type="md-map" /> -->
+                    <div class="singl_tool_style">
+                      <Icon
+                        type="md-map"
+                        size="60"
+                        @click.native="toolPanel('map')"
+                        title="Map"
+                        color="lightblue"
+                      />
+                      <br>
+                      <span style="display:flex;justify-content:center">Map</span>
+                    </div>
+                    <!-- <Icon type="ios-book-outline" /> -->
+                    <div class="singl_tool_style">
+                      <Icon
+                        type="md-grid"
+                        size="60"
+                        @click.native="toolPanel('chart')"
+                        title="Chart"
+                        color="darkgreen"
+                      />
+                      <br>
+                      <span style="display:flex;justify-content:center">Chart</span>
+                    </div>
+                    <div class="singl_tool_style">
+                      <Icon
+                        type="ios-create"
+                        size="60"
+                        @click.native="toolPanel('graphEditor')"
+                        title="Graph Editor"
+                        color="gray"
+                      />
+                      <br>
+                      <span style="display:flex;justify-content:center">Graph Editor</span>
+                    </div>
+                  </div>
+                  <h2>Non-Collaborative Tools</h2>
+                  <div style="display:flex;align-items:center">
+                    <Icon type="ios-information-circle-outline"/>
+                    <span>can't offer collaborative functions, it is suitable when other members are not online.</span>
+                  </div>
+                </TabPane>
+                <TabPane label="Special" name="Special">
+                  <h2>Special Tools</h2>
+                  <div style="display:flex;align-items:center">
+                    <Icon type="ios-information-circle-outline"/>
+                    <span>Aim to different stage of Geographical problems' solving</span>
+                  </div>
                   <br>
-                  <span style="display:flex;justify-content:center">Analyze</span>
-                </div>
-                <!-- <Icon type="md-brush" /> -->
-                <div class="singl_tool_style">
-                  <Icon type="md-brush" size="60" @click.native="toolPanel('draw')" title="DrawBoard" color="green"/>
-                  <br>
-                  <span style="display:flex;justify-content:center">Draw</span>
-                </div>
-                <!-- <Icon type="md-map" /> -->
-                <div class="singl_tool_style">
-                  <Icon type="md-map" size="60" @click.native="toolPanel('map')" title="Map" color="lightblue"/>
-                  <br>
-                  <span style="display:flex;justify-content:center">Map</span>
-                </div>
-                <!-- <Icon type="ios-book-outline" /> -->
-                <div class="singl_tool_style">
-                  <Icon type="md-grid" size="60" @click.native="toolPanel('chart')" title="Chart" color="darkgreen"/>
-                  <br>
-                  <span style="display:flex;justify-content:center">Chart</span>
-                </div>
-                <div class="singl_tool_style">
-                  <Icon type="ios-create" size="60" @click.native="toolPanel('graphEditor')" title="Graph Editor" color="gray"/>
-                  <br>
-                  <span style="display:flex;justify-content:center">Graph Editor</span>
-                </div>
-                <!-- <Icon type="md-analytics" size="60" @click.native="show" title="Modeling Tools"/>
-                <Icon type="md-analytics" size="60" @click.native="show" title="Modeling Tools"/> -->
-              </div>
-              <hr>
-              <h1>Special Tools</h1>
+                  <Collapse v-model="collapseValue">
+                      <Panel name="Preparation">
+                        Preparation
+                      </Panel>
+                      <Panel name="Analysis">
+                       Analysis
+                      </Panel>
+                      <Panel name="Modeling">
+                        Modeling
+                      </Panel>
+                      <Panel name="Simulation">
+                        Simulation
+                      </Panel>
+                      <Panel name="Comparison">
+                        Comparison
+                      </Panel>
+                      <Panel name="Verification">
+                        Verification
+                      </Panel>
+                    </Collapse>
+                </TabPane>
+              </Tabs>
             </Drawer>
           </div>
         </Col>
@@ -761,11 +872,7 @@
     >
       <div class="addNodeStyle">
         <span style="width:10%">Name</span>
-        <Input
-          v-model="moduleTitle"
-          placeholder="Enter something..."
-          style="width: 400px"
-        />
+        <Input v-model="moduleTitle" placeholder="Enter something..." style="width: 400px"/>
       </div>
       <div class="addNodeStyle">
         <span style="width:10%">Type</span>
@@ -883,7 +990,8 @@ export default {
         who: "",
         whoid: "",
         content: ""
-      }
+      },
+      collapseValue:["Preparation","Analysis"]
     };
   },
   created() {
@@ -902,7 +1010,6 @@ export default {
       } else {
         if (!(vm.subProjectInfo.isManager || vm.subProjectInfo.isMember)) {
           alert("No access");
-          // next(`/project/${vm.$store.getters.currentProjectId}`);
           vm.$router.go(-1);
         }
       }
@@ -1489,30 +1596,34 @@ export default {
             } else {
               // 告诉拉进去的人已经进项目
               // 把通知存库里
-               //reply to applicant
-            let replyNotice = {};
-            // 改apply.content.userId
-            replyNotice["recipientId"] = this.inviteList[i];// 改apply.content.userId
-            replyNotice["type"] = "notice";
-            replyNotice["content"] = {// 改
-              title: "Join subProject",
-              description:
-                "You have been invited by " + this.subProjectInfo.managerName +  " to join in the sub project: " +
-                this.subProjectInfo.title + " , and now you are a member in this sub project."
-            };
-            this.axios
-              .post("/GeoProblemSolving/notice/save", replyNotice)
-              .then(result => {
-                if (result.data == "Success") {
-                  this.$emit("sendNotice", this.inviteList[i]);// 改apply.content.userId
-                } else {
-                  this.$Message.danger("reply fail.");
-                }
-              // this.$emit("sendNotice", this.subProjectInfo.managerId);
-              //发给子项目的管理者
-            });
+              //reply to applicant
+              let replyNotice = {};
+              // 改apply.content.userId
+              replyNotice["recipientId"] = this.inviteList[i]; // 改apply.content.userId
+              replyNotice["type"] = "notice";
+              replyNotice["content"] = {
+                // 改
+                title: "Join subProject",
+                description:
+                  "You have been invited by " +
+                  this.subProjectInfo.managerName +
+                  " to join in the sub project: " +
+                  this.subProjectInfo.title +
+                  " , and now you are a member in this sub project."
+              };
+              this.axios
+                .post("/GeoProblemSolving/notice/save", replyNotice)
+                .then(result => {
+                  if (result.data == "Success") {
+                    this.$emit("sendNotice", this.inviteList[i]); // 改apply.content.userId
+                  } else {
+                    this.$Message.danger("reply fail.");
+                  }
+                  // this.$emit("sendNotice", this.subProjectInfo.managerId);
+                  //发给子项目的管理者
+                });
+            }
           }
-        }
         });
       }
       this.init();
@@ -1542,7 +1653,7 @@ export default {
         });
     },
     //创建任务
-    createTaskModalShow(){
+    createTaskModalShow() {
       let taskDefult = {
         taskName: "",
         description: "",
@@ -1791,16 +1902,16 @@ export default {
         headerTitle: "Tools",
         contentSize: "1000 600",
         content: toolURL,
-        disableOnMaximized: true,
+        disableOnMaximized: true
       });
       panel.resizeit("disable");
       $(".jsPanel-content").css("font-size", "0");
     },
     //task独立页面
-    goToTask(){
-      this.$router.push({name:"taskList"}) ;
-        disableOnMaximized: true
-      }
+    goToTask() {
+      this.$router.push({ name: "taskList" });
+      disableOnMaximized: true;
     }
+  }
 };
 </script>
