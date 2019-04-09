@@ -39,7 +39,7 @@ public class ModuleSocket {
     public void onMessage(@PathParam("moduleId") String moduleId, String message) {
         JSONObject messageObject = JSONObject.parseObject(message);
         String messageType = messageObject.getString("type");
-        if (messageType.equals("message")) {
+        if (!(messageType.equals("ping"))) {
             broadcastMessageToModule(moduleId, message);
         }
     }

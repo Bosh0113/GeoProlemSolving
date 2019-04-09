@@ -646,7 +646,7 @@ export default {
     });
   },
   beforeRouteLeave(to, from, next) {
-    // this.removeTimer();
+    this.removeTimer();
     next();
   },
   beforeDestroy: function() {
@@ -761,7 +761,7 @@ export default {
     showDetail(item) {
       this.order = item;
       if (item == 1) {        
-        this.openModuleSocket(this.subProjectInfo.subProjectId);
+        this.openModuleSocket();
       }
       else if( item == 2){
         this.closeModuleSocket();
@@ -773,13 +773,15 @@ export default {
     },
     closeModuleSocket() {
       if (this.subprojectSocket != null) {
+        this.removeTimer();
         this.subprojectSocket.close();
       }
     },
-    openModuleSocket(subprojectId) {
+    openModuleSocket() {
       if (this.subprojectSocket != null) {
         this.subprojectSocket = null;
       }
+      let subprojectId = this.subProjectInfo.subProjectId;
       var subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + subprojectId;
       // var subprojectSocketURL = "ws://202.195.237.252:8082/GeoProblemSolving/Module/" + subprojectId;
       // var subprojectSocketURL = "ws://172.21.212.7:8082/GeoProblemSolving/Module/" + subprojectId;
@@ -802,17 +804,10 @@ export default {
         who: "",
         content: ""
       };
-      
-      if (messageJson.type == "message") {
-        let message = messageJson.message;
 
-        // 任务记录
-        if (
-          message.type == "tasks" &&
-          message.whoid != this.$store.getters.userId
-        ) {
-          this.inquiryTask();
-        }
+      // 任务记录
+      if (messageJson.type == "tasks") {
+        this.inquiryTask();
       }
     },
     onClose(e) {
@@ -838,10 +833,7 @@ export default {
       clearInterval(this.timer);
     },
     sendMessage(message) {
-      var messageJson = {};
-      messageJson["type"] = "message";
-      messageJson["message"] = message;
-      this.subprojectSocket.send(JSON.stringify(messageJson));
+      this.subprojectSocket.send(JSON.stringify(message));
     },
     // 返回项目页
     backProject() {

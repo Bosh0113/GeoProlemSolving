@@ -227,14 +227,14 @@
                   class="editBtn"
                   title="Activate this module"
                 >Activate</Button>
+                <Button
+                  type="default"
+                  @click="delModal = true"
+                  icon="md-remove"
+                  class="removeBtn"
+                  title="Remove this module"
+                >Remove</Button>
               </template>
-              <Button
-                type="default"
-                @click="delModal = true"
-                icon="md-remove"
-                class="removeBtn"
-                title="Remove this module"
-              >Remove</Button>
             </template>
           </div>
           <Row>
@@ -245,7 +245,8 @@
                     v-for="(list,index) in moduleList"
                     :key="index"
                     @click.native="showDetail(index)"
-                    :title="list.title"
+                    :title="list.type"
+                    :content="list.title"
                     :order="index"
                   ></Step>
                 </Steps>
@@ -256,7 +257,8 @@
                     v-for="(list,index) in moduleList"
                     :key="index"
                     @click.native="showDetail(index)"
-                    :title="list.title"
+                    :title="list.type"
+                    :content="list.title"
                     :order="index"
                   ></Step>
                 </Steps>
@@ -829,7 +831,7 @@ export default {
       // 当前模块的索引
       currentModuleIndex: 0,
       // web socket for module
-      moduleSocket: null,
+      subprojectSocket: null,
       timer: null,
       // 动态记录相关
       // 所有module的记录
@@ -874,7 +876,8 @@ export default {
     this.getAllModules("init");
   },
   mounted() {
-    window.addEventListener("resize", this.reSize);
+    window.addEventListener("resize", this.reSize);    
+    this.openModuleSocket();
   },
   // add by mzy for navigation guards
   beforeRouteEnter: (to, from, next) => {
@@ -891,7 +894,7 @@ export default {
     });
   },
   beforeRouteLeave(to, from, next) {
-    // this.removeTimer();
+    this.removeTimer();
     this.closeModuleSocket();
     next();
   },
@@ -996,40 +999,39 @@ export default {
       }
     },
     showDetail(item) {
+      let oldId = this.currentModule.moduleId;
+
       this.currentModuleIndex = item;
+      this.order = item;
       this.currentModule = this.moduleList[this.currentModuleIndex];
+
+      if(oldId == this.currentModule.moduleId){
+        this.allRecords = [];
+      }
+
       sessionStorage.setItem("moduleId", this.currentModule.moduleId);
       sessionStorage.setItem("moduleName", this.currentModule.title);
-
-      if (item != this.order) {
-        this.closeModuleSocket();
-        this.openModuleSocket(this.currentModule.moduleId);
-      }
-      this.order = item;
-
-      this.olParticipants = [];
     },
     closeModuleSocket() {
-      if (this.moduleSocket != null) {
-        this.moduleSocket.close();
+      if (this.subprojectSocket != null) {
+        this.removeTimer();
+        this.subprojectSocket.close();
       }
     },
-    openModuleSocket(moduleId) {
-      if (this.moduleSocket != null) {
-        this.moduleSocket = null;
+    openModuleSocket() {
+      if (this.subprojectSocket != null) {
+        this.subprojectSocket = null;
       }
-      if (this.currentModule.activeStatus) {
-        var moduleSocketURL =
-          "ws://localhost:8081/GeoProblemSolving/Module/" + moduleId;
-        // var moduleSocketURL = "ws://202.195.237.252:8082/GeoProblemSolving/Module/" + moduleId;
-        // var moduleSocketURL = "ws://172.21.212.7:8082/GeoProblemSolving/Module/" + moduleId;
-        this.moduleSocket = new WebSocket(moduleSocketURL);
-        this.moduleSocket.onopen = this.onOpen;
-        this.moduleSocket.onmessage = this.onMessage;
-        this.moduleSocket.onclose = this.onClose;
-        this.moduleSocket.onerror = this.onError;
-        this.setTimer();
-      }
+      let subprojectId = this.subProjectInfo.subProjectId;
+      var subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + subprojectId;
+      // var subprojectSocketURL = "ws://202.195.237.252:8082/GeoProblemSolving/Module/" + subprojectId;
+      // var subprojectSocketURL = "ws://172.21.212.7:8082/GeoProblemSolving/Module/" + subprojectId;
+      this.subprojectSocket = new WebSocket(subprojectSocketURL);
+      this.subprojectSocket.onopen = this.onOpen;
+      this.subprojectSocket.onmessage = this.onMessage;
+      this.subprojectSocket.onclose = this.onClose;
+      this.subprojectSocket.onerror = this.onError;
+      this.setTimer();
     },
     onOpen() {
       console.log("ModuleSocket连接成功！");
@@ -1043,25 +1045,21 @@ export default {
         who: "",
         content: ""
       };
-      if (messageJson.type == "message") {
-        let message = messageJson.message;
-
-        // 资源记录
-        if (
-          message.type == "resources" &&
-          message.whoid != this.$store.getters.userId
-        ) {
-        }
-        // 工具记录
-        if (
-          message.type == "tools" &&
-          message.whoid != this.$store.getters.userId
-        ) {
-        }
-
-        this.allRecords.push(message);
-      } else if (messageJson.type == "members") {
-        // 比较 判断人员动态 更新records --by mzy
+        
+      // 资源记录
+      if (messageJson.type == "resources") {
+        this.allRecords.push(messageJson);
+      }
+      // 工具记录
+      else if (messageJson.type == "tools") {
+        this.allRecords.push(messageJson);
+      }
+      // module 更新
+      else if (messageJson.type == "module") {
+        this.getAllModules('init');
+      }
+      else if (messageJson.type == "members") {
+        // 比较 判断人员动态 更新records
 
         let members = messageJson.message
           .replace("[", "")
@@ -1086,19 +1084,13 @@ export default {
         var messageJson = {};
         messageJson["type"] = "ping";
         messageJson["message"] = "ping";
-        if (that.moduleSocket != null && that.moduleSocket != undefined) {
-          that.moduleSocket.send(JSON.stringify(messageJson));
+        if (that.subprojectSocket != null && that.subprojectSocket != undefined) {
+          that.subprojectSocket.send(JSON.stringify(messageJson));
         }
       }, 20000);
     },
     removeTimer() {
       clearInterval(this.timer);
-    },
-    sendMessage(message) {
-      var messageJson = {};
-      messageJson["type"] = "message";
-      messageJson["message"] = message;
-      this.moduleSocket.send(JSON.stringify(messageJson));
     },
     olParticipantChange(members, callback) {
       let userIndex = -1;
@@ -1211,10 +1203,6 @@ export default {
         .then(res => {
           if (res.data != "None") {
             this.moduleList = res.data;
-            // init allRecords
-            for (let i = 0; i < this.moduleList.length; i++) {
-              this.allRecords = [];
-            }
 
             let index = this.getActiveModule();
             if (state == "init") {
@@ -1224,6 +1212,7 @@ export default {
             } else if (state == "delete") {
               // this.showDetail(this.order - 1);
             } else if (state == "update") {
+                   
               this.showDetail(this.order);
             }
           } else if (res.data == "None") {
@@ -1267,6 +1256,9 @@ export default {
                   .post("/GeoProblemSolving/module/update", updateObject)
                   .then(res => {
                     this2.getAllModules("update");
+                    
+                    let socketMsg = {type:"module",operate:"update"};
+                    this2.subprojectSocket.send(JSON.stringify(socketMsg));
                   })
                   .catch(err => {
                     console.log(err.data);
@@ -1288,7 +1280,8 @@ export default {
     },
     copyModule() {},
     activateModule() {
-      var _this = this;
+      var this1 = this;
+      var this2 = this;
       if (
         this.$store.getters.userInfo.userId == this.subProjectInfo.managerId
       ) {
@@ -1301,17 +1294,21 @@ export default {
           this.axios
             .post("/GeoProblemSolving/module/update", updateObject)
             .then(res => {
-              if (_this.moduleList[activeModelIndex].activeStatus) {
+
+              if (this1.moduleList[activeModelIndex].activeStatus) {
                 let updateObject = new URLSearchParams();
                 updateObject.append(
                   "moduleId",
-                  _this.moduleList[activeModelIndex].moduleId
+                  this1.moduleList[activeModelIndex].moduleId
                 );
                 updateObject.append("activeStatus", false);
                 this.axios
                   .post("/GeoProblemSolving/module/update", updateObject)
                   .then(res => {
-                    _this.getAllModules("update");
+                    this2.getAllModules("update");
+                    
+                    let socketMsg = {type:"module",operate:"update"};
+                    this2.subprojectSocket.send(JSON.stringify(socketMsg));
                   })
                   .catch(err => {
                     console.log(err.data);
@@ -1345,11 +1342,38 @@ export default {
                 that.moduleList.splice(that.currentModuleIndex, 1);
 
                 let index = that.getActiveModule();
-                that.showDetail(index);
+                that.showDetail(index);                
+                
+                let socketMsg = {type:"module",operate:"update"};
+                that.subprojectSocket.send(JSON.stringify(socketMsg));
               } else {
                 that.moduleList = [];
               }
             }
+          })
+          .catch(err => {
+            console.log(err.data);
+          });
+      }
+    },
+    updateModule() {
+      if (
+        this.$store.getters.userInfo.userId == this.subProjectInfo.managerId
+      ) {
+        var that = this;
+        let updateObject = new URLSearchParams();
+        updateObject.append("moduleId", this.currentModule.moduleId);
+        updateObject.append("title", this.updateModuleTitle);
+        updateObject.append("description", this.updateModuleDescription);
+        updateObject.append("type", this.updateModuleType);
+        updateObject.append("creater", this.$store.getters.userId);
+        this.axios
+          .post("/GeoProblemSolving/module/update", updateObject)
+          .then(res => {
+            that.getAllModules("update");
+            
+            let socketMsg = {type:"module",operate:"update"};
+            that.subprojectSocket.send(JSON.stringify(socketMsg));
           })
           .catch(err => {
             console.log(err.data);
@@ -1487,27 +1511,6 @@ export default {
       this.getProjectInfo();
       let id = this.projectInfo.projectId;
       this.$router.push(`../${id}`);
-    },
-    //更新模块的函数
-    updateModule() {
-      if (
-        this.$store.getters.userInfo.userId == this.subProjectInfo.managerId
-      ) {
-        let updateObject = new URLSearchParams();
-        updateObject.append("moduleId", this.currentModule.moduleId);
-        updateObject.append("title", this.updateModuleTitle);
-        updateObject.append("description", this.updateModuleDescription);
-        updateObject.append("type", this.updateModuleType);
-        updateObject.append("creater", this.$store.getters.userId);
-        this.axios
-          .post("/GeoProblemSolving/module/update", updateObject)
-          .then(res => {
-            this.getAllModules("update");
-          })
-          .catch(err => {
-            console.log(err.data);
-          });
-      }
     },
     ok() {
       this.$Message.info("Clicked ok");

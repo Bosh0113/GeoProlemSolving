@@ -11,7 +11,7 @@
   align-items: center;
   justify-content: center;
   height: 300px;
-  background-color:lightgray;
+  background-color:white;
 }
 .detail_image img {
   max-width: 90%;
