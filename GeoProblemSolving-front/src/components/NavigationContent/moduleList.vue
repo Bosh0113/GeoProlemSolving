@@ -331,12 +331,12 @@
           </Col>
           <template>
             <Col
-              :xs="14"
-              :sm="15"
-              :md="16"
-              :lg="16"
+              :xs="{span: 14, offset: 1}"
+              :sm="{span: 15, offset: 1}"
+              :md="{span: 16, offset: 1}"
+              :lg="{span: 16, offset: 1}"
               :style="{height:sidebarHeight/5*2+'px'}"
-              style="margin-bottom:20px;margin-left:50px;"
+              style="margin-bottom:20px"
             >
               <div style="height:100%;background-color:white">
                 <h2
@@ -352,7 +352,11 @@
             </Col>
           </template>
           <template>
-            <Col :xs="14" :sm="15" :md="16" :lg="16" style="margin-left:50px;">
+            <Col :xs="{span: 14, offset: 1}"
+              :sm="{span: 15, offset: 1}"
+              :md="{span: 16, offset: 1}"
+              :lg="{span: 16, offset: 1}"
+              >
               <Col span="12" >
                 <div
                 :style="{height:sidebarHeight/5*3 - 32 + 'px'}"
@@ -554,8 +558,8 @@
       <template v-else>
         <Row style="margin-top:20px" :style="{height:sidebarHeight+6+'px'}">
           <template>
-            <Col span="22" offset="1" :style="{height:sidebarHeight/5*3+'px'}">
-              <div style="width:45%;height:100%;float:left;background-color:white">
+            <Col span="22" offset="1" :style="{height:sidebarHeight/5*2+'px'}">
+              <div style="width:100%;height:100%;float:left;background-color:white">
                 <h2
                   style="width:100%;padding:10px 10px 0 10px; display: inline-block;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;max-width: 80%;"
                 >{{currentModule.title}}</h2>
@@ -566,9 +570,18 @@
                   >{{currentModule.description}}</span>
                 </div>
               </div>
+            </Col>
+          </template>
+          <template>
+            <Col span="22" offset="1" style="margin-top:20px;">
+            <Col span="11">
               <div
-                style="width:50%;height:100%;float:right;border:1px solid lightgray;background-color:white;overflow-y:scroll"
+                style="border:1px solid lightgray;background-color:white;overflow-y:scroll"
+                :style="{height:sidebarHeight/5*3 - 32 + 'px'}"
               >
+              <span
+                  style="height:40px;line-height:40px;margin-left:20px;font-size:1.5em;font-weight: bold"
+                >Timeline</span>
                 <Timeline style="padding:10px">
                   <TimelineItem v-for="(item,index) in historyRecords" :key="index">
                     <template v-if="item.type == 'participants'">
@@ -599,14 +612,12 @@
                 </Timeline>
               </div>
             </Col>
-          </template>
-          <template>
-            <Col span="22" offset="1" style="margin-top:20px;">
-              <div style="background-color:white">
-                <span
-                  style="height:40px;line-height:40px;margin-left:20px;font-size:1.5em;font-weight: bold"
+            <Col span="12" offset="1">
+              <div style="background-color:white" class="unique" :style="{height:sidebarHeight/5*3 - 32 + 'px'}">
+                <span style="height:40px;line-height:40px;margin-left:20px;font-size:1.5em;font-weight: bold"
                 >Resource</span>
                 <div style="float:right;margin:4px 10px 0 0" class="popCenter">
+
                   <Button
                     id="upload"
                     type="default"
@@ -653,6 +664,7 @@
                   </Table>
                 </div>
               </div>
+              </Col>
             </Col>
           </template>
         </Row>
