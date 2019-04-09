@@ -29,21 +29,21 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/inquiryTodo", method = RequestMethod.GET)
-    public Object inquiryTodo(@RequestParam("moduleId") String moduleId){
+    public Object inquiryTodo(@RequestParam("subprojectId") String subprojectId){
         TaskDaoImpl taskDao=new TaskDaoImpl(mongoTemplate);
-        return taskDao.inquiryTodo(moduleId);
+        return taskDao.inquiryTodo(subprojectId);
     }
 
     @RequestMapping(value = "/inquiryDoing", method = RequestMethod.GET)
-    public Object inquiryDoing(@RequestParam("moduleId") String moduleId){
+    public Object inquiryDoing(@RequestParam("subprojectId") String subprojectId){
         TaskDaoImpl taskDao=new TaskDaoImpl(mongoTemplate);
-        return taskDao.inquiryDoing(moduleId);
+        return taskDao.inquiryDoing(subprojectId);
     }
 
     @RequestMapping(value = "/inquiryDone", method = RequestMethod.GET)
-    public Object inquiryDone(@RequestParam("moduleId") String moduleId){
+    public Object inquiryDone(@RequestParam("subprojectId") String subprojectId){
         TaskDaoImpl taskDao=new TaskDaoImpl(mongoTemplate);
-        return taskDao.inquiryDone(moduleId);
+        return taskDao.inquiryDone(subprojectId);
     }
 
     @RequestMapping(value = "/delete", method = RequestMethod.GET)

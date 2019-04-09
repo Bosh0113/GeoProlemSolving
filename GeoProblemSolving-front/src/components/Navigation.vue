@@ -29,7 +29,7 @@
 <template>
   <div class="mainPart">
     <div class="header">
-      <img src="@/assets/images/OGMS.png" id="logo" class="pic">
+      <img src="@/assets/images/OGMS.png" id="logo" class="pic" @click="goHome" style="cursor:pointer">
       <div class="navPart">
         <Menu
           mode="horizontal"
@@ -153,6 +153,9 @@ export default {
       } else if (name == "help") {
         this.$router.replace({ name: "Help" });
       }
+    },
+    goHome() {
+      this.$router.push({ name: "Home" });
     },
     unlogin(name) {
       if (name === "login") {
