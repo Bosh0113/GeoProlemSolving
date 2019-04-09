@@ -53,11 +53,11 @@ public class TaskDaoImpl implements ITaskDao{
     }
 
     @Override
-    public Object inquiryTodo(String moduleId){
+    public Object inquiryTodo(String subprojectId){
         try {
             Query query=new Query();
             Criteria criteria=new Criteria();
-            criteria.andOperator(Criteria.where("moduleId").is(moduleId),Criteria.where("state").is("todo"));
+            criteria.andOperator(Criteria.where("subprojectId").is(subprojectId),Criteria.where("state").is("todo"));
             query.addCriteria(criteria);
             query.with(new Sort(Sort.Direction.ASC,"order"));
             return mongoTemplate.find(query,TaskEntity.class);
@@ -67,11 +67,11 @@ public class TaskDaoImpl implements ITaskDao{
     }
 
     @Override
-    public Object inquiryDoing(String moduleId){
+    public Object inquiryDoing(String subprojectId){
         try {
             Query query=new Query();
             Criteria criteria=new Criteria();
-            criteria.andOperator(Criteria.where("moduleId").is(moduleId),Criteria.where("state").is("doing"));
+            criteria.andOperator(Criteria.where("subprojectId").is(subprojectId),Criteria.where("state").is("doing"));
             query.addCriteria(criteria);
             query.with(new Sort(Sort.Direction.ASC,"order"));
             return mongoTemplate.find(query,TaskEntity.class);
@@ -81,11 +81,11 @@ public class TaskDaoImpl implements ITaskDao{
     }
 
     @Override
-    public Object inquiryDone(String moduleId){
+    public Object inquiryDone(String subprojectId){
         try {
             Query query=new Query();
             Criteria criteria=new Criteria();
-            criteria.andOperator(Criteria.where("moduleId").is(moduleId),Criteria.where("state").is("done"));
+            criteria.andOperator(Criteria.where("subprojectId").is(subprojectId),Criteria.where("state").is("done"));
             query.addCriteria(criteria);
             query.with(new Sort(Sort.Direction.ASC,"order"));
             return mongoTemplate.find(query,TaskEntity.class);

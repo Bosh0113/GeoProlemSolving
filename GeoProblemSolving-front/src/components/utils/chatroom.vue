@@ -72,7 +72,7 @@
           <div class="contentFooter">
             <div class="message_bar">
               <div class="u_avater">
-                <avatar class="user_img" username="Me" :size="40" style="margin-top: -4px;"></avatar>
+                <avatar class="user_img" username="m e" :size="40" style="margin-top: -4px;"></avatar>
               </div>
               <div class="input_panel">
                 <Input
@@ -341,7 +341,7 @@
 .message_input {
   height: 40px;
   margin-top: 10px;
-  margin-bottom: 10px;
+  /* margin-bottom: 10px; */
   margin-right: 15px;
   margin-left: 15px;
 }
@@ -351,7 +351,7 @@
 .send_message_btn {
   height: 32px;
   margin-top: 10px;
-  margin-bottom: 18px;
+  /* margin-bottom: 10px; */
 }
 /* 发送信息部分结束 */
 .chatObject {
@@ -507,7 +507,7 @@ export default {
         });
       } else if (scope == "project") {
         let that = this;
-        let queryObject = { key: "projectId", value: that.projectId };
+        let queryObject = { key: "projectId", value: this.projectId };
         try {
           $.ajax({
             url:
@@ -521,7 +521,8 @@ export default {
               if (data != "None" && data != "Fail") {
                 let projectInfo = data[0];
                 let membersList = projectInfo["members"];
-                let manager = projectInfo["managerId"];
+                let manager =  { userId: projectInfo["managerId"] };
+
                 membersList.unshift(manager);
                 let participantsTemp = [];
                 for (let i = 0; i < membersList.length; i++) {
@@ -531,7 +532,7 @@ export default {
                       "?key=" +
                       "userId" +
                       "&value=" +
-                      membersList[i],
+                      membersList[i].userId,
                     type: "GET",
                     async: false,
                     success: function(data) {

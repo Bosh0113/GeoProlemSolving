@@ -6,7 +6,7 @@ import java.util.Date;
 
 @Document(collection = "Task")
 public class TaskEntity {
-    private String moduleId;
+    private String subprojectId;
     private String taskId;
     private String taskName;
     private String description;
@@ -37,8 +37,8 @@ public class TaskEntity {
         return taskId;
     }
 
-    public String getModuleId() {
-        return moduleId;
+    public String getSubprojectId() {
+        return subprojectId;
     }
 
     public Date getEndTime() {
@@ -81,8 +81,8 @@ public class TaskEntity {
         this.creatorId = creatorId;
     }
 
-    public void setModuleId(String moduleId) {
-        this.moduleId = moduleId;
+    public void setSubprojectId(String subprojectId) {
+        this.subprojectId = subprojectId;
     }
 
     public void setEndTime(Date endTime) {
