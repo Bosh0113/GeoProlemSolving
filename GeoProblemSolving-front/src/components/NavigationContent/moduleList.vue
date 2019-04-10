@@ -1029,7 +1029,7 @@ export default {
       this.order = item;
       this.currentModule = this.moduleList[this.currentModuleIndex];
 
-      if(oldId == this.currentModule.moduleId){
+      if(oldId != this.currentModule.moduleId){
         this.allRecords = [];
       }
 
@@ -1272,6 +1272,7 @@ export default {
             if (res.data === "Fail") {
               this.$Message.info("Fail");
             } else {
+
               if (this1.moduleList.length > 0) {
                 let updateObject = new URLSearchParams();
                 updateObject.append("moduleId", this1.currentModule.moduleId);
@@ -1287,6 +1288,9 @@ export default {
                   .catch(err => {
                     console.log(err.data);
                   });
+              }
+              else {                
+                this1.getAllModules("update");
               }
 
               this1.createModuleSuccess(Module["title"]);
