@@ -99,7 +99,7 @@
   height: 10px;
 }
 .taskList {
-  min-height: 80px;
+  min-height: 60px;
   background: #f7f7f7;
 }
 .taskName {
@@ -121,32 +121,37 @@
         <Card>
           <p
             slot="title"
-           style="height:40px;line-height:40px;font-size:20px;display: inline-block;cursor: pointer;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;max-width: 50%;"
+            style="height:40px;line-height:40px;font-size:20px;display: inline-block;cursor: pointer;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;max-width: 50%;"
           >{{subProjectInfo.title}}</p>
           <div
             slot="extra"
             style="height:40px;display:flex;align-items:center"
             class="operatePanel"
           >
-              <Button
-                type="default"
-                @click="conveneWork()"
-                icon="md-mail"
-                title="Start to work"
-              >Convene</Button>
-              <Button
-                type="default"
-                @click="backProject()"
-                icon="md-arrow-back"
-                title="Back to project page"
-              >Back</Button>
+            <Button
+              type="default"
+              @click="conveneWork()"
+              icon="md-mail"
+              title="Start to work"
+            >Convene</Button>
+            <Button
+              type="default"
+              @click="backProject()"
+              icon="md-arrow-back"
+              title="Back to project page"
+            >Back</Button>
           </div>
           <Row>
             <Col span="22" offset="1" style="margin-top:10px;background-color:white;">
               <Steps :current="order">
                 <Step title="Home" icon="ios-home" @click.native="showDetail(0)" :order="0"></Step>
-                <Step title="Task" icon="ios-home" @click.native="showDetail(1)" :order="1"></Step>
-                <Step title="Start working" icon="ios-home" @click.native="showDetail(2)" :order="2"></Step>
+                <Step title="Task" icon="md-list" @click.native="showDetail(1)" :order="1"></Step>
+                <Step
+                  title="Start working"
+                  icon="ios-git-network"
+                  @click.native="showDetail(2)"
+                  :order="2"
+                ></Step>
               </Steps>
             </Col>
           </Row>
@@ -311,10 +316,7 @@
       </div>
       <template v-else-if="order == 1">
         <Col span="22" offset="1" style="margin-top:20px" :style="{height:sidebarHeight+4+'px'}">
-          <div
-            style="padding: 5px 0;background-color:white"
-            :style="{height:sidebarHeight-6+'px'}"
-          >
+          <div style="padding: 5px 0;background-color:white" :style="{height:sidebarHeight-6+'px'}">
             <Row type="flex" justify="center">
               <Col span="7">
                 <Card :padding="0" :border="false">
@@ -339,17 +341,28 @@
                   >
                     <Card v-for="(item,index) in taskTodo" :key="index" :padding="3">
                       <div>
-                        <strong                         
-                          class="taskName"
-                        >{{item.taskName}}</strong>
-                        <span
-                          style="float:right;margin-right:3px;cursor: pointer;color:gray;"
-                          @click="taskRemove(index, taskTodo)"
-                        >
-                          <Icon type="ios-trash"/>
+                        <span style="float:left;padding:0 2.5px">
+                          <Icon type="ios-list" color="gray" :size="20"/>
                         </span>
+                        <span style="padding:5px">
+                          <strong style="color:#57a3f3" class="taskName">{{item.taskName}}</strong>
+                        </span>
+                        <div style="float:right">
+                          <span>
+                            <Icon type="ios-more" color="gray" :size="20" style="cursor:pointer" @click="editOneTask(index, taskTodo)"/>
+                          </span>
+                          <span
+                            style="margin-left:5px;margin-right:3px;cursor: pointer;color:gray;"
+                            @click="taskRemove(index,taskTodo)"
+                          >
+                            <Icon type="ios-trash" :size="20" color="red"/>
+                          </span>
+                        </div>
                       </div>
-                      <p style="word-break:break-word;padding:5px;cursor:pointer" @click="editOneTask(index, taskTodo)">{{item.description}}</p>
+                      <p
+                        style="word-break:break-word;padding:5px;cursor:pointer"
+                        @click="editOneTask(index, taskTodo)"
+                      >{{item.description}}</p>
                     </Card>
                   </draggable>
                 </Card>
@@ -369,17 +382,33 @@
                   >
                     <Card v-for="(item,index)  in taskDoing" :key="index" :padding="3">
                       <div>
-                        <strong                         
-                          class="taskName"
-                        >{{item.taskName}}</strong>
-                        <span
-                          style="float:right;margin-right:3px;cursor: pointer;color:gray;"
-                          @click="taskRemove(index,taskDoing)"
-                        >
-                          <Icon type="ios-trash"/>
+                        <span style="float:left;padding:0 2.5px">
+                          <Icon type="ios-information-circle-outline" color="gray" :size="20"/>
                         </span>
+                        <span style="padding:5px">
+                          <strong style="color:#57a3f3" class="taskName">{{item.taskName}}</strong>
+                        </span>
+                        <div style="float:right">
+                          <span>
+                            <Icon type="ios-more" color="gray" :size="20" style="cursor:pointer" @click="editOneTask(index,taskDoing)"/>
+                          </span>
+                          <span
+                            style="margin-left:5px;margin-right:3px;cursor: pointer;color:gray;"
+                            @click="taskRemove(index,taskDoing)"
+                          >
+                            <Icon type="ios-trash" :size="20" color="red"/>
+                          </span>
+                        </div>
                       </div>
-                      <p style="word-break:break-word;padding:5px;cursor:pointer" @click="editOneTask(index,taskDoing)">{{item.description}}</p>
+                      <div style="display:flex">
+                        <p
+                        style="word-break:break-word;padding:5px;cursor:pointer;width:80%"
+                        @click="editOneTask(index,taskDoing)"
+                      >{{item.description}}</p>
+                      <div style="display:flex;align-items:center">
+                        <!-- 这里取用户头像 -->
+                      </div>
+                      </div>
                     </Card>
                   </draggable>
                 </Card>
@@ -399,17 +428,28 @@
                   >
                     <Card v-for="(item,index) in taskDone" :key="index" :padding="3">
                       <div>
-                        <strong                         
-                          class="taskName"
-                        >{{item.taskName}}</strong>
-                        <span
-                          style="float:right;margin-right:3px;cursor: pointer;color:gray;"
-                          @click="taskRemove(index,taskDone)"
-                        >
-                          <Icon type="ios-trash"/>
+                        <span style="float:left;padding:0 2.5px">
+                          <Icon type="md-checkmark-circle-outline"/>
                         </span>
+                        <span style="padding:5px">
+                          <strong style="color:#57a3f3" class="taskName">{{item.taskName}}</strong>
+                        </span>
+                        <div style="float:right">
+                          <span>
+                            <Icon type="ios-more" color="gray" :size="20" style="cursor:pointer" @click="editOneTask(index,taskDone)"/>
+                          </span>
+                          <span
+                            style="margin-left:5px;margin-right:3px;cursor: pointer;color:gray;"
+                            @click="taskRemove(index,taskDone)"
+                          >
+                            <Icon type="ios-trash" :size="20" color="red"/>
+                          </span>
+                        </div>
+                        <p
+                        style="word-break:break-word;padding:5px;cursor:pointer"
+                        @click="editOneTask(index,taskDone)"
+                      >{{item.description}}</p>
                       </div>
-                      <p style="word-break:break-word;padding:5px;cursor:pointer" @click="editOneTask(index,taskDone)">{{item.description}}</p>
                     </Card>
                   </draggable>
                 </Card>
@@ -476,6 +516,8 @@
       title="Edit task panel"
       @on-ok="updateTask()"
       @on-cancel="cancel()"
+      ok-text = "assure"
+      cancel-text = "cancel"
       width="800px"
     >
       <div class="taskFormItem">
@@ -637,7 +679,12 @@ export default {
       if (!vm.$store.getters.userState) {
         next("/login");
       } else {
-        if (!(vm.subProjectInfo.managerId == vm.$store.getters.userId || vm.subProjectInfo.isMember)) {
+        if (
+          !(
+            vm.subProjectInfo.managerId == vm.$store.getters.userId ||
+            vm.subProjectInfo.isMember
+          )
+        ) {
           alert("No access");
           // next(`/project/${vm.$store.getters.currentProjectId}`);
           vm.$router.go(-1);
@@ -688,7 +735,10 @@ export default {
             if (data != "None") {
               subProjectInfo = data[0];
               this.$set(this, "subProjectInfo", subProjectInfo);
-              sessionStorage.setItem("subProjectId", subProjectInfo.subProjectId);
+              sessionStorage.setItem(
+                "subProjectId",
+                subProjectInfo.subProjectId
+              );
               sessionStorage.setItem("subProjectName", subProjectInfo.title);
 
               // this.managerIdentity(subProjectInfo.managerId);
@@ -720,18 +770,21 @@ export default {
     showMembers() {
       let membersList = this.subProjectInfo.members;
       let manager = { userId: this.subProjectInfo.managerId };
-      if (membersList.length == 0 || membersList[0].userId != this.subProjectInfo.managerId) {
+      if (
+        membersList.length == 0 ||
+        membersList[0].userId != this.subProjectInfo.managerId
+      ) {
         membersList.unshift(manager);
       }
       let participantsTemp = [];
       let index = membersList.length - 1;
 
-        this.axios
-          .get(
-            "/GeoProblemSolving/user/inquiry" +
-              "?key=" +
-              "userId" +
-              "&value=" +
+      this.axios
+        .get(
+          "/GeoProblemSolving/user/inquiry" +
+            "?key=" +
+            "userId" +
+            "&value=" +
             membersList[0].userId
         )
         .then(res => {
@@ -745,7 +798,7 @@ export default {
                   "?key=" +
                   "userId" +
                   "&value=" +
-              membersList[i].userId
+                  membersList[i].userId
               )
               .then(res => {
                 participantsTemp.push(res.data);
@@ -760,14 +813,13 @@ export default {
     },
     showDetail(item) {
       this.order = item;
-      if (item == 1) {        
+      if (item == 1) {
         this.openModuleSocket();
       }
       else if( item == 2){
         this.closeModuleSocket();
         this.$router.push(`./workspace`);
-      }
-      else if(item == 0){
+      } else if (item == 0) {
         this.closeModuleSocket();
       }
     },
@@ -824,7 +876,10 @@ export default {
         var messageJson = {};
         messageJson["type"] = "ping";
         messageJson["message"] = "ping";
-        if (that.subprojectSocket != null && that.subprojectSocket != undefined) {
+        if (
+          that.subprojectSocket != null &&
+          that.subprojectSocket != undefined
+        ) {
           that.subprojectSocket.send(JSON.stringify(messageJson));
         }
       }, 20000);
@@ -844,7 +899,6 @@ export default {
       ) {
         let id = projectInfo.projectId;
         this.$router.push(`../${id}`);
-
       } else {
         this.axios
           .get(
@@ -929,11 +983,11 @@ export default {
       this.candidates = [];
       this.inviteList = [];
       let projectInfo = this.$store.getters.project;
-      
+
       if (
         JSON.stringify(projectInfo) != "{}" &&
         projectInfo.projectId == this.subProjectInfo.projectId
-      ) {        
+      ) {
         let allMembers = projectInfo.members;
         let manager = {
           userName: projectInfo.managerName,
@@ -988,7 +1042,7 @@ export default {
           .catch(err => {
             console.log(err.data);
           });
-      }      
+      }
       this.inviteModal = true;
     },
     inviteMembers() {

@@ -1146,7 +1146,6 @@ export default {
     getAllResource() {
       // url是请求的网址
       //查询的形式是key-value格式
-      // this.axios.get("/GeoProblemSolving/resource/inquiry",obj)
       this.axios
         .get(
           "/GeoProblemSolving/resource/inquiry" +
@@ -1162,7 +1161,6 @@ export default {
             this.projectResourceList = [];
           }
           //渲染函数，将列表展现出来，下载
-          // this.showProjectResource(this.projectResourceList);
         })
         .catch(err => {
           console.log(err.data);

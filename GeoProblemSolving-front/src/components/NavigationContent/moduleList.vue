@@ -130,6 +130,9 @@
 .singl_tool_style {
   margin: 10px;
   cursor: pointer;
+  width:20%;
+  display: flex;
+  justify-content:center;
 }
 .singl_tool_style:hover {
   transition: all 1s;
@@ -138,7 +141,6 @@
 .singl_tool_style span {
   display: flex;
   text-align: center;
-  /* justify-content: center; */
   align-items: center;
 }
 .taskFormItem {
@@ -481,9 +483,8 @@
                           color="orange"
                         />
                         <br>
-                        <span style="display:flex;justify-content:center">Analyze</span>
+                        <span>Analyze</span>
                       </div>
-                      <!-- <Icon type="md-brush" /> -->
                       <div class="singl_tool_style">
                         <Icon
                           type="md-brush"
@@ -493,9 +494,8 @@
                           color="green"
                         />
                         <br>
-                        <span style="display:flex;justify-content:center">Draw</span>
+                        <span>Draw</span>
                       </div>
-                      <!-- <Icon type="md-map" /> -->
                       <div class="singl_tool_style">
                         <Icon
                           type="md-map"
@@ -505,9 +505,8 @@
                           color="lightblue"
                         />
                         <br>
-                        <span style="display:flex;justify-content:center">Map</span>
+                        <span>Map</span>
                       </div>
-                      <!-- <Icon type="ios-book-outline" /> -->
                       <div class="singl_tool_style">
                         <Icon
                           type="md-grid"
@@ -517,7 +516,7 @@
                           color="darkgreen"
                         />
                         <br>
-                        <span style="display:flex;justify-content:center">Chart</span>
+                        <span>Chart</span>
                       </div>
                       <div class="singl_tool_style">
                         <Icon
@@ -528,7 +527,54 @@
                           color="gray"
                         />
                         <br>
-                        <span style="display:flex;justify-content:center">Graph Editor</span>
+                        <span>Graph Editor</span>
+                      </div>
+
+                    </div>
+                    <div class="tool-panel">
+                      <div class="singl_tool_style">
+                        <Icon
+                          type="md-cube"
+                          size="60"
+                          @click.native="toolPanel('3DmodelViewer')"
+                          title="3D model Viewer"
+                          color="gray"
+                        />
+                        <br>
+                        <span style="display:flex;justify-content:center">3D model Viewer</span>
+                      </div>
+                      <div class="singl_tool_style">
+                        <Icon
+                          type="md-git-commit"
+                          size="60"
+                          @click.native="toolPanel('LogicalModel')"
+                          title="Logical Model"
+                          color="gray"
+                        />
+                        <br>
+                        <span style="display:flex;justify-content:center">Logical Model</span>
+                      </div>
+                      <div class="singl_tool_style">
+                        <Icon
+                          type="md-bonfire"
+                          size="60"
+                          @click.native="toolPanel('ConceptualModel')"
+                          title="Conceptual Model"
+                          color="gray"
+                        />
+                        <br>
+                        <span style="display:flex;justify-content:center">Conceptual Model</span>
+                      </div>
+                      <div class="singl_tool_style">
+                        <Icon
+                          type="md-pulse"
+                          size="60"
+                          @click.native="toolPanel('ComputationalModel')"
+                          title="Computational Model"
+                          color="gray"
+                        />
+                        <br>
+                        <span>Computational Model</span>
                       </div>
                     </div>
                     <h2>Non-collaborative Tools</h2>
@@ -1468,7 +1514,7 @@ export default {
     submitFile() {
       let formData = new FormData();
       formData.append("file", this.file);
-      formData.append("description", "");
+      formData.append("description", this.fileDescription);
       formData.append("type", this.fileType);
       formData.append("uploaderId", this.$store.getters.userId);
       // currentModule.title;
@@ -1660,7 +1706,39 @@ export default {
           "?groupID=" +
           this.currentModule.moduleId +
           '" style="width: 100%;height:100%"></iframe>';
+      }else if(type == "3DmodelViewer"){
+        toolURL =
+          '<iframe src="/GeoProblemSolving/Collaborative/3DmodelViewer/index.html' +
+          "?groupID=" +
+          this.currentModule.moduleId +
+          '" style="width: 100%;height:100%"></iframe>';
       }
+      else if(type == "LogicalModel"){
+        toolURL =
+          '<iframe src="/GeoProblemSolving/Collaborative/LogicalModel/index.html' +
+          "?groupID=" +
+          this.currentModule.moduleId +
+          '" style="width: 100%;height:100%"></iframe>';
+      }
+      else if(type == "ConceptualModel"){
+        toolURL =
+          '<iframe src="/GeoProblemSolving/Collaborative/ConceptualModel/index.html' +
+          "?groupID=" +
+          this.currentModule.moduleId +
+          '" style="width: 100%;height:100%"></iframe>';
+      }
+      else if(type == "ComputionalModel"){
+        toolURL =
+          '<iframe src="/GeoProblemSolving/Collaborative/ComputionalModel/index.html' +
+          "?groupID=" +
+          this.currentModule.moduleId +
+          '" style="width: 100%;height:100%"></iframe>';
+      }
+      // 3d
+      // computational
+      // conceptual
+      // logical
+
       var panel = jsPanel.create({
         theme: "primary",
         headerTitle: "Tools",
