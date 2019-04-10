@@ -130,7 +130,7 @@
 .singl_tool_style {
   margin: 10px;
   cursor: pointer;
-  width:20%;
+  width:25%;
   display: flex;
   justify-content:center;
 }
@@ -569,7 +569,8 @@
                         <Icon
                           type="md-pulse"
                           size="60"
-                          @click.native="toolPanel('ComputationalModel')"
+
+                          @click.native="toolPanel('ComputionalModel')"
                           title="Computational Model"
                           color="gray"
                         />
@@ -945,7 +946,7 @@ export default {
     this.getAllResource();
   },
   mounted() {
-    window.addEventListener("resize", this.reSize);    
+    window.addEventListener("resize", this.reSize);
     this.openModuleSocket();
   },
   // add by mzy for navigation guards
@@ -1115,7 +1116,7 @@ export default {
         who: "",
         content: ""
       };
-        
+
       // 资源记录
       if (messageJson.type == "resources") {
         this.allRecords.push(messageJson);
@@ -1282,7 +1283,7 @@ export default {
             } else if (state == "delete") {
               // this.showDetail(this.order - 1);
             } else if (state == "update") {
-                   
+
               this.showDetail(this.order);
             }
           } else if (res.data == "None") {
@@ -1327,7 +1328,7 @@ export default {
                   .post("/GeoProblemSolving/module/update", updateObject)
                   .then(res => {
                     this2.getAllModules("update");
-                    
+
                     let socketMsg = {type:"module",operate:"update"};
                     this2.subprojectSocket.send(JSON.stringify(socketMsg));
                   })
@@ -1335,7 +1336,7 @@ export default {
                     console.log(err.data);
                   });
               }
-              else {                
+              else {
                 this1.getAllModules("update");
               }
 
@@ -1380,7 +1381,7 @@ export default {
                   .post("/GeoProblemSolving/module/update", updateObject)
                   .then(res => {
                     this2.getAllModules("update");
-                    
+
                     let socketMsg = {type:"module",operate:"update"};
                     this2.subprojectSocket.send(JSON.stringify(socketMsg));
                   })
@@ -1416,8 +1417,8 @@ export default {
                 that.moduleList.splice(that.currentModuleIndex, 1);
 
                 let index = that.getActiveModule();
-                that.showDetail(index);                
-                
+                that.showDetail(index);
+
                 let socketMsg = {type:"module",operate:"update"};
                 that.subprojectSocket.send(JSON.stringify(socketMsg));
               } else {
@@ -1445,7 +1446,7 @@ export default {
           .post("/GeoProblemSolving/module/update", updateObject)
           .then(res => {
             that.getAllModules("update");
-            
+
             let socketMsg = {type:"module",operate:"update"};
             that.subprojectSocket.send(JSON.stringify(socketMsg));
           })
@@ -1729,7 +1730,7 @@ export default {
       }
       else if(type == "ComputionalModel"){
         toolURL =
-          '<iframe src="/GeoProblemSolving/Collaborative/ComputionalModel/index.html' +
+          '<iframe src="/GeoProblemSolving/Collaborative/ComputationalModel/index.html' +
           "?groupID=" +
           this.currentModule.moduleId +
           '" style="width: 100%;height:100%"></iframe>';
