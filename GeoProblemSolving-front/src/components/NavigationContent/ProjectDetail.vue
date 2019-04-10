@@ -11,7 +11,7 @@
   align-items: center;
   justify-content: center;
   height: 300px;
-  background-color:white;
+  /* background-color:lightgray; */
 }
 .detail_image img {
   max-width: 90%;
@@ -197,13 +197,13 @@
                   <div style="height:80px;">
                     <h3 style="margin-left:5px">Description</h3>
                     <div
-                      style="height:56px;overflow-y:auto;text-indent:2em;padding:0 5px"
+                      style="height:56px;overflow-y:auto;text-indent:2em;padding:0 5px;word-break: break-word;"
                     >{{currentProjectDetail.description}}</div>
                   </div>
                   <div style="height:220px;padding-top:10px">
                     <h3 style="margin-left:5px">Introduction</h3>
                     <div
-                      style="height:196px;overflow-y: auto;text-indent:2em;padding:0 5px"
+                      style="height:196px;overflow-y: auto;text-indent:2em;padding:0 5px;word-break: break-word;"
                     >{{currentProjectDetail.introduction}}</div>
                   </div>
                 </Col>
@@ -816,7 +816,8 @@ export default {
         if (
           !(
             vm.currentProjectDetail.isManager ||
-            vm.currentProjectDetail.isMember
+            vm.currentProjectDetail.isMember||
+            vm.currentProjectDetail.managerId == vm.$store.getters.userId
           )
         ) {
           alert("No access");

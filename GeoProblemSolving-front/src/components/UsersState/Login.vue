@@ -198,9 +198,10 @@ export default {
               if (res.data === "Email") {
                 this.$Message.error("Email does not exist.");
               }
-              else if(res.data === "Password"){
+              else if(res.data === "Password"||res.data === "Fail"){
                 this.$Message.error("Invalid account or password.");
-              } else {
+              }
+               else {
                 this.$Message.success("Success!");
                 this.$store.commit("userLogin", res.data);
                 this.$router.go(-1);
