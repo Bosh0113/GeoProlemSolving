@@ -203,7 +203,7 @@
     </Modal>
   </Row>
 </template>
-<style>
+<style scoped>
 .taskFormItem {
   display: flex;
   align-items: center;

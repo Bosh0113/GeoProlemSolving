@@ -39,6 +39,10 @@ img {
   <div>
     <Row>
       <Col span="22" offset="1">
+        <Spin fix  v-show="getFinish">
+            <Icon type="ios-loading" size="100" class="demo-spin-icon-load" color="yellowgreen"></Icon>
+            <div>Loading</div>
+        </Spin>
         <div style="display:flex;height:60px;justify-content:center">
         </div>
         <div class="Tabpane" style="display:flex">
@@ -72,11 +76,7 @@ img {
         </div>
       </Col>
       <div class="ProjectList">
-          <Spin fix  v-if="getFinish">
-              <Icon type="ios-loading" size="100" class="demo-spin-icon-load" color="yellowgreen"></Icon>
-              <div>Loading</div>
-          </Spin>
-          <div v-else>
+          <div v-show="!getFinish">
             <div v-if="currentProjectList.length < 1">
               <Col span="22" offset="1">
                 <Card :bordered="false">

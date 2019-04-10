@@ -1019,10 +1019,9 @@ export default {
         this.moduleSocket = null;
       }
       if (this.currentModule.activeStatus) {
-        var moduleSocketURL =
-          "ws://localhost:8081/GeoProblemSolving/Module/" + moduleId;
+        // var moduleSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + moduleId;
         // var moduleSocketURL = "ws://202.195.237.252:8082/GeoProblemSolving/Module/" + moduleId;
-        // var moduleSocketURL = "ws://172.21.212.7:8082/GeoProblemSolving/Module/" + moduleId;
+        var moduleSocketURL = "ws://172.21.212.7:8082/GeoProblemSolving/Module/" + moduleId;
         this.moduleSocket = new WebSocket(moduleSocketURL);
         this.moduleSocket.onopen = this.onOpen;
         this.moduleSocket.onmessage = this.onMessage;

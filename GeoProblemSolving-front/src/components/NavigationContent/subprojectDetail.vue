@@ -780,9 +780,9 @@ export default {
       if (this.subprojectSocket != null) {
         this.subprojectSocket = null;
       }
-      var subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + subprojectId;
+      // var subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + subprojectId;
       // var subprojectSocketURL = "ws://202.195.237.252:8082/GeoProblemSolving/Module/" + subprojectId;
-      // var subprojectSocketURL = "ws://172.21.212.7:8082/GeoProblemSolving/Module/" + subprojectId;
+      var subprojectSocketURL = "ws://172.21.212.7:8082/GeoProblemSolving/Module/" + subprojectId;
       this.subprojectSocket = new WebSocket(subprojectSocketURL);
       this.subprojectSocket.onopen = this.onOpen;
       this.subprojectSocket.onmessage = this.onMessage;
