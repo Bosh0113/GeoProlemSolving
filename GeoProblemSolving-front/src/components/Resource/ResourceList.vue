@@ -11,10 +11,7 @@
 .resourcePanel {
   flex: 1;
 }
-.topPanel {
-  margin-top: 20px;
-  display: flex;
-}
+
 .btnPanel {
   flex: 1;
   /* justify-content:flex-start; */
@@ -70,30 +67,38 @@
           </Menu>
         </div>
         <div class="resourcePanel">
-          <div class="topPanel">
-            <div class="btnPanel">
-              <Button type="primary" title="upload resource" @click="fileUploadModalShow()">
-                <Icon type="ios-cloud-upload-outline" :size="20"/>
-              </Button>
-              <Button type="success" title="download resource" >
-                <Icon type="ios-download-outline" :size="20"/>
-              </Button>
-            </div>
-            <!-- <div class="searchPanel">
-              <Input
-                v-model="searchResourceInput"
-                placeholder="Enter something..."
-                style="width:auto"
-              >
-                <Button slot="append" icon="ios-search"></Button>
-              </Input>
-            </div> -->
-          </div>
           <div style="height:20px"></div>
           <div class="resourcePanel">
             <Row>
               <Col span="22" offset="1">
-                <Table border ref="selection" :columns="resourceColumn" :data="specifiedResourceList"></Table>
+                <Table :columns="resourceColumn" :data="specifiedResourceList">
+                  <template slot-scope="{ row }" slot="name">
+                    <strong>{{ row.name }}</strong>
+                  </template>
+                  <template slot-scope="{ row, index }" slot="action">
+                    <Button
+                      type="success"
+                      size="small"
+                      style="margin-right: 5px"
+                      @click="download(index)"
+                    >
+                      <Icon type="md-download"/>
+                    </Button>
+                    <Button
+                      type="error"
+                      size="small"
+                      @click="deleteResource(index)"
+                      :disabled="judgeDelete(index)"
+                    >
+                      <Icon type="md-close"/>
+                    </Button>
+                  </template>
+                </Table>
+                <div style="display:flex;margin-top:20px;justify-content:center">
+                  <Button type="primary" title="upload resource" @click="fileUploadModalShow()">
+                    <Icon type="ios-cloud-upload-outline" :size="20"/>
+                  </Button>
+                </div>
               </Col>
             </Row>
             <div style="height:20px"></div>
@@ -103,39 +108,38 @@
       </div>
     </Col>
     <Modal
-        v-model="uploadModal"
-        title="Upload resource"
-        @on-ok="submitFile()"
-        @on-cancel="cancel()"
-        ok-text="submit"
-        cancel-text="cancel"
-        :mask-closable="false"
-        width="600px"
-        >
-          <div style="display:flex;text-align:center;align-items:center;justify-content:center">
-            <!-- 这里定义上传的几种资源类型供用户选择 -->
-            <span style="width:20%">Type</span>
-            <RadioGroup v-model="fileType" style="width:80%">
-              <Radio label="image"></Radio>
-              <Radio label="video"></Radio>
-              <Radio label="data"></Radio>
-              <Radio label="paper"></Radio>
-              <Radio label="document"></Radio>
-              <Radio label="model"></Radio>
-              <Radio label="others"></Radio>
-            </RadioGroup>
-            <!-- 结束 -->
-          </div>
-          <br>
-          <div style="display:flex;text-align:center;align-items:center;justify-content:center">
-            <span style="width:20%">Description</span>
-            <Input type="textarea" :rows="2" v-model="fileDescription"/>
-          </div>
-          <br>
-          <input type="file" @change="getFile($event)" style="margin-left:20%">
+      v-model="uploadModal"
+      title="Upload resource"
+      @on-ok="submitFile()"
+      @on-cancel="cancel()"
+      ok-text="submit"
+      cancel-text="cancel"
+      :mask-closable="false"
+      width="600px"
+    >
+      <div style="display:flex;text-align:center;align-items:center;justify-content:center">
+        <!-- 这里定义上传的几种资源类型供用户选择 -->
+        <span style="width:20%">Type</span>
+        <RadioGroup v-model="fileType" style="width:80%">
+          <Radio label="image"></Radio>
+          <Radio label="video"></Radio>
+          <Radio label="data"></Radio>
+          <Radio label="paper"></Radio>
+          <Radio label="document"></Radio>
+          <Radio label="model"></Radio>
+          <Radio label="others"></Radio>
+        </RadioGroup>
+        <!-- 结束 -->
+      </div>
+      <br>
+      <div style="display:flex;text-align:center;align-items:center;justify-content:center">
+        <span style="width:20%">Description</span>
+        <Input type="textarea" :rows="2" v-model="fileDescription"/>
+      </div>
+      <br>
+      <input type="file" @change="getFile($event)" style="margin-left:20%">
     </Modal>
   </Row>
-
 </template>
 <script>
 export default {
@@ -179,6 +183,10 @@ export default {
           title: "Uploader Time",
           key: "uploadTime",
           sortable: true
+        },
+        {
+          title: "Action",
+          slot: "action"
         }
       ],
       uploaderArray: [],
@@ -208,10 +216,12 @@ export default {
         .then(res => {
           if (res.data != "None") {
             let specifiedResourceListPre = res.data;
-              specifiedResourceListPre.forEach(function(list) {
-                list["uploader"] = list.uploaderName + "(" + list.organization + ")";
-              });
-              this.$set(this,"specifiedResourceList",specifiedResourceListPre);
+            specifiedResourceListPre.forEach(function(list) {
+              list["uploader"] =
+                list.uploaderName + "(" + list.organization + ")";
+            });
+            this.$set(this, "specifiedResourceList", specifiedResourceListPre);
+            console.table(this.specifiedResourceList);
           }
         });
     },
@@ -241,7 +251,7 @@ export default {
       this.axios
         .post("/GeoProblemSolving/resource/upload", formData)
         .then(res => {
-          if (res.data!="Size over" && res.data.length>0) {
+          if (res.data != "Size over" && res.data.length > 0) {
             this.$Notice.open({
               title: "Upload notification title",
               desc: "File uploaded successfully",
@@ -252,13 +262,43 @@ export default {
             this.getAllResource();
             // 创建一个函数根据pid去后台查询该项目下的资源
           }
-           
         })
         .catch(err => {});
     },
     getFile(event) {
       this.file = event.target.files[0];
-       
+    },
+    judgeDelete(index) {
+      if (
+        this.specifiedResourceList[index].uploaderId ==
+        this.$store.getters.userId
+      ) {
+        return false;
+      } else {
+        return true;
+      }
+    },
+    download(index) {
+      window.open(this.specifiedResourceList[index].pathURL);
+    },
+    deleteResource(index) {
+      if (this.specifiedResourceList[index].resourceId != "") {
+        let id = this.specifiedResourceList[index].resourceId;
+        this.axios
+          .get("/GeoProblemSolving/resource/delete?" + "resourceId=" + id)
+          .then(res => {
+            if (res.data == "Success") {
+              this.$Message.info("Delete successfully");
+              this.getUserResource();
+            } else if (res.data == "Fail") {
+              this.$Message.info("Failure");
+            }
+          })
+          .catch(err => {
+            console.log(err.data);
+          });
+      }
+      // this.specifiedResourceList[index].resourceId
     }
   }
 };

@@ -24,7 +24,7 @@
   --loginContentColor: white;
   --loginFontColor: white;
   --loginTitleColor: #57a3f3;
-  width: 60%;
+  width: 40%;
   --loginBtnFontSize: 15px;
 }
 .login_title {

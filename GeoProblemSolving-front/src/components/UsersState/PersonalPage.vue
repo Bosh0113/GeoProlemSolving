@@ -235,7 +235,6 @@
                             <Button
                               type="success"
                               size="small"
-                              style="margin-right: 5px"
                               :href="userResourceList[index].pathURL"
                               title="download"
                               @click="download(index)"
@@ -243,7 +242,7 @@
                               <Icon type="md-download"/>
                             </Button>
                             <Button type="warning" size="small">
-                              <Icon type="md-eye"/>
+                              <Icon type="md-eye" @click="processResourceModalShow(index)"/>
                             </Button>
                             <Button
                               type="error"
@@ -369,6 +368,17 @@
       cancel-text="cancel"
     >
       <p>Once you exit the project, you will not be able to participate in the collaborative process, confirm the exit?</p>
+    </Modal>
+    <Modal
+        v-model="processResourceModal"
+        title="share resource in other projects"
+        @on-ok="processResource()"
+        @on-cancel="cancel"
+        >
+        <!-- todo:这里需要过滤参与的项目以及管理的项目重新渲染 -->
+        <p>Content of dialog</p>
+        <p>Content of dialog</p>
+        <p>Content of dialog</p>
     </Modal>
   </div>
 </template>
@@ -515,7 +525,11 @@ export default {
       // rightContentWidth:"",
       // 退出项目的modal
       quitModal: false,
-      quitPid: ""
+      quitPid: "",
+      // 处理资源的模态框激活
+      processResourceModal:false,
+      // 选中资源的索引
+      selectResourceIndex:"",
     };
   },
   methods: {
@@ -692,7 +706,7 @@ export default {
           this.$store.commit("uploadAvatar", imgcode);
         };
       }
-      
+
     },
     handleView() {
       this.visible = true;
@@ -770,7 +784,7 @@ export default {
         .then(res => {
           if (res.data != "None" && res.data != "Fail") {
             this.userResourceList = res.data;
-             
+
           }
         })
         .catch(err => {
@@ -800,6 +814,18 @@ export default {
             console.log(err.data);
           });
       }
+    },
+    // 处理个人的资源可以选择copy到参与的项目，也可以选择copy到管理的项目
+    processResource(){
+      alert(this.selectResourceIndex);
+      console.table(this.joinedProjectsNameArray);
+    },
+    cancel(){
+
+    },
+    processResourceModalShow(index){
+      this.processResourceModal = true;
+      this.selectResourceIndex = index;
     }
   }
 };
