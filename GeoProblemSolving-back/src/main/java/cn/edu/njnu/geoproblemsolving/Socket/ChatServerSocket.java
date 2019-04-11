@@ -1,7 +1,12 @@
 package cn.edu.njnu.geoproblemsolving.Socket;
 
 import cn.edu.njnu.geoproblemsolving.Config.GetHttpSessionConfigurator;
+import cn.edu.njnu.geoproblemsolving.Config.MyEndPointConfigure;
+import cn.edu.njnu.geoproblemsolving.Dao.HistoryEvent.HistoryEventDaoImpl;
+import cn.edu.njnu.geoproblemsolving.Entity.HistoryEventEntity;
 import com.alibaba.fastjson.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpSession;
@@ -14,11 +19,14 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-@ServerEndpoint(value = "/ChatServer/{roomId}", configurator = GetHttpSessionConfigurator.class)
+@ServerEndpoint(value = "/ChatServer/{roomId}", configurator = MyEndPointConfigure.class)
 public class ChatServerSocket {
 
     private Session session=null;
     private static final Map<String,Map<String,ChatServerSocket>> rooms=new ConcurrentHashMap<>();
+
+    @Autowired
+    MongoTemplate mongoTemplate;
 
     @OnOpen
     public void onOpen(@PathParam("roomId") String roomId, Session session,EndpointConfig config)
@@ -43,6 +51,19 @@ public class ChatServerSocket {
         String messageType = messageObject.getString("type");
         if (messageType.equals("message")) {
             broadcastMessageToRoom(roomId, message);
+
+            // 将历史消息进行存储
+            try {
+                HistoryEventDaoImpl historyEventDao = new HistoryEventDaoImpl(mongoTemplate);
+                HistoryEventEntity historyEventEntity = new HistoryEventEntity();
+                historyEventEntity.setScopeId(roomId);
+                historyEventEntity.setEventType("message");
+                historyEventEntity.setDescription(message);
+                historyEventDao.saveHistoryEvent(historyEventEntity);
+            }
+            catch (Exception ex) {
+                throw ex;
+            }
         }
     }
     @OnClose

@@ -259,10 +259,13 @@ export default {
             this.$route.params.id
         )
         .then(res => {
-          this.userDetail = res.data;
-          this.joinedProjectsNameArray = this.userDetail.joinedProjects;
-          this.getParticipatoryList(this.joinedProjectsNameArray);
-          //打印用户的具体信息
+          if(res.data != "None" && res.data != "Fail" && res.data.length > 0) {
+            
+            this.userDetail = res.data;
+            this.joinedProjectsNameArray = this.userDetail.joinedProjects;
+            if(this.joinedProjectsNameArray)
+            this.getParticipatoryList(this.joinedProjectsNameArray);
+          }
            
         })
         .catch(err => {
@@ -273,7 +276,8 @@ export default {
       this.axios
         .get(
           "/GeoProblemSolving/history/inquiry?" +
-            "key=userId" +
+            "eventType=project" +
+            "&key=userId" +
             "&value=" +
             this.$route.params.id
         )

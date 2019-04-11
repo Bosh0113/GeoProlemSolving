@@ -299,20 +299,14 @@ export default {
         this.$store.getters.userName +
         " created a " +
         this.formInline.category +
-        " project called " +
+        " project named " +
         this.formInline.title;
       form["description"] = description;
       form["scopeId"] = scopeId;
+      form["eventType"] = "project";
+      form["userId"] = this.$store.getters.userId;
       this.axios
-        .post(
-          "/GeoProblemSolving/history/save?",
-          "description=" +
-            description +
-            "&scopeId=" +
-            scopeId +
-            "&userId=" +
-            this.$store.getters.userId
-        )
+        .post("/GeoProblemSolving/history/save", form)
         .then(res => {
 
           if (res.data === "Success") {

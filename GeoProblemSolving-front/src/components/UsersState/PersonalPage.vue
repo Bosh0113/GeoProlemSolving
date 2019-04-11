@@ -60,7 +60,7 @@
                     type="success"
                     style="height:40px"
                     @click="editModalShow()"
-                  >Update</Button>
+                  >Edit</Button>
                   <Drawer
                     title="Profile Edit Panel"
                     placement="left"
@@ -213,7 +213,7 @@
                     <Card>
                       <p slot="title">History Line</p>
                       <Timeline
-                        style="margin-top:20px;margin-left:5%;max-height:300px;overflow-y:auto"
+                        style="margin-left:5%;max-height:300px;overflow-y:auto"
                       >
                         <TimelineItem v-for="(item,index) in userEventList" :key="index">
                           <strong>
@@ -224,36 +224,38 @@
                       </Timeline>
                     </Card>
                     <br>
-                    <div>
+                    <div style="margin-bottom:40px">
                       <Card>
                         <p slot="title">Resource List</p>
-                        <Table :data="userResourceList" :columns="resourceColumn" class="table">
-                          <template slot-scope="{ row }" slot="name">
-                            <strong>{{ row.name }}</strong>
-                          </template>
-                          <template slot-scope="{ row, index }" slot="action">
-                            <Button
-                              type="success"
-                              size="small"
-                              style="margin-right: 5px"
-                              :href="userResourceList[index].pathURL"
-                              title="download"
-                              @click="download(index)"
-                            >
-                              <Icon type="md-download"/>
-                            </Button>
-                            <Button type="warning" size="small">
-                              <Icon type="md-eye"/>
-                            </Button>
-                            <Button
-                              type="error"
-                              size="small"
-                              @click="deleteResource(userResourceList[index].resourceId)"
-                            >
-                              <Icon type="md-close"/>
-                            </Button>
-                          </template>
-                        </Table>
+                        <div style="overflow-y:scroll;height:500px">
+                          <Table :data="userResourceList" :columns="resourceColumn" class="table">
+                            <template slot-scope="{ row }" slot="name">
+                              <strong>{{ row.name }}</strong>
+                            </template>
+                            <template slot-scope="{ row, index }" slot="action">
+                              <Button
+                                type="success"
+                                size="small"
+                                style="margin-right: 5px"
+                                :href="userResourceList[index].pathURL"
+                                title="download"
+                                @click="download(index)"
+                              >
+                                <Icon type="md-download"/>
+                              </Button>
+                              <Button type="warning" size="small">
+                                <Icon type="md-eye"/>
+                              </Button>
+                              <Button
+                                type="error"
+                                size="small"
+                                @click="deleteResource(userResourceList[index].resourceId)"
+                              >
+                                <Icon type="md-close"/>
+                              </Button>
+                            </template>
+                          </Table>
+                        </div>
                       </Card>
                     </div>
                   </Col>
@@ -376,6 +378,15 @@
 <script>
 import Avatar from "vue-avatar";
 export default {
+  beforeRouteEnter: (to, from, next) => {
+    next(vm => {
+      if (!vm.$store.getters.userState) {
+        next("/login");
+      } else {
+        next();
+      }
+    });
+  },
   mounted() {
     this.getUserProfile();
     // 获取用户资源
@@ -528,31 +539,33 @@ export default {
     },
     //获取用户参与的项目列表
     getParticipatoryList(projectIds) {
-      var count = projectIds.length;
-      let participatoryProjectListTemp = [];
-      for (let i = 0; i < projectIds.length; i++) {
-        this.axios
-          .get(
-            "/GeoProblemSolving/project/inquiry" +
-              "?key=projectId" +
-              "&value=" +
-              projectIds[i].projectId
-          )
-          .then(res => {
-            if (res.data != "None") {
-              participatoryProjectListTemp.push(res.data[0]);
-            }
-            if (--count == 0) {
-              this.$set(
-                this,
-                "joinedProjectsList",
-                participatoryProjectListTemp
-              );
-            }
-          })
-          .catch(err => {
-            console.log(err.data);
-          });
+      if(projectIds != null) {
+        var count = projectIds.length;
+        let participatoryProjectListTemp = [];
+        for (let i = 0; i < projectIds.length; i++) {
+          this.axios
+            .get(
+              "/GeoProblemSolving/project/inquiry" +
+                "?key=projectId" +
+                "&value=" +
+                projectIds[i].projectId
+            )
+            .then(res => {
+              if (res.data != "None") {
+                participatoryProjectListTemp.push(res.data[0]);
+              }
+              if (--count == 0) {
+                this.$set(
+                  this,
+                  "joinedProjectsList",
+                  participatoryProjectListTemp
+                );
+              }
+            })
+            .catch(err => {
+              console.log(err.data);
+            });
+        }
       }
     },
     //获取用户可管理支配的全部项目列表
@@ -746,7 +759,8 @@ export default {
       this.axios
         .get(
           "/GeoProblemSolving/history/inquiry?" +
-            "key=userId" +
+            "eventType=project" +
+            "&key=userId" +
             "&value=" +
             this.$store.getters.userId
         )

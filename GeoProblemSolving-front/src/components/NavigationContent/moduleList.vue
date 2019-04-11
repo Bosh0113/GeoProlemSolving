@@ -109,7 +109,6 @@
   transition: all 0.5s;
 }
 .member-panel {
-  border: 1px solid lightgray;
   transition: all 1s;
 }
 .subProjectDesc {
@@ -178,12 +177,12 @@
         <Card>
           <p
             slot="title"
-            style="height:40px;line-height:40px;font-size:20px;display: inline-block;cursor: pointer;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;max-width: 50%;"
+            style="height:30px;line-height:30px;font-size:20px;display: inline-block;cursor: pointer;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;max-width: 50%;"
             @click="backtoSubproject()"
           >{{subProjectInfo.title}}</p>
           <div
             slot="extra"
-            style="height:40px;display:flex;align-items:center"
+            style="height:30px;display:flex;align-items:center"
             class="operatePanel"
           >
             <template v-if="this.$store.getters.userInfo.userId == this.subProjectInfo.managerId">
@@ -194,16 +193,20 @@
                   icon="md-add"
                   class="addBtn"
                   title="Add a new module"
-                >Add</Button>
+                >Add
+                </Button>
               </template>
-              <template v-else-if="this.currentModule.activeStatus">
+              <template v-else>
                 <Button
                   type="default"
-                  @click="addModal = true"
+                  @click="chooseResource()"
                   icon="md-add"
                   class="addBtn"
                   title="Add a new module"
-                >Add</Button>
+                >Add
+                </Button>
+              </template>
+              <template v-if="this.currentModule.activeStatus">
                 <Button
                   type="default"
                   @click="editModalShow()"
@@ -213,13 +216,6 @@
                 >Edit</Button>
               </template>
               <template v-else>
-                <Button
-                  type="default"
-                  @click="copyModal = true"
-                  icon="ios-copy"
-                  class="addBtn"
-                  title="Copy this module"
-                >Copy</Button>
                 <Button
                   type="default"
                   @click="activateModal = true"
@@ -238,7 +234,7 @@
             </template>
           </div>
           <Row>
-            <Col span="22" offset="1" style="margin-top:10px;background-color:white;">
+            <Col span="22" offset="1" style="background-color:white;">
               <template v-if="this.$store.getters.userInfo.userId == this.subProjectInfo.managerId">
                 <Steps :current="order">
                   <Step
@@ -289,7 +285,7 @@
             :lg="5"
             v-bind="this.olParticipants"
             offset="1"
-            :style="{height:sidebarHeight+6+'px'}"
+            :style="{height:sidebarHeight+8+'px'}"
           >
             <div
               class="member-panel"
@@ -337,7 +333,7 @@
               :sm="{span: 15, offset: 1}"
               :md="{span: 16, offset: 1}"
               :lg="{span: 16, offset: 1}"
-              :style="{height:sidebarHeight/5*2+'px'}"
+              :style="{height:sidebarHeight/3*1+'px'}"
               style="margin-bottom:20px"
             >
               <div style="height:100%;background-color:white">
@@ -361,8 +357,9 @@
               >
               <Col span="12" >
                 <div
-                :style="{height:sidebarHeight/5*3 - 32 + 'px'}"
+                :style="{height:sidebarHeight/3*2 - 32 + 'px'}"
                 style="border:1px solid lightgray;background-color:white;overflow-y:scroll"
+                class="recordLine"
               >
               <span
                   style="height:40px;line-height:40px;margin-left:20px;font-size:1.5em;font-weight: bold"
@@ -370,22 +367,6 @@
                 <Timeline style="padding:10px">
                   <TimelineItem v-for="(item,index) in allRecords" :key="index">
                     <template v-if="item.type == 'participants'">
-                      <span class="time" style="color:blue">{{item.time}}</span>
-                      <span class="time" style="color:blue; margin-left:10px">{{item.who}}</span>
-                      <span
-                        class="content"
-                        style="color:blue; margin-left:10px; word-break:break-word"
-                      >{{item.content}}</span>
-                    </template>
-                    <template v-if="item.type == 'resources'">
-                      <span class="time">{{item.time}}</span>
-                      <span class="time" style="margin-left:10px">{{item.who}}</span>
-                      <span
-                        class="content"
-                        style="margin-left:10px; word-break:break-word"
-                      >{{item.content}}</span>
-                    </template>
-                    <template v-if="item.type == 'tasks'">
                       <span class="time" style="color:gray">{{item.time}}</span>
                       <span class="time" style="color:gray; margin-left:10px">{{item.who}}</span>
                       <span
@@ -393,12 +374,30 @@
                         style="color:gray; margin-left:10px; word-break:break-word"
                       >{{item.content}}</span>
                     </template>
+                    <template v-if="item.type == 'resource'">
+                      <span class="time" style="color:#0664a2">{{item.time}}</span>
+                      <span class="time" style="color:#0664a2;margin-left:10px">{{item.who}}</span>
+                      <span
+                        class="content"
+                        style="color:#0664a2;margin-left:10px; word-break:break-word"
+                      >{{item.content}}</span>
+                      <a style="cursor:pointer;color:green;margin-left:5px" :href="'http://172.21.212.7:8081/GeoProblemSolving/resource/upload/'+item.file" target="_blank">download</a>
+                    </template>
+                    <template v-if="item.type == 'tools'">
+                      <span class="time" style="color:#0664a2">{{item.time}}</span>
+                      <span class="time" style="color:#0664a2; margin-left:10px">{{item.who}}</span>
+                      <span
+                        class="content"
+                        style="color:#0664a2; margin-left:10px; word-break:break-word"                       
+                      >{{item.content}}</span>
+                      <span style="cursor:pointer;color:green;margin-left:5px" @click="toolPanel(item.toolType)">check</span>
+                    </template>
                   </TimelineItem>
                 </Timeline>
               </div>
               </Col>
               <Col span="11" offset="1">
-                <div style="background-color:white" :style="{height:sidebarHeight/5*3 - 32 + 'px'}" class="resourcePanel">
+                <div style="background-color:white" :style="{height:sidebarHeight/3*2 - 32 + 'px'}" class="resourcePanel">
                 <span
                   style="height:40px;line-height:40px;margin-left:20px;font-size:1.5em;font-weight: bold"
                 >Resource</span>
@@ -406,7 +405,7 @@
                   <Button
                     id="upload"
                     type="default"
-                    @click="uploadFileModalShow()"
+                    @click="uploadFileModal = true"
                     class="uploadBtn"
                     title="upload resource"
                   >
@@ -422,12 +421,12 @@
                     <Icon type="md-more"/>
                   </Button>
                 </div>
-                <div style="padding:0px 10px 10px 10px">
+                <div style="overflow-y:scroll;padding:0px 10px 10px 10px" :style="{height:sidebarHeight/3*2 - 80 + 'px'}">
                   <Table
                     style="overflow:auto"
-                    :columns="projectTableColName"
-                    :data="this.projectResourceList"
-                    v-show="this.projectResourceList!=[] && this.projectResourceList!='None'"
+                    :columns="tableColName"
+                    :data="this.resourceList"
+                    v-show="this.resourceList!=[] && this.resourceList!='None'"
                   >
                     <template slot-scope="{ row }" slot="name">
                       <strong>{{ row.name }}</strong>
@@ -437,7 +436,7 @@
                         type="success"
                         size="small"
                         style="margin-right: 5px"
-                        :href="projectResourceList[index].pathURL"
+                        :href="resourceList[index].pathURL"
                         @click="show(index)"
                         title="download"
                       >
@@ -558,9 +557,9 @@
         </Row>
       </template>
       <template v-else>
-        <Row style="margin-top:20px" :style="{height:sidebarHeight+6+'px'}">
+        <Row style="margin-top:20px" :style="{height:sidebarHeight+8+'px'}">
           <template>
-            <Col span="22" offset="1" :style="{height:sidebarHeight/5*2+'px'}">
+            <Col span="22" offset="1" :style="{height:sidebarHeight/3*1+'px'}">
               <div style="width:100%;height:100%;float:left;background-color:white">
                 <h2
                   style="width:100%;padding:10px 10px 0 10px; display: inline-block;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;max-width: 80%;"
@@ -579,7 +578,8 @@
             <Col span="11">
               <div
                 style="border:1px solid lightgray;background-color:white;overflow-y:scroll"
-                :style="{height:sidebarHeight/5*3 - 32 + 'px'}"
+                :style="{height:sidebarHeight/3*2 - 32 + 'px'}"
+                class="recordLine"
               >
               <span
                   style="height:40px;line-height:40px;margin-left:20px;font-size:1.5em;font-weight: bold"
@@ -587,22 +587,6 @@
                 <Timeline style="padding:10px">
                   <TimelineItem v-for="(item,index) in historyRecords" :key="index">
                     <template v-if="item.type == 'participants'">
-                      <span class="time" style="color:blue">{{item.time}}</span>
-                      <span class="time" style="color:blue; margin-left:10px">{{item.who}}</span>
-                      <span
-                        class="content"
-                        style="color:blue; margin-left:10px; word-break:break-word"
-                      >{{item.content}}</span>
-                    </template>
-                    <template v-if="item.type == 'resources'">
-                      <span class="time">{{item.time}}</span>
-                      <span class="time" style="margin-left:10px">{{item.who}}</span>
-                      <span
-                        class="content"
-                        style="margin-left:10px; word-break:break-word"
-                      >{{item.content}}</span>
-                    </template>
-                    <template v-if="item.type == 'tasks'">
                       <span class="time" style="color:gray">{{item.time}}</span>
                       <span class="time" style="color:gray; margin-left:10px">{{item.who}}</span>
                       <span
@@ -610,20 +594,37 @@
                         style="color:gray; margin-left:10px; word-break:break-word"
                       >{{item.content}}</span>
                     </template>
+                    <template v-if="item.type == 'resource'">
+                      <span class="time" style="color:#0664a2">{{item.time}}</span>
+                      <span class="time" style="color:#0664a2;margin-left:10px">{{item.who}}</span>
+                      <span
+                        class="content"
+                        style="color:#0664a2;margin-left:10px; word-break:break-word"
+                      >{{item.content}}</span>
+                      <a style="cursor:pointer;color:green;margin-left:5px" :href="'http://172.21.212.7:8081/GeoProblemSolving/resource/upload/'+item.file" target="_blank">download</a>
+                    </template>
+                    <template v-if="item.type == 'tools'">
+                      <span class="time" style="color:#0664a2">{{item.time}}</span>
+                      <span class="time" style="color:#0664a2; margin-left:10px">{{item.who}}</span>
+                      <span
+                        class="content"
+                        style="color:#0664a2; margin-left:10px; word-break:break-word; cursor:pointer"
+                        @click="toolPanel(item.toolType)"
+                      >{{item.content}}</span>
+                    </template>
                   </TimelineItem>
                 </Timeline>
               </div>
             </Col>
             <Col span="12" offset="1">
-              <div style="background-color:white" class="unique" :style="{height:sidebarHeight/5*3 - 32 + 'px'}">
+              <div style="background-color:white" class="unique" :style="{height:sidebarHeight/3*2 - 32 + 'px'}">
                 <span style="height:40px;line-height:40px;margin-left:20px;font-size:1.5em;font-weight: bold"
                 >Resource</span>
                 <div style="float:right;margin:4px 10px 0 0" class="popCenter">
-
                   <Button
                     id="upload"
                     type="default"
-                    @click="uploadFileModalShow()"
+                    @click="uploadFileModal = true"
                     class="uploadBtn"
                     title="upload resource"
                   >
@@ -639,11 +640,11 @@
                     <Icon type="md-more"/>
                   </Button>
                 </div>
-                <div style="overflow-y:scroll;padding:0px 10px 10px 10px">
+                <div style="overflow-y:scroll;padding:0px 10px 10px 10px" :style="{height:sidebarHeight/3*2 - 80 + 'px'}">
                   <Table
-                    :columns="projectTableColName"
-                    :data="this.projectResourceList"
-                    v-show="this.projectResourceList!=[] && this.projectResourceList!='None'"
+                    :columns="tableColName"
+                    :data="this.resourceList"
+                    v-show="this.resourceList!=[] && this.resourceList!='None'"
                   >
                     <template slot-scope="{ row }" slot="name">
                       <strong>{{ row.name }}</strong>
@@ -653,7 +654,7 @@
                         type="success"
                         size="small"
                         style="margin-right: 5px"
-                        :href="projectResourceList[index].pathURL"
+                        :href="resourceList[index].pathURL"
                         @click="show(index)"
                         title="download"
                       >
@@ -733,14 +734,21 @@
         <textarea v-model="moduleDescription" style="width:400px" :rows="6"></textarea>
       </div>
     </Modal>
-    <Modal
-      width="600px"
-      v-model="copyModal"
-      title="Copy this process"
-      @on-ok="copyModule()"
-      @on-cancel="cancel()"
-    >
-      <p>Do you want to activate this process?</p>
+    <Modal 
+      v-model="inheritData"
+      title="Choose data to next process"
+      @on-ok="addModal = true"
+      @on-cancel="cancel()" >
+      <Transfer      
+        :data="inheritResource"
+        :target-keys="targetKeys"
+        :list-style="listStyle"
+        :render-format="resourceRender"
+        filterable
+        :filter-method="filterMethod"
+        @on-change="handleChange"
+      >
+      </Transfer>
     </Modal>
     <Modal
       width="600px"
@@ -818,6 +826,7 @@ export default {
       addModal: false,
       copyModal: false,
       delModal: false,
+      inheritData:false,
       //编辑的模态框
       editModal: false,
       activateModal: false,
@@ -859,20 +868,13 @@ export default {
       // 所有module的记录
       allRecords: [],
       historyRecords: [],
+      allHistRecords:[],
       // 当前参与者
       olParticipants: [],
       ofParticipants: [],
-      // 消息
-      socketMsg: {
-        type: "",
-        time: "",
-        who: "",
-        whoid: "",
-        content: ""
-      },
       uploadFileModal: false,
-      projectResourceList: [],
-      projectTableColName: [
+      resourceList: [],
+      tableColName: [
         {
           title: "Name",
           key: "name",
@@ -891,16 +893,20 @@ export default {
       fileType: "",
       fileDescription: "",
       resourceHeight:400,
+      //资源继承
+      inheritResource: [],
+      targetKeys: [],
+      listStyle: { width: '210px', height: '300px' }
     };
   },
   created() {
     this.init();
-    this.getAllModules("init");
-    this.getAllResource();
   },
   mounted() {
     window.addEventListener("resize", this.reSize);    
     this.openModuleSocket();
+    this.getHistoryRecords();
+    this.getAllModules("init");
   },
   // add by mzy for navigation guards
   beforeRouteEnter: (to, from, next) => {
@@ -924,6 +930,14 @@ export default {
   beforeDestroy: function() {
     window.removeEventListener("resize", this.reSize);
     this.closeModuleSocket();
+  },
+  updated: function(){
+    this.$nextTick(function(){
+      var div = document.getElementsByClassName('recordLine');
+      for(let i = 0; i <div.length;i++) {        
+        div[i].scrollTop = div[i].scrollHeight;
+      }
+    })
   },
   methods: {
     initSize() {
@@ -1003,6 +1017,7 @@ export default {
       ) {
         this.projectInfo = projectInfo;
       } else {
+        let _this = this;
         this.axios
           .get(
             "/GeoProblemSolving/project/inquiry" +
@@ -1012,7 +1027,10 @@ export default {
           )
           .then(res => {
             if (res.data != "None" && res.data != "Fail") {
-              this.projectInfo = res.data[0];
+              _this.projectInfo = res.data[0];
+              
+              sessionStorage.setItem("projectId", _this.projectInfo.projectId);
+              sessionStorage.setItem("projectName", _this.projectInfo.title);
             } else {
               console.log(res.data);
             }
@@ -1028,13 +1046,42 @@ export default {
       this.currentModuleIndex = item;
       this.order = item;
       this.currentModule = this.moduleList[this.currentModuleIndex];
-
-      if(oldId == this.currentModule.moduleId){
-        this.allRecords = [];
-      }
-
       sessionStorage.setItem("moduleId", this.currentModule.moduleId);
       sessionStorage.setItem("moduleName", this.currentModule.title);
+
+      if(oldId !== this.currentModule.moduleId) {
+        this.getAllResource();
+        let records = [];
+        if(!this.currentModule.activeStatus) {
+          for(let i = 0;i<this.allHistRecords.length;i++) {
+            if(this.currentModule.moduleId == this.allHistRecords[i].moduleId) {
+              let record = this.allHistRecords[i];
+              records.push(record);
+            }
+          }
+          this.historyRecords = records;
+        }
+        else {
+          let noRecords = true;
+          for(let i = 0; i < this.allRecords.length; i++) {
+            if(this.allRecords[i].type != "participants") {
+              noRecords = false;
+              break;
+            }
+          }
+          if(noRecords) {
+            for(let i = 0;i<this.allHistRecords.length;i++) {
+              if(this.currentModule.moduleId == this.allHistRecords[i].moduleId) {
+                let record = this.allHistRecords[i];
+                records.push(record);
+              }
+            }
+            let temp = records.concat(this.allRecords);
+            this.allRecords = temp;
+          }
+        }
+      }
+
     },
     closeModuleSocket() {
       if (this.subprojectSocket != null) {
@@ -1071,11 +1118,20 @@ export default {
       };
         
       // 资源记录
-      if (messageJson.type == "resources") {
+      if (messageJson.type == "resource") {
+        let record = {};
+        record["who"] = messageJson.who;
+        record["content"] = messageJson.content;
+        record["time"] = messageJson.time;
         this.allRecords.push(messageJson);
+        this.getAllResource();
       }
       // 工具记录
       else if (messageJson.type == "tools") {
+        let record = {};
+        record["who"] = messageJson.who;
+        record["content"] = messageJson.content;
+        record["time"] = messageJson.time;
         this.allRecords.push(messageJson);
       }
       // module 更新
@@ -1176,7 +1232,7 @@ export default {
                 that.olParticipants.push(res.data);
                 if (userIndex != -1) {
                   record.who = res.data.userName;
-                  record.content = "enter this module.";
+                  record.content = "enter this process module.";
                 }
               } else if (res.data == "None") {
               }
@@ -1194,7 +1250,7 @@ export default {
             }
           }
           record.who = this.olParticipants[userIndex].userName;
-          record.content = "leave this module.";
+          record.content = "leave this process module.";
           this.olParticipants.splice(userIndex, 1);
         }
       }
@@ -1214,6 +1270,54 @@ export default {
       //   }
       // }
     },
+    getHistoryRecords() {
+      this.allHistRecords = [];
+      let that = this;
+      this.axios
+      .get(
+        "/GeoProblemSolving/history/inquiry" + 
+        "?eventType=record" +
+        "&key=scopeId"+
+        "&value="+ this.subProjectInfo.subProjectId
+      )
+      .then(res=>{
+        if(res.data != "None") {
+          for(let i = 0;i<res.data.length;i++) {
+            let record = JSON.parse(res.data[i].description);
+            that.allHistRecords.push(record);
+          }
+        }
+      })
+    },
+    chooseResource(){
+      this.inheritData = true;
+      this.inheritResource = this.getMockData();
+      this.targetKeys = this.getTargetKeys ();
+    },
+    getMockData () {
+      let mockData = [];
+      for (let i = 0; i < this.resourceList.length; i++) {
+        mockData.push({
+          key: i.toString(),
+          name: this.resourceList[i].name,
+          type: this.resourceList[i].type,
+          resourceId:this.resourceList[i].resourceId
+        });
+      }
+      return mockData;
+    },
+    getTargetKeys () {
+      return this.getMockData();
+    },
+    handleChange (newTargetKeys) {
+      this.targetKeys = newTargetKeys;
+    },
+    filterMethod (data, query) {
+      return data.type.indexOf(query) > -1;
+    },
+    resourceRender(item) {
+      return item.type + ' - ' + item.name;
+    },
     getAllModules(state) {
       //这里重写以下获取module
       let subProjectId = this.$route.params.id;
@@ -1228,17 +1332,14 @@ export default {
           if (res.data != "None") {
             this.moduleList = res.data;
 
-            let index = this.getActiveModule();
             if (state == "init") {
+              let index = this.getActiveModule();
               this.showDetail(index);
-            } else if (state == "add") {
-              // this.showDetail(this.moduleList.length -1);
-            } else if (state == "delete") {
-              // this.showDetail(this.order - 1);
             } else if (state == "update") {
-                   
+              this.allRecords = [];
               this.showDetail(this.order);
             }
+
           } else if (res.data == "None") {
             this.moduleList = [];
           }
@@ -1288,6 +1389,9 @@ export default {
                     console.log(err.data);
                   });
               }
+              else {
+                this1.getAllModules("update");
+              }
 
               this1.createModuleSuccess(Module["title"]);
               this1.moduleList.push(Module);
@@ -1302,7 +1406,6 @@ export default {
           });
       }
     },
-    copyModule() {},
     activateModule() {
       var this1 = this;
       var this2 = this;
@@ -1394,7 +1497,7 @@ export default {
         this.axios
           .post("/GeoProblemSolving/module/update", updateObject)
           .then(res => {
-            that.getAllModules("update");
+            that.getAllModules("init");
             
             let socketMsg = {type:"module",operate:"update"};
             that.subprojectSocket.send(JSON.stringify(socketMsg));
@@ -1403,6 +1506,9 @@ export default {
             console.log(err.data);
           });
       }
+    },
+    copyResource() {
+      
     },
     getActiveModule() {
       var index = 0;
@@ -1414,39 +1520,8 @@ export default {
       }
       return index;
     },
-    uploadFileModalShow() {
-      this.uploadFileModal = true;
-    },
     toResourceList() {
       this.$router.push({ path: "/resourceList" });
-    },
-    addUploadEvent(scopeId) {
-      let form = {};
-      let description =
-        this.$store.getters.userName +
-        " uploaded a " +
-        this.fileType +
-        " file in " +
-        " project called " +
-        this.currentProjectDetail.title;
-      form["description"] = description;
-      form["scopeId"] = scopeId;
-      this.axios
-        .post(
-          "/GeoProblemSolving/history/save?",
-          "description=" +
-            description +
-            "&scopeId=" +
-            scopeId +
-            "&userId=" +
-            this.$store.getters.userId
-        )
-        .then(res => {
-          console.log(res.data);
-        })
-        .catch(err => {
-          console.log(err.data);
-        });
     },
     getResourceList() {
       this.axios
@@ -1472,30 +1547,50 @@ export default {
       // 添加字段属于那个项目
       formData.append("belong", this.currentModule.title);
 
-      let scopeObject = {
-        projectId: window.sessionStorage.getItem("projectId"),
-        subprojectId: window.sessionStorage.getItem("subProjectId"),
-        moduleId: this.currentModule.moduleId,
-      };
-      formData.append("scope", JSON.stringify(scopeObject));
-      //这里还要添加其他的字段
-      this.axios
-        .post("/GeoProblemSolving/resource/upload", formData)
-        .then(res => {
-          if (res.data != "Size over" && res.data.length > 0) {
-            this.$Notice.open({
-              title: "Upload notification title",
-              desc: "File uploaded successfully",
-              duration: 2
-            });
-            //这里重新获取一次该项目下的全部资源
-            this.addUploadEvent(this.currentProjectDetail.projectId);
-            this.getAllResource();
-            // 创建一个函数根据pid去后台查询该项目下的资源
-          }
-          // console.log(res.data);
+      if(sessionStorage.getItem("projectId") == "" || sessionStorage.getItem("projectId") == undefined || sessionStorage.getItem("projectId") == null) {
+        this.getProjectInfo();
+      }
+      this.sleep(1000).then(() => {
+        let scopeObject = {
+          projectId: sessionStorage.getItem("projectId"),
+          subprojectId: sessionStorage.getItem("subProjectId"),
+          moduleId: this.currentModule.moduleId,
+        };
+        formData.append("scope", JSON.stringify(scopeObject));
+        //这里还要添加其他的字段
+        let that = this;
+        this.axios
+          .post("/GeoProblemSolving/resource/upload", formData)
+          .then(res => {
+            if (res.data != "Size over" && res.data.length > 0) {
+              that.$Notice.open({
+                title: "Upload notification title",
+                desc: "File uploaded successfully",
+                duration: 2
+              });
+              //这里重新获取全部资源
+              that.getAllResource();
+
+              // 同步
+              let record = {
+                who: that.$store.getters.userName,
+                whoid: that.$store.getters.userId,
+                type:"resource",
+                content:"upload a/an "+ that.fileType + " : " + that.file.name,                
+                moduleId: this.currentModule.moduleId,
+                time: new Date().toLocaleString(),
+                file: res.data[0].fileName
+              };
+              that.subprojectSocket.send(JSON.stringify(record));
+              // that.allRecords.push(record);
+            }
+            // console.log(res.data);
+          })
+          .catch(err => {});
         })
-        .catch(err => {});
+    },
+    sleep (time) {
+      return new Promise((resolve) => setTimeout(resolve, time));
     },
     //获取全部资源的方法
     getAllResource() {
@@ -1512,13 +1607,12 @@ export default {
         .then(res => {
           // 写渲染函数，取到所有资源
           if (res.data !== "None") {
-            this.$set(this, "projectResourceList", res.data);
-            console.log(this.projectResourceList);
+            this.$set(this, "resourceList", res.data);
           } else {
-            this.projectResourceList = [];
+            this.resourceList = [];
           }
           // 渲染函数，将列表展现出来，下载
-          // this.showProjectResource(this.projectResourceList);
+          // this.showProjectResource(this.resourceList);
         })
         .catch(err => {
           console.log(err.data);
@@ -1547,7 +1641,7 @@ export default {
 
     },
     show(index) {
-      window.open(this.projectResourceList[index].pathURL);
+      window.open(this.resourceList[index].pathURL);
     },
     toolContainerMove(e) {
       let odiv = e.target;
@@ -1669,6 +1763,21 @@ export default {
       });
       panel.resizeit("disable");
       $(".jsPanel-content").css("font-size", "0");
+
+      // 生成records
+      
+      // 同步
+      let record = {
+        who: this.$store.getters.userName,
+        whoid: this.$store.getters.userId,
+        type:"tools",
+        toolType: type,
+        content:"is using a tool: " + type,
+        moduleId: this.currentModule.moduleId,
+        time: new Date().toLocaleString()
+      };
+      this.subprojectSocket.send(JSON.stringify(record));
+      // this.allRecords.push(record);
     }
   }
 };

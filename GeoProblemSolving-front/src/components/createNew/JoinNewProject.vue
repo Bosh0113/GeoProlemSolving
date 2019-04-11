@@ -16,7 +16,7 @@
         </FormItem>
         <div style="display:flex;justify-content:center">
           <Button type="default" @click="joinByMail()">
-            Assure
+            Send Email
           </Button>
         </div>
       </Form>
