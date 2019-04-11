@@ -12,7 +12,7 @@
         <div v-show="registeredHintShow==true" style="margin-left:100px;display:flex;align-items:center"><Icon type="ios-information-circle-outline" :size="25" color="yellowGreen"/><span style="font-size:15px;">{{this.registeredHint}}</span></div>
           <div v-show="unregisteredHintShow==true" style="margin-left:100px;display:flex;align-items:center"><Icon type="ios-information-circle-outline" :size="25" color="red"/><span style="font-size:15px;">{{this.unregisteredHint}}</span></div>
         <FormItem label="Password" v-show="passwordInputShow">
-          <Input v-model="password" ></Input>
+          <Input v-model="password" type="password"></Input>
         </FormItem>
         <div style="display:flex;justify-content:center">
           <Button type="default" @click="joinByMail()">
@@ -50,7 +50,7 @@ export default {
     // console.log('email', email);
   },
   methods:{
-      judgeMailRegiste(){  
+      judgeMailRegiste(){
         this.axios
         .get(
           "/GeoProblemSolving/user/isRegistered?" +
@@ -70,7 +70,7 @@ export default {
         })
         .catch(err => {
           this.$Message.danger("Judge fail");
-        }); 
+        });
     },
     joinByMail(){
       this.axios
@@ -92,6 +92,7 @@ export default {
             this.$Message.info("Fail to join in this project");
           }else if(res.data === "Exist"){
             this.$Message.info("you have been in this group,no need to apply again");
+            this.$router.push({ name: "ProjectDetail", params: { id: gotoProjectId } });
           }else if(res.data === "None"){
             this.$Message.info("this group doesn't exist");
           }else if(res.data === "Password"){
@@ -100,7 +101,7 @@ export default {
         })
         .catch(err => {
           this.$Message.danger("Join fail");
-        }); 
+        });
     }
   }
 };
