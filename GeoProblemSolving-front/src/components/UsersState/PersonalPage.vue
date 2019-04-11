@@ -177,29 +177,10 @@
                       </FormItem>
                     </Form>
                   </Drawer>
-                  <!-- <Button
-                    type="error"
-                    style="height:40px;float:right"
-                    @click="logOutModalShow()"
-                  >logOut</Button> -->
                 </div>
-
-                <!-- <Modal
-                  v-model="logOutProfileModal"
-                  title="Logout Warning"
-                  @on-ok="logOutAccount()"
-                  @on-cancel="cancel"
-                  logOutAccount-text="assure"
-                  cancel-text="cancel"
-                >
-                  <p
-                    style="font-size:20px"
-                  >If you choose logout your account,the personal information you have filled will be removed.</p>
-                </Modal> -->
               </div>
             </div>
           </Col>
-          <!-- <Col span="18" offset="1"> -->
           <Col
             :lg="{span:18,offset:1}"
             :md="{span:15,offset:1}"
@@ -374,15 +355,36 @@
         title="share resource in other projects"
         @on-ok="processResource()"
         @on-cancel="cancel"
+        ok-text="assure"
+        cancel-text="cancel"
         >
         <!-- todo:这里需要过滤参与的项目以及管理的项目重新渲染 -->
-        <p>Content of dialog</p>
-        <p>Content of dialog</p>
-        <p>Content of dialog</p>
+        <div>
+          <h3>Participatory Projects</h3>
+          <!-- 多选框 -->
+          <RadioGroup v-model="selectShareProject">
+          <Radio v-for="(item,index) in joinedProjectsNameList" :key="item.index" :label="item.title">
+          </Radio>
+        </RadioGroup>
+          <!-- <div v-for="(item,index)in joinedProjectsNameArray" :key="item.index">{{item.title}}</div> -->
+        </div>
+        <div>
+          <h3>Management Projects</h3>
+          <RadioGroup v-model="selectShareProject">
+          <Radio v-for="(item,index) in userManagerProjectList" :key="item.index" :label="item.title">
+            <span>{{item.title}}</span>
+          </Radio>
+          </RadioGroup>
+        </div>
+        <div style="margin-top:5px">
+          <Icon type="ios-information-circle-outline" color="lightblue"/>
+          <span>
+            the resource will be shared in the project you choosed.
+          </span>
+        </div>
     </Modal>
   </div>
 </template>
-
 <script>
 import Avatar from "vue-avatar";
 export default {
@@ -396,6 +398,7 @@ export default {
     // 获取用户的历史event
     this.readPersonalEvent();
     this.detailSidebarHeight = window.innerHeight - 60 + "px";
+    this.joinedProjectsNameList = this.$store.getters.userInfo["joinedProjects"];
   },
   computed: {
     username() {
@@ -406,7 +409,8 @@ export default {
     },
     userId() {
       return this.$store.getters.userId;
-    }
+    },
+
   },
   components: {
     Avatar
@@ -530,6 +534,10 @@ export default {
       processResourceModal:false,
       // 选中资源的索引
       selectResourceIndex:"",
+      // 参与的项目的名称列表
+      joinedProjectsNameList:[],
+      // 选中的将要分享资源的项目名
+      selectShareProject:"",
     };
   },
   methods: {
@@ -817,8 +825,14 @@ export default {
     },
     // 处理个人的资源可以选择copy到参与的项目，也可以选择copy到管理的项目
     processResource(){
-      alert(this.selectResourceIndex);
-      console.table(this.joinedProjectsNameArray);
+      let resourceInfo = {};
+      this.joinedProjectsNameList = this.$store.getters.userInfo["joinedProjects"];
+      console.log(this.joinedProjectsNameList);
+      // submit
+      console.log(this.userResourceList[this.selectResourceIndex]);
+      resourceInfo = this.userResourceList[this.selectResourceIndex];
+      let shareForm = new FormData();
+      shareForm.append("file",)
     },
     cancel(){
 
@@ -826,7 +840,7 @@ export default {
     processResourceModalShow(index){
       this.processResourceModal = true;
       this.selectResourceIndex = index;
-    }
+    },
   }
 };
 </script>

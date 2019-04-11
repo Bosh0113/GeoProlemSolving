@@ -1,158 +1,170 @@
 <template>
-  <Row>
-    <Col span="22" offset="1">
-      <div class="mainPanel">
-        <div class="detailSidebar2" :style="{height:detailSidebarHeight}">
-          <div class="user-img">
-            <img v-bind:src="userDetail.avatar" class="u_img"
-            v-if="userDetail.avatar!=''&&userDetail.avatar!='undefined'">
-            <avatar
-              style="width:100%"
-              :username="userDetail.userName"
-              :size="200"
-              :rounded="false"
-              v-else>
-            </avatar>
-          </div>
-          <div style="text-align:center">
-            <div class="single-info">{{userDetail.userName}}</div>
-            <br>
-          </div>
-          <div class="user-desc" style="min-hieght:60px;padding:0 10px;border:1px dotted gray">
-            <p>{{this.userDetail.introduction}}</p>
-            <!-- <Input type="textarea" :rows="4" :value="this.userDetail.introduction"/> -->
-          </div>
-          <div class="user-info">
-            <div class="single-info">
-              <span>email:</span>
-              <span style="float:right">{{userDetail.email}}</span>
+<div>
+    <Row>
+      <Col span="22" offset="1">
+        <Row>
+          <Col :lg="5" :md="8" :sm="10" :xs="12">
+            <div class="detailSidebar" :style="{height:detailSidebarHeight}">
+              <div class="user-img">
+                <img v-bind:src="userDetail.avatar" class="u_img"
+                  v-if="userDetail.avatar!=''&&userDetail.avatar!='undefined'">
+                <avatar
+                  style="width:100%"
+                  :username="userDetail.userName"
+                  :size="200"
+                  :rounded="false"
+                  v-else>
+                </avatar>
+              </div>
+              <div class="single-info">
+                <Icon type="ios-contact-outline" :size="20"/>
+                <span>{{userDetail.userName}}</span>
+              </div>
+              <div class="user-info">
+                <div class="single-info" >
+                  <!-- <span>email:</span> -->
+                  <Icon type="ios-mail-outline" :size="20"/>
+                  <span>{{userDetail.email}}</span>
+                </div>
+                <div class="single-info">
+                  <Icon type="ios-call-outline" :size="20"/>
+                  <span>{{userDetail.mobilePhone}}</span>
+                </div>
+                <div class="single-info">
+                  <Icon type="ios-hammer-outline" :size="20"/>
+                  <span>{{userDetail.jobTitle}}</span>
+                </div>
+                <div class="single-info">
+                  <Icon type="ios-compass-outline" :size="20"/>
+                  <span>{{userDetail.country}}&nbsp{{userDetail.city}}</span>
+                </div>
+                <div class="single-info">
+                  <Icon type="ios-home-outline" :size="20"/>
+                  <span>{{userDetail.organization}}</span>
+                </div>
+                <div class="single-info">
+                  <Icon type="ios-contract" :size="20"/>
+                  <span>{{userDetail.direction}}</span>
+                </div>
+                <div class="single-info">
+                  <Icon type="md-link" :size="20"/>
+                  <span>{{userDetail.homePage}}</span>
+                </div>
+                <br>
+                <div style="padding:20px 20px 0 20px;font-size:12px;text-indent:2em;border:1px dotted lightgray">
+                  {{this.userDetail.introduction}}
+                </div>
+              </div>
             </div>
-            <div class="single-info">
-              <span>phone</span>
-              <span style="float:right">{{userDetail.mobilePhone}}</span>
-            </div>
-            <div class="single-info">
-              <span>job:</span>
-              <span style="float:right">{{userDetail.jobTitle}}</span>
-            </div>
-            <div class="single-info">
-              <span>location:</span>
-              <span style="float:right">{{userDetail.country}}&nbsp{{userDetail.city}}</span>
-            </div>
-            <div class="single-info">
-              <span>organization</span>
-              <span style="float:right">{{userDetail.organization}}</span>
-            </div>
-            <div class="single-info">
-              <span>direction</span>
-              <span style="float:right">{{userDetail.direction}}</span>
-            </div>
-            <div class="single-info">
-              <span>homepage</span>
-              <span style="float:right">{{userDetail.homePage}}</span>
-            </div>
-            <div class="whitespace"></div>
-          </div>
-        </div>
-        <div class="rightContent">
-        <Tabs value="Overview">
-              <TabPane label="Overview" name="Overview">
-                <Col :lg="{span:22,offset:1}" :md="{span:22,offset:1}" :sm="{span:22,offset:1}">
-                  <Card>
-                    <p slot="title">History Line</p>
-                    <Timeline style="margin-top:20px;margin-left:5%">
-                      <TimelineItem v-for="(item,index) in userEventList" :key="index">
-                        <strong>
-                          <p class="time">{{item.createTime}}</p>
-                        </strong>
-                        <p class="content">{{item.description}}</p>
-                      </TimelineItem>
-                    </Timeline>
-                  </Card>
-                  <br>
-                  <div>
-                  </div>
-                </Col>
-              </TabPane>
-              <TabPane label="Participatory Project" name="Participatory">
-                <div
-                  v-for="(item,index) in joinedProjectsList"
-                  :key="index"
-                  v-show="joinedProjectsList!='None'"
-                >
-                  <Col :lg="{span:11, offset:1}" :md="{span:22, offset:1}">
-                    <Card style="height:320px;margin-top:20px;">
-                      <p
-                        slot="title"
-                        style="height:40x"
-                        class="projectsTitle"
-                        @click="goSingleProject(item.projectId)"
-                      >{{item.title}}</p>
-                      <p
-                        style="height:200px;text-indent:2em;overflow-y:scroll"
-                      >{{item.introduction}}</p>
-                      <br>
-                      <div style="height:40px">
-                        <span style="float:left">CreateTime:</span>
-                        <span style="float:right">{{item.createTime}}</span>
-                      </div>
+          </Col>
+          <Col
+            :lg="{span:18,offset:1}"
+            :md="{span:15,offset:1}"
+            :sm="{span:13,offset:1}"
+            :xs="{span:11,offset:1}"
+          >
+            <div class="rightContent">
+              <Tabs value="Overview">
+                <TabPane label="Overview" name="Overview">
+                  <Col :lg="{span:22,offset:1}" :md="{span:22,offset:1}" :sm="{span:22,offset:1}">
+                    <Card>
+                      <p slot="title">History Line</p>
+                      <Timeline
+                        style="margin-top:20px;margin-left:5%;max-height:300px;overflow-y:auto"
+                      >
+                        <TimelineItem v-for="(item,index) in userEventList" :key="index">
+                          <strong>
+                            <p class="time">{{item.createTime}}</p>
+                          </strong>
+                          <p class="content">{{item.description}}</p>
+                        </TimelineItem>
+                      </Timeline>
                     </Card>
                   </Col>
-                </div>
-              </TabPane>
-              <TabPane label="Management Project" name="Management">
-                <div
-                  v-for="(mProject,index) in userManagerProjectList"
-                  v-show="userManagerProjectList!='None'"
-                >
-                  <Col :lg="{span:11, offset:1}" :md="{span:22, offset:1}">
-                    <Card style="height:320px;margin-top:20px">
-                      <p
-                        slot="title"
-                        class="projectsTitle"
-                        @click="goSingleProject(mProject.projectId)"
-                      >{{mProject.title}}</p>
-                      <!-- 表头结束 -->
-                      <p
-                        style="height:200px;text-indent:2em;overflow-y:scroll"
-                      >{{mProject.introduction}}</p>
-                      <!-- <hr> -->
-                      <br>
-                      <div>
-                        <span style="float:left">CreateTime:</span>
-                        <span style="float:right">{{mProject.createTime}}</span>
+                </TabPane>
+                <TabPane label="Participatory Project" name="Participatory">
+                  <div
+                    v-for="(item,index) in joinedProjectsList"
+                    :key="index"
+                    v-show="joinedProjectsList!=[]"
+                  >
+                    <Col :lg="{span:11, offset:1}" :md="{span:22, offset:1}">
+                      <div class="participatoryProjectCard" @click="goSingleProject(item.projectId)">
+                        <Card style="height:320px;margin-top:20px;">
+                        <p
+                          slot="title"
+                          style="height:40x"
+                          class="projectsTitle"
+                        >{{item.title}}</p>
+                        <p
+                          style="height:200px;text-indent:2em;overflow-y:auto;word-break:break-word"
+                        >{{item.introduction}}</p>
+                        <br>
+                        <div style="height:40px">
+                          <span style="float:left">CreateTime:</span>
+                          <span style="float:right">{{item.createTime}}</span>
+                        </div>
+                      </Card>
                       </div>
-                    </Card>
-                  </Col>
-                </div>
-              </TabPane>
-            </Tabs>
-      </div>
-      </div>
 
-    </Col>
-  </Row>
+                    </Col>
+                  </div>
+                </TabPane>
+                <TabPane label="Management Project" name="Management">
+                  <div
+                    v-for="(mProject,index) in userManagerProjectList"
+                    v-show="userManagerProjectList!='None'"
+                    :key="index"
+                  >
+                    <Col :lg="{span:11, offset:1}" :md="{span:22, offset:1}">
+                    <div class="manageProjectsCard" @click="goSingleProject(mProject.projectId)">
+                      <Card style="height:320px;margin-top:20px">
+                        <p
+                          slot="title"
+                          class="projectsTitle"
+                        >{{mProject.title}}</p>
+                        <p
+                          style="height:200px;text-indent:2em;overflow-y:auto;word-break:break-word"
+                        >{{mProject.introduction}}</p>
+                        <!-- <hr> -->
+                        <br>
+                        <div>
+                          <span style="float:left">CreateTime:</span>
+                          <span style="float:right">{{mProject.createTime}}</span>
+                        </div>
+                      </Card>
+                    </div>
+                    </Col>
+                  </div>
+                </TabPane>
+              </Tabs>
+            </div>
+          </Col>
+        </Row>
+        <div></div>
+      </Col>
+    </Row>
+  </div>
+
 </template>
 <style scoped>
-.mainPanel {
-  display: flex;
-}
-.detailSidebar2 {
-  min-width: 250px;
-  max-width: 300px;
+.detailSidebar {
   margin-right: 20px;
 }
 .rightContent {
   flex: 1;
 }
 img {
-  width: 100%;
-  height: auto;
+  padding: 10px;
+  max-width: 100%;
+  max-height: 100%;
 }
 h1 {
   font-weight: normal;
 }
-
+body {
+  overflow-x: hidden;
+}
 .sidebar {
   margin-top: 20px;
 }
@@ -177,6 +189,16 @@ h1 {
   height: 20px;
   font-size: 10px;
   line-height: 20px;
+}
+.userDescription {
+  height: auto;
+  line-height: 10px;
+  font-size: 10px;
+  /* max-width: 200px; */
+  /* display: inline-block; */
+  overflow: hidden;
+  word-wrap: break-word;
+  word-break: break-all;
 }
 .user-project {
   margin-top: 20px;
@@ -204,6 +226,103 @@ h1 {
 /* 表示空格间距的 */
 .whitespace {
   height: 20px;
+}
+.editStyle {
+  display: flex;
+  align-items: center;
+  margin-top: 5px;
+  /* justify-content: center; */
+}
+.editStyle span {
+  width: 20%;
+  text-align: left;
+}
+
+/* 关于提交用户更改头像信息的样式 */
+.demo-upload-list {
+  display: inline-block;
+  width: 60px;
+  height: 60px;
+  text-align: center;
+  line-height: 60px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #fff;
+  position: relative;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+  margin-right: 4px;
+}
+.demo-upload-list img {
+  width: 100%;
+  height: 100%;
+}
+.demo-upload-list-cover {
+  display: none;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.6);
+}
+.demo-upload-list:hover .demo-upload-list-cover {
+  display: block;
+}
+.demo-upload-list-cover i {
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+  margin: 0 2px;
+}
+.uploadAvatar {
+  position: relative;
+  width: 58px;
+  height: 58px;
+  top: 0;
+  left: 0;
+  outline: none;
+  background-color: transparent;
+  opacity: 0;
+}
+.uploadBox {
+  display: inline-block;
+  width: 58px;
+  height: 58px;
+  line-height: 58px;
+  overflow: hidden;
+  border-width: 0.75px;
+  border-style: dashed;
+  border-color: lightslategray;
+}
+/* 2-25 add 实现的效果是旋浮上去出现下划线且变红 */
+.projectsTitle:hover {
+  /* color: red; */
+  cursor: pointer;
+}
+
+/* 新定义的样式 */
+.authorBtn:hover {
+  background-color: #57a3f3;
+  color: white;
+}
+.editBtn:hover {
+  background-color: #19be6b;
+  color: white;
+}
+.deleteBtn:hover {
+  background-color: #ed4014;
+  color: white;
+}
+.table table {
+  table-layout: auto;
+  width: 100% !important;
+}
+.participatoryProjectCard:hover,{
+  cursor:pointer;
+}
+.manageProjectsCard:hover{
+  cursor:pointer;
 }
 </style>
 <script>
@@ -263,7 +382,7 @@ export default {
           this.joinedProjectsNameArray = this.userDetail.joinedProjects;
           this.getParticipatoryList(this.joinedProjectsNameArray);
           //打印用户的具体信息
-           
+
         })
         .catch(err => {
           console.log(err.data);
@@ -279,23 +398,7 @@ export default {
         )
         .then(res => {
           this.userEventList = res.data;
-           
-        })
-        .catch(err => {
-          console.log(err.data);
-        });
-    },
-    getUserResource() {
-      this.axios
-        .get(
-          "/GeoProblemSolving/resource/inquiry" +
-            "?key=uploaderId" +
-            "&value=" +
-            this.$store.getters.userId
-        )
-        .then(res => {
-          this.userResourceList = res.data;
-           
+
         })
         .catch(err => {
           console.log(err.data);
@@ -311,7 +414,6 @@ export default {
         )
         .then(res => {
           // 打印用户所管理的项目
-           
           this.userManagerProjectList = res.data;
         })
         .catch(err => {});
@@ -347,7 +449,6 @@ export default {
     this.getUserProfile();
     this.getManagerProjectList();
     this.readPersonalEvent();
-    this.getUserResource();
     this.detailSidebarHeight = window.innerHeight - 60 + "px";
   },
 };
