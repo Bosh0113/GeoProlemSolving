@@ -532,6 +532,17 @@
                       <Icon type="ios-information-circle-outline"/>
                       <span>This tool can't support collaborative functions.</span>
                     </div>
+                    <div class="tool-panel">
+                      <div class="singl_tool_style">
+                        <Icon
+                          type="md-globe"
+                          size="60"
+                          @click.native="toolPanel('3DEarth')"
+                          title="3D Earth"
+                          color="gray"
+                        />
+                      </div>
+                    </div>
                   </TabPane>
                   <TabPane label="Special tools" name="Special">
                     <h2>Special Tools</h2>
@@ -1138,10 +1149,10 @@ export default {
         this.subprojectSocket = null;
       }
       let subprojectId = this.subProjectInfo.subProjectId;
-      var subprojectSocketURL =
-        "ws://localhost:8081/GeoProblemSolving/Module/" + subprojectId;
+      // var subprojectSocketURL =
+        // "ws://localhost:8081/GeoProblemSolving/Module/" + subprojectId;
       // var subprojectSocketURL = "ws://202.195.237.252:8082/GeoProblemSolving/Module/" + subprojectId;
-      // var subprojectSocketURL = "ws://172.21.212.7:8082/GeoProblemSolving/Module/" + subprojectId;
+      var subprojectSocketURL = "ws://172.21.212.7:8082/GeoProblemSolving/Module/" + subprojectId;
       this.subprojectSocket = new WebSocket(subprojectSocketURL);
       this.subprojectSocket.onopen = this.onOpen;
       this.subprojectSocket.onmessage = this.onMessage;
@@ -1848,7 +1859,11 @@ export default {
           "?groupID=" +
           this.currentModule.moduleId +
           '" style="width: 100%;height:100%"></iframe>';
-      }
+      } else if (type == "3DEarth") {
+        toolURL =
+          '<iframe src="/GeoProblemSolving/Collaborative/3DEarth/index.html' +
+          '" style="width: 100%;height:100%"></iframe>';
+      } 
       // tableEditor
       // 3d
       // computational
