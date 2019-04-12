@@ -397,7 +397,6 @@ export default {
         .then(res => {
           if(res.data != "None" && res.data != "Fail") {
             this.userDetail = res.data;
-            console.table(this.userDetail);
             this.joinedProjectsNameArray = this.userDetail.joinedProjects;
             if(this.joinedProjectsNameArray.length > 0) {
               this.getParticipatoryList(this.joinedProjectsNameArray);
