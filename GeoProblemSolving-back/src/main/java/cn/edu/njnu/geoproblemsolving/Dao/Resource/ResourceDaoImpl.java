@@ -246,9 +246,43 @@ public class ResourceDaoImpl implements IResourceDao {
             e.printStackTrace();
         }
     }
-}
 
-class ResourceUploadInfo {
+    @Override
+    public Object shareResource(HttpServletRequest request){
+        try {
+            Date date = new Date();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            String uploadTime = dateFormat.format(date);
+            String resourceId=UUID.randomUUID().toString();
+            ResourceEntity resourceEntity=new ResourceEntity();
+            resourceEntity.setResourceId(resourceId);
+            resourceEntity.setUploadTime(uploadTime);
+            resourceEntity.setName(request.getParameter("name"));
+            resourceEntity.setDescription(request.getParameter("description"));
+            resourceEntity.setBelong(request.getParameter("belong"));
+            resourceEntity.setType(request.getParameter("type"));
+            resourceEntity.setFileSize(request.getParameter("fileSize"));
+            resourceEntity.setPathURL(request.getParameter("pathURL"));
+            resourceEntity.setUploaderId(request.getParameter("uploaderId"));
+            JSONObject scope = JSON.parseObject(request.getParameter("scope"));
+            // decode projectId
+            String projectId = scope.getString("projectId");
+            if (projectId.length() > 36) {
+                String sid = new String(EncodeUtil.decode(projectId));
+                projectId = sid.substring(0, sid.length() - 2);
+            }
+            scope.put("projectId", projectId);
+
+            resourceEntity.setScope(scope);
+
+            mongoTemplate.save(resourceEntity);
+            Query query=new Query(Criteria.where("resourceId").is(resourceId));
+            return mongoTemplate.findOne(query,ResourceEntity.class);
+        }catch (Exception e){
+            return "Fail";
+        }
+    }
+}class ResourceUploadInfo {
     private String FileName;
     private ArrayList<String> ZipFiles;
 
