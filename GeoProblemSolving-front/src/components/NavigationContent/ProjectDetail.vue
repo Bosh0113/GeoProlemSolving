@@ -1287,7 +1287,7 @@ export default {
             this.currentProjectDetail.projectId
         )
         .then(res => {
-          if (res.data != "") {
+          if (res.data != "Fail") {
             this.$Notice.success({
               title: "Notification title",
               desc: "Delete successfully"

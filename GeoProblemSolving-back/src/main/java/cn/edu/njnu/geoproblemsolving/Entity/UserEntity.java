@@ -20,10 +20,15 @@ public class UserEntity {
     private String city;
     private String organization;
     private JSONArray joinedProjects;
+    private JSONArray manageProjects;
     private String introduction;
     private String direction;
     private String homePage;
     private String avatar;
+
+    public JSONArray getManageProjects() {
+        return manageProjects;
+    }
 
     public String getUserId() {
         return userId;
@@ -143,5 +148,9 @@ public class UserEntity {
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    public void setManageProjects(JSONArray manageProjects) {
+        this.manageProjects = manageProjects;
     }
 }

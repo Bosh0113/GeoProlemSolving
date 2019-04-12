@@ -52,6 +52,14 @@ public class ProjectDaoImpl implements IProjectDao {
         Query query = Query.query(Criteria.where("userId").is(project.getManagerId()));
         UserEntity userInfo = mongoTemplate.findOne(query, UserEntity.class);
         project.setManagerName(userInfo.getUserName());
+        JSONArray manageProjects = userInfo.getManageProjects();
+        JSONObject projectInfo=new JSONObject();
+        projectInfo.put("projectId",project.getProjectId());
+        projectInfo.put("title",project.getTitle());
+        manageProjects.add(projectInfo);
+        Update updateUser = new Update();
+        updateUser.set("manageProjects",manageProjects);
+        mongoTemplate.updateFirst(query,updateUser,UserEntity.class);
         mongoTemplate.save(project);
         return project.getProjectId();
     }
@@ -100,8 +108,27 @@ public class ProjectDaoImpl implements IProjectDao {
             String projectId = new String(EncodeUtil.decode(pid));
             value = projectId.substring(0, projectId.length() - 2);
         }
-
         Query query = Query.query(Criteria.where(key).is(value));
+        ProjectEntity projectEntity=mongoTemplate.findOne(query,ProjectEntity.class);
+        JSONArray members =projectEntity.getMembers();
+        for (int i=0;i<members.size();i++) {
+            JSONObject memberObject = members.getJSONObject(i);
+            quitProject(value, memberObject.getString("userId"));
+        }
+        String managerId=projectEntity.getManagerId();
+        Query queryManager=Query.query(Criteria.where("userId").is(managerId));
+        UserEntity managerObject=mongoTemplate.findOne(queryManager,UserEntity.class);
+        JSONArray manageProjects=managerObject.getManageProjects();
+        for (int i=0;i<manageProjects.size();i++){
+            JSONObject manageProject =manageProjects.getJSONObject(i);
+            if(manageProject.get("projectId").equals(value)){
+                manageProjects.remove(i);
+                break;
+            }
+        }
+        Update updateManager =new Update();
+        updateManager.set("manageProjects",manageProjects);
+        mongoTemplate.updateFirst(queryManager,updateManager,UserEntity.class);
         mongoTemplate.remove(query, "Project");
     }
 
@@ -143,7 +170,7 @@ public class ProjectDaoImpl implements IProjectDao {
                 Query queryUser = Query.query(Criteria.where("userId").is(userId));
                 UserEntity user = mongoTemplate.findOne(queryUser, UserEntity.class);
                 CommonMethod method = new CommonMethod();
-                Object result = method.joinGroup(members, managerId, userId, user.getUserName(), mongoTemplate);
+                Object result = method.joinGroup(members, managerId, userId, user.getUserName());
                 if (result.equals("Exist")) {
                     return "Exist";
                 } else {
@@ -216,6 +243,7 @@ public class ProjectDaoImpl implements IProjectDao {
 
             Query query = new Query(Criteria.where("projectId").is(projectId));
             ProjectEntity project = mongoTemplate.findOne(query, ProjectEntity.class);
+            quitProject(projectId,userId);
             JSONArray members = project.getMembers();
             CommonMethod method = new CommonMethod();
             JSONArray newMembers = method.quitGroup(members, userId, "userId");
@@ -223,8 +251,32 @@ public class ProjectDaoImpl implements IProjectDao {
             foreManager.put("userId", project.getManagerId());
             foreManager.put("userName", project.getManagerName());
             newMembers.add(foreManager);
+            Query oldManagerQuery = Query.query(Criteria.where("userId").is(project.getManagerId()));
+            UserEntity oldManagerObject=mongoTemplate.findOne(oldManagerQuery,UserEntity.class);
+            JSONArray oldManageProjects=oldManagerObject.getManageProjects();
+            for (int i=0;i<oldManageProjects.size();i++){
+                JSONObject oldManageProject=oldManageProjects.getJSONObject(i);
+                if(oldManageProject.get("projectId").equals(projectId)){
+                    oldManageProjects.remove(i);
+                    break;
+                }
+            }
+            Update updateOldManager=new Update();
+            updateOldManager.set("manageProjects",oldManageProjects);
             Query newManagerQuery = Query.query(Criteria.where("userId").is(userId));
             UserEntity newManager = mongoTemplate.findOne(newManagerQuery, UserEntity.class);
+            JSONArray newManageProjects=newManager.getManageProjects();
+            JSONObject newManageProject=new JSONObject();
+            newManageProject.put("projectId",project.getProjectId());
+            newManageProject.put("title",project.getTitle());
+            newManageProjects.add(newManageProject);
+            JSONArray oldManageJoinedProjects= oldManagerObject.getJoinedProjects();
+            oldManageJoinedProjects.add(newManageProject);
+            updateOldManager.set("joinedProjects",oldManageJoinedProjects);
+            mongoTemplate.updateFirst(oldManagerQuery,updateOldManager,UserEntity.class);
+            Update updateNewManager =new Update();
+            updateNewManager.set("manageProjects",newManageProjects);
+            mongoTemplate.updateFirst(newManagerQuery,updateNewManager,UserEntity.class);
             Update update = new Update();
             update.set("managerId", newManager.getUserId());
             update.set("managerName", newManager.getUserName());
