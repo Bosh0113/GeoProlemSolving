@@ -51,7 +51,7 @@
                   <span>{{userDetail.homePage}}</span>
                 </div>
                 <br>
-                <div style="padding:20px 20px 0 20px;font-size:12px;text-indent:2em;border:1px dotted lightgray">
+                <div style="padding:10px;font-size:12px;border:1px dotted lightgray">
                   {{this.userDetail.introduction}}
                 </div>
                 <div class="whitespace"></div>
@@ -363,17 +363,18 @@
           <h3>Participatory Projects</h3>
           <!-- 多选框 -->
           <RadioGroup v-model="selectShareProject">
-          <Radio v-for="(item,index) in joinedProjectsNameList" :key="item.index" :label="item.title">
-          </Radio>
+          <span @click="selectPID(item.projectId)" v-for="(item,index) in joinedProjectsNameList" >
+           <Radio :key="item.index" :label="item.title" ></Radio>
+          </span>
         </RadioGroup>
           <!-- <div v-for="(item,index)in joinedProjectsNameArray" :key="item.index">{{item.title}}</div> -->
         </div>
         <div>
           <h3>Management Projects</h3>
           <RadioGroup v-model="selectShareProject">
-          <Radio v-for="(item,index) in userManagerProjectList" :key="item.index" :label="item.title">
-            <span>{{item.title}}</span>
-          </Radio>
+            <span @click="selectPID(item.projectId)" v-for="(item,index) in userManagerProjectList">
+              <Radio :key="item.index" :label="item.title"></Radio>
+            </span>
           </RadioGroup>
         </div>
         <div style="margin-top:5px">
@@ -538,6 +539,7 @@ export default {
       joinedProjectsNameList:[],
       // 选中的将要分享资源的项目名
       selectShareProject:"",
+      selectShareProjectId:"",
     };
   },
   methods: {
@@ -832,7 +834,40 @@ export default {
       console.log(this.userResourceList[this.selectResourceIndex]);
       resourceInfo = this.userResourceList[this.selectResourceIndex];
       let shareForm = new FormData();
-      shareForm.append("file",)
+      shareForm.append("name",resourceInfo.name);
+      shareForm.append("description",resourceInfo.description);
+      shareForm.append("belong",this.selectShareProject);
+      shareForm.append("type",resourceInfo.type);
+      shareForm.append("fileSize",resourceInfo.fileSize);
+      shareForm.append("pathURL",resourceInfo.pathURL);
+      shareForm.append("uploaderId",resourceInfo.uploaderId);
+      // 还有一个获取到选中的项目的id
+      let scopeObject = {
+        projectId: this.selectShareProjectId,
+        subProjectId: "",
+        moduleId: ""
+      };
+      shareForm.append("scope", JSON.stringify(scopeObject));
+      if(scopeObject.projectId!=""){
+        this.axios
+        .post("/GeoProblemSolving/resource/share", shareForm)
+        .then(res => {
+          if (res.data != "Size over" && res.data.length > 0) {
+            this.$Notice.open({
+              title: "Upload notification title",
+              desc: "File shared to " + this.selectShareProject + " successfully.",
+              duration: 2
+            });
+            //这里重新获取一次该项目下的全部资源
+            this.addUploadEvent(this.currentProjectDetail.projectId);
+            this.getAllResource();
+            // 创建一个函数根据pid去后台查询该项目下的资源
+          }
+          // console.log(res.data);
+        })
+        .catch(err => {});
+      }
+      // uploaderId
     },
     cancel(){
 
@@ -841,6 +876,10 @@ export default {
       this.processResourceModal = true;
       this.selectResourceIndex = index;
     },
+    selectPID(id){
+      this.selectShareProjectId = id;
+      console.log(this.selectShareProjectId);
+    }
   }
 };
 </script>

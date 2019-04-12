@@ -261,7 +261,14 @@
           inline
         >
           <FormItem label="Recipient" prop="inputEmail" style="width:100%">
-            <Input v-model="emailInfo.inputEmail" placeholder="input email and press enter button the email will be added below" style="width:70%"/>
+            <AutoComplete
+                v-model="emailInfo.inputEmail"
+                @on-search="handleSearch2"
+                placeholder="input email and press enter button the email will be added below"
+                style="width:70%">
+                <Option v-for="item in data2" :value="item" :key="item">{{ item }}</Option>
+            </AutoComplete>
+            <!-- <Input v-model="emailInfo.inputEmail" placeholder="input email and press enter button the email will be added below" style="width:70%"/> -->
           </FormItem>
           <FormItem label="Title" prop="emailTitle" style="width:100%">
             <Input v-model="emailInfo.emailTitle" placeholder="set the email title to recivers by your self" style="width:70%"/>
@@ -793,7 +800,10 @@ export default {
       authorizeModal: false,
       // 子项目成员数组
       subProjectMembers: [],
-      errorHint: "email format is not correct , please check it again"
+      errorHint: "email format is not correct , please check it again",
+      //关于邮箱提示的
+      value2: '',
+      data2: []
     };
   },
   created() {
@@ -985,7 +995,17 @@ export default {
           this.axios
             .post("/GeoProblemSolving/email/send", emailFormBody)
             .then(res => {
-              console.log(res.data);
+              if(res.data=="Success"){
+                this.$Notice.success({
+                    title: 'Email send title',
+                    desc: "The invitation has been sent,the receiver will process this request later."
+                });
+              }else{
+                this.$Notice.error({
+                    title: 'Email send fail',
+                    desc: "The invitation isn't be sent successfully."
+                });
+              }
             })
             .catch(err => {
               console.log(err.data);
@@ -1333,7 +1353,17 @@ export default {
     },
     authorizeModalShow() {
       this.authorizeModal = true;
-    }
+    },
+    handleSearch2 (value) {
+                this.data2 = !value || value.indexOf('@') >= 0 ? [] : [
+                    value + '@gmail.com',
+                    value + '@sina.com',
+                    value + '@163.com',
+                    value + '@126.com',
+                    value + '@qq.com',
+                ];
+                // this.emailInfo.inputEmail = this.value2;
+            },
   }
 };
 </script>

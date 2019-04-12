@@ -1,6 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.Controller;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Resource.ResourceDaoImpl;
+import cn.edu.njnu.geoproblemsolving.Entity.ResourceEntity;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,5 +38,11 @@ public class ResourceController {
     public void getZipResource(HttpServletRequest request, HttpServletResponse response, @RequestParam("key") String key, @RequestParam("value") String value){
         ResourceDaoImpl resourceDao=new ResourceDaoImpl(mongoTemplate);
         resourceDao.getZipResource(request, response,key, value);
+    }
+
+    @RequestMapping(value = "/share",method = RequestMethod.POST)
+    public Object shareResource(HttpServletRequest request){
+        ResourceDaoImpl resourceDao=new ResourceDaoImpl(mongoTemplate);
+        return resourceDao.shareResource(request);
     }
 }

@@ -123,6 +123,11 @@
 .tool-panel {
   display: flex;
   height: auto;
+  /* flex-wrap控制子元素换行
+     nowrap --- 不允许换行
+     wrap --- 允许换行
+   */
+  flex-wrap: wrap;
   /* justify-content: center; */
   align-items: center;
 }
