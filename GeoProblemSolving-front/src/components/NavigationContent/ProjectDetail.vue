@@ -51,8 +51,9 @@
 }
 .subProjectDescription {
   text-indent: 25px;
-  min-height: 60px;
-  word-break: break-all;
+  height: 150px;
+  word-break: break-word;
+  overflow-y: auto;
 }
 .subProjectCreate button {
   height: 40px;
@@ -1098,7 +1099,6 @@ export default {
             //改变this的指向，此时this需要赋值给其他变量
             that.subProjectList = res.data;
             that.identity(that.subProjectList);
-            that.cutString(that.subProjectList, 200);
           }
         })
         .catch(err => {
@@ -1193,13 +1193,6 @@ export default {
     },
     show(index) {
       window.open(this.projectResourceList[index].pathURL);
-    },
-
-    cutString(data, len) {
-      for (var i = 0; i < data.length; i++) {
-        data[i].description = data[i].description.substring(0, len) + "...";
-      }
-      return data;
     },
     gotoPersonalPage(id) {
       if (id == this.$store.getters.userId) {
@@ -1311,7 +1304,7 @@ export default {
             this.currentProjectDetail.projectId
         )
         .then(res => {
-          if (res.data != "") {
+          if (res.data != "Fail") {
             this.$Notice.success({
               title: "Notification title",
               desc: "Delete successfully"

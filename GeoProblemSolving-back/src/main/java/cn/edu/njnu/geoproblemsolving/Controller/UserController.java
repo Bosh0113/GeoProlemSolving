@@ -26,6 +26,7 @@ public class UserController {
         String userId = UUID.randomUUID().toString();
         user.setUserId(userId);
         user.setJoinedProjects(new JSONArray());
+        user.setManageProjects(new JSONArray());
         try {
             return userDao.saveUser(user);
         } catch (Exception e) {
