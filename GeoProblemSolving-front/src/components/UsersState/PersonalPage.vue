@@ -60,7 +60,8 @@
                     type="success"
                     style="height:40px"
                     @click="editModalShow()"
-                  >Edit</Button>
+                    title="Edit"
+                  ><Icon type="md-create" :size="20"/></Button>
                   <Drawer
                     title="Profile Edit Panel"
                     placement="left"
@@ -141,6 +142,7 @@
                       </FormItem>
                       <FormItem label="Introduce" prop="introduction">
                         <Input
+                          style="word-wrap:break-word"
                           v-model="personalInfoItem.introduction"
                           type="textarea"
                           :autosize="{minRows: 2,maxRows: 5}"
@@ -217,15 +219,15 @@
                               <Button
                                 type="success"
                                 size="small"
-                                style="margin-right: 5px"
+                                style="margin-right: 10px"
                                 :href="userResourceList[index].pathURL"
                                 title="download"
                                 @click="download(index)"
                               >
                                 <Icon type="md-download"/>
                               </Button>
-                              <Button type="warning" size="small">
-                                <Icon type="md-eye" @click="processResourceModalShow(index)"/>
+                              <Button type="warning" size="small" style="margin-right: 10px">
+                                <Icon type="md-share" @click="processResourceModalShow(index)" title="share"/>
                               </Button>
                               <Button
                                 type="error"
@@ -242,6 +244,15 @@
                   </Col>
                 </TabPane>
                 <TabPane label="Participatory Project" name="Participatory">
+                  <Card :bordered="false" v-if="joinedProjectsList.length == 0">
+                      <div style="display:flex;justify-content:center">
+                        <Icon type="md-alert" size="40" color="gray"/>
+                      </div>
+                      <br>
+                      <div style="display:flex;justify-content:center" >
+                        <h2 style="text-align:center;width:50%">Sorry,you don't participate in any projects.</h2>
+                      </div>
+                  </Card>
                   <div
                     v-for="(item,index) in joinedProjectsList"
                     :key="index"
@@ -271,6 +282,15 @@
                   </div>
                 </TabPane>
                 <TabPane label="Management Project" name="Management">
+                  <Card :bordered="false" v-if="userManagerProjectList.length == 0">
+                      <div style="display:flex;justify-content:center">
+                        <Icon type="md-alert" size="40" color="gray"/>
+                      </div>
+                      <br>
+                      <div style="display:flex;justify-content:center" >
+                        <h2 style="text-align:center;width:50%">Sorry,until now you don't create any projects.</h2>
+                      </div>
+                  </Card>
                   <div
                     v-for="(mProject,index) in userManagerProjectList"
                     v-show="userManagerProjectList!='None'"
@@ -469,7 +489,7 @@ export default {
         {
           title: "Action",
           slot: "action",
-          width: 150,
+          width: 200,
           align: "center"
         }
       ],
@@ -867,7 +887,7 @@ export default {
         this.axios
         .post("/GeoProblemSolving/resource/share", shareForm)
         .then(res => {
-          if (res.data != "Size over" && res.data.length > 0) {
+          if (res.data != "Fail") {
             this.$Notice.open({
               title: "Upload notification title",
               desc: "File shared to " + this.selectShareProject + " successfully.",

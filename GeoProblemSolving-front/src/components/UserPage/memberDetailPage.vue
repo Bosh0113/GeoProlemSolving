@@ -83,6 +83,15 @@
                   </Col>
                 </TabPane>
                 <TabPane label="Participatory Project" name="Participatory">
+                  <Card :bordered="false" v-if="joinedProjectsList.length == 0">
+                      <div style="display:flex;justify-content:center">
+                        <Icon type="md-alert" size="40" color="gray"/>
+                      </div>
+                      <br>
+                      <div style="display:flex;justify-content:center" >
+                        <h2 style="text-align:center;width:50%">Sorry,this user doesn't participate in any projects.</h2>
+                      </div>
+                  </Card>
                   <div
                     v-for="(item,index) in joinedProjectsList"
                     :key="index"
@@ -106,11 +115,19 @@
                         </div>
                       </Card>
                       </div>
-
                     </Col>
                   </div>
                 </TabPane>
                 <TabPane label="Management Project" name="Management">
+                  <Card :bordered="false" v-if="userManagerProjectList.length == 0">
+                      <div style="display:flex;justify-content:center">
+                        <Icon type="md-alert" size="40" color="gray"/>
+                      </div>
+                      <br>
+                      <div style="display:flex;justify-content:center" >
+                        <h2 style="text-align:center;width:50%">Sorry,this user doesn't manage any projects.</h2>
+                      </div>
+                  </Card>
                   <div
                     v-for="(mProject,index) in userManagerProjectList"
                     v-show="userManagerProjectList!='None'"
@@ -378,15 +395,15 @@ export default {
             this.$route.params.id
         )
         .then(res => {
-          if(res.data != "None" && res.data != "Fail" && res.data.length > 0) {
-            
+          if(res.data != "None" && res.data != "Fail") {
             this.userDetail = res.data;
+            console.table(this.userDetail);
             this.joinedProjectsNameArray = this.userDetail.joinedProjects;
             if(this.joinedProjectsNameArray.length > 0) {
               this.getParticipatoryList(this.joinedProjectsNameArray);
             }
           }
-           
+
         })
         .catch(err => {
           console.log(err.data);
@@ -418,8 +435,14 @@ export default {
             this.$route.params.id
         )
         .then(res => {
+          if(res.data!="None" && res.data!=""){
+            //判断是否为空
+            this.userManagerProjectList = res.data;
+            // console.log("用户管理的项目是");
+            // console.table(this.userManagerProjectList);
+          }
           // 打印用户所管理的项目
-          this.userManagerProjectList = res.data;
+
         })
         .catch(err => {});
     },

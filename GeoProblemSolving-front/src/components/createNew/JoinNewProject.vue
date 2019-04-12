@@ -43,11 +43,8 @@ export default {
   // },
   mounted(){
     this.projectId = this.$route.params.id;;
-    // let id = this.$route.params.id;
-    // console.log("id是"+id);
     this.email = this.$route.params.email;
     this.judgeMailRegiste();
-    // console.log('email', email);
   },
   methods:{
       judgeMailRegiste(){

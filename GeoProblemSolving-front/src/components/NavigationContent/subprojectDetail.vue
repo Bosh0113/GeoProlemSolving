@@ -354,7 +354,7 @@
                             style="margin-left:5px;margin-right:3px;cursor: pointer;color:gray;"
                             @click="taskRemove(index,taskTodo)"
                           >
-                            <Icon type="ios-trash" :size="20" color="red"/>
+                            <Icon type="ios-trash" :size="20" color="gray"/>
                           </span>
                         </div>
                       </div>
@@ -395,7 +395,7 @@
                             style="margin-left:5px;margin-right:3px;cursor: pointer;color:gray;"
                             @click="taskRemove(index,taskDoing)"
                           >
-                            <Icon type="ios-trash" :size="20" color="red"/>
+                            <Icon type="ios-trash" :size="20" color="gray"/>
                           </span>
                         </div>
                       </div>
@@ -441,7 +441,7 @@
                             style="margin-left:5px;margin-right:3px;cursor: pointer;color:gray;"
                             @click="taskRemove(index,taskDone)"
                           >
-                            <Icon type="ios-trash" :size="20" color="red"/>
+                            <Icon type="ios-trash" :size="20" color="gray"/>
                           </span>
                         </div>
                         <p
