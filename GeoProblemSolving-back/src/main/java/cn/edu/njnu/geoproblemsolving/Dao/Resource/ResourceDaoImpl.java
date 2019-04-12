@@ -183,6 +183,9 @@ public class ResourceDaoImpl implements IResourceDao {
                     // get
                     ResourceEntity resourceEntitity = resourceEntitites.get(i);
                     JSONObject scope = resourceEntitity.getScope();
+                    if(scope == null){
+                        continue;
+                    }
 
                     // encode
                     String projectId = scope.getString("projectId");

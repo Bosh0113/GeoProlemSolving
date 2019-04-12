@@ -36,10 +36,10 @@ public class HistoryEventDaoImpl implements IHistoryEventDao {
     }
 
     @Override
-    public Object inquiryHistoryEvent(String key,String value){
+    public Object inquiryHistoryEvent(String eventType, String key, String value){
         try {
 
-            Query query=new Query(Criteria.where(key).is(value));
+            Query query=new Query(Criteria.where("eventType").is(eventType).and(key).is(value));
             if (mongoTemplate.find(query,HistoryEventEntity.class).isEmpty()){
                 return "None";
             }

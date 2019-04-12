@@ -77,7 +77,6 @@
   align-items: center;
 }
 .member-panel {
-  border: 1px solid lightgray;
   transition: all 1s;
 }
 .subProjectDesc {

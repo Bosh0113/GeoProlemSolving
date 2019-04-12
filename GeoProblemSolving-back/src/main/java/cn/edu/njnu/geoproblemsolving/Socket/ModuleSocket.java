@@ -1,13 +1,21 @@
 package cn.edu.njnu.geoproblemsolving.Socket;
 
 import cn.edu.njnu.geoproblemsolving.Config.GetHttpSessionConfigurator;
+import cn.edu.njnu.geoproblemsolving.Config.MyEndPointConfigure;
+import cn.edu.njnu.geoproblemsolving.Dao.HistoryEvent.HistoryEventDaoImpl;
+import cn.edu.njnu.geoproblemsolving.Entity.HistoryEventEntity;
 import com.alibaba.fastjson.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.web.socket.server.standard.SpringConfigurator;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
+import javax.websocket.server.ServerEndpointConfig;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -15,10 +23,15 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-@ServerEndpoint(value = "/Module/{moduleId}", configurator = GetHttpSessionConfigurator.class)
+@ServerEndpoint(value = "/Module/{moduleId}", configurator = MyEndPointConfigure.class)
+
 public class ModuleSocket {
     private Session session = null;
     private static final Map<String, Map<String, ModuleSocket>> modules = new ConcurrentHashMap<>();
+
+    private String userId = "";
+    @Autowired
+    MongoTemplate mongoTemplate;
 
     @OnOpen
     public void onOpen(@PathParam("moduleId") String moduleId, Session session, EndpointConfig config) {
@@ -27,6 +40,7 @@ public class ModuleSocket {
         if (!modules.containsKey(moduleId)) {
             Map<String, ModuleSocket> module = new ConcurrentHashMap<>();
             module.put(httpSession.getAttribute("userId").toString(), this);
+            userId = httpSession.getAttribute("userId").toString();
             modules.put(moduleId, module);
         } else {
             modules.get(moduleId).put(httpSession.getAttribute("userId").toString(), this);
@@ -41,6 +55,21 @@ public class ModuleSocket {
         String messageType = messageObject.getString("type");
         if (!(messageType.equals("ping"))) {
             broadcastMessageToModule(moduleId, message);
+            // 将资源记录和工具记录存储
+            try {
+                if(messageType.equals("resource") || messageType.equals("tools")) {
+                    HistoryEventDaoImpl historyEventDao = new HistoryEventDaoImpl(mongoTemplate);
+                    HistoryEventEntity historyEventEntity = new HistoryEventEntity();
+                    historyEventEntity.setScopeId(moduleId);
+                    historyEventEntity.setEventType("record");
+                    historyEventEntity.setUserId(userId);
+                    historyEventEntity.setDescription(message);
+                    historyEventDao.saveHistoryEvent(historyEventEntity);
+                }
+            }
+            catch (Exception ex) {
+                throw ex;
+            }
         }
     }
 

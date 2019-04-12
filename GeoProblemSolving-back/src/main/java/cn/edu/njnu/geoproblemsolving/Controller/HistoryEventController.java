@@ -17,7 +17,7 @@ public class HistoryEventController {
     private MongoTemplate mongoTemplate;
 
     @RequestMapping(value = "/save", produces = {"application/json;charset=UTF-8"}, method = RequestMethod.POST)
-    public String saveHistoryEvent(HistoryEventEntity historyEvent) {
+    public String saveHistoryEvent(@RequestBody HistoryEventEntity historyEvent) {
         // decode scopeId
         String scopeId = historyEvent.getScopeId();
         if (scopeId.length() > 36) {
@@ -30,12 +30,12 @@ public class HistoryEventController {
     }
 
     @RequestMapping(value = "/inquiry", method = RequestMethod.GET)
-    public Object inquiryHistoryEvent(@RequestParam("key") String key, @RequestParam("value") String value) {
+    public Object inquiryHistoryEvent(@RequestParam("eventType") String eventType, @RequestParam("key") String key, @RequestParam("value") String value) {
         HistoryEventDaoImpl historyEventDao = new HistoryEventDaoImpl(mongoTemplate);
         if (key.equals("scopeId")&&value.length() > 36){
             String sid = new String(EncodeUtil.decode(value));
             value = sid.substring(0, sid.length() - 2);
         }
-        return historyEventDao.inquiryHistoryEvent(key, value);
+        return historyEventDao.inquiryHistoryEvent(eventType, key, value);
     }
 }

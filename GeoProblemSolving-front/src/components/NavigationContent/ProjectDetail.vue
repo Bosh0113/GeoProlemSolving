@@ -288,7 +288,7 @@
         <div class="whitespace"></div>
         <div style="padding: 20px">
           <Card :bordered="false">
-            <p slot="title" style="font-size:25px;height:40px;line-height:40px">Sub Projects</p>
+            <p slot="title" style="font-size:25px;height:40px;line-height:40px">Subprojects</p>
             <div slot="extra" style="height:40px" class="popCenter">
               <Poptip trigger="hover" content="add new subproject" placement="right">
                 <Button
@@ -347,6 +347,7 @@
                             type="default"
                             v-show="subProject['isManager'] == true"
                             @click.stop="handOverSubProjectShow(index)"
+                            title="Exchange manager"
                           >
                             <Icon type="md-person"/>
                           </Button>
@@ -359,7 +360,8 @@
                           <Button
                             type="success"
                             v-show="subProject['isMember'] == false&&subProject['isManager'] == false"
-                            @click.stop="joinSubProject(subProject)"
+                            @click.stop="joinSubProject(subProject)"  
+                            title="Apply"                         
                           >
                             <Icon type="md-add"/>
                           </Button>
@@ -368,6 +370,7 @@
                             style="margin-left:10px"
                             v-show="subProject['isManager'] == true"
                             @click.stop="editSubProjectShow(index)"
+                            title="Edit" 
                           >
                             <Icon type="md-brush"/>
                           </Button>
@@ -376,6 +379,7 @@
                             style="margin-left:10px"
                             v-show="subProject['isManager'] == true"
                             @click.stop="deleteSubProjectShow(index)"
+                            title="Delete"
                           >
                             <Icon type="md-close"/>
                           </Button>
@@ -431,7 +435,7 @@
                 cancel-text="cancel"
                 @on-ok="editSubProject()"
                 @on-cancel="cancel()"
-                title="edit sub project info"
+                title="Edit the information of this subproject"
                 width="800px"
                 :mask-closable="false"
               >
@@ -826,7 +830,7 @@ export default {
         if (
           !(
             vm.currentProjectDetail.isManager ||
-            vm.currentProjectDetail.isMember||
+            vm.currentProjectDetail.isMember ||
             vm.currentProjectDetail.managerId == vm.$store.getters.userId
           )
         ) {
@@ -892,6 +896,7 @@ export default {
       that.projectManager.userId = that.currentProjectDetail.managerId;
       that.projectManager.userName = that.currentProjectDetail.managerName;
       sessionStorage.setItem("projectId", that.currentProjectDetail.projectId);
+      sessionStorage.setItem("projectName", that.currentProjectDetail.title);
       //将tag进行分割
       // var arr = that.currentProjectDetail.tag.split(',');
       // that.currentProjectDetail.tag = arr;
@@ -1270,16 +1275,10 @@ export default {
         this.currentProjectDetail.title;
       form["description"] = description;
       form["scopeId"] = scopeId;
+      form["eventType"] = "project";
+      form["userId"] = this.$store.getters.userId;
       this.axios
-        .post(
-          "/GeoProblemSolving/history/save?",
-          "description=" +
-            description +
-            "&scopeId=" +
-            scopeId +
-            "&userId=" +
-            this.$store.getters.userId
-        )
+        .post("/GeoProblemSolving/history/save", form)
         .then(res => {
           console.log(res.data);
         })
