@@ -356,14 +356,11 @@
               :lg="{span: 16, offset: 1}"
               >
               <Col span="12" >
-                <div
-                :style="{height:sidebarHeight/3*2 - 32 + 'px'}"
-                style="border:1px solid lightgray;background-color:white;overflow-y:scroll"
-                class="recordLine"
-              >
-              <span
+                <div style="border:1px solid lightgray;background-color:white">
+                <span
                   style="height:40px;line-height:40px;margin-left:20px;font-size:1.5em;font-weight: bold"
                 >Timeline</span>
+                <div class="recordLine" :style="{height:sidebarHeight/3*2 - 72 + 'px'}" style="overflow-y:scroll">
                 <Timeline style="padding:10px">
                   <TimelineItem v-for="(item,index) in allRecords" :key="index">
                     <template v-if="item.type == 'participants'">
@@ -394,6 +391,7 @@
                     </template>
                   </TimelineItem>
                 </Timeline>
+                </div>
               </div>
               </Col>
               <Col span="11" offset="1">
@@ -576,14 +574,12 @@
           <template>
             <Col span="22" offset="1" style="margin-top:20px;">
             <Col span="11">
-              <div
-                style="border:1px solid lightgray;background-color:white;overflow-y:scroll"
-                :style="{height:sidebarHeight/3*2 - 32 + 'px'}"
-                class="recordLine"
-              >
-              <span
+              
+                <div style="border:1px solid lightgray;background-color:white">
+                <span
                   style="height:40px;line-height:40px;margin-left:20px;font-size:1.5em;font-weight: bold"
                 >Timeline</span>
+                <div class="recordLine" :style="{height:sidebarHeight/3*2 - 72 + 'px'}" style="overflow-y:scroll">
                 <Timeline style="padding:10px">
                   <TimelineItem v-for="(item,index) in historyRecords" :key="index">
                     <template v-if="item.type == 'participants'">
@@ -614,6 +610,7 @@
                     </template>
                   </TimelineItem>
                 </Timeline>
+                </div>
               </div>
             </Col>
             <Col span="12" offset="1">
@@ -682,26 +679,22 @@
       <p>Do you really want to delete this step?</p>
     </Modal>
     <Modal
+      width="600px"
       v-model="editModal"
       title="Update this process"
-      @on-ok="updateModule()"
+      @on-ok="updateModule('formValidate2')"
       @on-cancel="cancel()"
     >
-      <div class="editNodeStyle">
-        <span style="width:10%">Name</span>
-        <Input
-          v-model="updateModuleTitle"
-          placeholder="Enter something..."
-          style="width: 400px"
-          :placeholder="moduleTitle"
-        />
-      </div>
-      <div class="editNodeStyle">
-        <span style="width:10%">Type</span>
-        <Select v-model="updateModuleType" style="width:400px" placeholder="please select type">
-          <Option v-for="item in typeList" :key="item.index" :value="item">{{ item }}</Option>
-        </Select>
-      </div>
+      <Form ref="formValidate2" :model="formValidate2" :rules="ruleValidate2" :label-width="80" style="margin-left: 30px">
+          <FormItem label="Name" prop="updateModuleTitle">
+            <Input v-model="formValidate2.updateModuleTitle" placeholder="Enter something..." style="width: 400px"/>
+          </FormItem>
+          <FormItem label="Type" prop="updateModuleType">
+            <Select v-model="formValidate2.updateModuleType" style="width:400px" placeholder="please select module type...">
+              <Option v-for="item in typeList" :key="item.index" :value="item">{{ item }}</Option>
+            </Select>
+          </FormItem>
+        </Form>
       <div class="editNodeStyle">
         <span style="width:10%">Detail</span>
         <textarea
@@ -716,21 +709,21 @@
       width="600px"
       v-model="addModal"
       title="Start a new process"
-      @on-ok="addModule()"
+      @on-ok="addModule('formValidate1')"
       @on-cancel="cancel()"
     >
+      <Form ref="formValidate1" :model="formValidate1" :rules="ruleValidate1" :label-width="80" style="margin-left: 30px">
+        <FormItem label="Name" prop="moduleTitle">
+          <Input v-model="formValidate1.moduleTitle" placeholder="Enter something..." style="width: 400px"/>
+        </FormItem>
+        <FormItem label="Type" prop="moduleType">
+          <Select v-model="formValidate1.moduleType" style="width:400px" placeholder="please select module type...">
+            <Option v-for="item in typeList" :key="item.index" :value="item">{{ item }}</Option>
+          </Select>
+        </FormItem>
+      </Form>
       <div class="addNodeStyle">
-        <span style="width:10%">Name</span>
-        <Input v-model="moduleTitle" placeholder="Enter something..." style="width: 400px"/>
-      </div>
-      <div class="addNodeStyle">
-        <span style="width:10%">Type</span>
-        <Select v-model="moduleType" style="width:400px" placeholder="please select type">
-          <Option v-for="item in typeList" :key="item.index" :value="item">{{ item }}</Option>
-        </Select>
-      </div>
-      <div class="addNodeStyle">
-        <span style="width:10%">Detail</span>
+        <span style="margin:0 10px 0 10px">Detail</span>
         <textarea v-model="moduleDescription" style="width:400px" :rows="6"></textarea>
       </div>
     </Modal>
@@ -744,6 +737,8 @@
         :target-keys="targetKeys"
         :list-style="listStyle"
         :render-format="resourceRender"
+        :titles = "['This process', 'The next process']"
+        filter-placeholder = "Enter key words..."
         filterable
         :filter-method="filterMethod"
         @on-change="handleChange"
@@ -761,33 +756,33 @@
     </Modal>
     <Modal
       v-model="uploadFileModal"
-      title="upload file"
-      @on-ok="submitFile()"
+      title="Upload resource"
+      @on-ok="submitFile('formValidate3')"
       ok-text="submit"
       cancel-text="cancel"
       width="600px"
       :mask-closable="false"
     >
-      <div style="display:flex;text-align:center;align-items:center;justify-content:center">
-        <span style="width:20%">File Type</span>
-        <RadioGroup v-model="fileType" style="width:80%">
-          <Radio label="image"></Radio>
-          <Radio label="video"></Radio>
-          <Radio label="data"></Radio>
-          <Radio label="paper"></Radio>
-          <Radio label="document"></Radio>
-          <Radio label="model"></Radio>
-          <Radio label="others"></Radio>
-        </RadioGroup>
-        <!-- 结束 -->
-      </div>
+      <Form ref="formValidate3" :model="formValidate3" :rules="ruleValidate3" :label-width="80" style="margin-left:20px">
+        <FormItem label="File type: " prop="fileType">
+          <RadioGroup v-model="formValidate3.fileType">
+            <Radio label="image"></Radio>
+            <Radio label="video"></Radio>
+            <Radio label="data"></Radio>
+            <Radio label="paper"></Radio>
+            <Radio label="document"></Radio>
+            <Radio label="model"></Radio>
+            <Radio label="others"></Radio>
+          </RadioGroup>
+        </FormItem>
+      </Form>
       <br>
       <div style="display:flex;text-align:center;align-items:center;justify-content:center">
         <span style="width:20%">Description</span>
         <Input type="textarea" :rows="2" v-model="fileDescription"/>
       </div>
       <br>
-      <input type="file" @change="getFile($event)" style="margin-left:20%">
+      <input type="file" @change="getFile($event)" style="margin-left:20px">
     </Modal>
   </div>
 </template>
@@ -841,15 +836,42 @@ export default {
         "Analysis",
         "Modeling",
         "Simulation",
-        "validation",
+        "Validation",
         "Comparison"
       ],
-      //
-      moduleTitle: "",
-      updateModuleTitle: "",
-      // type是指选中后的列表
-      moduleType: "",
-      updateModuleType: "",
+      // 添加/编辑module
+      formValidate1: {
+        moduleTitle: "",
+        moduleType: ""
+      },
+      ruleValidate1: {
+        moduleTitle: [
+          { required: true, message: 'Please enter name...', trigger: 'blur' }
+        ],
+        moduleType: [
+          { required: true, message: 'Please select type...', trigger: 'blur' }
+        ]
+      },
+      formValidate2: {
+        updateModuleTitle: "",
+        updateModuleType: ""
+      },
+      ruleValidate2: {
+        updateModuleTitle: [
+          { required: true, message: 'Please enter name...', trigger: 'blur' }
+        ],
+        updateModuleType: [
+          { required: true, message: 'Please select type...', trigger: 'blur' }
+        ]
+      },
+      formValidate3: {
+        fileType: "",
+      },
+      ruleValidate3: {
+        fileType: [
+          { required: true, message: 'Please select type...', trigger: 'blur' }
+        ]
+      },
       // moduleDescription指的是节点的详情信息
       moduleDescription: "",
       updateModuleDescription: "",
@@ -890,7 +912,6 @@ export default {
           align: "center"
         }
       ],
-      fileType: "",
       fileDescription: "",
       resourceHeight:400,
       //资源继承
@@ -1346,65 +1367,77 @@ export default {
         })
         .catch(err => {});
     },
-    addModule() {
-      if (
-        this.$store.getters.userInfo.userId == this.subProjectInfo.managerId
-      ) {
-        let Module = {};
-        Module["activeStatus"] = true;
-        Module["subProjectId"] = this.$route.params.id;
-        Module["title"] = this.moduleTitle;
-        Module["description"] = this.moduleDescription;
-        Module["creator"] = this.$store.getters.userId;
-        Module["type"] = this.moduleType;
-        if (this.moduleList.length !== 0) {
-          Module["foreModuleId"] = this.moduleList[
-            this.moduleList.length - 1
-          ].moduleId;
-        } else {
-          Module["foreModuleId"] = "";
-        }
-        Module["nextModuleId"] = "";
-        var this1 = this;
-        var this2 = this;
-        this.axios
-          .post("/GeoProblemSolving/module/create", Module)
-          .then(res => {
-            if (res.data === "Fail") {
-              this.$Message.info("Fail");
+    addModule(name) {
+      this.$refs[name].validate((valid) => {
+        if (valid) {
+          if (this.$store.getters.userInfo.userId == this.subProjectInfo.managerId) {
+            let Module = {};
+            Module["activeStatus"] = true;
+            Module["subProjectId"] = this.$route.params.id;
+            Module["title"] = this.formValidate1.moduleTitle;
+            Module["description"] = this.moduleDescription;
+            Module["creator"] = this.$store.getters.userId;
+            Module["type"] = this.formValidate1.moduleType;
+            if (this.moduleList.length !== 0) {
+              Module["foreModuleId"] = this.moduleList[
+                this.moduleList.length - 1
+              ].moduleId;
             } else {
-              if (this1.moduleList.length > 0) {
-                let updateObject = new URLSearchParams();
-                updateObject.append("moduleId", this1.currentModule.moduleId);
-                updateObject.append("activeStatus", false);
-                this1.axios
-                  .post("/GeoProblemSolving/module/update", updateObject)
-                  .then(res => {
-                    this2.getAllModules("update");
-                    
-                    let socketMsg = {type:"module",operate:"update"};
-                    this2.subprojectSocket.send(JSON.stringify(socketMsg));
-                  })
-                  .catch(err => {
-                    console.log(err.data);
-                  });
-              }
-              else {
-                this1.getAllModules("update");
-              }
-
-              this1.createModuleSuccess(Module["title"]);
-              this1.moduleList.push(Module);
-              this1.showDetail(this.moduleList.length - 1);
-              this1.moduleTitle = "";
-              this1.moduleDescription = "";
-              this1.moduleType = "";
+              Module["foreModuleId"] = "";
             }
-          })
-          .catch(err => {
-            console.log(err.data);
-          });
-      }
+            Module["nextModuleId"] = "";
+            var this1 = this;
+            var this2 = this;
+            this.axios
+              .post("/GeoProblemSolving/module/create", Module)
+              .then(res => {
+                if (res.data === "Fail") {
+                  this.$Message.info("Fail");
+                } else {
+                  if (this1.moduleList.length > 0) {
+                    let moduleId = "";
+                    if(this1.currentModule.activeStatus) {
+                      moduleId = this1.currentModule.moduleId;
+                    }
+                    else {
+                      let index = this1.getActiveModule();
+                      moduleId = this1.moduleList[index].moduleId;
+                    }
+                    let updateObject = new URLSearchParams();
+                    updateObject.append("moduleId", moduleId);
+                    updateObject.append("activeStatus", false);
+                    this1.axios
+                      .post("/GeoProblemSolving/module/update", updateObject)
+                      .then(res => {
+                        this2.getAllModules("update");
+                        
+                        let socketMsg = {type:"module",operate:"update"};
+                        this2.subprojectSocket.send(JSON.stringify(socketMsg));
+                      })
+                      .catch(err => {
+                        console.log(err.data);
+                      });
+                  }
+                  else {
+                    this1.getAllModules("update");
+                  }
+
+                  this1.createModuleSuccess(Module["title"]);
+                  this1.moduleList.push(Module);
+                  this1.showDetail(this.moduleList.length - 1);
+                  this1.formValidate1.moduleTitle = "";
+                  this1.moduleDescription = "";
+                  this1.formValidate1.moduleType = "";
+                }
+              })
+              .catch(err => {
+                console.log(err.data);
+              });
+          }
+        } else {
+          this.$Message.error('Please enter the necessary information!');
+        }
+      })      
     },
     activateModule() {
       var this1 = this;
@@ -1412,7 +1445,6 @@ export default {
       if (
         this.$store.getters.userInfo.userId == this.subProjectInfo.managerId
       ) {
-        let activeModelIndex = this.getActiveModule();
 
         if (!this.currentModule.activeStatus) {
           let updateObject = new URLSearchParams();
@@ -1422,6 +1454,7 @@ export default {
             .post("/GeoProblemSolving/module/update", updateObject)
             .then(res => {
 
+              let activeModelIndex = this1.getActiveModule();
               if (this1.moduleList[activeModelIndex].activeStatus) {
                 let updateObject = new URLSearchParams();
                 updateObject.append(
@@ -1450,9 +1483,7 @@ export default {
     },
     delModule() {
       let that = this;
-      if (
-        this.$store.getters.userInfo.userId == this.subProjectInfo.managerId
-      ) {
+      if ( this.$store.getters.userInfo.userId == this.subProjectInfo.managerId ) {
         // let foreModuleId = this.currentModule.foreModuleId;
         // let nextModuleId = this.currentModule.nextModuleId;
         this.axios
@@ -1483,32 +1514,36 @@ export default {
           });
       }
     },
-    updateModule() {
-      if (
-        this.$store.getters.userInfo.userId == this.subProjectInfo.managerId
-      ) {
-        var that = this;
-        let updateObject = new URLSearchParams();
-        updateObject.append("moduleId", this.currentModule.moduleId);
-        updateObject.append("title", this.updateModuleTitle);
-        updateObject.append("description", this.updateModuleDescription);
-        updateObject.append("type", this.updateModuleType);
-        updateObject.append("creater", this.$store.getters.userId);
-        this.axios
-          .post("/GeoProblemSolving/module/update", updateObject)
-          .then(res => {
-            that.getAllModules("init");
-            
-            let socketMsg = {type:"module",operate:"update"};
-            that.subprojectSocket.send(JSON.stringify(socketMsg));
-          })
-          .catch(err => {
-            console.log(err.data);
-          });
-      }
+    updateModule(name) {
+      this.$refs[name].validate((valid) => {
+        if (valid) {
+          if ( this.$store.getters.userInfo.userId == this.subProjectInfo.managerId ) {
+            var that = this;
+            let updateObject = new URLSearchParams();
+            updateObject.append("moduleId", this.currentModule.moduleId);
+            updateObject.append("title", this.formValidate2.updateModuleTitle);
+            updateObject.append("description", this.updateModuleDescription);
+            updateObject.append("type", this.formValidate2.updateModuleType);
+            updateObject.append("creater", this.$store.getters.userId);
+            this.axios
+              .post("/GeoProblemSolving/module/update", updateObject)
+              .then(res => {
+                that.getAllModules("init");
+                
+                let socketMsg = {type:"module",operate:"update"};
+                that.subprojectSocket.send(JSON.stringify(socketMsg));
+              })
+              .catch(err => {
+                console.log(err.data);
+              });
+          }
+        } else {
+          this.$Message.error('Please enter the necessary information !');
+        }
+      })      
     },
     copyResource() {
-      
+
     },
     getActiveModule() {
       var index = 0;
@@ -1536,58 +1571,65 @@ export default {
     getFile(event) {
       this.file = event.target.files[0];
     },
-    submitFile() {
-      let formData = new FormData();
-      formData.append("file", this.file);
-      formData.append("description", "");
-      formData.append("type", this.fileType);
-      formData.append("uploaderId", this.$store.getters.userId);
-      // currentModule.title;
-      // currentModule.moduleId
-      // 添加字段属于那个项目
-      formData.append("belong", this.currentModule.title);
+    submitFile(name) {
+      this.$refs[name].validate((valid) => {
+        if (valid) {
+          let formData = new FormData();
+          formData.append("file", this.file);
+          formData.append("description", "");
+          formData.append("type", this.formValidate3.fileType);
+          formData.append("uploaderId", this.$store.getters.userId);
+          // currentModule.title;
+          // currentModule.moduleId
+          // 添加字段属于那个项目
+          formData.append("belong", this.currentModule.title);
 
-      if(sessionStorage.getItem("projectId") == "" || sessionStorage.getItem("projectId") == undefined || sessionStorage.getItem("projectId") == null) {
-        this.getProjectInfo();
-      }
-      this.sleep(1000).then(() => {
-        let scopeObject = {
-          projectId: sessionStorage.getItem("projectId"),
-          subprojectId: sessionStorage.getItem("subProjectId"),
-          moduleId: this.currentModule.moduleId,
-        };
-        formData.append("scope", JSON.stringify(scopeObject));
-        //这里还要添加其他的字段
-        let that = this;
-        this.axios
-          .post("/GeoProblemSolving/resource/upload", formData)
-          .then(res => {
-            if (res.data != "Size over" && res.data.length > 0) {
-              that.$Notice.open({
-                title: "Upload notification title",
-                desc: "File uploaded successfully",
-                duration: 2
-              });
-              //这里重新获取全部资源
-              that.getAllResource();
+          if(sessionStorage.getItem("projectId") == "" || sessionStorage.getItem("projectId") == undefined || sessionStorage.getItem("projectId") == null) {
+            this.getProjectInfo();
+          }
+          this.sleep(1000).then(() => {
+            let scopeObject = {
+              projectId: sessionStorage.getItem("projectId"),
+              subprojectId: sessionStorage.getItem("subProjectId"),
+              moduleId: this.currentModule.moduleId,
+            };
+            formData.append("scope", JSON.stringify(scopeObject));
+            //这里还要添加其他的字段
+            let that = this;
+            this.axios
+              .post("/GeoProblemSolving/resource/upload", formData)
+              .then(res => {
+                if (res.data != "Size over" && res.data.length > 0) {
+                  that.$Notice.open({
+                    title: "Upload notification title",
+                    desc: "File uploaded successfully",
+                    duration: 2
+                  });
+                  //这里重新获取全部资源
+                  that.getAllResource();
 
-              // 同步
-              let record = {
-                who: that.$store.getters.userName,
-                whoid: that.$store.getters.userId,
-                type:"resource",
-                content:"upload a/an "+ that.fileType + " : " + that.file.name,                
-                moduleId: this.currentModule.moduleId,
-                time: new Date().toLocaleString(),
-                file: res.data[0].fileName
-              };
-              that.subprojectSocket.send(JSON.stringify(record));
-              // that.allRecords.push(record);
-            }
-            // console.log(res.data);
-          })
-          .catch(err => {});
-        })
+                  // 同步
+                  let record = {
+                    who: that.$store.getters.userName,
+                    whoid: that.$store.getters.userId,
+                    type:"resource",
+                    content:"upload a/an "+ that.formValidate3.fileType + " : " + that.file.name,                
+                    moduleId: this.currentModule.moduleId,
+                    time: new Date().toLocaleString(),
+                    file: res.data[0].fileName
+                  };
+                  that.subprojectSocket.send(JSON.stringify(record));
+                  // that.allRecords.push(record);
+                }
+                // console.log(res.data);
+              })
+              .catch(err => {});
+            })
+        } else {
+          this.$Message.error('Please enter the resource type!');
+        }
+      })
+      
     },
     sleep (time) {
       return new Promise((resolve) => setTimeout(resolve, time));
@@ -1624,8 +1666,8 @@ export default {
     editModalShow() {
       this.editModal = true;
       let order = this.currentModuleIndex;
-      this.updateModuleTitle = this.moduleList[order].title;
-      this.updateModuleType = this.moduleList[order].type;
+      this.formValidate2.updateModuleTitle = this.moduleList[order].title;
+      this.formValidate2.updateModuleType = this.moduleList[order].type;
       this.updateModuleDescription = this.moduleList[order].description;
     },
     // 返回项目页
