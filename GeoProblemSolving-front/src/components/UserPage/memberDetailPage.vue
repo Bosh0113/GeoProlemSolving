@@ -378,7 +378,7 @@ export default {
             this.$route.params.id
         )
         .then(res => {
-          if(res.data != "None" && res.data != "Fail" && res.data.length > 0) {
+          if(res.data != "None" && res.data != "Fail") {
             
             this.userDetail = res.data;
             this.joinedProjectsNameArray = this.userDetail.joinedProjects;
