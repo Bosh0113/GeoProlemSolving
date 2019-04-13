@@ -102,7 +102,6 @@
               </Col>
             </Row>
             <div style="height:20px"></div>
-            <!-- <Table border ref="selection" :columns="columns4" :data="data1"></Table> -->
           </div>
         </div>
       </div>
