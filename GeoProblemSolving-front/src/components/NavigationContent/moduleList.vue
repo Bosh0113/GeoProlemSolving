@@ -532,6 +532,17 @@
                       <Icon type="ios-information-circle-outline"/>
                       <span>This tool can't support collaborative functions.</span>
                     </div>
+                    <div class="tool-panel">
+                      <div class="singl_tool_style">
+                        <Icon
+                          type="md-globe"
+                          size="60"
+                          @click.native="toolPanel('3DEarth')"
+                          title="3D Earth"
+                          color="gray"
+                        />
+                      </div>
+                    </div>
                   </TabPane>
                   <TabPane label="Special tools" name="Special">
                     <h2>Special Tools</h2>
@@ -754,7 +765,7 @@
     <Modal 
       v-model="inheritData"
       title="Choose data to next process"
-      @on-ok="addModal = true"
+      @on-ok="createModule()"
       @on-cancel="cancel()" >
       <Transfer      
         :data="inheritResource"
@@ -939,7 +950,8 @@ export default {
       resourceHeight:400,
       //资源继承
       inheritResource: [],
-      targetKeys: [],
+      targetKeys: [],      
+      selectResource: [],
       listStyle: { width: '210px', height: '300px' }
     };
   },
@@ -1138,10 +1150,10 @@ export default {
         this.subprojectSocket = null;
       }
       let subprojectId = this.subProjectInfo.subProjectId;
-      var subprojectSocketURL =
-        "ws://localhost:8081/GeoProblemSolving/Module/" + subprojectId;
+      // var subprojectSocketURL =
+        // "ws://localhost:8081/GeoProblemSolving/Module/" + subprojectId;
       // var subprojectSocketURL = "ws://202.195.237.252:8082/GeoProblemSolving/Module/" + subprojectId;
-      // var subprojectSocketURL = "ws://172.21.212.7:8082/GeoProblemSolving/Module/" + subprojectId;
+      var subprojectSocketURL = "ws://172.21.212.7:8082/GeoProblemSolving/Module/" + subprojectId;
       this.subprojectSocket = new WebSocket(subprojectSocketURL);
       this.subprojectSocket.onopen = this.onOpen;
       this.subprojectSocket.onmessage = this.onMessage;
@@ -1339,13 +1351,18 @@ export default {
     chooseResource(){
       this.inheritData = true;
       this.inheritResource = this.getMockData();
-      this.targetKeys = this.getTargetKeys ();
+      // this.targetKeys = this.getTargetKeys();
+    },
+    createModule() {
+      this.addModal = true;
+      this.selectResource = [];
+      this.selectResource = this.getTargetKeys();
     },
     getMockData () {
       let mockData = [];
       for (let i = 0; i < this.resourceList.length; i++) {
         mockData.push({
-          key: i.toString(),
+          key: i,
           name: this.resourceList[i].name,
           type: this.resourceList[i].type,
           resourceId:this.resourceList[i].resourceId
@@ -1354,7 +1371,18 @@ export default {
       return mockData;
     },
     getTargetKeys () {
-      return this.getMockData();
+      let mockData = [];
+      if(this.inheritResource.length > 0) {
+        for(let i = 0;i < this.targetKeys.length; i++) {
+          mockData.push({
+            key: this.targetKeys[i],
+            name: this.inheritResource[this.targetKeys[i]].name,
+            type: this.inheritResource[this.targetKeys[i]].type,
+            resourceId:this.inheritResource[this.targetKeys[i]].resourceId
+          });
+        }
+      }
+      return mockData;
     },
     handleChange (newTargetKeys) {
       this.targetKeys = newTargetKeys;
@@ -1411,16 +1439,19 @@ export default {
               ].moduleId;
             } else {
               Module["foreModuleId"] = "";
-            }
-            
-            var this1 = this;
-            var this2 = this;
+            }            
+            let this1 = this;
+            let this2 = this;
             this.axios
               .post("/GeoProblemSolving/module/create", Module)
               .then(res => {
                 if (res.data === "Fail") {
-                  this.$Message.info("Fail");
+                  this1.$Message.info("Fail");
                 } else {
+                  //更新新module的资源
+                  this1.copyResource(res.data);
+
+                  // 使其他module为非激活状态
                   if (this1.moduleList.length > 0) {
                     let moduleId = "";
                     if(this1.currentModule.activeStatus) {
@@ -1444,6 +1475,7 @@ export default {
                       .catch(err => {
                         console.log(err.data);
                       });
+                    
                   }
                   else {
                     this1.getAllModules("update");
@@ -1570,8 +1602,43 @@ export default {
         }
       })      
     },
-    copyResource() {
+    copyResource(newModuleId) {
+      for(let i = 0;i < this.selectResource.length; i++) {
+        for(let j = 0; j <this.resourceList.length; j++) {
+          if(this.resourceList[j].resourceId == this.selectResource[i].resourceId) {
 
+            let resourceInfo = this.resourceList[j];
+            let shareForm = new FormData();
+            shareForm.append("name",resourceInfo.name);
+            shareForm.append("description",resourceInfo.description);
+            shareForm.append("belong",resourceInfo.belong);
+            shareForm.append("type",resourceInfo.type);
+            shareForm.append("fileSize",resourceInfo.fileSize);
+            shareForm.append("pathURL",resourceInfo.pathURL);
+            shareForm.append("uploaderId",resourceInfo.uploaderId);
+            let scopeObject = {
+              projectId: resourceInfo.scope.projectId,
+              subProjectId: resourceInfo.scope.subProjectId,
+              moduleId: newModuleId
+            };
+            shareForm.append("scope", JSON.stringify(scopeObject));
+
+            if(newModuleId != null && newModuleId != undefined && newModuleId.length > 0) {
+              this.axios
+              .post("/GeoProblemSolving/resource/share", shareForm)
+              .then(res => {
+                if (res.data != "Fail") {
+                  //...
+                }
+              })
+              .catch(err => {
+                console.log(err);
+              });
+            }
+            break;
+          }
+        }
+      }
     },
     getActiveModule() {
       var index = 0;
@@ -1848,7 +1915,11 @@ export default {
           "?groupID=" +
           this.currentModule.moduleId +
           '" style="width: 100%;height:100%"></iframe>';
-      }
+      } else if (type == "3DEarth") {
+        toolURL =
+          '<iframe src="/GeoProblemSolving/Collaborative/3DEarth/index.html' +
+          '" style="width: 100%;height:100%"></iframe>';
+      } 
       // tableEditor
       // 3d
       // computational

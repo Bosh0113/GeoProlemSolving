@@ -22,7 +22,7 @@ public class CommonMethod {
         return update;
     }
 
-    public Object joinGroup(JSONArray members, String managerId, String userId, String userName, MongoTemplate mongoTemplate) {
+    public Object joinGroup(JSONArray members, String managerId, String userId, String userName) {
         Boolean exist = false;
         if (members.size() > 0) {
             if (userId.equals(managerId)) {

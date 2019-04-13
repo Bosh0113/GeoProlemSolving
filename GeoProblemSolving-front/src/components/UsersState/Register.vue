@@ -419,6 +419,10 @@ export default {
           userJson["direction"] = this.formValidate.field;
           userJson["homePage"] = this.formValidate.homePage;
           userJson["avatar"] = this.formValidate.avatar;
+          var that = this;
+          var passwordFro=this.formValidate.password;
+          var passwordAES = this.encrypto(passwordFro);
+          var email=this.formValidate.email;
           this.axios
             .post(
               "/GeoProblemSolving/user/register",
@@ -431,21 +435,21 @@ export default {
               } else if (res.data == "MobilePhone") {
                 this.$Message.success("Phone number has been used!");
               } else {
-                this.axios
+                that.axios
                   .get(
                     "/GeoProblemSolving/user/login" +
                       "?email=" +
-                      this.formValidate.email +
+                      email +
                       "&password=" +
-                      this.formInline.password
+                      passwordAES
                   )
                   .then(res => {
                     if (res.data === "Fail") {
-                      this.$Message.error("Invalid account or password.");
+                      that.$Message.error("Invalid account or password.");
                     } else {
-                      this.$Message.success("Success!");
-                      this.$store.commit("userLogin", res.data);
-                      this.$router.push({ path: "/" });
+                      that.$Message.success("Success!");
+                      that.$store.commit("userLogin", res.data);
+                      that.$router.push({ path: "/" });
 
                     }
                   });
@@ -496,7 +500,24 @@ export default {
     changeType() {
       this.pwdType = this.pwdType === "password" ? "text" : "password";
       // this.eyeIconType = 'ios-eye-on';
-    }
+    },
+    encrypto(context) {
+      var CryptoJS = require("crypto-js");
+      var key = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
+      var iv = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
+      var encrypted = "";
+      if (typeof context == "string") {
+      } else if (typeof context == "object") {
+        context = JSON.stringify(context);
+      }
+      var srcs = CryptoJS.enc.Utf8.parse(context);
+      encrypted = CryptoJS.AES.encrypt(srcs, key, {
+        iv: iv,
+        mode: CryptoJS.mode.CBC,
+        padding: CryptoJS.pad.Pkcs7
+      });
+      return encrypted.toString();
+    },
   }
 };
 </script>

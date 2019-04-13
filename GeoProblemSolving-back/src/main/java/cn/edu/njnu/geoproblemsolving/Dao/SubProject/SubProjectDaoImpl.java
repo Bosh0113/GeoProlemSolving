@@ -126,7 +126,7 @@ public class SubProjectDaoImpl implements ISubProjectDao {
                 CommonMethod method = new CommonMethod();
                 Query queryUser=Query.query(Criteria.where("userId").is(userId));
                 UserEntity userEntity=mongoTemplate.findOne(queryUser,UserEntity.class);
-                Object result = method.joinGroup(members, managerId, userId,userEntity.getUserName(), mongoTemplate);
+                Object result = method.joinGroup(members, managerId, userId,userEntity.getUserName());
                 if (result.equals("Exist")) {
                     return "Exist";
                 } else {
@@ -175,7 +175,7 @@ public class SubProjectDaoImpl implements ISubProjectDao {
             JSONArray members = subProject.getMembers();
             CommonMethod method = new CommonMethod();
             JSONArray newMembers = method.quitGroup(members, userId, "userId");
-            JSONArray newMembers1 = (JSONArray) method.joinGroup(newMembers, userId, foreManagerId,foreManagerName, mongoTemplate);
+            JSONArray newMembers1 = (JSONArray) method.joinGroup(newMembers, userId, foreManagerId,foreManagerName);
             Query queryUser =Query.query(Criteria.where("userId").is(userId));
             UserEntity newManager=mongoTemplate.findOne(queryUser,UserEntity.class);
             Update update = new Update();

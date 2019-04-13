@@ -864,9 +864,6 @@ export default {
     processResource(){
       let resourceInfo = {};
       this.joinedProjectsNameList = this.$store.getters.userInfo["joinedProjects"];
-      console.log(this.joinedProjectsNameList);
-      // submit
-      console.log(this.userResourceList[this.selectResourceIndex]);
       resourceInfo = this.userResourceList[this.selectResourceIndex];
       let shareForm = new FormData();
       shareForm.append("name",resourceInfo.name);
@@ -893,19 +890,36 @@ export default {
               desc: "File shared to " + this.selectShareProject + " successfully.",
               duration: 2
             });
-            //这里重新获取一次该项目下的全部资源
-            this.addUploadEvent(this.currentProjectDetail.projectId);
-            this.getAllResource();
-            // 创建一个函数根据pid去后台查询该项目下的资源
+            // 保存记录
+            // addUploadEvent( this.selectShareProjectId);
           }
-          // console.log(res.data);
         })
         .catch(err => {});
       }
       // uploaderId
     },
-    cancel(){
-
+    cancel(){},    
+    addUploadEvent(scopeId) {
+      let form = {};
+      let description =
+        this.$store.getters.userName +
+        " share a " +
+        this.fileType +
+        " file to " +
+        " project called " +
+        this.currentProjectDetail.title;
+      form["description"] = description;
+      form["scopeId"] = scopeId;
+      form["eventType"] = "project";
+      form["userId"] = this.$store.getters.userId;
+      this.axios
+        .post("/GeoProblemSolving/history/save", form)
+        .then(res => {
+          console.log(res.data);
+        })
+        .catch(err => {
+          console.log(err.data);
+        });
     },
     processResourceModalShow(index){
       this.processResourceModal = true;
