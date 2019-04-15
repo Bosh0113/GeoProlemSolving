@@ -90,12 +90,10 @@
 .taskFormItem {
   display: flex;
   align-items: center;
+  margin-bottom: 10px 
 }
 .taskFormItem span {
   text-align: center;
-}
-.whiteSpace {
-  height: 10px;
 }
 .taskList {
   min-height: 60px;
@@ -103,7 +101,6 @@
 }
 .taskName {
   display: inline-block;
-  cursor: pointer;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -120,11 +117,11 @@
         <Card>
           <p
             slot="title"
-            style="height:40px;line-height:40px;font-size:20px;display: inline-block;cursor: pointer;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;max-width: 50%;"
+            style="height:30px;line-height:30px;font-size:20px;display: inline-block;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;max-width: 50%;"
           >{{subProjectInfo.title}}</p>
           <div
             slot="extra"
-            style="height:40px;display:flex;align-items:center"
+            style="height:30px;display:flex;align-items:center"
             class="operatePanel"
           >
             <Button
@@ -165,7 +162,7 @@
           v-bind="this.participants"
           offset="1"
           style="margin-top:20px"
-          :style="{height:sidebarHeight+4+'px'}"
+          :style="{height:sidebarHeight+14+'px'}"
         >
           <div
             class="member-panel"
@@ -295,8 +292,8 @@
             </div>
           </div>
         </Col>
-        <Col :xs="14" :sm="15" :md="16" :lg="16" offset="1" style="margin-top:20px">
-          <div style="background-color:white;padding:20px">
+        <Col :xs="15" :sm="16" :md="17" :lg="17" style="margin-top:20px">
+          <div style="background-color:white;padding:20px;margin-left:30px">
             <h2 style="margin-bottom:5px">Description</h2>
             <hr style="margin-bottom:10px">
             <div
@@ -304,7 +301,7 @@
               class="subProjectDesc"
             >{{subProjectInfo.description}}</div>
           </div>
-          <div style="display:flex;align-items:center;justify-content:center;height:60px">
+          <div style="display:flex;align-items:center;justify-content:center;height:60px;margin-left:30px">
             <Button
               type="error"
               style="margin:auto"
@@ -314,9 +311,9 @@
         </Col>
       </div>
       <template v-else-if="order == 1">
-        <Col span="22" offset="1" style="margin-top:20px" :style="{height:sidebarHeight+4+'px'}">
-          <div style="padding: 5px 0;background-color:white" :style="{height:sidebarHeight-6+'px'}">
-            <Row type="flex" justify="center">
+        <Col id="taskPage" span="22" offset="1" style="margin-top:20px" :style="{height:taskContainerHeight+14+'px'}">
+          <div id="taskContainer" style="padding: 10px 0;background-color:white" :style="{height:taskContainerHeight+'px'}">
+            <Row type="flex" justify="center" id="taskList">
               <Col span="7">
                 <Card :padding="0" :border="false">
                   <h3 slot="title">Todo</h3>
@@ -347,12 +344,12 @@
                           <strong style="color:#57a3f3" class="taskName">{{item.taskName}}</strong>
                         </span>
                         <div style="float:right">
-                          <span>
+                          <span title="Edit">
                             <Icon type="ios-more" color="gray" :size="20" style="cursor:pointer" @click="editOneTask(index, taskTodo)"/>
                           </span>
                           <span
-                            style="margin-left:5px;margin-right:3px;cursor: pointer;color:gray;"
-                            @click="taskRemove(index,taskTodo)"
+                            style="margin-left:5px;margin-right:3px;cursor: pointer;color:gray;" title="Delete"
+                            @click="taskRemoveAssure(index,taskTodo)"
                           >
                             <Icon type="ios-trash" :size="20" color="gray"/>
                           </span>
@@ -360,7 +357,7 @@
                       </div>
                       <p
                         style="word-break:break-word;padding:5px;cursor:pointer"
-                        @click="editOneTask(index, taskTodo)"
+                        @click="showTask(index,taskTodo)"
                       >{{item.description}}</p>
                     </Card>
                   </draggable>
@@ -393,7 +390,7 @@
                           </span>
                           <span
                             style="margin-left:5px;margin-right:3px;cursor: pointer;color:gray;"
-                            @click="taskRemove(index,taskDoing)"
+                            @click="taskRemoveAssure(index,taskDoing)"
                           >
                             <Icon type="ios-trash" :size="20" color="gray"/>
                           </span>
@@ -402,7 +399,7 @@
                       <div style="display:flex">
                         <p
                         style="word-break:break-word;padding:5px;cursor:pointer;width:80%"
-                        @click="editOneTask(index,taskDoing)"
+                        @click="showTask(index,taskDoing)"
                       >{{item.description}}</p>
                       <div style="display:flex;align-items:center">
                         <!-- 这里取用户头像 -->
@@ -439,14 +436,14 @@
                           </span>
                           <span
                             style="margin-left:5px;margin-right:3px;cursor: pointer;color:gray;"
-                            @click="taskRemove(index,taskDone)"
+                            @click="taskRemoveAssure(index,taskDone)"
                           >
                             <Icon type="ios-trash" :size="20" color="gray"/>
                           </span>
                         </div>
                         <p
                         style="word-break:break-word;padding:5px;cursor:pointer"
-                        @click="editOneTask(index,taskDone)"
+                        @click="showTask(index,taskDone)"
                       >{{item.description}}</p>
                       </div>
                     </Card>
@@ -457,118 +454,139 @@
           </div>
         </Col>
       </template>
-    </Row>
+    </Row>    
+    <Modal
+      v-model="taskDeleteModal"
+      title="Delete task"
+      @on-ok="taskRemove()"
+      @on-cancel="cancel()"
+    >
+      <p>Do yout want to delete this task?</p>
+    </Modal>
     <Modal
       v-model="createTaskModal"
       title="Create task panel"
-      @on-ok="createTask()"
+      @on-ok="createTask('formValidate')"
       @on-cancel="cancel()"
       ok-text="ok"
       cancel-text="cancel"
       width="800px"
     >
-      <div class="taskFormItem">
-        <span style="width:30%">Name</span>
-        <Input
-          style="width: 300px"
-          :placeholder="this.taskPlaceHolder.name"
-          v-model="taskInfo.taskName"
-        />
-      </div>
-      <div class="whiteSpace"></div>
-      <div class="taskFormItem">
-        <span style="width:30%">Description</span>
-        <Input
-          style="width: 300px"
-          :placeholder="this.taskPlaceHolder.description"
-          type="textarea"
-          :rows="4"
-          v-model="taskInfo.description"
-        />
-      </div>
-      <div class="whiteSpace"></div>
-      <div class="taskFormItem">
-        <span style="width:30%">Start Time</span>
-        <DatePicker
-          type="datetime"
-          format="yyyy-MM-dd HH:mm:ss"
-          :placeholder="this.taskPlaceHolder.startTime"
-          style="width: 300px"
-          v-model="taskInfo.startTime"
-        ></DatePicker>
-      </div>
-      <div class="whiteSpace"></div>
-      <div class="taskFormItem">
-        <span style="width:30%">End Time</span>
-        <DatePicker
-          type="datetime"
-          format="yyyy-MM-dd HH:mm:ss"
-          :placeholder="this.taskPlaceHolder.endTime"
-          style="width: 300px"
-          v-model="taskInfo.endTime"
-        ></DatePicker>
-      </div>
-      <div class="whiteSpace"></div>
+      <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="100" style="margin-left: 30px">
+        <FormItem label="Name" prop="taskName">
+          <Input v-model="formValidate.taskName" placeholder="Fill in the name of task..." style="width: 560px"/>
+        </FormItem>
+        <FormItem label="Description" prop="description">
+          <Input v-model="formValidate.description" type="textarea" placeholder="Fill in the description of task..." style="width: 560px" :autosize="{minRows: 6}"/>
+        </FormItem>
+        <FormItem label="Start time" prop="startTime">
+          <DatePicker
+            v-model="formValidate.startTime"
+            type="datetime"
+            format="yyyy-MM-dd HH:mm:ss"
+            placeholder="Select start time..."
+            style="width: 560px"
+          ></DatePicker>
+        </FormItem>
+        <FormItem label="End time" prop="endTime">
+          <DatePicker
+            v-model="formValidate.endTime"
+            type="datetime"
+            format="yyyy-MM-dd HH:mm:ss"
+            placeholder="Select end time..."
+            style="width: 560px"
+          ></DatePicker>
+        </FormItem>
+      </Form>
     </Modal>
     <Modal
       v-model="editTaskModal"
       title="Edit task panel"
-      @on-ok="updateTask()"
+      @on-ok="updateTask('formValidate')"
       @on-cancel="cancel()"
-      ok-text = "assure"
-      cancel-text = "cancel"
+      ok-text = "Ok"
+      cancel-text = "Cancel"
+      width="800px"
+    >
+      <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="100" style="margin-left: 30px">
+        <FormItem label="Name" prop="taskName">
+          <Input v-model="formValidate.taskName" placeholder="Fill in the name of task..." style="width: 560px"/>
+        </FormItem>
+        <FormItem label="Description" prop="description">
+          <Input v-model="formValidate.description" type="textarea" placeholder="Fill in the description of task..." style="width:560px" :autosize="{minRows: 6}"/>
+        </FormItem>
+        <FormItem label="Start time" prop="startTime">
+          <DatePicker
+            v-model="formValidate.startTime"
+            type="datetime"
+            format="yyyy-MM-dd HH:mm:ss"
+            placeholder="Select start time..."
+            style="width: 560px"
+          ></DatePicker>
+        </FormItem>
+        <FormItem label="End time" prop="endTime">
+          <DatePicker
+            v-model="formValidate.endTime"
+            type="datetime"
+            format="yyyy-MM-dd HH:mm:ss"
+            placeholder="Select end time..."
+            style="width: 560px"
+          ></DatePicker>
+        </FormItem>
+        <FormItem label="Status" prop="state">
+          <RadioGroup v-model="formValidate.state" disabled>
+            <Radio label="todo"></Radio>
+            <Radio label="doing"></Radio>
+            <Radio label="done"></Radio>
+          </RadioGroup>
+        </FormItem>
+      </Form>
+    </Modal>
+    <Modal
+      v-model="taskDetailModal"
+      title="Task detail"
       width="800px"
     >
       <div class="taskFormItem">
-        <span style="width:30%">taskName</span>
+        <span style="width:15%">Task name</span>
         <Input
-          style="width: 300px"
+          style="width: 600px"
           :placeholder="this.taskPlaceHolder.name"
           v-model="taskInfo.taskName"
         />
       </div>
-      <div class="whiteSpace"></div>
       <div class="taskFormItem">
-        <span style="width:30%">description</span>
+        <span style="width:15%">Description</span>
         <Input
-          style="width: 300px"
+          style="width: 600px"
           :placeholder="this.taskPlaceHolder.description"
           type="textarea"
           :rows="4"
           v-model="taskInfo.description"
+          :autosize="{minRows: 6}"
         />
       </div>
-      <div class="whiteSpace"></div>
       <div class="taskFormItem">
-        <span style="width:30%">start Time</span>
+        <span style="width:15%">Start time</span>
         <DatePicker
           type="datetime"
           format="yyyy-MM-dd HH:mm:ss"
           :placeholder="this.taskPlaceHolder.startTime"
-          style="width: 300px"
+          style="width: 600px"
           v-model="taskInfo.startTime"
         ></DatePicker>
       </div>
-      <div class="whiteSpace"></div>
-      <div class="taskFormItem">
-        <span style="width:30%">end Time</span>
+      <div class="taskFormItem" style="margin-bottom:10px">
+        <span style="width:15%">End time</span>
         <DatePicker
           type="datetime"
           format="yyyy-MM-dd HH:mm:ss"
           :placeholder="this.taskPlaceHolder.endTime"
-          style="width: 300px"
+          style="width: 600px"
           v-model="taskInfo.endTime"
         ></DatePicker>
       </div>
-      <div class="whiteSpace"></div>
-      <div class="taskFormItem">
-        <span style="width:30%">state</span>
-        <RadioGroup v-model="taskInfo.state" disabled>
-          <Radio label="todo"></Radio>
-          <Radio label="doing"></Radio>
-          <Radio label="done"></Radio>
-        </RadioGroup>
-      </div>
+      <div slot="footer"></div>
     </Modal>
   </div>
 </template>
@@ -601,50 +619,29 @@ export default {
       inviteModal: false,
       quitModal: false,
       sidebarHeight: 800,
+      taskContainerHeight: 800,
       participants: [],
       candidates: [],
       inviteList: [],
       inviteAble: true,
-      // current: 0,
-      addModal: false,
-      delModal: false,
-      //编辑的模态框
-      editModal: false,
       order: 0,
-      //typeList是选择模块种类的列表，select从这里渲染
-      typeList: [
-        "Preparation",
-        "Analysis",
-        "Modeling",
-        "Simulation",
-        "Comparison",
-        "Verification"
-      ],
-      //
-      moduleTitle: "",
-      updateModuleTitle: "",
-      // type是指选中后的列表
-      moduleType: "",
-      updateModuleType: "",
-      // moduleDescription指的是节点的详情信息
-      moduleDescription: "",
-      updateModuleDescription: "",
-      // 抽屉的控制开关
-      drawerOpen: false,
       // 后台获取的module下的task列表
       taskList: [],
+      selectTaskIndex: 0,
+      taskDeleteModal: false,
       // 后台拿到的Module集合，渲染成一条轴用的
       moduleList: [],
       // 创建任务的模态框
       createTaskModal: false,
       // 编辑任务的模态框
       editTaskModal: false,
+      taskDetailModal:false,
       // task的placeHolder默认值
       taskPlaceHolder: {
-        description: "please input the task description.",
-        name: "please input task's name",
-        startTime: "choose the task's start time",
-        endTime: "set the time of the task's end time"
+        description: "Please input the task description.",
+        name: "Please input the task name",
+        startTime: "Choose the start time of task",
+        endTime: "Choose the end time of task"
       },
       //task相关
       taskInfo: {},
@@ -662,7 +659,22 @@ export default {
         who: "",
         whoid: "",
         content: ""
-      }
+      },
+      formValidate: {
+        taskName: "",
+        description: "",
+        startTime: '',
+        endTime: '',
+        state:"todo"
+      },
+      ruleValidate: {
+        taskName: [
+          { required: true, message: 'Please enter name...', trigger: 'blur' }
+        ],
+        description: [
+          { required: true, message: 'Please select type...', trigger: 'blur' }
+        ]
+      },
     };
   },
   created() {
@@ -702,11 +714,20 @@ export default {
     initSize() {
       //侧边栏的高度随着屏幕的高度自适应
       this.sidebarHeight = window.innerHeight - 227;
+      this.taskContainerHeight = this.sidebarHeight;
       //通知栏的属性设置，top表示距离顶部的距离，duration表示持续的时间
       this.$Notice.config({
         top: 50,
         duration: 2
       });
+    },
+    // 动态task改变样式
+    taskReSize() {
+      let taskHeight = $("#taskList")[0].offsetHeight;
+      this.taskContainerHeight = taskHeight+45;
+      if(this.taskContainerHeight < this.sidebarHeight) {
+        this.taskContainerHeight = this.sidebarHeight;
+      }
     },
     //初始化函数，作用是控制侧边栏的高度，设置右边通知栏弹出时候的距顶高度以及延迟的时间
     init() {
@@ -787,25 +808,29 @@ export default {
             membersList[0].userId
         )
         .then(res => {
-          participantsTemp.push(res.data);
-          this.$set(this, "participants", participantsTemp);
+          if(res.data!="Fail" && res.data!="None") {
+            participantsTemp.push(res.data);
+            this.$set(this, "participants", participantsTemp);
 
-          for (let i = 1; i < membersList.length; i++) {
-            this.axios
-              .get(
-                "/GeoProblemSolving/user/inquiry" +
-                  "?key=" +
-                  "userId" +
-                  "&value=" +
-                  membersList[i].userId
-              )
-              .then(res => {
-                participantsTemp.push(res.data);
-                if (index-- == 1) {
-                  this.$set(this, "participants", participantsTemp);
-                }
-              })
-              .catch(err => {});
+            for (let i = 1; i < membersList.length; i++) {
+              this.axios
+                .get(
+                  "/GeoProblemSolving/user/inquiry" +
+                    "?key=" +
+                    "userId" +
+                    "&value=" +
+                    membersList[i].userId
+                )
+                .then(res => {
+                  if(res.data!="Fail" && res.data!="None") {
+                    participantsTemp.push(res.data);
+                    if (index-- == 1) {
+                      this.$set(this, "participants", participantsTemp);
+                    }
+                  }
+                })
+                .catch(err => {});
+            }
           }
         })
         .catch(err => {});
@@ -832,10 +857,10 @@ export default {
       if (this.subprojectSocket != null) {
         this.subprojectSocket = null;
       }
-      let subprojectId = this.subProjectInfo.subProjectId;
-      var subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + subprojectId;
-      // var subprojectSocketURL = "ws://202.195.237.252:8082/GeoProblemSolving/Module/" + subprojectId;
-      // var subprojectSocketURL = "ws://172.21.212.7:8082/GeoProblemSolving/Module/" + subprojectId;
+      let roomId = this.subProjectInfo.subProjectId + "task";
+      var subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + roomId;
+      // var subprojectSocketURL = "ws://202.195.237.252:8082/GeoProblemSolving/Module/" + roomId;
+      // var subprojectSocketURL = "ws://172.21.212.7:8082/GeoProblemSolving/Module/" + roomId;
       this.subprojectSocket = new WebSocket(subprojectSocketURL);
       this.subprojectSocket.onopen = this.onOpen;
       this.subprojectSocket.onmessage = this.onMessage;
@@ -955,13 +980,6 @@ export default {
       this.$Message.info("Clicked ok");
     },
     cancel() {
-      this.$Message.info("Clicked cancel");
-      this.moduleTitle = "";
-      this.moduleDescription = "";
-      this.moduleType = "";
-      this.editModuleTitle = "";
-      this.editModuleDescription = "";
-      this.editModuleType = "";
     },
     createModuleSuccess(title) {
       this.$Notice.success({
@@ -1131,37 +1149,44 @@ export default {
         description: "",
         startTime: "",
         endTime: "",
-        state: ""
+        state: "todo"
       };
       this.$set(this, "taskInfo", taskDefult);
+      this.$set(this, "formValidate", taskDefult);
       this.createTaskModal = true;
     },
-    createTask() {
-      //RequestBody，所以是json格式
-      let taskForm = {};
-      taskForm["taskName"] = this.taskInfo.taskName;
-      taskForm["description"] = this.taskInfo.description;
-      taskForm["startTime"] = new Date(this.taskInfo.startTime);
-      taskForm["endTime"] = new Date(this.taskInfo.endTime);
-      taskForm["creatorId"] = this.$store.getters.userId;
-      taskForm["subprojectId"] = this.subProjectInfo.subProjectId;
-      taskForm["state"] = "todo";
-      taskForm["order"] = "";
-      this.axios
-        .post("/GeoProblemSolving/task/save", taskForm)
-        .then(res => {
-          if (res.data == "Success") {
-            // 任务更新socket
-            this.socketMsg.whoid = this.$store.getters.userId;
-            this.socketMsg.who = this.$store.getters.userName;
-            this.socketMsg.type = "tasks";
-            this.socketMsg.content = "created a new task.";
-            this.socketMsg.time = new Date().toLocaleString();
-            this.sendMessage(this.socketMsg);
-            this.inquiryTask();
-          }
-        })
-        .catch(err => {});
+    createTask(name) {
+      this.$refs[name].validate((valid) => {
+        if (valid) {
+          let taskForm = {};
+          taskForm["taskName"] = this.formValidate.taskName;
+          taskForm["description"] = this.formValidate.description;
+          taskForm["startTime"] = new Date(this.formValidate.startTime);
+          taskForm["endTime"] = new Date(this.formValidate.endTime);
+          taskForm["creatorId"] = this.$store.getters.userId;
+          taskForm["subprojectId"] = this.subProjectInfo.subProjectId;
+          taskForm["state"] = "todo";
+          taskForm["order"] = "";
+          this.axios
+            .post("/GeoProblemSolving/task/save", taskForm)
+            .then(res => {
+              if (res.data == "Success") {
+                // 任务更新socket
+                this.socketMsg.whoid = this.$store.getters.userId;
+                this.socketMsg.who = this.$store.getters.userName;
+                this.socketMsg.type = "tasks";
+                this.socketMsg.content = "created a new task.";
+                this.socketMsg.time = new Date().toLocaleString();
+                this.sendMessage(this.socketMsg);
+
+                this.inquiryTask();
+              }
+            })
+            .catch(err => {});
+        } else {
+          this.$Message.error('Please enter the necessary information!');
+        }
+      })  
     },
     //打开task编辑器
     editOneTask(index, taskList) {
@@ -1177,7 +1202,7 @@ export default {
             let taskInfoRes = res.data[0];
             taskInfoRes.startTime = new Date(taskInfoRes.startTime);
             taskInfoRes.endTime = new Date(taskInfoRes.endTime);
-            this.$set(this, "taskInfo", taskInfoRes);
+            this.$set(this, "formValidate", taskInfoRes);
             this.editTaskModal = true;
           } else {
             this.$Message.error("Fail!");
@@ -1187,33 +1212,63 @@ export default {
           this.$Message.error("Fail!");
         });
     },
-    //更新某个task
-    updateTask() {
-      let taskForm = new URLSearchParams();
-      taskForm.append("taskId", this.taskInfo.taskId);
-      taskForm.append("taskName", this.taskInfo.taskName);
-      taskForm.append("description", this.taskInfo.description);
-      taskForm.append("startTime", new Date(this.taskInfo.startTime));
-      taskForm.append("endTime", new Date(this.taskInfo.endTime));
-      taskForm.append("state", this.taskInfo.state);
+    showTask(index, taskList) {
       this.axios
-        .post("/GeoProblemSolving/task/update", taskForm)
+        .get(
+          "/GeoProblemSolving/task/inquiry?" +
+            "key=taskId" +
+            "&value=" +
+            taskList[index]["taskId"]
+        )
         .then(res => {
-          if (res.data != "None" && res.data != "Fail") {
-            this.inquiryTask(); // 任务更新socket
-            this.socketMsg.whoid = this.$store.getters.userId;
-            this.socketMsg.who = this.$store.getters.userName;
-            this.socketMsg.type = "tasks";
-            this.socketMsg.content = "edited a new task.";
-            this.socketMsg.time = new Date().toLocaleString();
-            this.sendMessage(this.socketMsg);
+          if (res.data != "Fail") {
+            let taskInfoRes = res.data[0];
+            taskInfoRes.startTime = new Date(taskInfoRes.startTime);
+            taskInfoRes.endTime = new Date(taskInfoRes.endTime);
+            this.$set(this, "taskInfo", taskInfoRes);
+            this.taskDetailModal = true;
           } else {
             this.$Message.error("Fail!");
           }
         })
         .catch(err => {
-          console.log(err.data);
+          this.$Message.error("Fail!");
         });
+    },
+    //更新某个task
+    updateTask(name) {
+      this.$refs[name].validate((valid) => {
+        if (valid) {
+          let taskForm = new URLSearchParams();
+          taskForm.append("taskId", this.formValidate.taskId);
+          taskForm.append("taskName", this.formValidate.taskName);
+          taskForm.append("description", this.formValidate.description);
+          taskForm.append("startTime", new Date(this.formValidate.startTime));
+          taskForm.append("endTime", new Date(this.formValidate.endTime));
+          taskForm.append("state", this.formValidate.state);
+          this.axios
+            .post("/GeoProblemSolving/task/update", taskForm)
+            .then(res => {
+              if (res.data != "None" && res.data != "Fail") {
+                this.inquiryTask(); // 任务更新socket
+                this.socketMsg.whoid = this.$store.getters.userId;
+                this.socketMsg.who = this.$store.getters.userName;
+                this.socketMsg.type = "tasks";
+                this.socketMsg.content = "edited a new task.";
+                this.socketMsg.time = new Date().toLocaleString();
+                this.sendMessage(this.socketMsg);
+                
+              } else {
+                this.$Message.error("Fail!");
+              }
+            })
+            .catch(err => {
+              console.log(err.data);
+            });
+          } else {
+          this.$Message.error('Please enter the necessary information!');
+        }
+      })   
     },
     //查询task
     inquiryTask() {
@@ -1227,6 +1282,8 @@ export default {
         .then(res => {
           if (res.data != "None" && res.data != "Fail") {
             this.$set(this, "taskTodo", res.data);
+            
+            this.taskReSize();
           } else {
             this.$Message.error("Fail!");
           }
@@ -1243,6 +1300,8 @@ export default {
         .then(res => {
           if (res.data != "None" && res.data != "Fail") {
             this.$set(this, "taskDoing", res.data);
+            
+            this.taskReSize();
           } else {
             this.$Message.error("Fail!");
           }
@@ -1259,6 +1318,8 @@ export default {
         .then(res => {
           if (res.data != "None" && res.data != "Fail") {
             this.$set(this, "taskDone", res.data);
+            
+            this.taskReSize();
           } else {
             this.$Message.error("Fail!");
           }
@@ -1283,6 +1344,7 @@ export default {
       this.taskOrderUpdate(taskList, type);
     },
     taskOrderUpdate(taskList, type) {
+      let count = 0;
       for (let i = 0; i < taskList.length; i++) {
         let thisTask = taskList[i];
         let taskUpdateObj = new URLSearchParams();
@@ -1293,7 +1355,8 @@ export default {
           .post("/GeoProblemSolving/task/update", taskUpdateObj)
           .then(res => {
             if (res.data != "Fail") {
-              if (this.MoveCount == 0) {
+              count++;
+              if (this.MoveCount == 0 && count == taskList.length) {
                 this.endMove();
               }
             }
@@ -1311,17 +1374,24 @@ export default {
       this.socketMsg.content = "changed the task schedule.";
       this.socketMsg.time = new Date().toLocaleString();
       this.sendMessage(this.socketMsg);
+
+      this.taskReSize()
     },
-    taskRemove(index, taskList) {
+    taskRemoveAssure(index, taskList){
+      this.taskDeleteModal = true;
+      this.selectTaskIndex = index;
+      this.taskList = taskList;
+    },
+    taskRemove() {
       this.axios
         .get(
           "/GeoProblemSolving/task/delete" +
             "?taskId=" +
-            taskList[index]["taskId"]
+            this.taskList[this.selectTaskIndex]["taskId"]
         )
         .then(res => {
           if (res.data == "Success") {
-            taskList.splice(index, 1);
+            this.taskList.splice(this.selectTaskIndex, 1);
             // 任务更新socket
             this.socketMsg.whoid = this.$store.getters.userId;
             this.socketMsg.who = this.$store.getters.userName;
@@ -1329,6 +1399,7 @@ export default {
             this.socketMsg.content = "removed a task.";
             this.socketMsg.time = new Date().toLocaleString();
             this.sendMessage(this.socketMsg);
+
           } else {
             this.$Message.error("Fail!");
           }

@@ -330,14 +330,14 @@
           </Col>
           <template>
             <Col
-              :xs="{span: 14, offset: 1}"
-              :sm="{span: 15, offset: 1}"
-              :md="{span: 16, offset: 1}"
-              :lg="{span: 16, offset: 1}"
+              :xs="15"
+              :sm="16"
+              :md="17"
+              :lg="17"
               :style="{height:sidebarHeight/3*1+'px'}"
               style="margin-bottom:20px"
             >
-              <div style="height:100%;background-color:white">
+              <div style="height:100%;background-color:white;margin-left:30px">
                 <h2
                   style="width:100%;padding:10px 10px 0 10px; display: inline-block;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;max-width: 80%;"
                 >{{this.currentModule.title}}</h2>
@@ -352,17 +352,17 @@
           </template>
           <template>
             <Col
-              :xs="{span: 14, offset: 1}"
-              :sm="{span: 15, offset: 1}"
-              :md="{span: 16, offset: 1}"
-              :lg="{span: 16, offset: 1}"
+              :xs="15"
+              :sm="16"
+              :md="17"
+              :lg="17"
               >
               <Col span="12" >
-                <div style="border:1px solid lightgray;background-color:white">
+                <div style="border:1px solid lightgray;background-color:white;margin-left:30px">
                   <span
                     style="height:40px;line-height:40px;margin-left:20px;font-size:1.5em;font-weight: bold"
                   >Timeline</span>
-                  <div class="recordLine" :style="{height:sidebarHeight/3*2 - 72 + 'px'}" style="overflow-y:scroll">
+                  <div class="recordLine" :style="{height:sidebarHeight/3*2 - 67 + 'px'}" style="overflow-y:scroll">
                     <Timeline style="padding:10px">
                       <TimelineItem v-for="(item,index) in allRecords" :key="index">
                         <template v-if="item.type == 'participants'">
@@ -396,8 +396,8 @@
                   </div>
                 </div>
               </Col>
-              <Col span="11" offset="1">
-                <div style="background-color:white" :style="{height:sidebarHeight/3*2 - 32 + 'px'}" class="resourcePanel">
+              <Col span="12">
+                <div style="background-color:white;margin-left:30px" :style="{height:sidebarHeight/3*2 - 25 + 'px'}" class="resourcePanel">
                   <span
                     style="height:40px;line-height:40px;margin-left:20px;font-size:1.5em;font-weight: bold"
                   >Resource</span>
@@ -600,8 +600,8 @@
           </template>
           <template>
             <Col span="22" offset="1" style="margin-top:20px;">
-              <Col span="11">              
-                <div style="border:1px solid lightgray;background-color:white">
+              <Col span="12">              
+                <div style="border:1px solid lightgray;background-color:white;margin-right:15px">
                   <span style="height:40px;line-height:40px;margin-left:20px;font-size:1.5em;font-weight: bold">Timeline</span>
                   <div class="recordLine" :style="{height:sidebarHeight/3*2 - 72 + 'px'}" style="overflow-y:scroll">
                     <Timeline style="padding:10px">
@@ -637,8 +637,8 @@
                   </div>
                 </div>
               </Col>
-              <Col span="12" offset="1">
-                <div style="background-color:white" class="unique" :style="{height:sidebarHeight/3*2 - 32 + 'px'}">
+              <Col span="12">
+                <div style="background-color:white;margin-left:15px" :style="{height:sidebarHeight/3*2 - 30 + 'px'}">
                   <span style="height:40px;line-height:40px;margin-left:20px;font-size:1.5em;font-weight: bold"
                   >Resource</span>
                   <div style="float:right;margin:4px 10px 0 0" class="popCenter">
@@ -1183,7 +1183,8 @@ export default {
       // module 更新
       else if (messageJson.type == "module") {
         this.getAllModules("init");
-      } else if (messageJson.type == "members") {
+      } 
+      else if (messageJson.type == "members") {
         // 比较 判断人员动态 更新records
 
         let members = messageJson.message

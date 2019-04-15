@@ -22,8 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @ServerEndpoint(value = "/ChatServer/{roomId}", configurator = MyEndPointConfigure.class)
 public class ChatServerSocket {
 
-    private Session session=null;
-    private static final Map<String,Map<String,ChatServerSocket>> rooms=new ConcurrentHashMap<>();
+    private static final Map<String,Map<String,Session>> rooms=new ConcurrentHashMap<>();
 
     @Autowired
     MongoTemplate mongoTemplate;
@@ -31,26 +30,25 @@ public class ChatServerSocket {
     @OnOpen
     public void onOpen(@PathParam("roomId") String roomId, Session session,EndpointConfig config)
     {
-        this.session=session;
         HttpSession httpSession=(HttpSession) config.getUserProperties().get(HttpSession.class.getName());
         if (!rooms.containsKey(roomId)){
-            Map<String,ChatServerSocket> room=new ConcurrentHashMap<>();
-            room.put(httpSession.getAttribute("userId").toString(), this);
+            Map<String,Session> room=new ConcurrentHashMap<>();
+            room.put(httpSession.getAttribute("userId").toString(), session);
             rooms.put(roomId,room);
         }
         else {
-            rooms.get(roomId).put(httpSession.getAttribute("userId").toString(), this);
+            rooms.get(roomId).put(httpSession.getAttribute("userId").toString(), session);
         }
         broadcastMembersToRoom(roomId);
     }
     //接收消息后所调用的方法
     @OnMessage
-    public void onMessage(@PathParam("roomId") String roomId, String message)
+    public void onMessage(@PathParam("roomId") String roomId, String message, Session session)
     {
         JSONObject messageObject = JSONObject.parseObject(message);
         String messageType = messageObject.getString("type");
         if (messageType.equals("message")) {
-            broadcastMessageToRoom(roomId, message);
+            broadcastMessageToRoom(roomId, message, session);
 
             // 将历史消息进行存储
             try {
@@ -67,10 +65,10 @@ public class ChatServerSocket {
         }
     }
     @OnClose
-    public void onClose(@PathParam("roomId") String roomId)
+    public void onClose(@PathParam("roomId") String roomId, Session session)
     {
-        for (Map.Entry<String, ChatServerSocket> server : rooms.get(roomId).entrySet()) {
-            if (server.getValue().equals(this)) {
+        for (Map.Entry<String, Session> server : rooms.get(roomId).entrySet()) {
+            if (server.getValue().equals(session)) {
                 rooms.get(roomId).remove(server.getKey());
                 break;
             }
@@ -78,10 +76,10 @@ public class ChatServerSocket {
         broadcastMembersToRoom(roomId);
     }
     @OnError
-    public void onError(@PathParam("roomId") String roomId,Throwable error)
+    public void onError(@PathParam("roomId") String roomId, Session session,Throwable error)
     {
-        for (Map.Entry<String, ChatServerSocket> server : rooms.get(roomId).entrySet()) {
-            if (server.getValue().equals(this)) {
+        for (Map.Entry<String, Session> server : rooms.get(roomId).entrySet()) {
+            if (server.getValue().equals(session)) {
                 rooms.get(roomId).remove(server.getKey());
                 break;
             }
@@ -91,16 +89,16 @@ public class ChatServerSocket {
 
     private void broadcastMembersToRoom(String roomId){
         ArrayList<String> members = new ArrayList<>();
-        for (Map.Entry<String, ChatServerSocket> server : rooms.get(roomId).entrySet()) {
+        for (Map.Entry<String, Session> server : rooms.get(roomId).entrySet()) {
             members.add(server.getKey());
         }
         JSONObject messageObject = new JSONObject();
         messageObject.put("type", "members");
         messageObject.put("message", members.toString());
         String message = messageObject.toString();
-        for (Map.Entry<String, ChatServerSocket> server : rooms.get(roomId).entrySet()) {
+        for (Map.Entry<String, Session> server : rooms.get(roomId).entrySet()) {
             try {
-                server.getValue().session.getBasicRemote().sendText(message);
+                server.getValue().getBasicRemote().sendText(message);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -108,11 +106,11 @@ public class ChatServerSocket {
 
     }
 
-    private void broadcastMessageToRoom(String roomId,String message){
-        for (Map.Entry<String, ChatServerSocket> server : rooms.get(roomId).entrySet()) {
-            if (!this.equals(server.getValue())) {
+    private void broadcastMessageToRoom(String roomId,String message, Session session){
+        for (Map.Entry<String, Session> server : rooms.get(roomId).entrySet()) {
+            if (!session.equals(server.getValue())) {
                 try {
-                    server.getValue().session.getBasicRemote().sendText(message);
+                    server.getValue().getBasicRemote().sendText(message);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
