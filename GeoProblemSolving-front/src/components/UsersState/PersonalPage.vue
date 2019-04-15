@@ -9,7 +9,7 @@
                 <img v-bind:src="userDetail.avatar" class="u_img"
                   v-if="userDetail.avatar!=''&&userDetail.avatar!='undefined'">
                 <avatar
-                  style="width:100%"
+                  class="avatarStyle"
                   :username="userDetail.userName"
                   :size="200"
                   :rounded="false"
@@ -74,70 +74,54 @@
                         <Input
                           v-model="personalInfoItem.userName"
                           :class="{InputStyle: inputstyle}"
-                          :placeholder="userDetail.userName"
-                        ></Input>
-                      </FormItem>
-                      <FormItem label="Password" prop="password">
-                        <Input
-                          v-model="personalInfoItem.password"
-                          :class="{InputStyle: inputstyle}"
-                          :placeholder="userDetail.password"
                         ></Input>
                       </FormItem>
                       <FormItem label="Job Title" prop="jobTitle">
                         <Input
                           v-model="personalInfoItem.jobTitle"
                           :class="{InputStyle: inputstyle}"
-                          :placeholder="userDetail.jobTitle"
                         ></Input>
                       </FormItem>
                       <FormItem label="E-mail" prop="email">
                         <Input
                           v-model="personalInfoItem.email"
                           :class="{InputStyle: inputstyle}"
-                          :placeholder="userDetail.email"
                         ></Input>
                       </FormItem>
                       <FormItem label="Phone" prop="mobilePhone">
                         <Input
                           v-model="personalInfoItem.mobilePhone"
                           :class="{InputStyle: inputstyle}"
-                          :placeholder="userDetail.mobilePhone"
                         ></Input>
                       </FormItem>
                       <FormItem label="Country" prop="country">
                         <Input
                           v-model="personalInfoItem.country"
                           :class="{InputStyle: inputstyle}"
-                          :placeholder="userDetail.country"
                         ></Input>
                       </FormItem>
                       <FormItem label="City" prop="city">
                         <Input
                           v-model="personalInfoItem.city"
                           :class="{InputStyle: inputstyle}"
-                          :placeholder="userDetail.city"
                         ></Input>
                       </FormItem>
                       <FormItem label="Agency" prop="organization">
                         <Input
                           v-model="personalInfoItem.organization"
                           :class="{InputStyle: inputstyle}"
-                          :placeholder="userDetail.organization"
                         ></Input>
                       </FormItem>
                       <FormItem label="Direction" prop="direction">
                         <Input
                           v-model="personalInfoItem.direction"
                           :class="{InputStyle: inputstyle}"
-                          :placeholder="userDetail.direction"
                         ></Input>
                       </FormItem>
                       <FormItem label="Url" prop="homePage">
                         <Input
                           v-model="personalInfoItem.homePage"
                           :class="{InputStyle: inputstyle}"
-                          :placeholder="userDetail.homePage"
                         ></Input>
                       </FormItem>
                       <FormItem label="Introduce" prop="introduction">
@@ -146,7 +130,6 @@
                           v-model="personalInfoItem.introduction"
                           type="textarea"
                           :autosize="{minRows: 2,maxRows: 5}"
-                          :placeholder="userDetail.introduction"
                         ></Input>
                       </FormItem>
                       <FormItem label="Avatar" prop="avatar">
@@ -196,7 +179,7 @@
                     <Card>
                       <p slot="title">History Line</p>
                       <Timeline
-                        style="margin-left:5%;max-height:300px;overflow-y:auto"
+                        class="timeLineStyle"
                       >
                         <TimelineItem v-for="(item,index) in userEventList" :key="index">
                           <strong>
@@ -390,7 +373,7 @@
            <Radio :key="item.index" :label="item.title" ></Radio>
           </span>
         </RadioGroup>
-          <!-- <div v-for="(item,index)in joinedProjectsNameArray" :key="item.index">{{item.title}}</div> -->
+          <!-- <div v-for="(item,index)in joinedProjectsNameList" :key="item.index">{{item.title}}</div> -->
         </div>
         <div>
           <h3>Management Projects</h3>
@@ -422,16 +405,20 @@ export default {
     });
   },
   mounted() {
+     // 获取用户资源
     this.getUserProfile();
-    // 获取用户资源
+    //获取用户资源
     this.getUserResource();
-    // 获取用户管理列表
+    // 获取用户管理的项目信息
     this.getManagerProjectList();
-    this.getParticipatoryList(this.joinedProjectsNameArray);
-    // 获取用户的历史event
+    // 获取用户参与的项目信息（根据参与的项目id、array获取项目详情）
+    this.getParticipatoryList(this.joinedProjectsNameList);
+    // 获取用户的历史事件记录
     this.readPersonalEvent();
-    this.detailSidebarHeight = window.innerHeight - 60 + "px";
-    this.joinedProjectsNameList = this.$store.getters.userInfo["joinedProjects"];
+    // 初始化样式的高度
+    this.initStyle();
+
+
   },
   computed: {
     username() {
@@ -453,7 +440,6 @@ export default {
       userDetail: {
         userName: "",
         email: "",
-        password: "",
         jobTitle: "",
         mobilePhone: "",
         gender: "",
@@ -531,7 +517,6 @@ export default {
       personalInfoItem: {
         userName: "",
         email: "",
-        password: "",
         jobTitle: "",
         mobilePhone: "",
         gender: "",
@@ -551,7 +536,7 @@ export default {
       //抽屉开启状态控制
       // drawerClose:false,
       //加入的项目的名字id数组
-      joinedProjectsNameArray: [],
+      joinedProjectsNameList: [],
       //加入的项目详情数组列表
       joinedProjectsList: [],
       // 关于样式的变量定义
@@ -567,20 +552,21 @@ export default {
       processResourceModal:false,
       // 选中资源的索引
       selectResourceIndex:"",
-      // 参与的项目的名称列表
-      joinedProjectsNameList:[],
       // 选中的将要分享资源的项目名
       selectShareProject:"",
       selectShareProjectId:"",
     };
   },
   methods: {
+    // 初始化侧边栏样式
+    initStyle(){
+      this.detailSidebarHeight = window.innerHeight - 60 + "px";
+    },
     //获取用户的详细信息
     getUserProfile() {
       this.userDetail = this.$store.getters.userInfo;
-      //打印用户的具体信息
-      this.joinedProjectsNameArray = this.userDetail.joinedProjects;
-      // this.getParticipatoryList(this.joinedProjectsNameArray);
+      this.personalInfoItem = this.$store.getters.userInfo;
+      this.joinedProjectsNameList = this.userDetail.joinedProjects;
     },
     //获取用户参与的项目列表
     getParticipatoryList(projectIds) {
@@ -898,7 +884,7 @@ export default {
       }
       // uploaderId
     },
-    cancel(){},    
+    cancel(){},
     addUploadEvent(scopeId) {
       let form = {};
       let description =
@@ -939,90 +925,34 @@ export default {
 .rightContent {
   flex: 1;
 }
-img {
-  padding: 10px;
+/* 用户头像 */
+.user-img {
+  margin-top: 20px;
+}
+/* 注册时上传头像的用户的头像样式 */
+.u_img {
   max-width: 100%;
-  max-height: 100%;
+  padding: 10px;
 }
-h1 {
-  font-weight: normal;
+/* 注册时未上传头像的用户头像显示样式 */
+.avatarStyle{
+  margin:0 auto;
 }
+/* 用户头像结束 */
 body {
   overflow-x: hidden;
 }
-.sidebar {
-  margin-top: 20px;
-}
-.username {
-  text-align: center;
-  height: 30px;
-  margin-bottom: 20px;
-  line-height: 30px;
-  font-size: 15px;
-}
-.user-img {
-  margin-top: 20px;
-  width: 100%;
-  max-height: 100%;
-  text-align: center;
-}
-.u_img {
-  max-width: 100%;
-}
+/* 侧边用户信息的显示样式 */
 .single-info {
-  padding: 20px;
+  padding: 15px;
   height: 20px;
   font-size: 10px;
-  line-height: 20px;
-}
-.userDescription {
-  height: auto;
   line-height: 10px;
-  font-size: 10px;
-  /* max-width: 200px; */
-  /* display: inline-block; */
-  overflow: hidden;
-  word-wrap: break-word;
-  word-break: break-all;
 }
-.user-project {
-  margin-top: 20px;
-}
-.project-card {
-  margin-top: 5%;
-
-  height: 200px;
-  background-color: lightgray;
-}
-.user-contribution {
-  margin-top: 20px;
-}
-.user-history {
-  margin-top: 20px;
-  border: 1px solid black;
-}
-.user-data {
-  margin-top: 20px;
-  border: 1px solid black;
-  max-height: 300px;
-  overflow-y: scroll;
-}
-
 /* 表示空格间距的 */
 .whitespace {
   height: 20px;
 }
-.editStyle {
-  display: flex;
-  align-items: center;
-  margin-top: 5px;
-  /* justify-content: center; */
-}
-.editStyle span {
-  width: 20%;
-  text-align: left;
-}
-
 /* 关于提交用户更改头像信息的样式 */
 .demo-upload-list {
   display: inline-block;
@@ -1108,5 +1038,11 @@ body {
 }
 .manageProjectsCard:hover{
   cursor:pointer;
+}
+/* 时间轴样式 */
+.timeLineStyle{
+  margin-left:5%;
+  max-height:300px;
+  overflow-y:auto
 }
 </style>
