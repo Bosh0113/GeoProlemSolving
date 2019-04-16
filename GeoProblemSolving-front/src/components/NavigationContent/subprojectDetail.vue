@@ -236,7 +236,12 @@
                       <span style="padding:0 5px">{{member.organization}}</span>
                     </div>
                   </div>
+                  <!-- v-show="this.$store.getters.userId" -->
+                  <!-- v-show="this.subProjectInfo.managerId == this.$store.getters.userId" -->
                 </template>
+                <div style="line-height:60px" type="default" >
+                  <Button style="vertical-align:middle" v-show="giveDeleteProperty(index)" @click="removeMember(member.userId)"><Icon type="md-log-out" :size="20"/></Button>
+                </div>
               </div>
             </div>
             <div
@@ -348,7 +353,13 @@
                         </span>
                         <div style="float:right">
                           <span>
-                            <Icon type="ios-more" color="gray" :size="20" style="cursor:pointer" @click="editOneTask(index, taskTodo)"/>
+                            <Icon
+                              type="ios-more"
+                              color="gray"
+                              :size="20"
+                              style="cursor:pointer"
+                              @click="editOneTask(index, taskTodo)"
+                            />
                           </span>
                           <span
                             style="margin-left:5px;margin-right:3px;cursor: pointer;color:gray;"
@@ -389,7 +400,13 @@
                         </span>
                         <div style="float:right">
                           <span>
-                            <Icon type="ios-more" color="gray" :size="20" style="cursor:pointer" @click="editOneTask(index,taskDoing)"/>
+                            <Icon
+                              type="ios-more"
+                              color="gray"
+                              :size="20"
+                              style="cursor:pointer"
+                              @click="editOneTask(index,taskDoing)"
+                            />
                           </span>
                           <span
                             style="margin-left:5px;margin-right:3px;cursor: pointer;color:gray;"
@@ -401,12 +418,12 @@
                       </div>
                       <div style="display:flex">
                         <p
-                        style="word-break:break-word;padding:5px;cursor:pointer;width:80%"
-                        @click="editOneTask(index,taskDoing)"
-                      >{{item.description}}</p>
-                      <div style="display:flex;align-items:center">
-                        <!-- 这里取用户头像 -->
-                      </div>
+                          style="word-break:break-word;padding:5px;cursor:pointer;width:80%"
+                          @click="editOneTask(index,taskDoing)"
+                        >{{item.description}}</p>
+                        <div style="display:flex;align-items:center">
+                          <!-- 这里取用户头像 -->
+                        </div>
                       </div>
                     </Card>
                   </draggable>
@@ -435,7 +452,13 @@
                         </span>
                         <div style="float:right">
                           <span>
-                            <Icon type="ios-more" color="gray" :size="20" style="cursor:pointer" @click="editOneTask(index,taskDone)"/>
+                            <Icon
+                              type="ios-more"
+                              color="gray"
+                              :size="20"
+                              style="cursor:pointer"
+                              @click="editOneTask(index,taskDone)"
+                            />
                           </span>
                           <span
                             style="margin-left:5px;margin-right:3px;cursor: pointer;color:gray;"
@@ -445,9 +468,9 @@
                           </span>
                         </div>
                         <p
-                        style="word-break:break-word;padding:5px;cursor:pointer"
-                        @click="editOneTask(index,taskDone)"
-                      >{{item.description}}</p>
+                          style="word-break:break-word;padding:5px;cursor:pointer"
+                          @click="editOneTask(index,taskDone)"
+                        >{{item.description}}</p>
                       </div>
                     </Card>
                   </draggable>
@@ -515,8 +538,8 @@
       title="Edit task panel"
       @on-ok="updateTask()"
       @on-cancel="cancel()"
-      ok-text = "assure"
-      cancel-text = "cancel"
+      ok-text="assure"
+      cancel-text="cancel"
       width="800px"
     >
       <div class="taskFormItem">
@@ -814,8 +837,7 @@ export default {
       this.order = item;
       if (item == 1) {
         this.openModuleSocket();
-      }
-      else if( item == 2){
+      } else if (item == 2) {
         this.closeModuleSocket();
         this.$router.push(`./workspace`);
       } else if (item == 0) {
@@ -835,7 +857,8 @@ export default {
       let subprojectId = this.subProjectInfo.subProjectId;
       // var subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + subprojectId;
       // var subprojectSocketURL = "ws://202.195.237.252:8082/GeoProblemSolving/Module/" + subprojectId;
-      var subprojectSocketURL = "ws://172.21.212.7:8082/GeoProblemSolving/Module/" + subprojectId;
+      var subprojectSocketURL =
+        "ws://172.21.212.7:8082/GeoProblemSolving/Module/" + subprojectId;
       this.subprojectSocket = new WebSocket(subprojectSocketURL);
       this.subprojectSocket.onopen = this.onOpen;
       this.subprojectSocket.onmessage = this.onMessage;
@@ -1343,6 +1366,39 @@ export default {
       } else {
         this.$router.push({ name: "MemberDetailPage", params: { id: id } });
       }
+    },
+    giveDeleteProperty(index){
+      if(this.subProjectInfo.managerId == this.$store.getters.userId&&index!=0){
+        return true
+      }else{
+        return false
+      }
+    },
+    removeMember(uid){
+      // 获取到userId
+      console.table(uid);
+      this.axios
+        .get(
+          "/GeoProblemSolving/subProject/quit" +
+            "?subProjectId=" +
+            this.$route.params.id +
+            "&userId=" +
+            uid
+        )
+        .then(res => {
+          if (res.data == "Success") {
+            let projectId = sessionStorage.getItem("projectId");
+            this.$router.push({
+              name: "ProjectDetail",
+              params: { id: projectId }
+            });
+          } else {
+            this.$Message.error("Fail!");
+          }
+        })
+        .catch(err => {
+          console.log(err.data);
+        });
     }
   }
 };

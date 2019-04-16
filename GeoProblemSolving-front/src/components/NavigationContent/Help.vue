@@ -40,7 +40,6 @@ export default {
       showdata(){
         this.axios.get('/users')
         .then((res) =>{
-           
           this.datalist2 = res.data.data;
           this.dataCount = this.datalist2.length
           if(this.dataCount<this.pageSize){
@@ -48,7 +47,6 @@ export default {
           }else{
             this.showList = this.datalist2.slice(0,this.pageSize)
           }
-          // console.log(this.datalist2.length)
         })
         .catch(function (err) {
           cosnole.log('调用失败',err);

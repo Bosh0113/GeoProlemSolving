@@ -136,7 +136,7 @@
                         <div>
                           <div class="demo-upload-list" v-if="userDetail.avatar!=''">
                             <template>
-                              <img v-bind:src="userDetail.avatar">
+                              <img v-bind:src="userDetail.avatar" class="avatarImage">
                               <div class="demo-upload-list-cover">
                                 <Icon type="ios-eye-outline" @click.native="handleView()"></Icon>
                                 <Icon type="ios-trash-outline" @click.native="handleRemove()"></Icon>
@@ -968,7 +968,7 @@ body {
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
   margin-right: 4px;
 }
-.demo-upload-list img {
+.avatarImage {
   width: 100%;
   height: 100%;
 }

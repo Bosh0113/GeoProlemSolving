@@ -293,8 +293,16 @@
               :style="{height:sidebarHeight-6+'px'}"
               style="background-color:white"
             >
+              <div class="title">
+                Announcement
+              </div>
+              <div style="height:60px;padding:10px;word-wrap:break-word;margin-bottom:10px">
+                <p>Time:2019-04-22</p>
+                <p>Theme:model design discussion</p>
+                <p>Participants:all member in modeling module</p>
+              </div>
               <div class="title">Online participants</div>
-              <div :style="{height:sidebarHeight-100+'px'}">
+              <div :style="{height:sidebarHeight-170+'px'}">
                 <div class="member-desc" v-for="member in olParticipants" :key="member.id">
                   <template style="margin-top:5px">
                     <div
@@ -330,14 +338,14 @@
           </Col>
           <template>
             <Col
-              :xs="{span: 14, offset: 1}"
-              :sm="{span: 15, offset: 1}"
-              :md="{span: 16, offset: 1}"
-              :lg="{span: 16, offset: 1}"
+              :xs="15"
+              :sm="16"
+              :md="17"
+              :lg="17"
               :style="{height:sidebarHeight/3*1+'px'}"
               style="margin-bottom:20px"
             >
-              <div style="height:100%;background-color:white">
+              <div style="height:100%;background-color:white;margin-left:30px">
                 <h2
                   style="width:100%;padding:10px 10px 0 10px; display: inline-block;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;max-width: 80%;"
                 >{{this.currentModule.title}}</h2>
@@ -352,17 +360,17 @@
           </template>
           <template>
             <Col
-              :xs="{span: 14, offset: 1}"
-              :sm="{span: 15, offset: 1}"
-              :md="{span: 16, offset: 1}"
-              :lg="{span: 16, offset: 1}"
+              :xs="15"
+              :sm="16"
+              :md="17"
+              :lg="17"
               >
               <Col span="12" >
-                <div style="border:1px solid lightgray;background-color:white">
+                <div style="border:1px solid lightgray;background-color:white;margin-left:30px">
                   <span
                     style="height:40px;line-height:40px;margin-left:20px;font-size:1.5em;font-weight: bold"
                   >Timeline</span>
-                  <div class="recordLine" :style="{height:sidebarHeight/3*2 - 72 + 'px'}" style="overflow-y:scroll">
+                  <div class="recordLine" :style="{height:sidebarHeight/3*2 - 67 + 'px'}" style="overflow-y:scroll">
                     <Timeline style="padding:10px">
                       <TimelineItem v-for="(item,index) in allRecords" :key="index">
                         <template v-if="item.type == 'participants'">
@@ -370,7 +378,7 @@
                           <span class="time" style="color:gray; margin-left:10px">{{item.who}}</span>
                           <span
                             class="content"
-                            style="color:gray; margin-left:10px; word-break:break-word"
+                            style="color:gray; margin-left:10px;"
                           >{{item.content}}</span>
                         </template>
                         <template v-if="item.type == 'resource'">
@@ -387,7 +395,7 @@
                           <span class="time" style="color:#0664a2; margin-left:10px">{{item.who}}</span>
                           <span
                             class="content"
-                            style="color:#0664a2; margin-left:10px; word-break:break-word"                       
+                            style="color:#0664a2; margin-left:10px; word-break:break-word"
                           >{{item.content}}</span>
                           <span style="cursor:pointer;color:green;margin-left:5px" @click="toolPanel(item.toolType)">check</span>
                         </template>
@@ -396,8 +404,8 @@
                   </div>
                 </div>
               </Col>
-              <Col span="11" offset="1">
-                <div style="background-color:white" :style="{height:sidebarHeight/3*2 - 32 + 'px'}" class="resourcePanel">
+              <Col span="12">
+                <div style="background-color:white;margin-left:30px" :style="{height:sidebarHeight/3*2 - 25 + 'px'}" class="resourcePanel">
                   <span
                     style="height:40px;line-height:40px;margin-left:20px;font-size:1.5em;font-weight: bold"
                   >Resource</span>
@@ -532,17 +540,6 @@
                       <Icon type="ios-information-circle-outline"/>
                       <span>This tool can't support collaborative functions.</span>
                     </div>
-                    <div class="tool-panel">
-                      <div class="singl_tool_style">
-                        <Icon
-                          type="md-globe"
-                          size="60"
-                          @click.native="toolPanel('3DEarth')"
-                          title="3D Earth"
-                          color="gray"
-                        />
-                      </div>
-                    </div>
                   </TabPane>
                   <TabPane label="Special tools" name="Special">
                     <h2>Special Tools</h2>
@@ -611,8 +608,8 @@
           </template>
           <template>
             <Col span="22" offset="1" style="margin-top:20px;">
-              <Col span="11">              
-                <div style="border:1px solid lightgray;background-color:white">
+              <Col span="12">
+                <div style="border:1px solid lightgray;background-color:white;margin-right:15px">
                   <span style="height:40px;line-height:40px;margin-left:20px;font-size:1.5em;font-weight: bold">Timeline</span>
                   <div class="recordLine" :style="{height:sidebarHeight/3*2 - 72 + 'px'}" style="overflow-y:scroll">
                     <Timeline style="padding:10px">
@@ -648,8 +645,8 @@
                   </div>
                 </div>
               </Col>
-              <Col span="12" offset="1">
-                <div style="background-color:white" class="unique" :style="{height:sidebarHeight/3*2 - 32 + 'px'}">
+              <Col span="12">
+                <div style="background-color:white;margin-left:15px" :style="{height:sidebarHeight/3*2 - 30 + 'px'}">
                   <span style="height:40px;line-height:40px;margin-left:20px;font-size:1.5em;font-weight: bold"
                   >Resource</span>
                   <div style="float:right;margin:4px 10px 0 0" class="popCenter">
@@ -762,12 +759,12 @@
         <textarea v-model="moduleDescription" style="width:400px" :rows="6"></textarea>
       </div>
     </Modal>
-    <Modal 
+    <Modal
       v-model="inheritData"
       title="Choose data to next process"
       @on-ok="createModule()"
       @on-cancel="cancel()" >
-      <Transfer      
+      <Transfer
         :data="inheritResource"
         :target-keys="targetKeys"
         :list-style="listStyle"
@@ -950,7 +947,7 @@ export default {
       resourceHeight:400,
       //资源继承
       inheritResource: [],
-      targetKeys: [],      
+      targetKeys: [],
       selectResource: [],
       listStyle: { width: '210px', height: '300px' }
     };
@@ -990,7 +987,7 @@ export default {
   updated: function(){
     this.$nextTick(function(){
       var div = document.getElementsByClassName('recordLine');
-      for(let i = 0; i <div.length;i++) {        
+      for(let i = 0; i <div.length;i++) {
         div[i].scrollTop = div[i].scrollHeight;
       }
     })
@@ -1084,7 +1081,7 @@ export default {
           .then(res => {
             if (res.data != "None" && res.data != "Fail") {
               _this.projectInfo = res.data[0];
-              
+
               sessionStorage.setItem("projectId", _this.projectInfo.projectId);
               sessionStorage.setItem("projectName", _this.projectInfo.title);
             } else {
@@ -1150,10 +1147,10 @@ export default {
         this.subprojectSocket = null;
       }
       let subprojectId = this.subProjectInfo.subProjectId;
-      // var subprojectSocketURL =
-        // "ws://localhost:8081/GeoProblemSolving/Module/" + subprojectId;
+      var subprojectSocketURL =
+        "ws://localhost:8081/GeoProblemSolving/Module/" + subprojectId;
       // var subprojectSocketURL = "ws://202.195.237.252:8082/GeoProblemSolving/Module/" + subprojectId;
-      var subprojectSocketURL = "ws://172.21.212.7:8082/GeoProblemSolving/Module/" + subprojectId;
+      // var subprojectSocketURL = "ws://172.21.212.7:8082/GeoProblemSolving/Module/" + subprojectId;
       this.subprojectSocket = new WebSocket(subprojectSocketURL);
       this.subprojectSocket.onopen = this.onOpen;
       this.subprojectSocket.onmessage = this.onMessage;
@@ -1194,7 +1191,8 @@ export default {
       // module 更新
       else if (messageJson.type == "module") {
         this.getAllModules("init");
-      } else if (messageJson.type == "members") {
+      }
+      else if (messageJson.type == "members") {
         // 比较 判断人员动态 更新records
 
         let members = messageJson.message
@@ -1334,7 +1332,7 @@ export default {
       let that = this;
       this.axios
       .get(
-        "/GeoProblemSolving/history/inquiry" + 
+        "/GeoProblemSolving/history/inquiry" +
         "?eventType=record" +
         "&key=scopeId"+
         "&value="+ this.subProjectInfo.subProjectId
@@ -1439,7 +1437,7 @@ export default {
               ].moduleId;
             } else {
               Module["foreModuleId"] = "";
-            }            
+            }
             let this1 = this;
             let this2 = this;
             this.axios
@@ -1468,14 +1466,14 @@ export default {
                       .post("/GeoProblemSolving/module/update", updateObject)
                       .then(res => {
                         this2.getAllModules("update");
-                        
+
                         let socketMsg = {type:"module",operate:"update"};
                         this2.subprojectSocket.send(JSON.stringify(socketMsg));
                       })
                       .catch(err => {
                         console.log(err.data);
                       });
-                    
+
                   }
                   else {
                     this1.getAllModules("update");
@@ -1497,7 +1495,7 @@ export default {
         } else {
           this.$Message.error('Please enter the necessary information!');
         }
-      })      
+      })
     },
     activateModule() {
       var this1 = this;
@@ -1589,7 +1587,7 @@ export default {
               .post("/GeoProblemSolving/module/update", updateObject)
               .then(res => {
                 that.getAllModules("init");
-                
+
                 let socketMsg = {type:"module",operate:"update"};
                 that.subprojectSocket.send(JSON.stringify(socketMsg));
               })
@@ -1600,7 +1598,7 @@ export default {
         } else {
           this.$Message.error('Please enter the necessary information !');
         }
-      })      
+      })
     },
     copyResource(newModuleId) {
       for(let i = 0;i < this.selectResource.length; i++) {
@@ -1708,7 +1706,7 @@ export default {
                     who: that.$store.getters.userName,
                     whoid: that.$store.getters.userId,
                     type:"resource",
-                    content:"upload a/an "+ that.formValidate3.fileType + " : " + that.file.name,                
+                    content:"upload a/an "+ that.formValidate3.fileType + " : " + that.file.name,
                     moduleId: this.currentModule.moduleId,
                     time: new Date().toLocaleString(),
                     file: res.data[0].fileName
@@ -1724,7 +1722,7 @@ export default {
           this.$Message.error('Please enter the resource type!');
         }
       })
-      
+
     },
     sleep (time) {
       return new Promise((resolve) => setTimeout(resolve, time));
@@ -1915,11 +1913,7 @@ export default {
           "?groupID=" +
           this.currentModule.moduleId +
           '" style="width: 100%;height:100%"></iframe>';
-      } else if (type == "3DEarth") {
-        toolURL =
-          '<iframe src="/GeoProblemSolving/Collaborative/3DEarth/index.html' +
-          '" style="width: 100%;height:100%"></iframe>';
-      } 
+      }
       // tableEditor
       // 3d
       // computational
@@ -1940,7 +1934,7 @@ export default {
       $(".jsPanel-content").css("font-size", "0");
 
       // 生成records
-      
+
       // 同步
       let record = {
         who: this.$store.getters.userName,
