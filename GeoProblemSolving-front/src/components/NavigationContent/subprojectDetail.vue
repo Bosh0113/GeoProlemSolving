@@ -239,8 +239,14 @@
                   <!-- v-show="this.$store.getters.userId" -->
                   <!-- v-show="this.subProjectInfo.managerId == this.$store.getters.userId" -->
                 </template>
-                <div style="line-height:60px" type="default" >
-                  <Button style="vertical-align:middle" v-show="giveDeleteProperty(index)" @click="removeMember(member.userId)"><Icon type="md-log-out" :size="20"/></Button>
+                <div style="line-height:60px" type="default">
+                  <Button
+                    style="vertical-align:middle"
+                    v-show="giveDeleteProperty(index)"
+                    @click="removeMember(member.userId)"
+                  >
+                    <Icon type="md-log-out" :size="20"/>
+                  </Button>
                 </div>
               </div>
             </div>
@@ -352,6 +358,7 @@
                           <strong style="color:#57a3f3" class="taskName">{{item.taskName}}</strong>
                         </span>
                         <div style="float:right">
+
                           <span>
                             <Icon
                               type="ios-more"
@@ -368,11 +375,19 @@
                             <Icon type="ios-trash" :size="20" color="gray"/>
                           </span>
                         </div>
+                        <div style="display:flex;">
+                          <p
+                          style="word-break:break-word;padding:5px;cursor:pointer"
+                          @click="editOneTask(index, taskTodo)"
+                        >{{item.description}}</p>
+                        <!-- <div style="display:flex;align-items:flex-end">
+                          <span>{{item.creatorName}}</span>
+                        </div> -->
+                        </div>
+                        <div style="display:flex;justify-content:flex-end">
+                          <Tag color="primary">{{item.creatorName}}</Tag>
+                        </div>
                       </div>
-                      <p
-                        style="word-break:break-word;padding:5px;cursor:pointer"
-                        @click="editOneTask(index, taskTodo)"
-                      >{{item.description}}</p>
                     </Card>
                   </draggable>
                 </Card>
@@ -414,15 +429,15 @@
                           >
                             <Icon type="ios-trash" :size="20" color="gray"/>
                           </span>
-                        </div>
                       </div>
                       <div style="display:flex">
                         <p
-                          style="word-break:break-word;padding:5px;cursor:pointer;width:80%"
+                          style="word-break:break-word;padding:5px;cursor:pointer"
                           @click="editOneTask(index,taskDoing)"
                         >{{item.description}}</p>
-                        <div style="display:flex;align-items:center">
-                          <!-- 这里取用户头像 -->
+                      </div>
+                        <div style="display:flex;justify-content:flex-end">
+                          <Tag color="primary">{{item.creatorName}}</Tag>
                         </div>
                       </div>
                     </Card>
@@ -471,6 +486,9 @@
                           style="word-break:break-word;padding:5px;cursor:pointer"
                           @click="editOneTask(index,taskDone)"
                         >{{item.description}}</p>
+                        <div style="display:flex;justify-content:flex-end">
+                          <Tag color="primary">{{item.creatorName}}</Tag>
+                        </div>
                       </div>
                     </Card>
                   </draggable>
@@ -1167,6 +1185,7 @@ export default {
       taskForm["startTime"] = new Date(this.taskInfo.startTime);
       taskForm["endTime"] = new Date(this.taskInfo.endTime);
       taskForm["creatorId"] = this.$store.getters.userId;
+      taskForm["creatorName"] = this.$store.getters.userName;
       taskForm["subprojectId"] = this.subProjectInfo.subProjectId;
       taskForm["state"] = "todo";
       taskForm["order"] = "";
@@ -1367,14 +1386,17 @@ export default {
         this.$router.push({ name: "MemberDetailPage", params: { id: id } });
       }
     },
-    giveDeleteProperty(index){
-      if(this.subProjectInfo.managerId == this.$store.getters.userId&&index!=0){
-        return true
-      }else{
-        return false
+    giveDeleteProperty(index) {
+      if (
+        this.subProjectInfo.managerId == this.$store.getters.userId &&
+        index != 0
+      ) {
+        return true;
+      } else {
+        return false;
       }
     },
-    removeMember(uid){
+    removeMember(uid) {
       // 获取到userId
       console.table(uid);
       this.axios

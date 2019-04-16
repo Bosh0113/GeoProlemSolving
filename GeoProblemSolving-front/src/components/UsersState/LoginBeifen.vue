@@ -62,58 +62,67 @@
   <div class="layout">
     <Layout>
       <div class="header">
-        <img src="@/assets/images/OGMS.png" id="logo" class="pic" @click="goHome" style="cursor:pointer;">
+        <img
+          src="@/assets/images/OGMS.png"
+          id="logo"
+          class="pic"
+          @click="goHome"
+          style="cursor:pointer;"
+        >
       </div>
       <div class="content" ref="homePage" v-if="Userstate===false" v-bind:style="contentStyle">
         <div class="loginDiv" v-bind:style="loginStyle">
-              <div class="login_title" style="padding:0">Log in</div>
-              <div class="login-content">
-                <Form ref="formInline" :model="formInline" :rules="ruleInline" style="margin:25px">
-                  <div>
-                    <FormItem prop="user" label="E-mail" :label-width="100">
-                      <Input
-                        placeholder="Please input your username"
-                        style="width: 90%"
-                        v-model="formInline.user"
-                        type="text"
-                      />
-                    </FormItem>
-                  </div>
-                  <br>
-                  <FormItem prop="password" label="Password" :label-width="100">
-                    <Input
-                      placeholder="please input your password"
-                      style="width: 90%"
-                      v-model="formInline.password"
-                      type="password"
-                    />
-                  </FormItem>
-                  <div style="display:flex;text-align:center;justify-content:center">
-                    <Checkbox v-model="checked">Automatic login within one week</Checkbox>
-                  </div>
-                  <div style="display:flex;text-align:center;justify-content:center">
+          <div class="login_title" style="padding:0">Log in</div>
+          <div class="login-content">
+            <Form ref="formInline" :model="formInline" :rules="ruleInline" style="margin:25px">
+              <div>
+                <FormItem prop="user" label="E-mail" :label-width="100">
+                  <Input
+                    placeholder="Please input your username"
+                    style="width: 90%"
+                    v-model="formInline.user"
+                    type="text"
+                  />
+                </FormItem>
+              </div>
+              <br>
+              <FormItem prop="password" label="Password" :label-width="100">
+                <Input
+                  placeholder="please input your password"
+                  style="width: 90%"
+                  v-model="formInline.password"
+                  type="password"
+                />
+              </FormItem>
+              <div style="display:flex;text-align:center;justify-content:center">
+                <Checkbox v-model="checked">Automatic login within one week</Checkbox>
+              </div>
+              <div style="display:flex;text-align:center;justify-content:center">
                 <p>
                   Forget password?
-                  <a @click="sendResetEmail()">Reset</a>
+                  <!-- <a @click="sendResetEmail(formInline.user)">Reset</a> -->
                 </p>
               </div>
-                  <br>
-                  <FormItem>
-                    <div style="display:flex;align-items:center;justify-content:center">
-                      <Button
-                        type="default"
-                        @click='login("formInline")'
-                        v-model="formInline.State"
-                        class="loginBtn"
-                      >Log in</Button>
-                    </div>
-                  </FormItem>
-                  <div style="display:flex;text-align:center;justify-content:center">
-                    <span>If you don't hava an account,click <a @click="goRegister">Here</a> to register.</span>
-                  </div>
-                </Form>
+              <br>
+              <FormItem>
+                <div style="display:flex;align-items:center;justify-content:center">
+                  <Button
+                    type="default"
+                    @click="login("formInline")"
+                    v-model="formInline.State"
+                    class="loginBtn"
+                  >Log in</Button>
+                </div>
+              </FormItem>
+              <div style="display:flex;text-align:center;justify-content:center">
+                <p>
+                  If you don't hava an account,click
+                  <a @click="goRegister">Here</a> to register.
+                </p>
               </div>
-            </div>
+            </Form>
+          </div>
+        </div>
       </div>
     </Layout>
   </div>
@@ -167,8 +176,12 @@ export default {
         height: ""
       },
       checked: false,
-      changePwdEmailStyle:"This email is used for help you reset your password,you can click this url ",
-      urlAddress:"http://172.21.212.7:8082/GeoProblemSolving/resetPassword/",
+      //修改密码的邮箱模板
+      changePwdEmailStyle:
+        "This email is used for help you reset your password,you can click this url",
+      urlAddress:
+        "http://172.21.212.7:8082/GeoProblemSolving/resetPassword/" +
+        this.formInline.user,
     };
   },
   mounted() {
@@ -182,8 +195,8 @@ export default {
         if (valid) {
           if (this.checked == true) {
             localStorage.setItem("user", this.formInline.user);
-            var password = this.formInline.password
-            password=this.encrypto(password);
+            var password = this.formInline.password;
+            password = this.encrypto(password);
             localStorage.setItem("password", password);
             localStorage.setItem("statusRecord", this.checked);
             //  statusRecord
@@ -205,16 +218,12 @@ export default {
             .then(res => {
               if (res.data === "Email") {
                 this.$Message.error("Email does not exist.");
-              }
-              else if(res.data === "Password"||res.data === "Fail"){
+              } else if (res.data === "Password" || res.data === "Fail") {
                 this.$Message.error("Invalid account or password.");
-              }
-               else {
+              } else {
                 this.$Message.success("Success!");
                 this.$store.commit("userLogin", res.data);
-                // 这里逻辑有问题，需要修改
-                this.$router.push({ path: "/resourceList" });
-                // this.$router.go(-1);
+                this.$router.go(-1);
               }
             });
         } else {
@@ -232,7 +241,9 @@ export default {
     },
     getlocalStorage() {
       this.formInline.user = localStorage.getItem("user");
-      this.formInline.password = this.decrypto(localStorage.getItem("password"));
+      this.formInline.password = this.decrypto(
+        localStorage.getItem("password")
+      );
       // 将字符串格式的true转换为boolean模式的true
       if (localStorage.getItem("statusRecord")) {
         this.checked = eval(localStorage.getItem("statusRecord"));
@@ -260,44 +271,44 @@ export default {
       var key = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
       var iv = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
       var decrypt = CryptoJS.AES.decrypt(context, key, {
-          iv: iv,
-          mode: CryptoJS.mode.CBC,
-          padding: CryptoJS.pad.Pkcs7
+        iv: iv,
+        mode: CryptoJS.mode.CBC,
+        padding: CryptoJS.pad.Pkcs7
       });
       var decryptedStr = decrypt.toString(CryptoJS.enc.Utf8);
       return decryptedStr.toString();
     },
-    goRegister(){
-      this.$router.push({name:"Register"});
+    goRegister() {
+      this.$router.push({ name: "Register" });
     },
-    sendResetEmail() {
-      var emailFormBody = {};
-      emailFormBody["recipient"] = this.formInline.user;
-      emailFormBody["mailTitle"] = "Reset password notification";
-      emailFormBody["mailContent"] =
-        this.changePwdEmailStyle +
-        this.urlAddress + this.formInline.user +
-        " to change your password, thanks.";
-      this.axios
-        .post("/GeoProblemSolving/email/send", emailFormBody)
-        .then(res => {
-          if (res.data == "Success") {
-            this.$Notice.success({
-              title: "Email send title",
-              desc:
-                "The application for change password we have accepted,later you will recieve an email to help you reset it."
-            });
-          } else {
-            this.$Notice.error({
-              title: "Email send fail",
-              desc:
-                "Maybe you input your email wrong,please check out your input."
-            });
-          }
-        })
-        .catch(err => {
-          console.log(err.data);
-        });
+    sendResetEmail(uEmail) {
+      // var emailFormBody = {};
+      // emailFormBody["recipient"] = uEmail;
+      // emailFormBody["mailTitle"] = "Reset password notification";
+      // emailFormBody["mailContent"] =
+      //   this.changePwdEmailStyle +
+      //   this.urlAddress +
+      //   "to change your password,thanks.";
+      // this.axios
+      //   .post("/GeoProblemSolving/email/send", emailFormBody)
+      //   .then(res => {
+      //     if (res.data == "Success") {
+      //       this.$Notice.success({
+      //         title: "Email send title",
+      //         desc:
+      //           "The application for change password we have accepted,later you will recieve an email to help you reset it."
+      //       });
+      //     } else {
+      //       this.$Notice.error({
+      //         title: "Email send fail",
+      //         desc:
+      //           "Maybe you input your email wrong,please check out your input."
+      //       });
+      //     }
+      //   })
+      //   .catch(err => {
+      //     console.log(err.data);
+      //   });
     }
   }
 };

@@ -361,8 +361,8 @@
                           <Button
                             type="success"
                             v-show="subProject['isMember'] == false&&subProject['isManager'] == false"
-                            @click.stop="joinSubProject(subProject)"  
-                            title="Apply"                         
+                            @click.stop="joinSubProject(subProject)"
+                            title="Apply"
                           >
                             <Icon type="md-add"/>
                           </Button>
@@ -371,7 +371,7 @@
                             style="margin-left:10px"
                             v-show="subProject['isManager'] == true"
                             @click.stop="editSubProjectShow(index)"
-                            title="Edit" 
+                            title="Edit"
                           >
                             <Icon type="md-brush"/>
                           </Button>
@@ -935,15 +935,15 @@ export default {
     //前往工作空间
     goWorkspace(id, memberList, isManager) {
       var isMember;
-      if (memberList != []) {
-        memberList.forEach(item => {
-          if (item.userId == this.$store.getters.userId) {
+      if (!isManager && memberList != []) {
+        for(let i=0;i<memberList.length;i++){
+          if(memberList[i].userId == this.$store.getters.userId){
             isMember = true;
+            break;
           } else {
             isMember = false;
           }
-        });
-      } else {
+        }
       }
       if (this.$store.getters.userState) {
         if (isManager || isMember) {

@@ -14,8 +14,13 @@ public class TaskEntity {
     private Date endTime;
     private String state;   //_todo; doing; done.
     private String creatorId;
+    private String creatorName;
     private String createTime;
     private String order;
+
+    public String getCreatorName() {
+        return creatorName;
+    }
 
     public String getOrder() {
         return order;
@@ -91,6 +96,10 @@ public class TaskEntity {
 
     public void setState(String state) {
         this.state = state;
+    }
+
+    public void setCreatorName(String creatorName) {
+        this.creatorName = creatorName;
     }
 
     public void setOrder(String order) {
