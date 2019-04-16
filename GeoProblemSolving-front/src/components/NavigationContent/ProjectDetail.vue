@@ -935,15 +935,15 @@ export default {
     //前往工作空间
     goWorkspace(id, memberList, isManager) {
       var isMember;
-      if (memberList != []) {
-        memberList.forEach(item => {
-          if (item.userId == this.$store.getters.userId) {
+      if (!isManager && memberList != []) {
+        for(let i=0;i<memberList.length;i++){
+          if(memberList[i].userId == this.$store.getters.userId){
             isMember = true;
+            break;
           } else {
             isMember = false;
           }
-        });
-      } else {
+        }
       }
       if (this.$store.getters.userState) {
         if (isManager || isMember) {

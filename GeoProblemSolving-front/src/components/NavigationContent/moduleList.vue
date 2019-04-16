@@ -556,19 +556,19 @@
                     <div class="tool-panel" v-show="this.currentModule.type == 'Modeling'">
                       <div class="singl_tool_style">
                         <Icon
-                          type="md-git-commit"
+                          type="md-bonfire"
                           size="60"
-                          @click.native="toolPanel('LogicalModel')"
-                          title="Logical Model"
+                          @click.native="toolPanel('ConceptualModel')"
+                          title="Conceptual Model"
                           color="gray"
                         />
                       </div>
                       <div class="singl_tool_style">
                         <Icon
-                          type="md-bonfire"
+                          type="md-git-commit"
                           size="60"
-                          @click.native="toolPanel('ConceptualModel')"
-                          title="Conceptual Model"
+                          @click.native="toolPanel('LogicalModel')"
+                          title="Logical Model"
                           color="gray"
                         />
                       </div>

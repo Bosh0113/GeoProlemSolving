@@ -72,6 +72,23 @@ public class UserDaoImpl implements IUserDao {
     }
 
     @Override
+    public Object updatePassword(String email,String password){
+        try {
+            if (!isRegistered(email)){
+                return "None";
+            }else {
+                Query query = new Query(Criteria.where("email").is(email));
+                Update updatePassword=new Update();
+                updatePassword.set("password",password);
+                mongoTemplate.updateFirst(query, updatePassword, UserEntity.class);
+                return mongoTemplate.findOne(query, UserEntity.class);
+            }
+        } catch (Exception e) {
+            return "Fail";
+        }
+    }
+
+    @Override
     public Object login(String email, String password) {
         if(isRegistered(email)){
             AESUtils aesUtils=new AESUtils();
