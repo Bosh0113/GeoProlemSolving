@@ -1,10 +1,6 @@
 var modeldata = null;
 var modelType = "";
 
-
-var wsTModel = null;
-var socket_content = null;
-
 var reader = new FileReader();
 
 $("#modelType").change(function () {
@@ -65,15 +61,6 @@ function uploadFun() {
         success: function (data) {
             if (data != "Size over" && data.length > 0) {
 
-                socket_content= {
-                    "dataName":data[0].fileName,
-                    "dataFiles":data[0].zipFiles,
-                    "modelType":modelType,
-                    "operate":"dataupload"
-                };
-                wsTModel.send(JSON.stringify(socket_content));
-
-
                 // 加载模型
                 addModelFun(data[0].fileName, data[0].zipFiles);
             }
@@ -106,33 +93,7 @@ $(document).ready(function() {
     }
 
     var roomId = sessionStorage.getItem("moduleId");
-    if (WebSocket) {
-        // wsTModel = new WebSocket("ws://localhost:8081/GeoProblemSolving/3DviewerServer/"+roomId);
-        wsTModel = new WebSocket("ws://172.21.212.7:8082/GeoProblemSolving/3DviewerServer/"+roomId);
-    }
-    else {
-        alert("浏览器不支持websocket！");
-    }
 
-    wsTModel.onopen = function () {
-    };
-
-    wsTModel.onmessage = function (ev) {
-
-        var msgJson = JSON.parse(ev.data);
-
-        if(msgJson.operate === "dataupload") {
-            var files = msgJson.dataFiles;
-            var fileName = msgJson.dataName;
-            modelType = msgJson.modelType;
-
-            addModelFun(fileName, files);
-        }
-    };
-    wsTModel.onclose = function () {
-    };
-    wsTModel.onerror = function () {
-    };
 });
 
 function addModelFun(fileName, files) {

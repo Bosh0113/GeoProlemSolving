@@ -494,7 +494,7 @@
                           size="60"
                           @click.native="toolPanel('chart')"
                           title="Chart"
-                          color="darkgreen"
+                          color="lightgreen"
                         />
                       </div>
                       <div class="singl_tool_style">
@@ -503,7 +503,7 @@
                           size="60"
                           @click.native="toolPanel('tableEditor')"
                           title="Table editor"
-                          color="darkgreen"
+                          color="#2d8cf0"
                         />
                       </div>
                       <div class="singl_tool_style">
@@ -512,7 +512,7 @@
                           size="60"
                           @click.native="toolPanel('graphEditor')"
                           title="Graph Editor"
-                          color="gray"
+                          color="#eca01c"
                         />
                       </div>
                     </div>
@@ -523,7 +523,7 @@
                           size="60"
                           @click.native="toolPanel('3DmodelViewer')"
                           title="3D model Viewer"
-                          color="gray"
+                          color="#561cec"
                         />
                       </div>
                     </div>
@@ -531,6 +531,55 @@
                     <div style="display:flex;align-items:center">
                       <Icon type="ios-information-circle-outline"/>
                       <span>This tool can't support collaborative functions.</span>
+                    </div>
+                    <div class="tool-panel">
+                      <div class="singl_tool_style">
+                        <Icon
+                          type="md-brush"
+                          size="60"
+                          @click.native="toolPanel('nc-draw')"
+                          title="DrawBoard"
+                          color="gray"
+                        />
+                      </div>
+                      <div class="singl_tool_style">
+                        <Icon
+                          type="md-map"
+                          size="60"
+                          @click.native="toolPanel('nc-map')"
+                          title="Map"
+                          color="gray"
+                        />
+                      </div>
+                      <div class="singl_tool_style">
+                        <Icon
+                          type="ios-podium"
+                          size="60"
+                          @click.native="toolPanel('nc-chart')"
+                          title="Chart"
+                          color="gray"
+                        />
+                      </div>
+                      <div class="singl_tool_style">
+                        <Icon
+                          type="md-grid"
+                          size="60"
+                          @click.native="toolPanel('cn-tableEditor')"
+                          title="Table editor"
+                          color="gray"
+                        />
+                      </div>
+                    </div>
+                    <div class="tool-panel">
+                      <div class="singl_tool_style">
+                        <Icon
+                          type="md-cube"
+                          size="60"
+                          @click.native="toolPanel('nc-3DmodelViewer')"
+                          title="3D model Viewer"
+                          color="gray"
+                        />
+                      </div>
                     </div>
                   </TabPane>
                   <TabPane label="Special tools" name="Special">
@@ -545,29 +594,29 @@
                     <div class="tool-panel" v-show="this.currentModule.type == 'Modeling'">
                       <div class="singl_tool_style">
                         <Icon
-                          type="md-git-commit"
+                          type="md-bonfire"
                           size="60"
-                          @click.native="toolPanel('LogicalModel')"
-                          title="Logical Model"
-                          color="gray"
+                          @click.native="toolPanel('ConceptualModel')"
+                          title="Conceptual Modeling"
+                          color="#f90"
                         />
                       </div>
                       <div class="singl_tool_style">
                         <Icon
-                          type="md-bonfire"
+                          type="md-git-commit"
                           size="60"
-                          @click.native="toolPanel('ConceptualModel')"
-                          title="Conceptual Model"
-                          color="gray"
+                          @click.native="toolPanel('LogicalModel')"
+                          title="Logical Modeling"
+                          color="#19be6b"
                         />
                       </div>
                       <div class="singl_tool_style">
                         <Icon
                           type="md-pulse"
                           size="60"
-                          @click.native="toolPanel('ComputionalModel')"
-                          title="Computational Model"
-                          color="gray"
+                          @click.native="toolPanel('ComputationalModel')"
+                          title="Computational Modeling"
+                          color="#2d8cf0"
                         />
                       </div>
                     </div>
@@ -1854,67 +1903,107 @@ export default {
     // jspanel工具
     toolPanel(type) {
       var toolURL = "";
+      let toolName = "";
+
       if (type == "map") {
         toolURL =
           '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/map" style="width: 100%;height:100%"></iframe>';
-      } else if (type == "chatroom") {
-        toolURL =
-          '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/chat" style="width: 100%;height:100%"></iframe>';
+        toolName = "Map";  
+
       } else if (type == "draw") {
         toolURL =
           '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/draw" style="width: 100%;height:100%"></iframe>';
+        toolName = "Drawing";
+
       } else if (type == "chart") {
         toolURL =
           '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/charts" style="width: 100%;height:100%"></iframe>';
+        toolName = "Chart";
+
       } else if (type == "chat") {
         toolURL =
           '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/chat" style="width: 100%;height:100%"></iframe>';
+        toolName = "Chatroom";
+
       } else if (type == "graphEditor") {
         toolURL =
           '<iframe src="/GeoProblemSolving/Collaborative/GraphEditor/index.html' +
           "?groupID=" +
           this.currentModule.moduleId +
           '" style="width: 100%;height:100%"></iframe>';
+          toolName = "Sketchpad";
+
       } else if (type == "3DmodelViewer") {
         toolURL =
           '<iframe src="/GeoProblemSolving/Collaborative/3DmodelViewer/index.html' +
           "?groupID=" +
           this.currentModule.moduleId +
           '" style="width: 100%;height:100%"></iframe>';
+          toolName = "3D model viewer";
+
       } else if (type == "LogicalModel") {
         toolURL =
           '<iframe src="/GeoProblemSolving/Collaborative/LogicalModel/index.html' +
           "?groupID=" +
           this.currentModule.moduleId +
           '" style="width: 100%;height:100%"></iframe>';
+          toolName = "Logical modeling";
+
       } else if (type == "ConceptualModel") {
         toolURL =
           '<iframe src="/GeoProblemSolving/Collaborative/ConceptualModel/index.html' +
           "?groupID=" +
           this.currentModule.moduleId +
           '" style="width: 100%;height:100%"></iframe>';
-      } else if (type == "ComputionalModel") {
+          toolName = "Conceptual modeling";
+
+      } else if (type == "ComputationalModel") {
         toolURL =
           '<iframe src="/GeoProblemSolving/Collaborative/ComputationalModel/index.html' +
           "?groupID=" +
           this.currentModule.moduleId +
           '" style="width: 100%;height:100%"></iframe>';
+          toolName = "Computational modeling";
+
       } else if (type == "tableEditor") {
         toolURL =
-          '<iframe src="/GeoProblemSolving/Collaborative/jexcelTool/index.html' +
+          '<iframe src="/GeoProblemSolving/Collaborative/jexcelTool/excelTool.html' +
           "?groupID=" +
           this.currentModule.moduleId +
           '" style="width: 100%;height:100%"></iframe>';
+          toolName = "Table editor";  
+
+      } else if (type == "nc-map") {
+        toolURL =
+          '<iframe src="http://localhost:8080/nc/map" style="width: 100%;height:100%"></iframe>';
+        toolName = "Map";  
+
+      } else if (type == "nc-draw") {
+        toolURL =
+          '<iframe src="http://localhost:8080/nc/draw" style="width: 100%;height:100%"></iframe>';
+        toolName = "Drawing";
+
+      } else if (type == "nc-chart") {
+        toolURL =
+          '<iframe src="http://localhost:8080/nc/charts" style="width: 100%;height:100%"></iframe>';
+        toolName = "Chart";
+
+      } else if (type == "cn-tableEditor") {
+        toolURL =
+          '<iframe src="/GeoProblemSolving/Collaborative/jexcelTool/excelToolSingle.html' +          
+          '" style="width: 100%;height:100%"></iframe>';
+          toolName = "Table editor"; 
+
+      } else if (type == "nc-3DmodelViewer") {
+        toolURL =
+          '<iframe src="/GeoProblemSolving/Collaborative/3DmodelViewer/indexSingle.html' +          
+          '" style="width: 100%;height:100%"></iframe>';
+        toolName = "3D model viewer";
       }
-      // tableEditor
-      // 3d
-      // computational
-      // conceptual
-      // logical
 
       var panel = jsPanel.create({
         theme: "primary",
-        headerTitle: "Tools",
+        headerTitle: toolName,
         contentSize: "1000 600",
         content: toolURL,
         disableOnMaximized: true,
@@ -1925,9 +2014,7 @@ export default {
       panel.resizeit("disable");
       $(".jsPanel-content").css("font-size", "0");
 
-      // 生成records
-      
-      // 同步
+      // 生成records, 同步
       let record = {
         who: this.$store.getters.userName,
         whoid: this.$store.getters.userId,
