@@ -5,7 +5,6 @@ img {
   max-height: 100%;
   /* 用css替代图片，使图片显示为其灰度版本 */
   /* filter: grayscale(100%); */
-
 }
 .whitespace {
   height: 20px;
@@ -64,14 +63,6 @@ img {
               style="margin-right:2.5%;font-size:15px;height:40px"
               icon="md-add"
             >Create</Button>
-            <!-- <Button
-              type="default"
-              style="margin-right:2.5%;font-size:15px;height:40px"
-              icon="md-person-add"
-              class="btnJoin"
-              @click="joinModalShow"
-            >Join</Button> -->
-
           </div>
         </div>
       </Col>
@@ -121,7 +112,7 @@ img {
                       <Button
                         type="success"
                         v-show="!item.isMember&&!item.isManager&&UserState"
-                        @click.stop="joinApply(item)"
+                        @click.stop="joinApplyModalShow(item)"
                       >
                         <Icon type="md-add"/>
                       </Button>
@@ -171,38 +162,24 @@ img {
                         <strong v-for="tag in item.tag">{{tag}}</strong>
                       </span>
                     </div>
-
-                    <!-- <Modal
-                      v-model="joinModal"
-                      title="Join in project"
-                      ok-text="Submit"
-                      cancel-text="Cancel"
-                      @on-ok="joinProject()"
-                      @on-cancel="cancel"
-                    >
-                      <div style="display:flex;align-items:center">
-                        <span style="margin-right:5%">ProjectId:</span>
-                        <input
-                          v-model="joinProjectId"
-                          placeholder="Enter ProjectId you want to participate ..."
-                          style="width: 400px"
-                        >
-                      </div>
-                    </Modal> -->
-                    <Modal
-                      v-model="quitModal"
-                      title="Quit Project"
-                      ok-text="Assure"
-                      cancel-text="cancel"
-                      @on-ok="quitProject()"
-                      @on-cancel="cancel"
-                    >
-                      <p>Once you exit the project, you will not be able to participate in the collaborative process, confirm the exit?</p>
-                    </Modal>
                   </Card>
                 </div>
               </Col>
             </div>
+            <Modal
+              v-model="applyJoinModal"
+              title="Apply to join the project"
+              ok-text="Apply"
+              cancel-text="Cancel"
+              @on-ok="joinApply('applyValidate')"
+              @on-cancel="cancel"
+            >
+              <Form ref="applyValidate" :model="applyValidate" :rules="applyRuleValidate" :label-width="80">
+                <FormItem label="Reason" prop="reason">
+                  <Input v-model="applyValidate.reason" type="textarea" :rows="4" placeholder="Enter The Reason For Application ..." />
+                </FormItem>
+              </Form>
+            </Modal>
           </div>
       </div>
     </Row>
@@ -224,7 +201,7 @@ export default {
     },
     UserState() {
       return this.$store.getters.userState;
-    },
+    }
   },
   components: {
     Avatar
@@ -238,12 +215,27 @@ export default {
       currentProjectList: [],
       isMember: false,
       isManager: false,
-      // join按钮点击后模态框
-      // joinModal: false,
-      //quit按钮点击后弹出的模态框
-      quitModal: false,
-      //加入项目的Id号
-      joinProjectId: "",
+      //加入项目
+      applyProjectInfo: {},
+      applyValidate: {
+        reason: ""
+      },
+      applyRuleValidate: {
+        reason: [
+          {
+            required: true,
+            message: "Please enter the reason for application",
+            trigger: "blur"
+          },
+          {
+            type: "string",
+            min: 5,
+            message: "Introduce no less than 5 words",
+            trigger: "blur"
+          }
+        ]
+      },
+      applyJoinModal: false,
       //搜索的输入框
       search: "",
       // 记录已经申请的情况
@@ -322,37 +314,6 @@ export default {
         this.$router.push({ name: "NewProject" });
       }
     },
-    //项目成员的id和name都要加进去
-    // joinModalShow() {
-    //   if (this.$store.getters.userId != "") {
-    //     this.joinModal = true;
-    //   } else {
-    //     this.$Message.info("please login.");
-    //   }
-    // },
-    // joinProject() {
-    //   var projectId = this.joinProjectId;
-    //   this.axios
-    //     .get(
-    //       "/GeoProblemSolving/project/join?" +
-    //         "projectId=" +
-    //         projectId +
-    //         "&userId=" +
-    //         this.$store.getters.userId
-    //     )
-    //     .then(res => {
-    //       if (res.data === "Success") {
-    //         this.$Message.info("Join Success");
-    //         //跳转
-    //         this.$router.push({ path: `project/${projectId}` });
-    //       } else if (res.data === "Exist") {
-    //         this.$Message.info("you have already be a member in project");
-    //       }
-    //     })
-    //     .catch(err => {
-    //       this.$Message.danger("Join fail");
-    //     });
-    // },
     showJoinApplyBtn(item) {
       var state = this.$store.getters.userState;
       if (!item.isMember && !item.isManager && state) {
@@ -363,16 +324,6 @@ export default {
     },
     cancel() {
       this.$Message.info("Clicked cancel");
-    },
-    joinedRefresh() {
-      let projectList = this.currentProjectList;
-      let length = this.currentProjectList.length;
-      for (var i = 0; i < length; i++) {
-        if (projectList[i].projectId === this.joinProjectId) {
-          this.currentProjectList[i]["isMember"] = true;
-          break;
-        }
-      }
     },
     // 判断是不是成员
     judgeMember(list) {
@@ -430,56 +381,70 @@ export default {
         this.$router.push({ path: "/login" });
       }
     },
-    joinApply(data) {
-      if (
-        this.haveApplied == true &&
-        data.projectId == sessionStorage.getItem("applyId")
-      ) {
-        this.$Notice.warning({
-          title: "repeat apply warning",
-          desc: "You have apply success, no need to click again!"
-        });
-      } else {
-        if (this.$store.getters.userState) {
-          let joinForm = {};
-          sessionStorage.setItem("applyId", data.projectId);
-          joinForm["recipientId"] = data.managerId;
-          joinForm["type"] = "apply";
-          joinForm["content"] = {
-            userName: this.$store.getters.userName,
-            userId: this.$store.getters.userId,
-            title: "Group application",
-            description:
-              "User " +
-              this.$store.getters.userName +
-              " apply to join in your project: " +
-              data.title +
-              " .",
-            projectId: data.projectId,
-            projectTitle: data.title,
-            scope: "project",
-            approve: "unknow"
-          };
-          this.axios
-            .post("/GeoProblemSolving/notice/save", joinForm)
-            .then(res => {
-              this.$Notice.open({
-                title: "Apply Successfully",
-                desc:
-                  "The project's manager will process your apply in time,you can get a notification later to tell you the result.",
-                duration: 5
-              });
-              this.$emit("sendNotice", data.managerId);
-              this.haveApplied = true;
-            })
-            .catch(err => {
-              console.log("申请失败的原因是：" + err.data);
+    joinApplyModalShow(applyProjectInfo) {
+      this.$set(this, "applyProjectInfo", applyProjectInfo);
+      this.applyValidate.reason = "";
+      this.applyJoinModal = true;
+    },
+    joinApply(name) {
+      this.$refs[name].validate(valid => {
+        if (valid) {
+          var data = this.applyProjectInfo;
+          if (
+            this.haveApplied == true &&
+            data.projectId == sessionStorage.getItem("applyId")
+          ) {
+            this.$Notice.warning({
+              title: "repeat apply warning",
+              desc: "You have apply success, no need to click again!"
             });
+          } else {
+            if (this.$store.getters.userState) {
+              let joinForm = {};
+              sessionStorage.setItem("applyId", data.projectId);
+              joinForm["recipientId"] = data.managerId;
+              joinForm["type"] = "apply";
+              joinForm["content"] = {
+                userName: this.$store.getters.userName,
+                userId: this.$store.getters.userId,
+                title: "Group application",
+                description:
+                  "User " +
+                  this.$store.getters.userName +
+                  " apply to join in your project: " +
+                  data.title +
+                  " ." +
+                  " The reason for application is: " +
+                  this.applyValidate.reason,
+                projectId: data.projectId,
+                projectTitle: data.title,
+                scope: "project",
+                approve: "unknow"
+              };
+              this.axios
+                .post("/GeoProblemSolving/notice/save", joinForm)
+                .then(res => {
+                  this.$Notice.open({
+                    title: "Apply Successfully",
+                    desc:
+                      "The project's manager will process your apply in time,you can get a notification later to tell you the result.",
+                    duration: 5
+                  });
+                  this.$emit("sendNotice", data.managerId);
+                  this.haveApplied = true;
+                })
+                .catch(err => {
+                  console.log("申请失败的原因是：" + err.data);
+                });
+            } else {
+              this.$Message.error("you must have an account before you apply");
+              this.$router.push({ name: "Login" });
+            }
+          }
         } else {
-          this.$Message.error("you must have an account before you apply");
-          this.$router.push({ name: "Login" });
+          this.$Message.error("Fail!");
         }
-      }
+      });
     }
   }
 };

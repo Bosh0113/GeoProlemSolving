@@ -27,6 +27,8 @@
   height: 80px;
   margin: 5px 0;
   background-color: #f7f7f7;
+  word-break: break-word;
+  overflow-y: auto;
 }
 .noticeReadBtn {
   float: right;
