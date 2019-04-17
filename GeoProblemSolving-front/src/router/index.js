@@ -34,6 +34,8 @@ const routes = [{
 { path: '/nc/draw', name: 'drawUtilNC', component: resolve=>(require(["@/components/utils/singleUtils/drawBoard"],resolve)) },
 { path: '/nc/map', name: 'mapToolNC', component: resolve=>(require(["@/components/utils/singleUtils/mapTool"],resolve)) },
 { path: '/nc/charts', name: 'dataChartsNC', component: resolve=>(require(["@/components/utils/singleUtils/charts"],resolve)) },
+{ path: '/video', name: 'videoViewer', component: resolve=>(require(["@/components/utils/videoViewer"],resolve)) },
+{ path: '/pdfview', name: 'pdfViewer', component: resolve=>(require(["@/components/utils/pdfViewer"],resolve)) },
 { path: '/join/:id/:email', name: 'joinProject', component: resolve=>(require(["@/components/createNew/joinNewProject"],resolve)) },
 ]
 export default new Router({

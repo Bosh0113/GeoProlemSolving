@@ -122,10 +122,6 @@
 .tool-panel {
   display: flex;
   height: auto;
-  /* flex-wrap控制子元素换行
-     nowrap --- 不允许换行
-     wrap --- 允许换行
-   */
   flex-wrap: wrap;
   /* justify-content: center; */
   align-items: center;
@@ -249,7 +245,7 @@
                 </Steps>
               </template>
               <template v-else>
-                <Steps :current="order" style="pointer-events: none">
+                <Steps :current="order" >
                   <Step
                     v-for="(list,index) in moduleList"
                     :key="index"
@@ -576,7 +572,25 @@
                           type="md-cube"
                           size="60"
                           @click.native="toolPanel('nc-3DmodelViewer')"
-                          title="3D model Viewer"
+                          title="3D model viewer"
+                          color="gray"
+                        />
+                      </div>
+                      <div class="singl_tool_style">
+                        <Icon
+                          type="ios-videocam"
+                          size="60"
+                          @click.native="toolPanel('nc-video')"
+                          title="Video player"
+                          color="gray"
+                        />
+                      </div>
+                      <div class="singl_tool_style">
+                        <Icon
+                          type="md-book"
+                          size="60"
+                          @click.native="toolPanel('nc-pdf')"
+                          title="Video player"
                           color="gray"
                         />
                       </div>
@@ -1999,6 +2013,14 @@ export default {
           '<iframe src="/GeoProblemSolving/Collaborative/3DmodelViewer/indexSingle.html' +          
           '" style="width: 100%;height:100%"></iframe>';
         toolName = "3D model viewer";
+      } else if (type == "nc-video") {
+        toolURL =
+          '<iframe src="http://localhost:8080/video" style="width: 100%;height:100%"></iframe>';
+        toolName = "Video player";  
+      } else if (type == "nc-pdf") {
+        toolURL =
+          '<iframe src="http://localhost:8080/pdfview" style="width: 100%;height:100%"></iframe>';
+        toolName = "Pdf viewer";  
       }
 
       var panel = jsPanel.create({
