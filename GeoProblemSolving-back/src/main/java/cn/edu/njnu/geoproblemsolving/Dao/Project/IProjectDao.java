@@ -1,5 +1,6 @@
 package cn.edu.njnu.geoproblemsolving.Dao.Project;
 
+import cn.edu.njnu.geoproblemsolving.Entity.EmailEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.ProjectEntity;
 
 import javax.servlet.http.HttpServletRequest;
@@ -20,6 +21,8 @@ public interface IProjectDao {
     Object changeManager(String projectId,String userId);
 
     String joinByMail(String projectId, String email, String password);
+
+    String applyByEmail(EmailEntity emailEntity);
 
     String uploadPicture(HttpServletRequest request);
 }

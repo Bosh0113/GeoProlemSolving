@@ -761,7 +761,7 @@ export default {
       },
       //邮件格式
       emailAddStr:
-        "please click the url and join us: " +
+        "\n please click the url and join us: " +
         "http://172.21.212.7:8082/GeoProblemSolving/join/" +
         this.$route.params.id +
         "/",
@@ -999,7 +999,7 @@ export default {
           emailFormBody["mailContent"] =
             this.emailInfo.emailContent + this.emailAddStr;
           this.axios
-            .post("/GeoProblemSolving/email/send", emailFormBody)
+            .post("/GeoProblemSolving/email/invite", emailFormBody)
             .then(res => {
               if(res.data=="Success"){
                 this.$Notice.success({

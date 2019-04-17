@@ -700,6 +700,9 @@ export default {
         )
         .then(res => {
           if (res.data != "Fail") {
+            let projectInfo = res.data;
+            projectInfo.projectId = this.currentProject.projectId;
+            this.projectManageToJoin(projectInfo);
             let notice = {};
             let recipientId = this.selectManagerId;
             notice["recipientId"] = recipientId;
@@ -724,6 +727,17 @@ export default {
           }
         })
         .catch(err => {});
+    },
+    projectManageToJoin(project) {
+      this.joinedProjectsList.push(project);
+      var oldManageProjects = this.userManagerProjectList;
+      var newManageProjects = [];
+      for (let i = 0; i < oldManageProjects.length; i++) {
+        if (oldManageProjects[i].projectId != project.projectId) {
+          newManageProjects.push(oldManageProjects[i]);
+        }
+      }
+      this.$set(this, "userManagerProjectList", newManageProjects);
     },
     deleteProjectModalShow(pid) {
       if (confirm("Are you sure to delete this project?")) {

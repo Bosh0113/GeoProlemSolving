@@ -83,7 +83,7 @@ img {
                   <div style="display:flex;justify-content:center">
                     <h4
                       style="text-align:center;width:50%;color:lightblue"
-                    >You can click the button right top called create to add a new project. Enriching your description of the project and attracting more people to join in.</h4>
+                    >You can click the button right top called create to add a new project. Enriching your description of the project and attracting more people to join.</h4>
                   </div>
                 </Card>
               </Col>
@@ -373,7 +373,7 @@ export default {
           this.$Notice.error({
             title: "No access",
             desc:
-              "You need to click + button at the north right corner to apply join in the project",
+              "You need to click + button at the north right corner to apply join the project",
             duration: 5
           });
         }
@@ -411,7 +411,7 @@ export default {
                 description:
                   "User " +
                   this.$store.getters.userName +
-                  " apply to join in your project: " +
+                  " apply to join your project: " +
                   data.title +
                   " ." +
                   " The reason for application is: " +
@@ -436,6 +436,24 @@ export default {
                 .catch(err => {
                   console.log("申请失败的原因是：" + err.data);
                 });
+
+              let emailObject = {
+                recipient: joinForm.recipientId,
+                mailTitle:  "Group application",
+                mailContent: joinForm.content.description+'<br>'
+              };
+              this.axios
+              .post("/GeoProblemSolving/project/applyByMail",emailObject)
+              .then(res=>{
+                if(res.data=="Success"){
+                  console.log("Email Success.");
+                }else{
+                  console.log("Email fail.");
+                }
+              })
+              .catch(err=>{
+                console.log("Email fail.");
+              })
             } else {
               this.$Message.error("you must have an account before you apply");
               this.$router.push({ name: "Login" });
