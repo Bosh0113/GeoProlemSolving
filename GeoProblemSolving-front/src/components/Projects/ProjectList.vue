@@ -35,7 +35,7 @@ img {
 <template>
   <!-- tab栏分页 -->
   <!-- 外层div -->
-  <div>
+
     <Row>
       <Col span="22" offset="1">
         <Spin fix v-show="getFinish">
@@ -118,6 +118,7 @@ img {
                       v-show="!item.isMember&&!item.isManager&&UserState"
                       @click.stop="joinApply(item)"
                     >
+                    </Button>
                       <Button
                         type="success"
                         v-show="!item.isMember&&!item.isManager&&UserState"
@@ -205,7 +206,7 @@ img {
         <p>Content of dialog</p>
       </Modal>
     </Row>
-  </div>
+
 </template>
 <script>
 import Avatar from "vue-avatar";
