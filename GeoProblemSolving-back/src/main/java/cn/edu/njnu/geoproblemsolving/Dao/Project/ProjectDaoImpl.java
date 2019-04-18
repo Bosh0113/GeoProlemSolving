@@ -64,7 +64,12 @@ public class ProjectDaoImpl implements IProjectDao {
         updateUser.set("manageProjects",manageProjects);
         mongoTemplate.updateFirst(query,updateUser,UserEntity.class);
         mongoTemplate.save(project);
-        return project.getProjectId();
+        // encode
+        if (projectId.length() == 36) {
+            String randomID = UUID.randomUUID().toString().substring(0, 2);
+            projectId = EncodeUtil.encode((projectId + randomID).getBytes());
+        }
+        return projectId;
     }
 
     @Override

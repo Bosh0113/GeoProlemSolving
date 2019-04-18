@@ -17,7 +17,7 @@ public class TaskController {
     private MongoTemplate mongoTemplate;
 
     @RequestMapping(value = "/save", produces = {"application/json;charset=UTF-8"},method = RequestMethod.POST)
-    public String saveTask(@RequestBody TaskEntity task){
+    public Object saveTask(@RequestBody TaskEntity task){
         TaskDaoImpl taskDao=new TaskDaoImpl(mongoTemplate);
         return taskDao.saveTask(task);
     }

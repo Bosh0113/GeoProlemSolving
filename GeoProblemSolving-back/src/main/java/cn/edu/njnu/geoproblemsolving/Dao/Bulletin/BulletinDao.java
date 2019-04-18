@@ -10,6 +10,8 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.UUID;
 
 @Component
@@ -25,7 +27,10 @@ public class BulletinDao implements IBulletinDaoImpl {
     @Override
     public Object saveBulletin(BulletinEntity bulletinEntity) {
         try {
+            Date date=new Date();
+            SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
             bulletinEntity.setBulletinId(UUID.randomUUID().toString());
+            bulletinEntity.setTime(dateFormat.format(date));
             mongoTemplate.save(bulletinEntity);
             return bulletinEntity;
         } catch (Exception e) {

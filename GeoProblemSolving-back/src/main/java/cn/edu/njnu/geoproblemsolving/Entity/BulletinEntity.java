@@ -10,20 +10,10 @@ public class BulletinEntity {
     private String moduleId;
     private String title;
     private String description;
-    private String creatorId;
-    private String creatorName;
-    private Date time;
+    private String time;
 
     public void setModuleId(String moduleId) {
         this.moduleId = moduleId;
-    }
-
-    public void setCreatorName(String creatorName) {
-        this.creatorName = creatorName;
-    }
-
-    public void setCreatorId(String creatorId) {
-        this.creatorId = creatorId;
     }
 
     public void setDescription(String description) {
@@ -38,16 +28,12 @@ public class BulletinEntity {
         this.bulletinId = bulletinId;
     }
 
-    public void setTime(Date time) {
+    public void setTime(String time) {
         this.time = time;
     }
 
-    public String getCreatorName() {
-        return creatorName;
-    }
-
-    public String getCreatorId() {
-        return creatorId;
+    public String getTime() {
+        return time;
     }
 
     public String getDescription() {
@@ -56,10 +42,6 @@ public class BulletinEntity {
 
     public String getTitle() {
         return title;
-    }
-
-    public Date getTime() {
-        return time;
     }
 
     public String getBulletinId() {

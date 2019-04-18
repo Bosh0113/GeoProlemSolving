@@ -2,8 +2,11 @@ package cn.edu.njnu.geoproblemsolving.Dao.User;
 
 
 import cn.edu.njnu.geoproblemsolving.Dao.Method.AESUtils;
+import cn.edu.njnu.geoproblemsolving.Entity.ProjectEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.UserEntity;
 import cn.edu.njnu.geoproblemsolving.Dao.Method.CommonMethod;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
@@ -12,6 +15,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 
 @Component
@@ -118,5 +122,30 @@ public class UserDaoImpl implements IUserDao {
     public Boolean verifyPassword(String email,String password){
         Query query = new Query(Criteria.where("email").is(email).and("password").is(password));
         return !mongoTemplate.find(query, UserEntity.class).isEmpty();
+    }
+
+    public String updateKey(){
+        try {
+            List<UserEntity> userList = mongoTemplate.findAll(UserEntity.class);
+            for (UserEntity user:userList){
+                String userId = user.getUserId();
+                Query queryUser = Query.query(Criteria.where("userId").is(userId));
+                JSONArray manageProjects = new JSONArray();
+                Query queryProject = Query.query(Criteria.where("managerId").is(userId));
+                List<ProjectEntity> projectEntityList=mongoTemplate.find(queryProject,ProjectEntity.class);
+                for (ProjectEntity projectEntity:projectEntityList){
+                    JSONObject projectInfo =new JSONObject();
+                    projectInfo.put("title",projectEntity.getTitle());
+                    projectInfo.put("projectId",projectEntity.getProjectId());
+                    manageProjects.add(projectInfo);
+                }
+                Update updateUser = new Update();
+                updateUser.set("manageProjects",manageProjects);
+                mongoTemplate.updateFirst(queryUser,updateUser,UserEntity.class);
+            }
+            return "Success";
+        }catch (Exception e){
+            return "Fail";
+        }
     }
 }

@@ -281,6 +281,7 @@ export default {
                 this.createProjectId = res.data;
                 this.$Message.success("Success");
                 this.addHistoryEvent(this.createProjectId);
+                this.$router.push({ path: `project/${res.data}` });
               }
             })
             .catch(err => {
@@ -293,7 +294,6 @@ export default {
     },
     //创建历史纪录的函数
     addHistoryEvent(scopeId) {
-
       let form = {};
       let description =
         this.$store.getters.userName +
@@ -308,9 +308,8 @@ export default {
       this.axios
         .post("/GeoProblemSolving/history/save", form)
         .then(res => {
-
           if (res.data === "Success") {
-            this.$router.push({ name: "Project" });
+            // this.$router.push({ name: "Project" });
           }
         })
         .catch(err => {

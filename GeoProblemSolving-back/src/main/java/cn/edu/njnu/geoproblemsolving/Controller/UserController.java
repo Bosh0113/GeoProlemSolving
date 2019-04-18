@@ -123,4 +123,10 @@ public class UserController {
         UserDaoImpl userDao = new UserDaoImpl(mongoTemplate);
         return userDao.isRegistered(email);
     }
+
+    @RequestMapping(value = "/updateKey", method = RequestMethod.GET)
+    public String updateKey(){
+        UserDaoImpl userDao = new UserDaoImpl(mongoTemplate);
+        return userDao.updateKey();
+    }
 }
