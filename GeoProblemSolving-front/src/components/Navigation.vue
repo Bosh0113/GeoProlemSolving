@@ -14,6 +14,16 @@
 }
 .header {
   height: 60px;
+  top:0;
+  z-index:100;
+  position:fixed;
+  width:100%;
+}
+.footer{
+  background-color:#515a6e;
+  height:60px;
+  width:100%;
+  bottom:0;
 }
 .userState {
   position: absolute;
@@ -45,8 +55,8 @@
           <MenuItem name="project">
             <span>Project</span>
           </MenuItem>
-          <MenuItem name="participants">
-            <span>Participant</span>
+          <MenuItem name="Public Resource">
+            <span>Public Resource</span>
           </MenuItem>
           <MenuItem name="community">
             <span>Community</span>
@@ -95,8 +105,12 @@
         </div>
       </div>
     </div>
-    <div class="content">
+    <div class="content" style="margin-top:60px;margin-bottom:70px">
       <router-view @sendNotice="sendMessage" @readNotification="readNotification"></router-view>
+    </div>
+    <div class="footer">
+      <h2 style="text-align:center;color:white;font-weight:bold;margin-top:15px"><i>Open Geographic Modeling and Simulation</i></h2>
+      <h4 style="text-align:center;color:white">copyright@2013-2019 OpenGMS.all rights reserved</h4>
     </div>
   </div>
 </template>
@@ -146,8 +160,8 @@ export default {
         this.$router.replace({ name: "Home" });
       } else if (name == "project") {
         this.$router.replace({ name: "Project" });
-      } else if (name == "participants") {
-        this.$router.replace({ name: "Participants" });
+      } else if (name == "Public Resource") {
+        this.$router.replace({ name: "resourceList" });
       } else if (name == "community") {
         this.$router.replace({ name: "Community" });
       } else if (name == "help") {

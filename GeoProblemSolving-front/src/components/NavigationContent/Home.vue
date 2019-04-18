@@ -92,7 +92,7 @@ img {
 <template>
   <div class="home">
     <Row>
-      <Col span = "20" offset ="2" style="margin-top:10px">
+      <Col span = "20" offset ="2" style="margin-top:60px">
         <Carousel v-model="imagelist" loop >
         <CarouselItem>
             <div class="demo-carousel">
