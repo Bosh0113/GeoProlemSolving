@@ -1327,7 +1327,7 @@ export default {
       let count = taskList.length;
       for (let i = 0; i < taskList.length; i++) {
         let thisTask = taskList[i];
-        if(thisTask.order!=i){
+        if (thisTask.order != i || thisTask.state != type) {
           let taskUpdateObj = new URLSearchParams();
           taskUpdateObj.append("taskId", taskList[i]["taskId"]);
           taskUpdateObj.append("order", i);

@@ -16,13 +16,13 @@ public class TaskEntity {
     private String creatorId;
     private String creatorName;
     private String createTime;
-    private String order;
+    private int order;
 
     public String getCreatorName() {
         return creatorName;
     }
 
-    public String getOrder() {
+    public int getOrder() {
         return order;
     }
 
@@ -102,7 +102,7 @@ public class TaskEntity {
         this.creatorName = creatorName;
     }
 
-    public void setOrder(String order) {
+    public void setOrder(int order) {
         this.order = order;
     }
 }
