@@ -8,14 +8,14 @@
           </div>
           <div v-for="(group,index) in groups" :key="index" class="f_list">
             <div>
-              <avatar :username="group.scope" :size="35" :rounded="false" :title="group.title"></avatar>
+              <avatar :username="group.scope" :size="35" :rounded="false" :title="group.title +': '+ group.name"></avatar>
             </div>
             <div
               class="name"
-              :title="group.scope"
+              :title="group.title +': '+ group.name"
               style="cursor:pointer"
               @click="changeChatroom(index)"
-            >{{group.name}}</div>
+            >{{group.scope}}</div>
           </div>
           <div class="participants">
             <h4>Participants</h4>
@@ -131,6 +131,11 @@
 }
 .panelHeader {
   height: 40px;
+  margin-top:10px;
+}
+.participants {
+  height: auto;
+  margin-top:10px;
 }
 .participants h4,
 .panelHeader h4 {
@@ -140,14 +145,10 @@
   text-align: center;
   color: white;
 }
-.participants {
-  height: auto;
-}
-
 .f_list {
   display: flex;
   padding-left: 10%;
-  padding-top: 15px;
+  padding-bottom: 15px;
   color: white;
 }
 .name {
@@ -330,13 +331,11 @@
 .user_img {
   background-color: lightblue;
   margin-top: 2px;
-  height: 32px;
-  width: 32px;
   margin-left: 5px;
 }
 .input_panel {
-  width: 75%;
-  margin-right: 5%;
+  width: 85%;
+  margin-right: 4%;
 }
 .message_input {
   height: 40px;
@@ -360,7 +359,7 @@
   display: flex;
   align-items:center;
   justify-content: center;
-  width: 80%;
+  width: 90%;
 }
 .s_name{
   font-size:20px;
@@ -370,7 +369,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 20%;
+  width: 10%;
 }
 .recordsButton {
   height: 40px;
@@ -402,6 +401,7 @@ export default {
       subProjectId: "",
       moduleId: "",
       participants: [],
+      olParticipants: [],
       groups: [],
       select_group: "",
       message: "",
@@ -414,6 +414,7 @@ export default {
       thisUserId: this.$store.getters.userId,
       panelHeight:'',
       messageListPanelHeight:'',
+      seletRoom:"module"
     };
   },
   methods: {
@@ -446,28 +447,30 @@ export default {
           title: "Chat in the project"
         }
       ];
-      //participants
-      this.getParticipants(this.moduleId, "module");
     },
     changeChatroom(index) {
       this.socketApi.close();
       if (index == 0) {
-        this.getParticipants(this.moduleId, "module");
+        this.participants = [];
         this.select_group = this.moduleName;
         this.startWebSocket(this.moduleId);
+        this.seletRoom = "module";
       } else if (index == 1) {
+        this.participants = [];
         this.getParticipants(this.subProjectId, "subproject");
         this.select_group = this.subProjectName;
         this.startWebSocket(this.subProjectId);
+        this.seletRoom = "subproject";
       } else if (index == 2) {
+        this.participants = [];
         this.getParticipants(this.projectId, "project");
         this.select_group = this.projectName;
         this.startWebSocket(this.projectId);
+        this.seletRoom = "project";
       }
     },
     getParticipants(id, scope) {
-      if (scope == "module") {
-      } else if (scope == "subproject") {
+      if (scope == "subproject") {
         let that = this;
         $.ajax({
           url:
@@ -555,6 +558,77 @@ export default {
         }
       }
     },
+    olParticipantChange() {
+        let userIndex = -1;
+
+        // 自己刚上线，olParticipants空
+        if (this.participants.length == 0) {
+          var that = this;
+          for (let i = 0; i < this.olParticipants.length; i++) {
+            this.axios
+              .get(
+                "/GeoProblemSolving/user/inquiry" +
+                  "?key=" +
+                  "userId" +
+                  "&value=" +
+                  this.olParticipants[i]
+              )
+              .then(res => {
+                if (res.data != "None" && res.data != "Fail") {
+                  that.participants.push(res.data);
+                } else if (res.data == "None") {
+                }
+              });
+          }
+        } else {
+          // members大于olParticipants，有人上线；小于olParticipants，离线
+          if (this.olParticipants.length > this.participants.length) {
+            for (var i = 0; i < this.olParticipants.length; i++) {
+              for (var j = 0; j < this.participants.length; j++) {
+                if (this.olParticipants[i] == this.participants[j].userId) {
+                  break;
+                }
+              }
+              if (j == this.participants.length) {
+                userIndex = i;
+                break;
+              }
+            }
+
+            // 人员渲染
+            var that = this;
+            this.axios
+              .get(
+                "/GeoProblemSolving/user/inquiry" +
+                  "?key=" +
+                  "userId" +
+                  "&value=" +
+                  this.olParticipants[userIndex]
+              )
+              .then(res => {
+                if (res.data != "None" && res.data != "Fail") {
+                  that.participants.push(res.data);
+                  if (userIndex != -1) {
+                  }
+                } else if (res.data == "None") {
+                }
+              });
+          } else if (this.olParticipants.length < this.participants.length) {
+            for (var i = 0; i < this.participants.length; i++) {
+              for (var j = 0; j < this.olParticipants.length; j++) {
+                if (this.participants[i].userId == this.olParticipants[j]) {
+                  break;
+                }
+              }
+              if (j == this.olParticipants.length) {
+                userIndex = i;
+                break;
+              }
+            }
+            this.participants.splice(userIndex, 1);
+          }
+        }
+    },
     showRecords() {
       this.searchPanelShow = !this.searchPanelShow;
       this.message_panelObj["right"] = 0;
@@ -583,10 +657,17 @@ export default {
     },
     getSocketConnect(data) {
       var chatMsg = data;
-      if (chatMsg.from === "Test") {
-        console.log(chatMsg.content);
-      } else if (data.type === "members") {
-      } else {
+      if (data.type === "members") {
+        let members = data.message
+          .replace("[", "")
+          .replace("]", "")
+          .replace(/\s/g, "")
+          .split(",");        
+        this.olParticipants = members;
+        if(this.seletRoom == "module") {
+          this.olParticipantChange();
+        }
+      } else if (data.type === "message") {
         //判断消息的发出者
         this.other_msglist.push(chatMsg);
         this.msglist.push(chatMsg);
@@ -616,7 +697,11 @@ export default {
   mounted() {
     window.addEventListener("resize", this.initSize);
     this.init();
-    this.startWebSocket(this.moduleId);
+      //init module
+      this.participants = [];
+      this.select_group = this.moduleName;
+      this.startWebSocket(this.moduleId);
+      this.seletRoom = "module";
   },
   beforeDestroy() {
     this.socketApi.close();

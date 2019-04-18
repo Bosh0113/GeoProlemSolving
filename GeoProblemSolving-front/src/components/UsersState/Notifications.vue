@@ -203,6 +203,16 @@ export default {
       }
     };
   },
+  // add by mzy for navigation guards
+  beforeRouteEnter: (to, from, next) => {
+    next(vm => {
+      if (!vm.$store.getters.userState) {
+        next("/login");
+      } else {
+        next();
+      }
+    });
+  },
   methods: {
     loadNotifications() {
       this.axios
