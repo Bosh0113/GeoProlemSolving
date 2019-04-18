@@ -122,10 +122,6 @@
 .tool-panel {
   display: flex;
   height: auto;
-  /* flex-wrap控制子元素换行
-     nowrap --- 不允许换行
-     wrap --- 允许换行
-   */
   flex-wrap: wrap;
   /* justify-content: center; */
   align-items: center;
@@ -194,8 +190,7 @@
                   icon="md-add"
                   class="addBtn"
                   title="Add a new module"
-                >Add
-                </Button>
+                >Add</Button>
               </template>
               <template v-else>
                 <Button
@@ -204,8 +199,7 @@
                   icon="md-add"
                   class="addBtn"
                   title="Add a new module"
-                >Add
-                </Button>
+                >Add</Button>
               </template>
               <template v-if="this.currentModule.activeStatus">
                 <Button
@@ -249,7 +243,7 @@
                 </Steps>
               </template>
               <template v-else>
-                <Steps :current="order" style="pointer-events: none">
+                <Steps :current="order">
                   <Step
                     v-for="(list,index) in moduleList"
                     :key="index"
@@ -288,52 +282,42 @@
             offset="1"
             :style="{height:sidebarHeight+8+'px'}"
           >
-            <div
-              class="member-panel"
-              :style="{height:sidebarHeight-6+'px'}"
-              style="background-color:white"
-            >
-              <div class="title">
-                Announcement
-              </div>
-              <div style="height:60px;padding:10px;word-wrap:break-word;margin-bottom:10px">
-                <p>Time:2019-04-22</p>
-                <p>Theme:model design discussion</p>
-                <p>Participants:all member in modeling module</p>
-              </div>
-              <div class="title">Online participants</div>
-              <div :style="{height:sidebarHeight-170+'px'}">
-                <div class="member-desc" v-for="member in olParticipants" :key="member.id">
-                  <template style="margin-top:5px">
-                    <div
-                      class="member-image"
-                      @click="gotoPersonalSpace(member.userId)"
-                      style="cursor:pointer"
-                    >
-                      <img
-                        v-if="member.avatar != ''"
-                        :src="member.avatar"
-                        style="width:auto;height:100%"
+            <div :style="{height:sidebarHeight-6+'px'}">
+              <Card style="background-color:white">
+                <h2 slot="title">Online participants</h2>
+                <div :style="{height:sidebarHeight-100+'px'}">
+                  <div class="member-desc" v-for="member in olParticipants" :key="member.id">
+                    <template style="margin-top:5px">
+                      <div
+                        class="member-image"
+                        @click="gotoPersonalSpace(member.userId)"
+                        style="cursor:pointer"
                       >
-                      <avatar
-                        :username="member.userName"
-                        :size="40"
-                        style="margin-top:10px"
-                        :title="member.userName"
-                        v-else
-                      ></avatar>
-                    </div>
-                    <div class="memebr-work">
-                      <div class="userName">
-                        <span style="padding:0 5px;float:right">{{member.userName}}</span>
+                        <img
+                          v-if="member.avatar != ''"
+                          :src="member.avatar"
+                          style="width:auto;height:100%"
+                        >
+                        <avatar
+                          :username="member.userName"
+                          :size="40"
+                          style="margin-top:10px"
+                          :title="member.userName"
+                          v-else
+                        ></avatar>
                       </div>
-                      <div class="organization">
-                        <span style="padding:0 5px">{{member.organization}}</span>
+                      <div class="memebr-work">
+                        <div class="userName">
+                          <span style="padding:0 5px;float:right">{{member.userName}}</span>
+                        </div>
+                        <div class="organization">
+                          <span style="padding:0 5px">{{member.organization}}</span>
+                        </div>
                       </div>
-                    </div>
-                  </template>
+                    </template>
+                  </div>
                 </div>
-              </div>
+              </Card>
             </div>
           </Col>
           <template>
@@ -345,117 +329,210 @@
               :style="{height:sidebarHeight/3*1+'px'}"
               style="margin-bottom:20px"
             >
+              <!-- <Col span="16">
               <div style="height:100%;background-color:white;margin-left:30px">
-                <h2
-                  style="width:100%;padding:10px 10px 0 10px; display: inline-block;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;max-width: 80%;"
-                >{{this.currentModule.title}}</h2>
-                <hr>
+              <Card tyle="height:100%">
+                <h2 slot="title">{{this.currentModule.title}}</h2>
                 <div style="width:100%;padding:10px">
                   <span
                     style="word-break: break-all;text-indent:2em;padding:10px"
                   >{{this.currentModule.description}}</span>
                 </div>
-              </div>
+              </Card>
+            </div>
+              </Col>-->
+
+              <Col span="16">
+                <div style="height:100%;margin-left:30px">
+                  <Card :style="{height:sidebarHeight/3*1 +'px'}">
+                    <h2 slot="title">{{this.currentModule.title}}</h2>
+                    <div style="width:100%;padding:10px">
+                      <span
+                        style="word-break: break-all;text-indent:2em;padding:10px"
+                      >{{this.currentModule.description}}</span>
+                    </div>
+                  </Card>
+                </div>
+              </Col>
+              <Col span="8">
+                <div style="height:100%;margin-left:30px">
+                  <Card :style="{height:sidebarHeight/3*1 +'px'}">
+                     <h2 slot="title">
+                      Announcement
+                    </h2>
+                    <div slot="extra" style="display:flex;align-items:center" v-if="this.$store.getters.userInfo.userId == this.subProjectInfo.managerId">
+                     <span @click="noticeModalShow=true" style="cursor:pointer" title="add a notice"><Icon type="md-add" /></span>
+                     <span @click="noticeDetailShow()" style="cursor:pointer;margin-left:10px" title="edit" ><Icon type="md-brush" /></span>
+                     <span @click="deleteNotice()" style="cursor:pointer;margin-left:10px" title="remove" ><Icon type="ios-trash" /></span>
+                    </div>
+                    <div>
+                      <div v-if="this.currentModuleNoticeList.length!=0">
+                        <h3 style="text-align:center">{{this.currentModuleNoticeList[this.currentModuleNoticeList.length-1].title}}</h3>
+                        <p style="text-indent:2em;overflow:hidden;break-word:word-break">{{this.currentModuleNoticeList[this.currentModuleNoticeList.length-1].description}}</p>
+                      </div>
+                      <div v-if="this.currentModuleNoticeList.length==0">
+                        <p style="text-indent:2em;overflow:hidden;break-word:word-break">Sorry,there are no notice recently</p>
+                      </div>
+                    </div>
+                  </Card>
+                  <Modal
+                    width="400px"
+                    v-model="noticeModalShow"
+                    title="Create a new notice"
+                    @on-ok="createNotice"
+                    @on-cancel="cancel"
+                    ok-text="assure"
+                    cancel-text="cancel">
+                      <Form :model="formItem" :label-width="60">
+                      <FormItem label="title">
+                          <Input v-model="formItem.title" placeholder="Enter bulletin title" ></Input>
+                      </FormItem>
+                      <FormItem label="content">
+                          <Input v-model="formItem.content" placeholder="Enter bulletin content" type="textarea" ></Input>
+                      </FormItem>
+                    </Form>
+                </Modal>
+                <Modal
+                    width="400px"
+                    v-model="noticeDetailShowModal"
+                    title="Notice detail update"
+                    @on-ok="editNotice()"
+                    @on-cancel="cancel"
+                    ok-text="assure"
+                    cancel-text="cancel">
+                  <Form :model="editFormItem" :label-width="60">
+                      <FormItem label="title">
+                          <Input v-model="editFormItem.title" placeholder="Enter bulletin title"></Input>
+                      </FormItem>
+                      <FormItem label="content">
+                          <Input v-model="editFormItem.description" placeholder="Enter bulletin content" type="textarea"></Input>
+                      </FormItem>
+                    </Form>
+                </Modal>
+                </div>
+              </Col>
             </Col>
           </template>
           <template>
-            <Col
-              :xs="15"
-              :sm="16"
-              :md="17"
-              :lg="17"
-              >
-              <Col span="12" >
-                <div style="border:1px solid lightgray;background-color:white;margin-left:30px">
-                  <span
-                    style="height:40px;line-height:40px;margin-left:20px;font-size:1.5em;font-weight: bold"
-                  >Timeline</span>
-                  <div class="recordLine" :style="{height:sidebarHeight/3*2 - 67 + 'px'}" style="overflow-y:scroll">
-                    <Timeline style="padding:10px">
-                      <TimelineItem v-for="(item,index) in allRecords" :key="index">
-                        <template v-if="item.type == 'participants'">
-                          <span class="time" style="color:gray">{{item.time}}</span>
-                          <span class="time" style="color:gray; margin-left:10px">{{item.who}}</span>
-                          <span
-                            class="content"
-                            style="color:gray; margin-left:10px;"
-                          >{{item.content}}</span>
-                        </template>
-                        <template v-if="item.type == 'resource'">
-                          <span class="time" style="color:#0664a2">{{item.time}}</span>
-                          <span class="time" style="color:#0664a2;margin-left:10px">{{item.who}}</span>
-                          <span
-                            class="content"
-                            style="color:#0664a2;margin-left:10px; word-break:break-word"
-                          >{{item.content}}</span>
-                          <a style="cursor:pointer;color:green;margin-left:5px" :href="'http://172.21.212.7:8081/GeoProblemSolving/resource/upload/'+item.file" target="_blank">download</a>
-                        </template>
-                        <template v-if="item.type == 'tools'">
-                          <span class="time" style="color:#0664a2">{{item.time}}</span>
-                          <span class="time" style="color:#0664a2; margin-left:10px">{{item.who}}</span>
-                          <span
-                            class="content"
-                            style="color:#0664a2; margin-left:10px; word-break:break-word"
-                          >{{item.content}}</span>
-                          <span style="cursor:pointer;color:green;margin-left:5px" @click="toolPanel(item.toolType)">check</span>
-                        </template>
-                      </TimelineItem>
-                    </Timeline>
-                  </div>
+            <Col :xs="15" :sm="16" :md="17" :lg="17">
+              <Col span="12">
+                <div
+                  style="border:1px solid lightgray;background-color:white;margin-left:30px"
+
+                >
+                  <Card>
+                    <h2 slot="title">Timeline</h2>
+                    <div
+                      class="recordLine"
+                      :style="{height:sidebarHeight/3*2 - 120 + 'px'}"
+                      style="overflow-y:auto"
+                    >
+                      <Timeline style="padding:10px">
+                        <TimelineItem v-for="(item,index) in allRecords" :key="index">
+                          <template v-if="item.type == 'participants'">
+                            <span class="time" style="color:gray">{{item.time}}</span>
+                            <span class="time" style="color:gray; margin-left:10px">{{item.who}}</span>
+                            <span
+                              class="content"
+                              style="color:gray; margin-left:10px; word-break:break-word"
+                            >{{item.content}}</span>
+                          </template>
+                          <template v-if="item.type == 'resource'">
+                            <span class="time" style="color:#0664a2">{{item.time}}</span>
+                            <span class="time" style="color:#0664a2;margin-left:10px">{{item.who}}</span>
+                            <span
+                              class="content"
+                              style="color:#0664a2;margin-left:10px; word-break:break-word"
+                            >{{item.content}}</span>
+                            <a
+                              style="cursor:pointer;color:green;margin-left:5px"
+                              :href="'http://172.21.212.7:8081/GeoProblemSolving/resource/upload/'+item.file"
+                              target="_blank"
+                            >download</a>
+                          </template>
+                          <template v-if="item.type == 'tools'">
+                            <span class="time" style="color:#0664a2">{{item.time}}</span>
+                            <span class="time" style="color:#0664a2; margin-left:10px">{{item.who}}</span>
+                            <span
+                              class="content"
+                              style="color:#0664a2; margin-left:10px; word-break:break-word"
+                            >{{item.content}}</span>
+                            <span
+                              style="cursor:pointer;color:green;margin-left:5px"
+                              @click="toolPanel(item.toolType)"
+                            >check</span>
+                          </template>
+                        </TimelineItem>
+                      </Timeline>
+                    </div>
+                  </Card>
                 </div>
               </Col>
               <Col span="12">
-                <div style="background-color:white;margin-left:30px" :style="{height:sidebarHeight/3*2 - 25 + 'px'}" class="resourcePanel">
-                  <span
-                    style="height:40px;line-height:40px;margin-left:20px;font-size:1.5em;font-weight: bold"
-                  >Resource</span>
-                  <div style="float:right;margin:4px 10px 0 0" class="popCenter" >
-                    <Button
-                      id="upload"
-                      type="default"
-                      @click="uploadFileModal = true"
-                      class="uploadBtn"
-                      title="upload resource"
+                <div
+                  style="background-color:white;margin-left:30px"
+                  class="resourcePanel"
+                >
+                  <Card>
+                    <h2 slot="title">Resource</h2>
+                    <div slot="extra" style="display:flex;align-items:center">
+                      <span
+                        id="upload"
+                        type="default"
+                        @click="uploadFileModal = true"
+                        class="uploadBtn"
+                        title="upload resource"
+                        style="cursor:pointer"
+                      >
+                        <Icon type="md-cloud-upload" size="20"/>
+                      </span>
+                      <span
+                        slot="extra"
+                        class="moreBtn"
+                        type="default"
+                        style="margin-left:15px;cursor:pointer"
+                        @click="toResourceList()"
+                        title="more"
+                      >
+                        <Icon type="md-more"/>
+                      </span>
+                    </div>
+                    <div
+                      style="overflow-y:auto;padding:0px 10px 10px 10px"
+                      :style="{height:sidebarHeight/3*2 - 120 + 'px'}"
                     >
-                      <Icon type="md-cloud-upload" size="20"/>
-                    </Button>
-                    <Button
-                      class="moreBtn"
-                      type="default"
-                      style="margin-left: 10px"
-                      @click="toResourceList()"
-                      title="more"
-                    >
-                      <Icon type="md-more"/>
-                    </Button>
-                  </div>
-                  <div style="overflow-y:scroll;padding:0px 10px 10px 10px" :style="{height:sidebarHeight/3*2 - 80 + 'px'}">
-                    <Table
-                      style="overflow:auto"
-                      :columns="tableColName"
-                      :data="this.resourceList"
-                      v-show="this.resourceList!=[] && this.resourceList!='None'"
-                    >
-                      <template slot-scope="{ row }" slot="name">
-                        <strong>{{ row.name }}</strong>
-                      </template>
-                      <template slot-scope="{ row, index }" slot="action">
-                        <Button
-                          type="success"
-                          size="small"
-                          style="margin-right: 5px"
-                          :href="resourceList[index].pathURL"
-                          @click="show(index)"
-                          title="download"
-                        >
-                          <Icon type="md-download"/>
-                        </Button>
-                        <Button type="warning" size="small" style="margin-right: 5px" title="View">
-                          <Icon type="md-eye"/>
-                        </Button>
-                      </template>
-                    </Table>
-                  </div>
+                      <Table
+                        style="overflow:auto"
+                        :columns="tableColName"
+                        :data="this.resourceList"
+                        v-show="this.resourceList!=[] && this.resourceList!='None'"
+                      >
+                        <template slot-scope="{ row }" slot="name">
+                          <strong>{{ row.name }}</strong>
+                        </template>
+                        <template slot-scope="{ row, index }" slot="action">
+                          <Button
+                            type="success"
+                            size="small"
+                            style="margin-right: 5px"
+                            :href="resourceList[index].pathURL"
+                            @click="show(index)"
+                            title="download"
+                          >
+                            <Icon type="md-download"/>
+                          </Button>
+                          <Button
+                            type="warning"
+                            size="small"
+                            style="margin-right: 5px"
+                            title="View"
+                          >
+                            <Icon type="md-eye"/>
+                          </Button>
+                        </template>
+                      </Table>
+                    </div>
+                  </Card>
                 </div>
               </Col>
             </Col>
@@ -502,7 +579,7 @@
                           size="60"
                           @click.native="toolPanel('chart')"
                           title="Chart"
-                          color="darkgreen"
+                          color="lightgreen"
                         />
                       </div>
                       <div class="singl_tool_style">
@@ -511,7 +588,7 @@
                           size="60"
                           @click.native="toolPanel('tableEditor')"
                           title="Table editor"
-                          color="darkgreen"
+                          color="#2d8cf0"
                         />
                       </div>
                       <div class="singl_tool_style">
@@ -520,7 +597,7 @@
                           size="60"
                           @click.native="toolPanel('graphEditor')"
                           title="Graph Editor"
-                          color="gray"
+                          color="#eca01c"
                         />
                       </div>
                     </div>
@@ -531,7 +608,7 @@
                           size="60"
                           @click.native="toolPanel('3DmodelViewer')"
                           title="3D model Viewer"
-                          color="gray"
+                          color="#561cec"
                         />
                       </div>
                     </div>
@@ -539,6 +616,73 @@
                     <div style="display:flex;align-items:center">
                       <Icon type="ios-information-circle-outline"/>
                       <span>This tool can't support collaborative functions.</span>
+                    </div>
+                    <div class="tool-panel">
+                      <div class="singl_tool_style">
+                        <Icon
+                          type="md-brush"
+                          size="60"
+                          @click.native="toolPanel('nc-draw')"
+                          title="DrawBoard"
+                          color="gray"
+                        />
+                      </div>
+                      <div class="singl_tool_style">
+                        <Icon
+                          type="md-map"
+                          size="60"
+                          @click.native="toolPanel('nc-map')"
+                          title="Map"
+                          color="gray"
+                        />
+                      </div>
+                      <div class="singl_tool_style">
+                        <Icon
+                          type="ios-podium"
+                          size="60"
+                          @click.native="toolPanel('nc-chart')"
+                          title="Chart"
+                          color="gray"
+                        />
+                      </div>
+                      <div class="singl_tool_style">
+                        <Icon
+                          type="md-grid"
+                          size="60"
+                          @click.native="toolPanel('cn-tableEditor')"
+                          title="Table editor"
+                          color="gray"
+                        />
+                      </div>
+                    </div>
+                    <div class="tool-panel">
+                      <div class="singl_tool_style">
+                        <Icon
+                          type="md-cube"
+                          size="60"
+                          @click.native="toolPanel('nc-3DmodelViewer')"
+                          title="3D model viewer"
+                          color="gray"
+                        />
+                      </div>
+                      <div class="singl_tool_style">
+                        <Icon
+                          type="ios-videocam"
+                          size="60"
+                          @click.native="toolPanel('nc-video')"
+                          title="Video player"
+                          color="gray"
+                        />
+                      </div>
+                      <div class="singl_tool_style">
+                        <Icon
+                          type="md-book"
+                          size="60"
+                          @click.native="toolPanel('nc-pdf')"
+                          title="Video player"
+                          color="gray"
+                        />
+                      </div>
                     </div>
                   </TabPane>
                   <TabPane label="Special tools" name="Special">
@@ -553,29 +697,29 @@
                     <div class="tool-panel" v-show="this.currentModule.type == 'Modeling'">
                       <div class="singl_tool_style">
                         <Icon
-                          type="md-git-commit"
+                          type="md-bonfire"
                           size="60"
-                          @click.native="toolPanel('LogicalModel')"
-                          title="Logical Model"
-                          color="gray"
+                          @click.native="toolPanel('ConceptualModel')"
+                          title="Conceptual Modeling"
+                          color="#f90"
                         />
                       </div>
                       <div class="singl_tool_style">
                         <Icon
-                          type="md-bonfire"
+                          type="md-git-commit"
                           size="60"
-                          @click.native="toolPanel('ConceptualModel')"
-                          title="Conceptual Model"
-                          color="gray"
+                          @click.native="toolPanel('LogicalModel')"
+                          title="Logical Modeling"
+                          color="#19be6b"
                         />
                       </div>
                       <div class="singl_tool_style">
                         <Icon
                           type="md-pulse"
                           size="60"
-                          @click.native="toolPanel('ComputionalModel')"
-                          title="Computational Model"
-                          color="gray"
+                          @click.native="toolPanel('ComputationalModel')"
+                          title="Computational Modeling"
+                          color="#2d8cf0"
                         />
                       </div>
                     </div>
@@ -593,25 +737,27 @@
         <Row style="margin-top:20px" :style="{height:sidebarHeight+8+'px'}">
           <template>
             <Col span="22" offset="1" :style="{height:sidebarHeight/3*1+'px'}">
-              <div style="width:100%;height:100%;float:left;background-color:white">
-                <h2
-                  style="width:100%;padding:10px 10px 0 10px; display: inline-block;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;max-width: 80%;"
-                >{{currentModule.title}}</h2>
-                <hr>
-                <div style="width:100%;padding:10px">
-                  <span
-                    style="word-break: break-all;text-indent:2em;padding:10px"
-                  >{{currentModule.description}}</span>
-                </div>
-              </div>
+            <Card :style="{height:sidebarHeight/3*1 +'px'}">
+                    <h2 slot="title">{{this.currentModule.title}}</h2>
+                    <div style="width:100%;padding:10px">
+                      <span
+                        style="word-break: break-all;text-indent:2em;padding:10px"
+                      >{{this.currentModule.description}}</span>
+                    </div>
+                  </Card>
             </Col>
           </template>
           <template>
             <Col span="22" offset="1" style="margin-top:20px;">
               <Col span="12">
                 <div style="border:1px solid lightgray;background-color:white;margin-right:15px">
-                  <span style="height:40px;line-height:40px;margin-left:20px;font-size:1.5em;font-weight: bold">Timeline</span>
-                  <div class="recordLine" :style="{height:sidebarHeight/3*2 - 72 + 'px'}" style="overflow-y:scroll">
+                  <Card>
+                    <h2 slot="title">Timeline</h2>
+                    <div
+                    class="recordLine"
+                    :style="{height:sidebarHeight/3*2 - 120 + 'px'}"
+                    style="overflow-y:auto"
+                  >
                     <Timeline style="padding:10px">
                       <TimelineItem v-for="(item,index) in historyRecords" :key="index">
                         <template v-if="item.type == 'participants'">
@@ -629,7 +775,11 @@
                             class="content"
                             style="color:#0664a2;margin-left:10px; word-break:break-word"
                           >{{item.content}}</span>
-                          <a style="cursor:pointer;color:green;margin-left:5px" :href="'http://172.21.212.7:8081/GeoProblemSolving/resource/upload/'+item.file" target="_blank">download</a>
+                          <a
+                            style="cursor:pointer;color:green;margin-left:5px"
+                            :href="'http://172.21.212.7:8081/GeoProblemSolving/resource/upload/'+item.file"
+                            target="_blank"
+                          >download</a>
                         </template>
                         <template v-if="item.type == 'tools'">
                           <span class="time" style="color:#0664a2">{{item.time}}</span>
@@ -643,61 +793,76 @@
                       </TimelineItem>
                     </Timeline>
                   </div>
+                  </Card>
                 </div>
               </Col>
               <Col span="12">
-                <div style="background-color:white;margin-left:15px" :style="{height:sidebarHeight/3*2 - 30 + 'px'}">
-                  <span style="height:40px;line-height:40px;margin-left:20px;font-size:1.5em;font-weight: bold"
-                  >Resource</span>
-                  <div style="float:right;margin:4px 10px 0 0" class="popCenter">
-                    <Button
-                      id="upload"
-                      type="default"
-                      @click="uploadFileModal = true"
-                      class="uploadBtn"
-                      title="upload resource"
+                <div
+                  style="background-color:white;margin-left:15px"
+                >
+                <Card>
+                    <h2 slot="title">Resource</h2>
+                    <div slot="extra" style="display:flex;align-items:center">
+                      <span
+                        id="upload"
+                        type="default"
+                        @click="uploadFileModal = true"
+                        class="uploadBtn"
+                        title="upload resource"
+                        style="cursor:pointer"
+                      >
+                        <Icon type="md-cloud-upload" size="20"/>
+                      </span>
+                      <span
+                        slot="extra"
+                        class="moreBtn"
+                        type="default"
+                        style="margin-left:15px;cursor:pointer"
+                        @click="toResourceList()"
+                        title="more"
+                      >
+                        <Icon type="md-more"/>
+                      </span>
+                    </div>
+                    <div
+                      style="overflow-y:auto;padding:0px 10px 10px 10px"
+                      :style="{height:sidebarHeight/3*2 - 120 + 'px'}"
                     >
-                      <Icon type="md-cloud-upload" size="20"/>
-                    </Button>
-                    <Button
-                      class="moreBtn"
-                      type="default"
-                      style="margin-left: 10px"
-                      @click="toResourceList()"
-                      title="more"
-                    >
-                      <Icon type="md-more"/>
-                    </Button>
-                  </div>
-                  <div style="overflow-y:scroll;padding:0px 10px 10px 10px" :style="{height:sidebarHeight/3*2 - 80 + 'px'}">
-                    <Table
-                      :columns="tableColName"
-                      :data="this.resourceList"
-                      v-show="this.resourceList!=[] && this.resourceList!='None'"
-                    >
-                      <template slot-scope="{ row }" slot="name">
-                        <strong>{{ row.name }}</strong>
-                      </template>
-                      <template slot-scope="{ row, index }" slot="action">
-                        <Button
-                          type="success"
-                          size="small"
-                          style="margin-right: 5px"
-                          :href="resourceList[index].pathURL"
-                          @click="show(index)"
-                          title="download"
-                        >
-                          <Icon type="md-download"/>
-                        </Button>
-                        <Button type="warning" size="small" style="margin-right: 5px" title="View">
-                          <Icon type="md-eye"/>
-                        </Button>
-                      </template>
-                    </Table>
-                  </div>
+                      <Table
+                        style="overflow:auto"
+                        :columns="tableColName"
+                        :data="this.resourceList"
+                        v-show="this.resourceList!=[] && this.resourceList!='None'"
+                      >
+                        <template slot-scope="{ row }" slot="name">
+                          <strong>{{ row.name }}</strong>
+                        </template>
+                        <template slot-scope="{ row, index }" slot="action">
+                          <Button
+                            type="success"
+                            size="small"
+                            style="margin-right: 5px"
+                            :href="resourceList[index].pathURL"
+                            @click="show(index)"
+                            title="download"
+                          >
+                            <Icon type="md-download"/>
+                          </Button>
+                          <Button
+                            type="warning"
+                            size="small"
+                            style="margin-right: 5px"
+                            title="View"
+                          >
+                            <Icon type="md-eye"/>
+                          </Button>
+                        </template>
+                      </Table>
+                    </div>
+                  </Card>
                 </div>
               </Col>
-            </col>
+            </Col>
           </template>
         </Row>
       </template>
@@ -717,16 +882,30 @@
       @on-ok="updateModule('formValidate2')"
       @on-cancel="cancel()"
     >
-      <Form ref="formValidate2" :model="formValidate2" :rules="ruleValidate2" :label-width="80" style="margin-left: 30px">
-          <FormItem label="Name" prop="updateModuleTitle">
-            <Input v-model="formValidate2.updateModuleTitle" placeholder="Enter something..." style="width: 400px"/>
-          </FormItem>
-          <FormItem label="Type" prop="updateModuleType">
-            <Select v-model="formValidate2.updateModuleType" style="width:400px" placeholder="please select module type...">
-              <Option v-for="item in typeList" :key="item.index" :value="item">{{ item }}</Option>
-            </Select>
-          </FormItem>
-        </Form>
+      <Form
+        ref="formValidate2"
+        :model="formValidate2"
+        :rules="ruleValidate2"
+        :label-width="80"
+        style="margin-left: 30px"
+      >
+        <FormItem label="Name" prop="updateModuleTitle">
+          <Input
+            v-model="formValidate2.updateModuleTitle"
+            placeholder="Enter something..."
+            style="width: 400px"
+          />
+        </FormItem>
+        <FormItem label="Type" prop="updateModuleType">
+          <Select
+            v-model="formValidate2.updateModuleType"
+            style="width:400px"
+            placeholder="please select module type..."
+          >
+            <Option v-for="item in typeList" :key="item.index" :value="item">{{ item }}</Option>
+          </Select>
+        </FormItem>
+      </Form>
       <div class="editNodeStyle">
         <span style="width:10%">Detail</span>
         <textarea
@@ -744,12 +923,26 @@
       @on-ok="addModule('formValidate1')"
       @on-cancel="cancel()"
     >
-      <Form ref="formValidate1" :model="formValidate1" :rules="ruleValidate1" :label-width="80" style="margin-left: 30px">
+      <Form
+        ref="formValidate1"
+        :model="formValidate1"
+        :rules="ruleValidate1"
+        :label-width="80"
+        style="margin-left: 30px"
+      >
         <FormItem label="Name" prop="moduleTitle">
-          <Input v-model="formValidate1.moduleTitle" placeholder="Enter something..." style="width: 400px"/>
+          <Input
+            v-model="formValidate1.moduleTitle"
+            placeholder="Enter something..."
+            style="width: 400px"
+          />
         </FormItem>
         <FormItem label="Type" prop="moduleType">
-          <Select v-model="formValidate1.moduleType" style="width:400px" placeholder="please select module type...">
+          <Select
+            v-model="formValidate1.moduleType"
+            style="width:400px"
+            placeholder="please select module type..."
+          >
             <Option v-for="item in typeList" :key="item.index" :value="item">{{ item }}</Option>
           </Select>
         </FormItem>
@@ -763,19 +956,19 @@
       v-model="inheritData"
       title="Choose data to next process"
       @on-ok="createModule()"
-      @on-cancel="cancel()" >
+      @on-cancel="cancel()"
+    >
       <Transfer
         :data="inheritResource"
         :target-keys="targetKeys"
         :list-style="listStyle"
         :render-format="resourceRender"
-        :titles = "['This process', 'The next process']"
-        filter-placeholder = "Enter key words..."
+        :titles="['This process', 'The next process']"
+        filter-placeholder="Enter key words..."
         filterable
         :filter-method="filterMethod"
         @on-change="handleChange"
-      >
-      </Transfer>
+      ></Transfer>
     </Modal>
     <Modal
       width="600px"
@@ -795,7 +988,13 @@
       width="600px"
       :mask-closable="false"
     >
-      <Form ref="formValidate3" :model="formValidate3" :rules="ruleValidate3" :label-width="80" style="margin-left:20px">
+      <Form
+        ref="formValidate3"
+        :model="formValidate3"
+        :rules="ruleValidate3"
+        :label-width="80"
+        style="margin-left:20px"
+      >
         <FormItem label="File type: " prop="fileType">
           <RadioGroup v-model="formValidate3.fileType">
             <Radio label="image"></Radio>
@@ -852,7 +1051,7 @@ export default {
       addModal: false,
       copyModal: false,
       delModal: false,
-      inheritData:false,
+      inheritData: false,
       //编辑的模态框
       editModal: false,
       activateModal: false,
@@ -877,10 +1076,10 @@ export default {
       },
       ruleValidate1: {
         moduleTitle: [
-          { required: true, message: 'Please enter name...', trigger: 'blur' }
+          { required: true, message: "Please enter name...", trigger: "blur" }
         ],
         moduleType: [
-          { required: true, message: 'Please select type...', trigger: 'blur' }
+          { required: true, message: "Please select type...", trigger: "blur" }
         ]
       },
       formValidate2: {
@@ -889,18 +1088,18 @@ export default {
       },
       ruleValidate2: {
         updateModuleTitle: [
-          { required: true, message: 'Please enter name...', trigger: 'blur' }
+          { required: true, message: "Please enter name...", trigger: "blur" }
         ],
         updateModuleType: [
-          { required: true, message: 'Please select type...', trigger: 'blur' }
+          { required: true, message: "Please select type...", trigger: "blur" }
         ]
       },
       formValidate3: {
-        fileType: "",
+        fileType: ""
       },
       ruleValidate3: {
         fileType: [
-          { required: true, message: 'Please select type...', trigger: 'blur' }
+          { required: true, message: "Please select type...", trigger: "blur" }
         ]
       },
       // moduleDescription指的是节点的详情信息
@@ -921,7 +1120,7 @@ export default {
       // 所有module的记录
       allRecords: [],
       historyRecords: [],
-      allHistRecords:[],
+      allHistRecords: [],
       // 当前参与者
       olParticipants: [],
       ofParticipants: [],
@@ -944,12 +1143,30 @@ export default {
         }
       ],
       fileDescription: "",
-      resourceHeight:400,
+      resourceHeight: 400,
       //资源继承
       inheritResource: [],
       targetKeys: [],
       selectResource: [],
-      listStyle: { width: '210px', height: '300px' }
+      listStyle: { width: "210px", height: "300px" },
+      //通知相关的变量
+      noticeModalShow:false,
+      formItem: {
+        title:"",
+        content:"",
+      },
+      editFormItem:{
+        title:"",
+        description:"",
+      },
+      currentModuleNoticeList:[
+        {title:"",
+        description:""}
+        ],
+      // 控制点击notice后模态框显示的modal
+      noticeDetailShowModal:false,
+      // 当前选中通知条目的详情
+      currentNoticeDetail:[]
     };
   },
   created() {
@@ -984,13 +1201,13 @@ export default {
     window.removeEventListener("resize", this.reSize);
     this.closeModuleSocket();
   },
-  updated: function(){
-    this.$nextTick(function(){
-      var div = document.getElementsByClassName('recordLine');
-      for(let i = 0; i <div.length;i++) {
+  updated: function() {
+    this.$nextTick(function() {
+      var div = document.getElementsByClassName("recordLine");
+      for (let i = 0; i < div.length; i++) {
         div[i].scrollTop = div[i].scrollHeight;
       }
-    })
+    });
   },
   methods: {
     initSize() {
@@ -1102,29 +1319,34 @@ export default {
       sessionStorage.setItem("moduleId", this.currentModule.moduleId);
       sessionStorage.setItem("moduleName", this.currentModule.title);
 
-      if(oldId !== this.currentModule.moduleId) {
+      if (oldId !== this.currentModule.moduleId) {
+        //查询公告
+        this.inquiryNotice();
         this.getAllResource();
         let records = [];
-        if(!this.currentModule.activeStatus) {
-          for(let i = 0;i<this.allHistRecords.length;i++) {
-            if(this.currentModule.moduleId == this.allHistRecords[i].moduleId) {
+        if (!this.currentModule.activeStatus) {
+          for (let i = 0; i < this.allHistRecords.length; i++) {
+            if (
+              this.currentModule.moduleId == this.allHistRecords[i].moduleId
+            ) {
               let record = this.allHistRecords[i];
               records.push(record);
             }
           }
           this.historyRecords = records;
-        }
-        else {
+        } else {
           let noRecords = true;
-          for(let i = 0; i < this.allRecords.length; i++) {
-            if(this.allRecords[i].type != "participants") {
+          for (let i = 0; i < this.allRecords.length; i++) {
+            if (this.allRecords[i].type != "participants") {
               noRecords = false;
               break;
             }
           }
-          if(noRecords) {
-            for(let i = 0;i<this.allHistRecords.length;i++) {
-              if(this.currentModule.moduleId == this.allHistRecords[i].moduleId) {
+          if (noRecords) {
+            for (let i = 0; i < this.allHistRecords.length; i++) {
+              if (
+                this.currentModule.moduleId == this.allHistRecords[i].moduleId
+              ) {
                 let record = this.allHistRecords[i];
                 records.push(record);
               }
@@ -1134,7 +1356,6 @@ export default {
           }
         }
       }
-
     },
     closeModuleSocket() {
       if (this.subprojectSocket != null) {
@@ -1191,8 +1412,7 @@ export default {
       // module 更新
       else if (messageJson.type == "module") {
         this.getAllModules("init");
-      }
-      else if (messageJson.type == "members") {
+      } else if (messageJson.type == "members") {
         // 比较 判断人员动态 更新records
 
         let members = messageJson.message
@@ -1331,22 +1551,23 @@ export default {
       this.allHistRecords = [];
       let that = this;
       this.axios
-      .get(
-        "/GeoProblemSolving/history/inquiry" +
-        "?eventType=record" +
-        "&key=scopeId"+
-        "&value="+ this.subProjectInfo.subProjectId
-      )
-      .then(res=>{
-        if(res.data != "None") {
-          for(let i = 0;i<res.data.length;i++) {
-            let record = JSON.parse(res.data[i].description);
-            that.allHistRecords.push(record);
+        .get(
+          "/GeoProblemSolving/history/inquiry" +
+            "?eventType=record" +
+            "&key=scopeId" +
+            "&value=" +
+            this.subProjectInfo.subProjectId
+        )
+        .then(res => {
+          if (res.data != "None") {
+            for (let i = 0; i < res.data.length; i++) {
+              let record = JSON.parse(res.data[i].description);
+              that.allHistRecords.push(record);
+            }
           }
-        }
-      })
+        });
     },
-    chooseResource(){
+    chooseResource() {
       this.inheritData = true;
       this.inheritResource = this.getMockData();
       // this.targetKeys = this.getTargetKeys();
@@ -1356,40 +1577,40 @@ export default {
       this.selectResource = [];
       this.selectResource = this.getTargetKeys();
     },
-    getMockData () {
+    getMockData() {
       let mockData = [];
       for (let i = 0; i < this.resourceList.length; i++) {
         mockData.push({
           key: i,
           name: this.resourceList[i].name,
           type: this.resourceList[i].type,
-          resourceId:this.resourceList[i].resourceId
+          resourceId: this.resourceList[i].resourceId
         });
       }
       return mockData;
     },
-    getTargetKeys () {
+    getTargetKeys() {
       let mockData = [];
-      if(this.inheritResource.length > 0) {
-        for(let i = 0;i < this.targetKeys.length; i++) {
+      if (this.inheritResource.length > 0) {
+        for (let i = 0; i < this.targetKeys.length; i++) {
           mockData.push({
             key: this.targetKeys[i],
             name: this.inheritResource[this.targetKeys[i]].name,
             type: this.inheritResource[this.targetKeys[i]].type,
-            resourceId:this.inheritResource[this.targetKeys[i]].resourceId
+            resourceId: this.inheritResource[this.targetKeys[i]].resourceId
           });
         }
       }
       return mockData;
     },
-    handleChange (newTargetKeys) {
+    handleChange(newTargetKeys) {
       this.targetKeys = newTargetKeys;
     },
-    filterMethod (data, query) {
+    filterMethod(data, query) {
       return data.type.indexOf(query) > -1;
     },
     resourceRender(item) {
-      return item.type + ' - ' + item.name;
+      return item.type + " - " + item.name;
     },
     getAllModules(state) {
       //这里重写以下获取module
@@ -1412,7 +1633,6 @@ export default {
               this.allRecords = [];
               this.showDetail(this.order);
             }
-
           } else if (res.data == "None") {
             this.moduleList = [];
           }
@@ -1420,10 +1640,11 @@ export default {
         .catch(err => {});
     },
     addModule(name) {
-      this.$refs[name].validate((valid) => {
+      this.$refs[name].validate(valid => {
         if (valid) {
-
-          if (this.$store.getters.userInfo.userId == this.subProjectInfo.managerId) {
+          if (
+            this.$store.getters.userInfo.userId == this.subProjectInfo.managerId
+          ) {
             let Module = {};
             Module["activeStatus"] = true;
             Module["subProjectId"] = this.$route.params.id;
@@ -1452,10 +1673,9 @@ export default {
                   // 使其他module为非激活状态
                   if (this1.moduleList.length > 0) {
                     let moduleId = "";
-                    if(this1.currentModule.activeStatus) {
+                    if (this1.currentModule.activeStatus) {
                       moduleId = this1.currentModule.moduleId;
-                    }
-                    else {
+                    } else {
                       let index = this1.getActiveModule();
                       moduleId = this1.moduleList[index].moduleId;
                     }
@@ -1467,15 +1687,13 @@ export default {
                       .then(res => {
                         this2.getAllModules("update");
 
-                        let socketMsg = {type:"module",operate:"update"};
+                        let socketMsg = { type: "module", operate: "update" };
                         this2.subprojectSocket.send(JSON.stringify(socketMsg));
                       })
                       .catch(err => {
                         console.log(err.data);
                       });
-
-                  }
-                  else {
+                  } else {
                     this1.getAllModules("update");
                   }
 
@@ -1491,11 +1709,10 @@ export default {
                 console.log(err.data);
               });
           }
-
         } else {
-          this.$Message.error('Please enter the necessary information!');
+          this.$Message.error("Please enter the necessary information!");
         }
-      })
+      });
     },
     activateModule() {
       var this1 = this;
@@ -1503,7 +1720,6 @@ export default {
       if (
         this.$store.getters.userInfo.userId == this.subProjectInfo.managerId
       ) {
-
         if (!this.currentModule.activeStatus) {
           let updateObject = new URLSearchParams();
           updateObject.append("moduleId", this.currentModule.moduleId);
@@ -1511,7 +1727,6 @@ export default {
           this.axios
             .post("/GeoProblemSolving/module/update", updateObject)
             .then(res => {
-
               let activeModelIndex = this1.getActiveModule();
               if (this1.moduleList[activeModelIndex].activeStatus) {
                 let updateObject = new URLSearchParams();
@@ -1541,7 +1756,9 @@ export default {
     },
     delModule() {
       let that = this;
-      if ( this.$store.getters.userInfo.userId == this.subProjectInfo.managerId ) {
+      if (
+        this.$store.getters.userInfo.userId == this.subProjectInfo.managerId
+      ) {
         // let foreModuleId = this.currentModule.foreModuleId;
         // let nextModuleId = this.currentModule.nextModuleId;
         this.axios
@@ -1573,9 +1790,11 @@ export default {
       }
     },
     updateModule(name) {
-      this.$refs[name].validate((valid) => {
+      this.$refs[name].validate(valid => {
         if (valid) {
-          if ( this.$store.getters.userInfo.userId == this.subProjectInfo.managerId ) {
+          if (
+            this.$store.getters.userInfo.userId == this.subProjectInfo.managerId
+          ) {
             var that = this;
             let updateObject = new URLSearchParams();
             updateObject.append("moduleId", this.currentModule.moduleId);
@@ -1588,7 +1807,7 @@ export default {
               .then(res => {
                 that.getAllModules("init");
 
-                let socketMsg = {type:"module",operate:"update"};
+                let socketMsg = { type: "module", operate: "update" };
                 that.subprojectSocket.send(JSON.stringify(socketMsg));
               })
               .catch(err => {
@@ -1596,24 +1815,25 @@ export default {
               });
           }
         } else {
-          this.$Message.error('Please enter the necessary information !');
+          this.$Message.error("Please enter the necessary information !");
         }
-      })
+      });
     },
     copyResource(newModuleId) {
-      for(let i = 0;i < this.selectResource.length; i++) {
-        for(let j = 0; j <this.resourceList.length; j++) {
-          if(this.resourceList[j].resourceId == this.selectResource[i].resourceId) {
-
+      for (let i = 0; i < this.selectResource.length; i++) {
+        for (let j = 0; j < this.resourceList.length; j++) {
+          if (
+            this.resourceList[j].resourceId == this.selectResource[i].resourceId
+          ) {
             let resourceInfo = this.resourceList[j];
             let shareForm = new FormData();
-            shareForm.append("name",resourceInfo.name);
-            shareForm.append("description",resourceInfo.description);
-            shareForm.append("belong",resourceInfo.belong);
-            shareForm.append("type",resourceInfo.type);
-            shareForm.append("fileSize",resourceInfo.fileSize);
-            shareForm.append("pathURL",resourceInfo.pathURL);
-            shareForm.append("uploaderId",resourceInfo.uploaderId);
+            shareForm.append("name", resourceInfo.name);
+            shareForm.append("description", resourceInfo.description);
+            shareForm.append("belong", resourceInfo.belong);
+            shareForm.append("type", resourceInfo.type);
+            shareForm.append("fileSize", resourceInfo.fileSize);
+            shareForm.append("pathURL", resourceInfo.pathURL);
+            shareForm.append("uploaderId", resourceInfo.uploaderId);
             let scopeObject = {
               projectId: resourceInfo.scope.projectId,
               subProjectId: resourceInfo.scope.subProjectId,
@@ -1621,17 +1841,21 @@ export default {
             };
             shareForm.append("scope", JSON.stringify(scopeObject));
 
-            if(newModuleId != null && newModuleId != undefined && newModuleId.length > 0) {
+            if (
+              newModuleId != null &&
+              newModuleId != undefined &&
+              newModuleId.length > 0
+            ) {
               this.axios
-              .post("/GeoProblemSolving/resource/share", shareForm)
-              .then(res => {
-                if (res.data != "Fail") {
-                  //...
-                }
-              })
-              .catch(err => {
-                console.log(err);
-              });
+                .post("/GeoProblemSolving/resource/share", shareForm)
+                .then(res => {
+                  if (res.data != "Fail") {
+                    //...
+                  }
+                })
+                .catch(err => {
+                  console.log(err);
+                });
             }
             break;
           }
@@ -1665,7 +1889,7 @@ export default {
       this.file = event.target.files[0];
     },
     submitFile(name) {
-      this.$refs[name].validate((valid) => {
+      this.$refs[name].validate(valid => {
         if (valid) {
           let formData = new FormData();
           formData.append("file", this.file);
@@ -1677,14 +1901,18 @@ export default {
           // 添加字段属于那个项目
           formData.append("belong", this.currentModule.title);
 
-          if(sessionStorage.getItem("projectId") == "" || sessionStorage.getItem("projectId") == undefined || sessionStorage.getItem("projectId") == null) {
+          if (
+            sessionStorage.getItem("projectId") == "" ||
+            sessionStorage.getItem("projectId") == undefined ||
+            sessionStorage.getItem("projectId") == null
+          ) {
             this.getProjectInfo();
           }
           this.sleep(1000).then(() => {
             let scopeObject = {
               projectId: sessionStorage.getItem("projectId"),
               subprojectId: sessionStorage.getItem("subProjectId"),
-              moduleId: this.currentModule.moduleId,
+              moduleId: this.currentModule.moduleId
             };
             formData.append("scope", JSON.stringify(scopeObject));
             //这里还要添加其他的字段
@@ -1705,8 +1933,12 @@ export default {
                   let record = {
                     who: that.$store.getters.userName,
                     whoid: that.$store.getters.userId,
-                    type:"resource",
-                    content:"upload a/an "+ that.formValidate3.fileType + " : " + that.file.name,
+                    type: "resource",
+                    content:
+                      "upload a/an " +
+                      that.formValidate3.fileType +
+                      " : " +
+                      that.file.name,
                     moduleId: this.currentModule.moduleId,
                     time: new Date().toLocaleString(),
                     file: res.data[0].fileName
@@ -1717,15 +1949,14 @@ export default {
                 // console.log(res.data);
               })
               .catch(err => {});
-            })
+          });
         } else {
-          this.$Message.error('Please enter the resource type!');
+          this.$Message.error("Please enter the resource type!");
         }
-      })
-
+      });
     },
-    sleep (time) {
-      return new Promise((resolve) => setTimeout(resolve, time));
+    sleep(time) {
+      return new Promise(resolve => setTimeout(resolve, time));
     },
     //获取全部资源的方法
     getAllResource() {
@@ -1862,67 +2093,101 @@ export default {
     // jspanel工具
     toolPanel(type) {
       var toolURL = "";
+      let toolName = "";
+
       if (type == "map") {
         toolURL =
           '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/map" style="width: 100%;height:100%"></iframe>';
-      } else if (type == "chatroom") {
-        toolURL =
-          '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/chat" style="width: 100%;height:100%"></iframe>';
+        toolName = "Map";
       } else if (type == "draw") {
         toolURL =
           '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/draw" style="width: 100%;height:100%"></iframe>';
+        toolName = "Drawing";
       } else if (type == "chart") {
         toolURL =
           '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/charts" style="width: 100%;height:100%"></iframe>';
+        toolName = "Chart";
       } else if (type == "chat") {
         toolURL =
           '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/chat" style="width: 100%;height:100%"></iframe>';
+        toolName = "Chatroom";
       } else if (type == "graphEditor") {
         toolURL =
           '<iframe src="/GeoProblemSolving/Collaborative/GraphEditor/index.html' +
           "?groupID=" +
           this.currentModule.moduleId +
           '" style="width: 100%;height:100%"></iframe>';
+        toolName = "Sketchpad";
       } else if (type == "3DmodelViewer") {
         toolURL =
           '<iframe src="/GeoProblemSolving/Collaborative/3DmodelViewer/index.html' +
           "?groupID=" +
           this.currentModule.moduleId +
           '" style="width: 100%;height:100%"></iframe>';
+        toolName = "3D model viewer";
       } else if (type == "LogicalModel") {
         toolURL =
           '<iframe src="/GeoProblemSolving/Collaborative/LogicalModel/index.html' +
           "?groupID=" +
           this.currentModule.moduleId +
           '" style="width: 100%;height:100%"></iframe>';
+        toolName = "Logical modeling";
       } else if (type == "ConceptualModel") {
         toolURL =
           '<iframe src="/GeoProblemSolving/Collaborative/ConceptualModel/index.html' +
           "?groupID=" +
           this.currentModule.moduleId +
           '" style="width: 100%;height:100%"></iframe>';
-      } else if (type == "ComputionalModel") {
+        toolName = "Conceptual modeling";
+      } else if (type == "ComputationalModel") {
         toolURL =
           '<iframe src="/GeoProblemSolving/Collaborative/ComputationalModel/index.html' +
           "?groupID=" +
           this.currentModule.moduleId +
           '" style="width: 100%;height:100%"></iframe>';
+        toolName = "Computational modeling";
       } else if (type == "tableEditor") {
         toolURL =
-          '<iframe src="/GeoProblemSolving/Collaborative/jexcelTool/index.html' +
+          '<iframe src="/GeoProblemSolving/Collaborative/jexcelTool/excelTool.html' +
           "?groupID=" +
           this.currentModule.moduleId +
           '" style="width: 100%;height:100%"></iframe>';
+        toolName = "Table editor";
+      } else if (type == "nc-map") {
+        toolURL =
+          '<iframe src="http://localhost:8080/nc/map" style="width: 100%;height:100%"></iframe>';
+        toolName = "Map";
+      } else if (type == "nc-draw") {
+        toolURL =
+          '<iframe src="http://localhost:8080/nc/draw" style="width: 100%;height:100%"></iframe>';
+        toolName = "Drawing";
+      } else if (type == "nc-chart") {
+        toolURL =
+          '<iframe src="http://localhost:8080/nc/charts" style="width: 100%;height:100%"></iframe>';
+        toolName = "Chart";
+      } else if (type == "cn-tableEditor") {
+        toolURL =
+          '<iframe src="/GeoProblemSolving/Collaborative/jexcelTool/excelToolSingle.html' +
+          '" style="width: 100%;height:100%"></iframe>';
+        toolName = "Table editor";
+      } else if (type == "nc-3DmodelViewer") {
+        toolURL =
+          '<iframe src="/GeoProblemSolving/Collaborative/3DmodelViewer/indexSingle.html' +
+          '" style="width: 100%;height:100%"></iframe>';
+        toolName = "3D model viewer";
+      } else if (type == "nc-video") {
+        toolURL =
+          '<iframe src="http://localhost:8080/video" style="width: 100%;height:100%"></iframe>';
+        toolName = "Video player";
+      } else if (type == "nc-pdf") {
+        toolURL =
+          '<iframe src="http://localhost:8080/pdfview" style="width: 100%;height:100%"></iframe>';
+        toolName = "Pdf viewer";
       }
-      // tableEditor
-      // 3d
-      // computational
-      // conceptual
-      // logical
 
       var panel = jsPanel.create({
         theme: "primary",
-        headerTitle: "Tools",
+        headerTitle: toolName,
         contentSize: "1000 600",
         content: toolURL,
         disableOnMaximized: true,
@@ -1932,21 +2197,92 @@ export default {
       });
       panel.resizeit("disable");
       $(".jsPanel-content").css("font-size", "0");
-
-      // 生成records
-
-      // 同步
+      // 生成records, 同步
       let record = {
         who: this.$store.getters.userName,
         whoid: this.$store.getters.userId,
-        type:"tools",
+        type: "tools",
         toolType: type,
-        content:"is using a tool: " + type,
+        content: "is using a tool: " + type,
         moduleId: this.currentModule.moduleId,
         time: new Date().toLocaleString()
       };
       this.subprojectSocket.send(JSON.stringify(record));
       // this.allRecords.push(record);
+    },
+    createNotice(){
+      let noticeForm ={};
+      noticeForm["title"] = this.formItem.title;
+      noticeForm["description"] = this.formItem.content;
+      noticeForm["moduleId"] = this.currentModule.moduleId;
+      this.axios
+      .post("/GeoProblemSolving/bulletin/save",noticeForm)
+      .then(res=> {
+        if(res.data!="Fail"){
+          this.$Notice.success({
+            title: "Create notice result",
+            desc: "The notice has been created successfully!"
+          });
+          this.inquiryNotice();
+
+        }
+      })
+      .catch(err=> {
+        console.log(err.data);
+      })
+    },
+    inquiryNotice(){
+      this.axios.get("/GeoProblemSolving/bulletin/inquiry?key=moduleId&value=" + window.sessionStorage.getItem("moduleId"))
+      .then(res=> {
+        if(res.data!="Fail"){
+          this.currentModuleNoticeList = res.data;
+          console.table(this.currentModuleNoticeList.length);
+        }
+      })
+      .catch(err=>{
+      })
+    },
+    editNotice(){
+      let updateForm = new URLSearchParams();
+      updateForm.append("bulletinId",this.currentNoticeDetail["bulletinId"]);
+      updateForm.append("title",this.editFormItem["title"]);
+      updateForm.append("description",this.editFormItem["description"]);
+      this.axios.post("/GeoProblemSolving/bulletin/update", updateForm)
+      .then(res=> {
+        if(res.data!="Fail"){
+          this.$Notice.info({
+            title:"update result",
+            desc:"update announcement successfully!"
+          });
+          this.inquiryNotice();
+        }
+      })
+      .catch(err=> {
+      })
+    },
+    deleteNotice(){
+      var index = this.currentModuleNoticeList.length-1;
+      let bulletinId = this.currentModuleNoticeList[index]["bulletinId"]
+      this.axios.get("/GeoProblemSolving/bulletin/delete"+"?bulletinId=" + bulletinId)
+      .then(res=> {
+        if(res.data!="Fail"){
+          this.$Notice.info({
+            title:"delete result",
+            desc:"delete announcement successfully!"
+          });
+          this.inquiryNotice();
+        }
+      })
+      .catch(err=> {
+      })
+    },
+    noticeDetailShow(){
+      this.noticeDetailShowModal = true;
+      let index = this.currentModuleNoticeList.length-1;
+      this.currentNoticeDetail = this.currentModuleNoticeList[index];
+      this.editFormItem.title = this.currentNoticeDetail.title;
+      this.editFormItem.description = this.currentNoticeDetail.description;
+      // this.currentModuleNoticeList[index];显示在模态框里面的内容
     }
   }
 };

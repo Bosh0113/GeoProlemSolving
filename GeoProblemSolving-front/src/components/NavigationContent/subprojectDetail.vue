@@ -243,7 +243,7 @@
                   <Button
                     style="vertical-align:middle"
                     v-show="giveDeleteProperty(index)"
-                    @click="removeMember(member.userId)"
+                    @click="removeMember(member.userId,member.userName)"
                   >
                     <Icon type="md-log-out" :size="20"/>
                   </Button>
@@ -325,8 +325,8 @@
         </Col>
       </div>
       <template v-else-if="order == 1">
-        <Col span="22" offset="1" style="margin-top:20px" :style="{height:sidebarHeight+4+'px'}">
-          <div style="padding: 5px 0;background-color:white" :style="{height:sidebarHeight-6+'px'}">
+        <Col span="22" offset="1" style="margin-top:20px;height:600px">
+          <div style="padding: 5px 0;background-color:white;height:100%">
             <Row type="flex" justify="center">
               <Col span="7">
                 <Card :padding="0" :border="false">
@@ -1104,8 +1104,6 @@ export default {
             } else if (data == "Fail") {
               this.$Message.error("Fail!");
             } else {
-              // 告诉拉进去的人已经进项目
-              // 把通知存库里
               //reply to applicant
               let replyNotice = {};
               // 改apply.content.userId
@@ -1117,7 +1115,7 @@ export default {
                 description:
                   "You have been invited by " +
                   this.subProjectInfo.managerName +
-                  " to join in the sub project: " +
+                  " to join in the sub project:" +
                   this.subProjectInfo.title +
                   " , and now you are a member in this sub project."
               };
@@ -1133,8 +1131,6 @@ export default {
                 .catch(err => {
                   this.$Message.danger("reply fail.");
                 });
-              // this.$emit("sendNotice", this.subProjectInfo.managerId);
-              //发给子项目的管理者
             }
           }
         });
@@ -1396,7 +1392,7 @@ export default {
         return false;
       }
     },
-    removeMember(uid) {
+    removeMember(uid,uname) {
       // 获取到userId
       console.table(uid);
       this.axios
@@ -1409,11 +1405,7 @@ export default {
         )
         .then(res => {
           if (res.data == "Success") {
-            let projectId = sessionStorage.getItem("projectId");
-            this.$router.push({
-              name: "ProjectDetail",
-              params: { id: projectId }
-            });
+            this.$Message.info("Delete member successfully");
           } else {
             this.$Message.error("Fail!");
           }
@@ -1421,6 +1413,28 @@ export default {
         .catch(err => {
           console.log(err.data);
         });
+        let projectId = sessionStorage.getItem("projectId");
+        let projectName = sessionStorage.getItem("projectName");
+            let removeNotice = {};
+            removeNotice["recipientId"] = uid;
+            removeNotice["type"] = "notice";
+            removeNotice["content"] = {
+              title: "remove notification",
+              description:
+                "You have been expeled from sub project called " +
+                this.subProjectInfo.title + ", which belongs to project "
+                +  projectName + ".",
+            };
+            this.axios
+            .post("/GeoProblemSolving/notice/save", removeNotice)
+            .then(res => {
+              if(res.data=="Success"){
+                this.$emit("sendNotice", uid);
+              }
+            })
+            .catch(err => {
+              console.log("申请失败的原因是：" + err.data);
+            });
     }
   }
 };
