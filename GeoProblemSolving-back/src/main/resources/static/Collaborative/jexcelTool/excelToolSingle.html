@@ -151,10 +151,7 @@
             headers: [],
             xValue: [],
             yValue: "",
-            activeTab: "tablePanel",
-            // 表格的socket工具
-            excelSocket: null,
-            boolCollaborate: false
+            activeTab: "tablePanel"
         },
         computed: {
             transferHeaders() {
@@ -179,20 +176,8 @@
                 $("#tablePanel").jexcel({
                     data: emptyExcel,
                     tableOverflow: false,
-                    minDimensions: [20, 20],
-                    onchange: this.handler,
-                    oninsertrow: this.insertrow,
-                    oninsertcolumn: this.insertcol,
-                    ondeleterow: this.deleterow,
-                    ondeletecolumn: this.deletecol,
-                    onsort: this.tableSort,
-                    onmoverow: this.rowMove
+                    minDimensions: [20, 20]
                 });
-                if (WebSocket) {
-                    this.openExcelSocket();
-                } else {
-                    alert("不支持");
-                }
             },
             // 下载文件
             download() {
@@ -225,14 +210,6 @@
                 this.yValue = "";
                 this.outputHas = false;
                 this.activeTab = "tablePanel";
-
-                if (!this.boolCollaborate) {
-                    var socket_content = {
-                        type: "clear"
-                    };
-                    this.excelSocket.send(JSON.stringify(socket_content));
-                }
-                this.boolCollaborate = false;
             },
             beforeUpload(file){
                 if (!/\.(xls|xlsx|csv)$/.test(file.name.toLowerCase())) {
@@ -254,8 +231,7 @@
                     moduleId: sessionStorage.getItem("moduleId")
                 };
                 formData.append("scope", JSON.stringify(scopeObject));
-
-                var _this = this;
+                var inThis = this;
                 $.ajax({
                     type: "POST",
                     url: "/GeoProblemSolving/resource/upload",
@@ -268,14 +244,7 @@
 
                             // this.$refs.upload.clearFiles();
                             var dataName = data[0].fileName;
-                            _this.uploadData(dataName);
-
-                            var socket_content = {
-                                type: "upload",
-                                fileName: dataName
-                            };
-                            _this.excelSocket.send(JSON.stringify(socket_content));
-
+                            inThis.uploadData(dataName);
                         }
                     },
                     error: function () {
@@ -283,49 +252,6 @@
                     }
                 });
                 return false;
-            },
-            closeModuleSocket() {
-                if (this.moduleSocket != null) {
-                    this.moduleSocket.close();
-                }
-            },
-            openExcelSocket() {
-                var moduleId = sessionStorage.getItem("moduleId");
-                // var moduleSocketURL = "ws://localhost:8081/GeoProblemSolving/ExcelTool/" + moduleId;
-                var moduleSocketURL = "ws://172.21.212.7:8082/GeoProblemSolving/ExcelTool/" + moduleId;
-                this.excelSocket = new WebSocket(moduleSocketURL);
-                this.excelSocket.onopen = this.onOpen;
-                this.excelSocket.onmessage = this.onMessage;
-                this.excelSocket.onclose = this.onClose;
-                this.excelSocket.onerror = this.onError;
-            },
-            onOpen() {
-                console.log("ModuleSocket连接成功！");
-                this.setTimer();
-            },
-            onMessage(e) {
-                var messageJson = JSON.parse(e.data);
-                this.getSocketContent(messageJson);
-            },
-            onClose(e) {
-                this.removeTimer();
-                console.log("ModuleSocket连接断开！");
-            },
-            onError(e) {
-                this.removeTimer();
-                console.log("ModuleSocket连接错误！");
-            },
-            setTimer() {
-                var _this = this;
-                this.timer = setInterval(function () {
-                    var messageJson = {};
-                    messageJson["type"] = "ping";
-                    messageJson["message"] = "ping";
-                    _this.excelSocket.send(JSON.stringify(messageJson));
-                }, 20000);
-            },
-            removeTimer() {
-                clearInterval(this.timer);
             },
             uploadData(name){
                 var inThis = this;
@@ -339,13 +265,6 @@
                         colWidths: [100, 100, 100, 100],
                         tableOverflow: false,
                         minDimensions: [20, 20],
-                        onchange: inThis.handler,
-                        oninsertrow: inThis.insertrow,
-                        oninsertcolumn: inThis.insertcol,
-                        ondeleterow: inThis.deleterow,
-                        ondeletecolumn: inThis.deletecol,
-                        onsort: inThis.tableSort,
-                        onmoverow: inThis.rowMove,
                         onload() {
                             inThis.headers = inThis.computeHeaders();
                             inThis.$notify({
@@ -396,13 +315,6 @@
                                         tableOverflow: false,
                                         csvHeaders: true,
                                         minDimensions: [20, 20],
-                                        onchange: inThis.handler,
-                                        oninsertrow: inThis.insertrow,
-                                        oninsertcolumn: inThis.insertcol,
-                                        ondeleterow: inThis.deleterow,
-                                        ondeletecolumn: inThis.deletecol,
-                                        onsort: inThis.tableSort,
-                                        onmoverow: inThis.rowMove,
                                         onload() {
                                             inThis.headers = inThis.computeHeaders();
                                             inThis.$notify({
@@ -421,127 +333,6 @@
                     };
                     xhr.send();
                 }
-            },
-            insertrow(obj, mixed, rowNumber){
-                if (!this.boolCollaborate) {
-                    var socket_content = {
-                        type: "insert_row",
-                        row: rowNumber,
-                        mixed: mixed
-                    };
-                    this.excelSocket.send(JSON.stringify(socket_content));
-                }
-                this.boolCollaborate = false;
-            },
-            insertcol(obj, mixed, properties, columnNumber){
-                if (!this.boolCollaborate) {
-                    var socket_content = {
-                        type: "insert_col",
-                        column: columnNumber,
-                        mixed: mixed,
-                        properties: properties
-                    };
-                    this.excelSocket.send(JSON.stringify(socket_content));
-                }
-                this.boolCollaborate = false;
-            },
-            handler(obj, cell, val) {
-                if (!this.boolCollaborate) {
-                    var socket_content = {};
-                    socket_content["type"] = "value_change";
-                    socket_content["cell"] = $(cell).prop('id');
-                    socket_content["value"] = val;
-                    console.log(socket_content);
-                    this.excelSocket.send(JSON.stringify(socket_content));
-                }
-                this.boolCollaborate = false;
-            },
-            deleterow(obj, row, num, rcd) {
-                if (!this.boolCollaborate) {
-                    var socket_content = {
-                        type: "delete_row",
-                        row: row,
-                        NumofRow: num
-                    };
-                    this.excelSocket.send(JSON.stringify(socket_content));
-                }
-                this.boolCollaborate = false;
-            },
-            deletecol(obj, col, num, rcd) {
-                if (!this.boolCollaborate) {
-                    var socket_content = {
-                        type: "delete_column",
-                        column: col,
-                        NumofCol: num
-                    };
-                    this.excelSocket.send(JSON.stringify(socket_content));
-                }
-                this.boolCollaborate = false;
-            },
-            rowMove(obj, movefrom, moveto) {
-                if (!this.boolCollaborate) {
-                    var socket_content = {
-                        type: "row_move",
-                        moveFrom: movefrom,
-                        moveTo: moveto
-                    };
-                    this.excelSocket.send(JSON.stringify(socket_content));
-                }
-                this.boolCollaborate = false;
-            },
-            tableSort(obj, col, order) {
-                if (!this.boolCollaborate) {
-                    var socket_content = {
-                        type: "sort",
-                        column: col,
-                        order: order
-                    };
-                    this.excelSocket.send(JSON.stringify(socket_content));
-                }
-                this.boolCollaborate = false;
-            },
-            getSocketContent(data){
-                this.boolCollaborate = true;
-                switch (data.type) {
-                    case "upload" : {
-                        this.uploadData(data.fileName);
-                        break;
-                    }
-                    case "insert_row" : {
-                        $('#tablePanel').jexcel('insertRow', data.mixed, data.row);
-                        break;
-                    }
-                    case "insert_col" : {
-                        $('#tablePanel').jexcel('insertColumn', data.mixed, data.properties, data.column);
-                        break;
-                    }
-                    case "value_change" : {
-                        $('#tablePanel').jexcel('setValue', data.cell, data.value);
-                        break;
-                    }
-                    case "delete_row" : {
-                        $('#tablePanel').jexcel('deleteRow', data.row, data.NumofRow);
-                        break;
-                    }
-                    case "delete_column" : {
-                        $('#tablePanel').jexcel('deleteColumn', data.column, data.NumofCol);
-                        break;
-                    }
-                    case "row_move" : {
-                        $('#tablePanel').jexcel('moveRow', data.moveFrom, data.moveTo);
-                        break;
-                    }
-                    case "sort" : {
-                        $('#tablePanel').jexcel('orderBy', data.column, data.order);
-                        break;
-                    }
-                    case "clear":{
-                        this.destroy();
-                        break;
-                    }
-                }
-
-                this.boolCollaborate = false;
             }
 
         },

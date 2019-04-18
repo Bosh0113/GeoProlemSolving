@@ -329,19 +329,6 @@
               :style="{height:sidebarHeight/3*1+'px'}"
               style="margin-bottom:20px"
             >
-              <!-- <Col span="16">
-              <div style="height:100%;background-color:white;margin-left:30px">
-              <Card tyle="height:100%">
-                <h2 slot="title">{{this.currentModule.title}}</h2>
-                <div style="width:100%;padding:10px">
-                  <span
-                    style="word-break: break-all;text-indent:2em;padding:10px"
-                  >{{this.currentModule.description}}</span>
-                </div>
-              </Card>
-            </div>
-              </Col>-->
-
               <Col span="16">
                 <div style="height:100%;margin-left:30px">
                   <Card :style="{height:sidebarHeight/3*1 +'px'}">
@@ -700,8 +687,8 @@
                           type="md-bonfire"
                           size="60"
                           @click.native="toolPanel('ConceptualModel')"
-                          title="Conceptual Model"
-                          color="gray"
+                          title="Conceptual Modeling"
+                          color="#f90"
                         />
                       </div>
                       <div class="singl_tool_style">
@@ -709,8 +696,8 @@
                           type="md-git-commit"
                           size="60"
                           @click.native="toolPanel('LogicalModel')"
-                          title="Logical Model"
-                          color="gray"
+                          title="Logical Modeling"
+                          color="#19be6b"
                         />
                       </div>
                       <div class="singl_tool_style">
@@ -1412,7 +1399,8 @@ export default {
       // module 更新
       else if (messageJson.type == "module") {
         this.getAllModules("init");
-      } else if (messageJson.type == "members") {
+      } 
+      else if (messageJson.type == "members") {
         // 比较 判断人员动态 更新records
 
         let members = messageJson.message
@@ -2098,7 +2086,8 @@ export default {
       if (type == "map") {
         toolURL =
           '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/map" style="width: 100%;height:100%"></iframe>';
-        toolName = "Map";
+        toolName = "Map";  
+
       } else if (type == "draw") {
         toolURL =
           '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/draw" style="width: 100%;height:100%"></iframe>';
@@ -2118,6 +2107,7 @@ export default {
           this.currentModule.moduleId +
           '" style="width: 100%;height:100%"></iframe>';
         toolName = "Sketchpad";
+
       } else if (type == "3DmodelViewer") {
         toolURL =
           '<iframe src="/GeoProblemSolving/Collaborative/3DmodelViewer/index.html' +
@@ -2125,6 +2115,7 @@ export default {
           this.currentModule.moduleId +
           '" style="width: 100%;height:100%"></iframe>';
         toolName = "3D model viewer";
+
       } else if (type == "LogicalModel") {
         toolURL =
           '<iframe src="/GeoProblemSolving/Collaborative/LogicalModel/index.html' +
@@ -2132,6 +2123,7 @@ export default {
           this.currentModule.moduleId +
           '" style="width: 100%;height:100%"></iframe>';
         toolName = "Logical modeling";
+
       } else if (type == "ConceptualModel") {
         toolURL =
           '<iframe src="/GeoProblemSolving/Collaborative/ConceptualModel/index.html' +
@@ -2167,12 +2159,13 @@ export default {
         toolName = "Chart";
       } else if (type == "cn-tableEditor") {
         toolURL =
-          '<iframe src="/GeoProblemSolving/Collaborative/jexcelTool/excelToolSingle.html' +
+          '<iframe src="/GeoProblemSolving/Collaborative/jexcelTool/excelToolSingle.html' +          
           '" style="width: 100%;height:100%"></iframe>';
-        toolName = "Table editor";
+          toolName = "Table editor"; 
+
       } else if (type == "nc-3DmodelViewer") {
         toolURL =
-          '<iframe src="/GeoProblemSolving/Collaborative/3DmodelViewer/indexSingle.html' +
+          '<iframe src="/GeoProblemSolving/Collaborative/3DmodelViewer/indexSingle.html' +          
           '" style="width: 100%;height:100%"></iframe>';
         toolName = "3D model viewer";
       } else if (type == "nc-video") {

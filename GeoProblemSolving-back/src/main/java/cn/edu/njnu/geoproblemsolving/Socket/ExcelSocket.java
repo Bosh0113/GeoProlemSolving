@@ -37,7 +37,11 @@ public class ExcelSocket {
     @OnMessage
     public void onMessage(@PathParam("roomId") String roomId, String message)
     {
-        broadcastMessageToRoom(roomId, message);
+        JSONObject messageObject = JSONObject.parseObject(message);
+        String messageType = messageObject.getString("type");
+        if (!messageType.equals("ping")) {
+            broadcastMessageToRoom(roomId, message);
+        }
     }
     @OnClose
     public void onClose(@PathParam("roomId") String roomId)

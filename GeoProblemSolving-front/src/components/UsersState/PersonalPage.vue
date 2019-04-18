@@ -369,7 +369,7 @@
           <h3>Participatory Projects</h3>
           <!-- 多选框 -->
           <RadioGroup v-model="selectShareProject">
-          <span @click="selectPID(item.projectId)" v-for="(item,index) in joinedProjectsNameList" >
+          <span @click="selectPID(item.projectId, item.title)" v-for="(item,index) in joinedProjectsNameList" v-bind:key="index">
            <Radio :key="item.index" :label="item.title" ></Radio>
           </span>
         </RadioGroup>
@@ -378,7 +378,7 @@
         <div>
           <h3>Management Projects</h3>
           <RadioGroup v-model="selectShareProject">
-            <span @click="selectPID(item.projectId)" v-for="(item,index) in userManagerProjectList">
+            <span @click="selectPID(item.projectId, item.title)" v-for="(item,index) in userManagerProjectList" v-bind:key="index">
               <Radio :key="item.index" :label="item.title"></Radio>
             </span>
           </RadioGroup>
@@ -528,8 +528,9 @@ export default {
       // 选中资源的索引
       selectResourceIndex:"",
       // 选中的将要分享资源的项目名
-      selectShareProject: "",
-      selectShareProjectId: ""
+      selectShareProject:"",
+      selectShareProjectId:"",
+      selectShareProjectName:""
     };
   },
   methods: {
@@ -887,22 +888,19 @@ export default {
       shareForm.append("scope", JSON.stringify(scopeObject));
       if (scopeObject.projectId != "") {
         this.axios
-          .post("/GeoProblemSolving/resource/share", shareForm)
-          .then(res => {
-            if (res.data != "Fail") {
-              this.$Notice.open({
-                title: "Upload notification title",
-                desc:
-                  "File shared to " +
-                  this.selectShareProject +
-                  " successfully.",
-                duration: 2
-              });
-              // 保存记录
-              // addUploadEvent( this.selectShareProjectId);
-            }
-          })
-          .catch(err => {});
+        .post("/GeoProblemSolving/resource/share", shareForm)
+        .then(res => {
+          if (res.data != "Fail") {
+            this.$Notice.open({
+              title: "Upload notification title",
+              desc: "File shared to " + this.selectShareProject + " successfully.",
+              duration: 2
+            });
+            // 保存记录
+            this.addUploadEvent( this.selectShareProjectId);
+          }
+        })
+        .catch(err => {});
       }
       // uploaderId
     },
@@ -915,7 +913,7 @@ export default {
         this.fileType +
         " file to " +
         " project called " +
-        this.currentProjectDetail.title; //这里是拿不到东西的，用的时候注意改一下
+        this.selectShareProjectName;
       form["description"] = description;
       form["scopeId"] = scopeId;
       form["eventType"] = "project";
@@ -933,8 +931,9 @@ export default {
       this.processResourceModal = true;
       this.selectResourceIndex = index;
     },
-    selectPID(id) {
+    selectPID(id, name){
       this.selectShareProjectId = id;
+      this.selectShareProjectName = name;
     }
   }
 };
