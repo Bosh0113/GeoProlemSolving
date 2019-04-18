@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Component
@@ -111,6 +112,10 @@ public class TaskDaoImpl implements ITaskDao{
             Query query=new Query(Criteria.where("taskId").is(request.getParameter("taskId")));
             CommonMethod method=new CommonMethod();
             Update update=method.setUpdate(request);
+            try{
+                int order = Integer.valueOf(request.getParameter("order"));
+                 update.set("order",order);
+            }catch (Exception ignored){}
             mongoTemplate.updateFirst(query,update,TaskEntity.class);
             return mongoTemplate.findOne(query,TaskEntity.class);
         }catch (Exception e){

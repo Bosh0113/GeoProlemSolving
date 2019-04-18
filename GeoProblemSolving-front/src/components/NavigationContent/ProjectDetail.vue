@@ -560,7 +560,7 @@
             <Input type="textarea" :rows="2" v-model="fileDescription"/>
           </div>
           <br>
-          <input type="file" @change="getFile($event)" style="margin-left:20%">
+          <input type="file" @change="getFile($event)" style="margin-left:20%" multiple="multiple">
         </Modal>
         <br>
       </Col>
@@ -1136,6 +1136,7 @@ export default {
       //创建 formData 对象
       let formData = new FormData();
       // 向 formData 对象中添加文件
+      formData.append("file", this.file);
       formData.append("file", this.file);
       formData.append("description", this.fileDescription);
       formData.append("type", this.fileType);
