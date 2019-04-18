@@ -10,7 +10,7 @@ import javax.annotation.Resource;
 
 @CrossOrigin(origins = "*", allowCredentials = "true")
 @RestController
-@RequestMapping("/history")
+@RequestMapping("/message")
 public class MessageRecordsController {
 
     @Resource
