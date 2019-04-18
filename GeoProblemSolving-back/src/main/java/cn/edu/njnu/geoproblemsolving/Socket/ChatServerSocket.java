@@ -2,8 +2,8 @@ package cn.edu.njnu.geoproblemsolving.Socket;
 
 import cn.edu.njnu.geoproblemsolving.Config.GetHttpSessionConfigurator;
 import cn.edu.njnu.geoproblemsolving.Config.MyEndPointConfigure;
-import cn.edu.njnu.geoproblemsolving.Dao.HistoryEvent.HistoryEventDaoImpl;
-import cn.edu.njnu.geoproblemsolving.Entity.HistoryEventEntity;
+import cn.edu.njnu.geoproblemsolving.Dao.MessageRecords.MessageEventDaoImpl;
+import cn.edu.njnu.geoproblemsolving.Entity.MessageRecordsEntity;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -52,12 +52,11 @@ public class ChatServerSocket {
 
             // 将历史消息进行存储
             try {
-                HistoryEventDaoImpl historyEventDao = new HistoryEventDaoImpl(mongoTemplate);
-                HistoryEventEntity historyEventEntity = new HistoryEventEntity();
-                historyEventEntity.setScopeId(roomId);
-                historyEventEntity.setEventType("message");
-                historyEventEntity.setDescription(message);
-                historyEventDao.saveHistoryEvent(historyEventEntity);
+                MessageEventDaoImpl messageEventDao = new MessageEventDaoImpl(mongoTemplate);
+                MessageRecordsEntity messageEventEntity = new MessageRecordsEntity();
+                messageEventEntity.setRoomId(roomId);
+                messageEventEntity.setContent(message);
+                messageEventDao.saveMessageEvent(messageEventEntity);
             }
             catch (Exception ex) {
                 throw ex;
