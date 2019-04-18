@@ -82,6 +82,14 @@ var userName=userInfo.userName;
             messageObject["messageType"] = "Join";
             messageObject["message"] = userName;
             wsMxgraph.send(JSON.stringify(messageObject));
+            window.setInterval(function(){
+                if(wsMxgraph!=null){
+                    var messageObject={
+                        messageType:"Ping"
+                    };
+                    wsMxgraph.send(JSON.stringify(messageObject));
+                }
+            },20000);
         };
         //接收来自服务器的消息后，触发该方法
         wsMxgraph.onmessage = function (ev) {

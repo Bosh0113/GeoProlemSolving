@@ -220,7 +220,6 @@ export default {
                 list.uploaderName + "(" + list.organization + ")";
             });
             this.$set(this, "specifiedResourceList", specifiedResourceListPre);
-            console.table(this.specifiedResourceList);
           }
         });
     },

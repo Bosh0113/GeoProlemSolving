@@ -65,6 +65,12 @@ public class UserController {
         }
     }
 
+    @RequestMapping(value = "/newPassword", method = RequestMethod.GET)
+    public Object updateNewPassword(@RequestParam("email") String email,@RequestParam("password") String password) {
+        UserDaoImpl userDao = new UserDaoImpl(mongoTemplate);
+        return userDao.updatePassword(email,password);
+    }
+
     @RequestMapping(value = "/login", method = RequestMethod.GET)
     public Object login(@RequestParam("email") String email, @RequestParam("password") String password, HttpServletRequest request) {
         UserDaoImpl userDao = new UserDaoImpl(mongoTemplate);
@@ -116,5 +122,11 @@ public class UserController {
     public Boolean isRegistered(@RequestParam("email") String email){
         UserDaoImpl userDao = new UserDaoImpl(mongoTemplate);
         return userDao.isRegistered(email);
+    }
+
+    @RequestMapping(value = "/updateKey", method = RequestMethod.GET)
+    public String updateKey(){
+        UserDaoImpl userDao = new UserDaoImpl(mongoTemplate);
+        return userDao.updateKey();
     }
 }

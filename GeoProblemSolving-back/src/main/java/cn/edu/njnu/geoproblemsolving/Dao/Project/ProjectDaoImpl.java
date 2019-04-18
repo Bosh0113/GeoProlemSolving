@@ -1,9 +1,12 @@
 package cn.edu.njnu.geoproblemsolving.Dao.Project;
 
+import cn.edu.njnu.geoproblemsolving.Dao.Email.EmailDaoImpl;
 import cn.edu.njnu.geoproblemsolving.Dao.User.UserDaoImpl;
+import cn.edu.njnu.geoproblemsolving.Entity.EmailEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.ProjectEntity;
 import cn.edu.njnu.geoproblemsolving.Dao.Method.CommonMethod;
 import cn.edu.njnu.geoproblemsolving.Dao.Method.EncodeUtil;
+import cn.edu.njnu.geoproblemsolving.Entity.SubProjectEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.UserEntity;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -61,7 +64,12 @@ public class ProjectDaoImpl implements IProjectDao {
         updateUser.set("manageProjects",manageProjects);
         mongoTemplate.updateFirst(query,updateUser,UserEntity.class);
         mongoTemplate.save(project);
-        return project.getProjectId();
+        // encode
+        if (projectId.length() == 36) {
+            String randomID = UUID.randomUUID().toString().substring(0, 2);
+            projectId = EncodeUtil.encode((projectId + randomID).getBytes());
+        }
+        return projectId;
     }
 
     @Override
@@ -222,6 +230,7 @@ public class ProjectDaoImpl implements IProjectDao {
                 updateUser.set("joinedProjects", newJoinedProjects);
                 mongoTemplate.updateFirst(queryUser, updateUser, UserEntity.class);
 
+                quitSubProjectFromProject(projectId,userId);
                 return "Success";
             } else {
                 return "None";
@@ -325,6 +334,25 @@ public class ProjectDaoImpl implements IProjectDao {
     }
 
     @Override
+    public String applyByEmail(EmailEntity emailEntity){
+        try {
+            String userId = emailEntity.getRecipient();
+            Query queryUser = Query.query(Criteria.where("userId").is(userId));
+            UserEntity manager = mongoTemplate.findOne(queryUser,UserEntity.class);
+            emailEntity.setRecipient(manager.getEmail());
+            String EmailContent = emailEntity.getMailContent();
+            EmailContent = EmailContent+"You can click this url and enter the site to process this application: "+
+            "http://172.21.212.7:8082/GeoProblemSolving/home";
+            emailEntity.setMailContent(EmailContent);
+            EmailDaoImpl emailDao=new EmailDaoImpl();
+            emailDao.sendEmail(emailEntity);
+            return "Success";
+        }catch (Exception e){
+            return "Fail";
+        }
+    }
+
+    @Override
     public String uploadPicture(HttpServletRequest request){
         try {
             InetAddress address=InetAddress.getLocalHost();
@@ -381,6 +409,40 @@ public class ProjectDaoImpl implements IProjectDao {
             return pathURL;
         }catch (Exception e){
             return "Fail";
+        }
+    }
+
+    private void quitSubProjectFromProject(String projectId,String userId){
+        Query querySubProjects = Query.query(Criteria.where("projectId").is(projectId));
+        List<SubProjectEntity> subProjectList=mongoTemplate.find(querySubProjects,SubProjectEntity.class);
+        for (SubProjectEntity subProject:subProjectList){
+            Query query = Query.query(Criteria.where("subProjectId").is(subProject.getSubProjectId()));
+            JSONArray members=subProject.getMembers();
+            String managerId = subProject.getManagerId();
+            if (managerId.equals(userId)){
+                if (members.size()>0){
+                    JSONObject firstMember = members.getJSONObject(0);
+                    members.remove(0);
+                    Update update = new Update();
+                    update.set("managerId",firstMember.get("userId"));
+                    update.set("managerName",firstMember.get("userName"));
+                    update.set("members",members);
+                    mongoTemplate.updateFirst(query,update,SubProjectEntity.class);
+                }else {
+                    mongoTemplate.remove(query,SubProjectEntity.class);
+                }
+            }else {
+                for (int i=0;i<members.size();i++){
+                    JSONObject member = members.getJSONObject(i);
+                    if (member.getString("userId").equals(userId)){
+                        members.remove(i);
+                        Update update =new Update();
+                        update.set("members",member);
+                        mongoTemplate.updateFirst(query,update,SubProjectEntity.class);
+                        break;
+                    }
+                }
+            }
         }
     }
 }

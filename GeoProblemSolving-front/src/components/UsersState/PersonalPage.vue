@@ -233,7 +233,7 @@
                       </div>
                       <br>
                       <div style="display:flex;justify-content:center" >
-                        <h2 style="text-align:center;width:50%">Sorry,you don't participate in any projects.</h2>
+                        <h2 style="text-align:center;width:50%">Sorry, you didn't participate in any projects.</h2>
                       </div>
                   </Card>
                   <div
@@ -249,7 +249,7 @@
                           style="height:40x"
                           class="projectsTitle"
                         >{{item.title}}</p>
-                        <Button slot="extra" @click.stop="quitModalShow(item.projectId)">Quit</Button>
+                        <Button slot="extra" @click.stop="quitModalShow(item)">Quit</Button>
                         <p
                           style="height:200px;text-indent:2em;overflow-y:auto;word-break:break-word"
                         >{{item.introduction}}</p>
@@ -271,7 +271,7 @@
                       </div>
                       <br>
                       <div style="display:flex;justify-content:center" >
-                        <h2 style="text-align:center;width:50%">Sorry,until now you don't create any projects.</h2>
+                        <h2 style="text-align:center;width:50%">Sorry, you didn't created any projects.</h2>
                       </div>
                   </Card>
                   <div
@@ -429,8 +429,7 @@ export default {
     },
     userId() {
       return this.$store.getters.userId;
-    },
-
+    }
   },
   components: {
     Avatar
@@ -451,7 +450,6 @@ export default {
         homePage: "",
         avatar: ""
       },
-      errors: {},
       resourceColumn: [
         {
           type: "selection",
@@ -479,40 +477,18 @@ export default {
           align: "center"
         }
       ],
-      userManagerProjectList: [
-        {
-          title: "",
-          description: "",
-          type: "",
-          createTime: "",
-          tag: ""
-        }
-      ],
+      userManagerProjectList: [],
       editProfileModal: false,
       logOutProfileModal: false,
       editProjectModal: false,
       // 项目授权的模态框
       authorizeProjectModal: false,
-      authorizeProjectIndex: "",
-      // 删除项目在项目列表中的索引值
-      // 编辑的项目在项目列表中的索引值
-      editProjectIndex: "",
-      //编辑项目专用的字段
-      editType: "",
-      editTags: "",
-      inputTag: "",
-      editDescription: "",
-      editTitle: "",
-      editIntroduction: "",
-      editPrivacy: "",
-      editProjectId: "",
       //编辑项目专用的字段结束
       item: "",
       projectMemberList: [],
-      selectManager: this.$store.getters.userName,
       selectManagerId: this.$store.getters.userId,
-      //当前项目的id
-      currentProjectId: "",
+      //当前选中项目
+      currentProject: {},
       //当前用户信息的表单
       personalInfoItem: {
         userName: "",
@@ -547,14 +523,13 @@ export default {
       // rightContentWidth:"",
       // 退出项目的modal
       quitModal: false,
-      quitPid: "",
       // 处理资源的模态框激活
-      processResourceModal:false,
+      processResourceModal: false,
       // 选中资源的索引
       selectResourceIndex:"",
       // 选中的将要分享资源的项目名
-      selectShareProject:"",
-      selectShareProjectId:"",
+      selectShareProject: "",
+      selectShareProjectId: ""
     };
   },
   methods: {
@@ -570,7 +545,7 @@ export default {
     },
     //获取用户参与的项目列表
     getParticipatoryList(projectIds) {
-      if(projectIds != null) {
+      if (projectIds != null) {
         var count = projectIds.length;
         let participatoryProjectListTemp = [];
         for (let i = 0; i < projectIds.length; i++) {
@@ -609,25 +584,10 @@ export default {
             this.userId
         )
         .then(res => {
-          this.userManagerProjectList = res.data;
-        })
-        .catch(err => {});
-    },
-    //退出项目的函数
-    quitProject() {
-      this.axios
-        .get(
-          "/GeoProblemSolving/project/quit" +
-            "?projectId=" +
-            this.quitPid +
-            "&userId=" +
-            this.$store.getters.userId
-        )
-        .then(res => {
-          if (res.data === "Success") {
-            this.$Message.success("Quit Success");
-            this.getProjectList();
-          } else if (res.data === "Fail") {
+          if (res.data != "None" && res.data != "Fail") {
+            this.userManagerProjectList = res.data;
+          } else {
+            this.userManagerProjectList = [];
           }
         })
         .catch(err => {});
@@ -651,57 +611,99 @@ export default {
           console.log(err.data);
         });
     },
+    quitModalShow(project) {
+      this.quitModal = true;
+      this.currentProject = project;
+    },
+    //退出项目的函数
+    quitProject() {
+      let quitProjectId = this.currentProject.projectId;
+      this.axios
+        .get(
+          "/GeoProblemSolving/project/quit" +
+            "?projectId=" +
+            quitProjectId +
+            "&userId=" +
+            this.$store.getters.userId
+        )
+        .then(res => {
+          if (res.data === "Success") {
+            this.$Message.success("Quit Success");
+            this.removeQuitProject(quitProjectId);
+            let notice = {};
+            let recipientId = this.currentProject.managerId;
+            notice["recipientId"] = recipientId;
+            notice["type"] = "notice";
+            notice["content"] = {
+              title: "Manager change",
+              description:
+                "The member called " +
+                this.$store.getters.userName +
+                " had quited from your project " +
+                this.currentProject.title +
+                "!"
+            };
+            this.axios
+              .post("/GeoProblemSolving/notice/save", notice)
+              .then(res => {
+                if (res.data == "Success") {
+                  this.$emit("sendNotice", recipientId);
+                }
+              })
+              .catch(err => {
+                console.log("申请失败的原因是：" + err.data);
+              });
+          } else if (res.data === "Fail") {
+          }
+        })
+        .catch(err => {});
+    },
+    removeQuitProject(projectId) {
+      let oldjoinedProjectsList = this.joinedProjectsList;
+      let newjoinedProjectsList = [];
+      for (var i = 0; i < oldjoinedProjectsList.length; i++) {
+        if (oldjoinedProjectsList[i].projectId != projectId) {
+          newjoinedProjectsList.push(oldjoinedProjectsList[i]);
+        }
+      }
+      this.$set(this, "joinedProjectsList", newjoinedProjectsList);
+    },
     authorizeModalShow(index) {
-      this.currentProjectId = this.userManagerProjectList[index].projectId;
       this.authorizeProjectModal = true;
       this.projectMemberList = this.userManagerProjectList[index].members;
-    },
-    deleteProjectModalShow(pid) {
-      if(confirm("Are you sure to delete this project?")){
-        this.axios
-          .get("/GeoProblemSolving/project/delete?" + "projectId=" + pid)
-          .then(res => {
-            this.$store.commit("getUserInfo");
-            var newManageProjects =[];
-            var oldManageProjects=this.userManagerProjectList;
-            for(var i=0;i<oldManageProjects.length;i++){
-              if(oldManageProjects[i].projectId!=pid){
-                newManageProjects.push(oldManageProjects[i]);
-              }
-            }
-            this.$set(this,"userManagerProjectList",newManageProjects);
-          })
-          .catch(err => {
-            alert(err.data);
-          });
-      }
+      this.currentProject = this.userManagerProjectList[index];
     },
     authorize() {
       this.axios
         .get(
           "/GeoProblemSolving/project/manager?" +
             "projectId=" +
-            this.currentProjectId +
+            this.currentProject.projectId +
             "&newManagerId=" +
             this.selectManagerId
         )
         .then(res => {
-          if(res.data!="Fail"){
+          if (res.data != "Fail") {
+            let projectInfo = res.data;
+            projectInfo.projectId = this.currentProject.projectId;
+            this.projectManageToJoin(projectInfo);
             let notice = {};
-            notice["recipientId"] = this.selectManagerId;
-            notice["type"] = "Notice";
+            let recipientId = this.selectManagerId;
+            notice["recipientId"] = recipientId;
+            notice["type"] = "notice";
             notice["content"] = {
               title: "Manager change",
               description:
                 "You have been the manager of project " +
-                this.userManagerProjectList[index].title +
+                this.currentProject.title +
                 " !"
             };
             this.axios
               .post("/GeoProblemSolving/notice/save", notice)
               .then(res => {
-                this.$Message.info("Apply Successfully");
-                this.$emit("sendNotice", data.managerId);
+                if (res.data == "Success") {
+                  this.$emit("sendNotice", recipientId);
+                }
               })
               .catch(err => {
                 console.log("申请失败的原因是：" + err.data);
@@ -709,6 +711,37 @@ export default {
           }
         })
         .catch(err => {});
+    },
+    projectManageToJoin(project) {
+      this.joinedProjectsList.push(project);
+      var oldManageProjects = this.userManagerProjectList;
+      var newManageProjects = [];
+      for (let i = 0; i < oldManageProjects.length; i++) {
+        if (oldManageProjects[i].projectId != project.projectId) {
+          newManageProjects.push(oldManageProjects[i]);
+        }
+      }
+      this.$set(this, "userManagerProjectList", newManageProjects);
+    },
+    deleteProjectModalShow(pid) {
+      if (confirm("Are you sure to delete this project?")) {
+        this.axios
+          .get("/GeoProblemSolving/project/delete?" + "projectId=" + pid)
+          .then(res => {
+            this.$store.commit("getUserInfo");
+            var newManageProjects = [];
+            var oldManageProjects = this.userManagerProjectList;
+            for (var i = 0; i < oldManageProjects.length; i++) {
+              if (oldManageProjects[i].projectId != pid) {
+                newManageProjects.push(oldManageProjects[i]);
+              }
+            }
+            this.$set(this, "userManagerProjectList", newManageProjects);
+          })
+          .catch(err => {
+            alert(err.data);
+          });
+      }
     },
     cancel() {
       this.$Message.info("cancel");
@@ -727,7 +760,7 @@ export default {
       if (filesize > 2101440) {
         // 图片大于2MB
         this.$Message.error("size > 2MB");
-      }else{
+      } else {
         var reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onload = e => {
@@ -736,7 +769,6 @@ export default {
           this.$store.commit("uploadAvatar", imgcode);
         };
       }
-
     },
     handleView() {
       this.visible = true;
@@ -772,20 +804,10 @@ export default {
         })
         .catch(err => {});
     },
-    addTag(tag) {
-      this.editTags.push(tag);
-      this.inputTag = "";
-    },
-    //处理tag的测试函数
-    deleteTag(index) {
-      this.editTags.splice(index, 1);
-    },
     //点击跳转到指定项目的函数
     goSingleProject(id) {
       this.$router.push({ name: "ProjectDetail", params: { id: id } });
     },
-    //获取个人上传的全部资源的函数
-    getUserFile() {},
     readPersonalEvent() {
       this.axios
         .get(
@@ -815,7 +837,6 @@ export default {
         .then(res => {
           if (res.data != "None" && res.data != "Fail") {
             this.userResourceList = res.data;
-
           }
         })
         .catch(err => {
@@ -824,10 +845,6 @@ export default {
     },
     download(index) {
       window.open(this.userResourceList[index].pathURL);
-    },
-    quitModalShow(pId) {
-      this.quitModal = true;
-      this.quitPid = pId;
     },
     deleteResource(id) {
       if (id != "") {
@@ -847,18 +864,20 @@ export default {
       }
     },
     // 处理个人的资源可以选择copy到参与的项目，也可以选择copy到管理的项目
-    processResource(){
+    processResource() {
       let resourceInfo = {};
-      this.joinedProjectsNameList = this.$store.getters.userInfo["joinedProjects"];
+      this.joinedProjectsNameList = this.$store.getters.userInfo[
+        "joinedProjects"
+      ];
       resourceInfo = this.userResourceList[this.selectResourceIndex];
       let shareForm = new FormData();
-      shareForm.append("name",resourceInfo.name);
-      shareForm.append("description",resourceInfo.description);
-      shareForm.append("belong",this.selectShareProject);
-      shareForm.append("type",resourceInfo.type);
-      shareForm.append("fileSize",resourceInfo.fileSize);
-      shareForm.append("pathURL",resourceInfo.pathURL);
-      shareForm.append("uploaderId",resourceInfo.uploaderId);
+      shareForm.append("name", resourceInfo.name);
+      shareForm.append("description", resourceInfo.description);
+      shareForm.append("belong", this.selectShareProject);
+      shareForm.append("type", resourceInfo.type);
+      shareForm.append("fileSize", resourceInfo.fileSize);
+      shareForm.append("pathURL", resourceInfo.pathURL);
+      shareForm.append("uploaderId", resourceInfo.uploaderId);
       // 还有一个获取到选中的项目的id
       let scopeObject = {
         projectId: this.selectShareProjectId,
@@ -866,25 +885,28 @@ export default {
         moduleId: ""
       };
       shareForm.append("scope", JSON.stringify(scopeObject));
-      if(scopeObject.projectId!=""){
+      if (scopeObject.projectId != "") {
         this.axios
-        .post("/GeoProblemSolving/resource/share", shareForm)
-        .then(res => {
-          if (res.data != "Fail") {
-            this.$Notice.open({
-              title: "Upload notification title",
-              desc: "File shared to " + this.selectShareProject + " successfully.",
-              duration: 2
-            });
-            // 保存记录
-            // addUploadEvent( this.selectShareProjectId);
-          }
-        })
-        .catch(err => {});
+          .post("/GeoProblemSolving/resource/share", shareForm)
+          .then(res => {
+            if (res.data != "Fail") {
+              this.$Notice.open({
+                title: "Upload notification title",
+                desc:
+                  "File shared to " +
+                  this.selectShareProject +
+                  " successfully.",
+                duration: 2
+              });
+              // 保存记录
+              // addUploadEvent( this.selectShareProjectId);
+            }
+          })
+          .catch(err => {});
       }
       // uploaderId
     },
-    cancel(){},
+    cancel() {},
     addUploadEvent(scopeId) {
       let form = {};
       let description =
@@ -893,7 +915,7 @@ export default {
         this.fileType +
         " file to " +
         " project called " +
-        this.currentProjectDetail.title;
+        this.currentProjectDetail.title; //这里是拿不到东西的，用的时候注意改一下
       form["description"] = description;
       form["scopeId"] = scopeId;
       form["eventType"] = "project";
@@ -907,13 +929,12 @@ export default {
           console.log(err.data);
         });
     },
-    processResourceModalShow(index){
+    processResourceModalShow(index) {
       this.processResourceModal = true;
       this.selectResourceIndex = index;
     },
-    selectPID(id){
+    selectPID(id) {
       this.selectShareProjectId = id;
-      console.log(this.selectShareProjectId);
     }
   }
 };
@@ -1033,11 +1054,11 @@ body {
   table-layout: auto;
   width: 100% !important;
 }
-.participatoryProjectCard:hover,{
-  cursor:pointer;
+.participatoryProjectCard:hover {
+  cursor: pointer;
 }
-.manageProjectsCard:hover{
-  cursor:pointer;
+.manageProjectsCard:hover {
+  cursor: pointer;
 }
 /* 时间轴样式 */
 .timeLineStyle{

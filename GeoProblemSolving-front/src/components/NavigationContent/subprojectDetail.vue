@@ -448,7 +448,7 @@
                           <Icon type="md-checkmark-circle-outline"/>
                         </span>
                         <span style="padding:5px">
-                          <strong style="color:#57a3f3" class="taskName">{{item.taskName}}</strong>
+                          <strong style="color:#57a3f3" class="taskName" :title="item.taskName">{{item.taskName}}</strong>
                         </span>
                         <div style="float:right">
                           <span>
@@ -951,7 +951,7 @@ export default {
         if (this.participants[i].userId != this.$store.getters.userId) {
           let notice = {};
           notice["recipientId"] = this.participants[i].userId;
-          notice["type"] = "Work";
+          notice["type"] = "Work"; //其他的类型都是小写，当然如果用的地方也同样用大写来判断也没问题
           notice["content"] = {
             subProjectId: this.subProjectInfo.subProjectId,
             title: "Work Notice",
@@ -965,11 +965,12 @@ export default {
           this.axios
             .post("/GeoProblemSolving/notice/save", notice)
             .then(res => {
-              this.$Message.info("Apply Successfully");
-              this.$emit("sendNotice", data.managerId);
+              //这个地方是不是应该加个回执判断比较好
+              this.$Message.info("Apply Successfully"); //这个提示是不是有点不对应情景？
+              this.$emit("sendNotice", data.managerId); //这个地方是拿不到managerId的
             })
             .catch(err => {
-              console.log("申请失败的原因是：" + err.data);
+              console.log("申请失败的原因是：" + err.data); //这也不对应情景
             });
         }
       }
@@ -985,19 +986,6 @@ export default {
       this.editModuleTitle = "";
       this.editModuleDescription = "";
       this.editModuleType = "";
-    },
-    createModuleSuccess(title) {
-      this.$Notice.success({
-        title: "Create Notification",
-        desc:
-          "The module" +
-          `<span style="color:lightblue"><strong>` +
-          "&nbsp" +
-          title +
-          "&nbsp" +
-          `</strong></span>` +
-          "has been created successfully"
-      });
     },
     //加载并打开成员邀请Modal
     inviteMembersModalShow() {
@@ -1160,31 +1148,41 @@ export default {
       this.createTaskModal = true;
     },
     createTask() {
-      //RequestBody，所以是json格式
-      let taskForm = {};
-      taskForm["taskName"] = this.taskInfo.taskName;
-      taskForm["description"] = this.taskInfo.description;
-      taskForm["startTime"] = new Date(this.taskInfo.startTime);
-      taskForm["endTime"] = new Date(this.taskInfo.endTime);
-      taskForm["creatorId"] = this.$store.getters.userId;
-      taskForm["subprojectId"] = this.subProjectInfo.subProjectId;
-      taskForm["state"] = "todo";
-      taskForm["order"] = "";
-      this.axios
-        .post("/GeoProblemSolving/task/save", taskForm)
-        .then(res => {
-          if (res.data == "Success") {
-            // 任务更新socket
-            this.socketMsg.whoid = this.$store.getters.userId;
-            this.socketMsg.who = this.$store.getters.userName;
-            this.socketMsg.type = "tasks";
-            this.socketMsg.content = "created a new task.";
-            this.socketMsg.time = new Date().toLocaleString();
-            this.sendMessage(this.socketMsg);
-            this.inquiryTask();
-          }
-        })
-        .catch(err => {});
+      if (this.taskInfo.taskName == "") {
+        this.$Message.error("Name should not be null.");
+      } else if (this.taskInfo.startTime == "" || this.taskInfo.endTime == "") {
+        this.$Message.error("Time should not be null.");
+      } else {
+        //RequestBody，所以是json格式
+        let taskForm = {};
+        taskForm["taskName"] = this.taskInfo.taskName;
+        taskForm["description"] = this.taskInfo.description;
+        taskForm["startTime"] = new Date(this.taskInfo.startTime);
+        taskForm["endTime"] = new Date(this.taskInfo.endTime);
+        taskForm["creatorId"] = this.$store.getters.userId;
+        taskForm["creatorName"] = this.$store.getters.userName;
+        taskForm["subprojectId"] = this.subProjectInfo.subProjectId;
+        taskForm["state"] = "todo";
+        taskForm["order"] = this.taskTodo.length;
+        this.axios
+          .post("/GeoProblemSolving/task/save", taskForm)
+          .then(res => {
+            if (res.data != "Fail") {
+              // 任务更新socket
+              this.socketMsg.whoid = this.$store.getters.userId;
+              this.socketMsg.who = this.$store.getters.userName;
+              this.socketMsg.type = "tasks";
+              this.socketMsg.content = "created a new task.";
+              this.socketMsg.time = new Date().toLocaleString();
+              this.sendMessage(this.socketMsg);
+              this.addNewTask(res.data);
+            }
+          })
+          .catch(err => {});
+      }
+    },
+    addNewTask(newTaskObject) {
+      this.taskTodo.push(newTaskObject);
     },
     //打开task编辑器
     editOneTask(index, taskList) {
@@ -1223,7 +1221,7 @@ export default {
         .post("/GeoProblemSolving/task/update", taskForm)
         .then(res => {
           if (res.data != "None" && res.data != "Fail") {
-            this.inquiryTask(); // 任务更新socket
+            this.updateTaskList(res.data); // 只更新单个任务
             this.socketMsg.whoid = this.$store.getters.userId;
             this.socketMsg.who = this.$store.getters.userName;
             this.socketMsg.type = "tasks";
@@ -1238,9 +1236,48 @@ export default {
           console.log(err.data);
         });
     },
+    updateTaskList(taskObject) {
+      switch (taskObject.state) {
+        case "todo": {
+          let taskList = this.taskTodo;
+          for (var i = 0; i < taskList.length; i++) {
+            if (taskList[i].taskId == taskObject.taskId) {
+              this.$set(this.taskTodo, i, taskObject);
+              break;
+            }
+          }
+          break;
+        }
+        case "doing": {
+          let taskList = this.taskDoing;
+          for (var i = 0; i < taskList.length; i++) {
+            if (taskList[i].taskId == taskObject.taskId) {
+              this.$set(this.taskDoing, i, taskObject);
+              break;
+            }
+          }
+          break;
+        }
+        case "done": {
+          let taskList = this.taskDone;
+          for (var i = 0; i < taskList.length; i++) {
+            if (taskList[i].taskId == taskObject.taskId) {
+              this.$set(this.taskDone, i, taskObject);
+              break;
+            }
+          }
+          break;
+        }
+      }
+    },
     //查询task
     inquiryTask() {
       // /task/inquiry
+      this.inquiryTodoTask();
+      this.inquiryDoingTask();
+      this.inquiryDoneTask();
+    },
+    inquiryTodoTask() {
       this.axios
         .get(
           "/GeoProblemSolving/task/inquiryTodo?" +
@@ -1257,6 +1294,8 @@ export default {
         .catch(err => {
           console.log(err.data);
         });
+    },
+    inquiryDoingTask() {
       this.axios
         .get(
           "/GeoProblemSolving/task/inquiryDoing?" +
@@ -1273,6 +1312,8 @@ export default {
         .catch(err => {
           console.log(err.data);
         });
+    },
+    inquiryDoneTask() {
       this.axios
         .get(
           "/GeoProblemSolving/task/inquiryDone?" +
@@ -1306,24 +1347,28 @@ export default {
       this.taskOrderUpdate(taskList, type);
     },
     taskOrderUpdate(taskList, type) {
+      let count = taskList.length;
       for (let i = 0; i < taskList.length; i++) {
         let thisTask = taskList[i];
-        let taskUpdateObj = new URLSearchParams();
-        taskUpdateObj.append("taskId", taskList[i]["taskId"]);
-        taskUpdateObj.append("order", i);
-        taskUpdateObj.append("state", type);
-        this.axios
-          .post("/GeoProblemSolving/task/update", taskUpdateObj)
-          .then(res => {
-            if (res.data != "Fail") {
-              if (this.MoveCount == 0) {
-                this.endMove();
+        if(thisTask.order!=i){
+          let taskUpdateObj = new URLSearchParams();
+          taskUpdateObj.append("taskId", taskList[i]["taskId"]);
+          taskUpdateObj.append("order", i);
+          taskUpdateObj.append("state", type);
+          this.axios
+            .post("/GeoProblemSolving/task/update", taskUpdateObj)
+            .then(res => {
+              count--;
+              if (res.data != "Fail") {
+                if (this.MoveCount == 0 && count == 1) {
+                  this.endMove();
+                }
               }
-            }
-          })
-          .catch(err => {
-            console.log(err.data);
-          });
+            })
+            .catch(err => {
+              console.log(err.data);
+            });
+        }
       }
     },
     endMove() {

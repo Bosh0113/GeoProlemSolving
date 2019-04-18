@@ -394,8 +394,7 @@ export default {
       taskForm["creatorId"] = this.$store.getters.userId;
       taskForm["moduleId"] = this.currentModule.moduleId;
       taskForm["state"] = "todo";
-      taskForm["order"] = "";
-      console.log(taskForm);
+      taskForm["order"] = taskTodo.length;
       this.axios
         .post("/GeoProblemSolving/task/save", taskForm)
         .then(res => {

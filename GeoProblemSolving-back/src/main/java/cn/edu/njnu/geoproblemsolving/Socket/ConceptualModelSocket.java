@@ -23,6 +23,7 @@ public class ConceptualModelSocket {
     private static JSONObject members=new JSONObject();
     private static JSONObject Controller=new JSONObject();
     private static final Map<String, ArrayList<String>> requireLists=new ConcurrentHashMap<>();
+    private static Map<String,JSONObject> messageCache=new ConcurrentHashMap<>();
 
     @OnOpen
     public void onOpen(@PathParam("groupID") String groupID,Session session, EndpointConfig config){
@@ -42,50 +43,56 @@ public class ConceptualModelSocket {
             ArrayList<String> list=new ArrayList<>();
             requireLists.put(groupID,list);
         }
+        if (!messageCache.containsKey(groupID)){
+            setNewMessageCache(groupID);
+        }
+        try {
+            this.session.getBasicRemote().sendText(messageCache.get(groupID).toString());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     @OnMessage
     public void onMessage(@PathParam("groupID") String groupID,String message){
         JSONObject messageObject=JSONObject.parseObject(message);
         String messageType=messageObject.getString("messageType");
-        if (messageType.equals("Message")){
-            try
-            {
-                //向客户端发送消息
-                for (ConceptualModelSocket server:groups.get(groupID))
-                {
-                    if (!this.equals(server)){
-                        server.session.getBasicRemote().sendText(message);
+        switch (messageType) {
+            case "Message":
+                messageCache.put(groupID, messageObject);
+                try {
+                    //向客户端发送消息
+                    for (ConceptualModelSocket server : groups.get(groupID)) {
+                        if (!this.equals(server)) {
+                            server.session.getBasicRemote().sendText(message);
+                        }
                     }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
-        }
-        else if (messageType.equals("Join")){
-            String userName=messageObject.getString("message");
-            if(groups.get(groupID).size()<2){//建组成员为演示者
-                Controller.put(groupID,userName);
-            }
-            members.put(this.session.getId(),userName);
-            System.out.println("Socket connect,  UserName:"+userName);
-            publicMembers(groupID,"Join",requireLists);//公布新的在线数组和演示者
-        }
-        else if (messageType.equals("Authority")){
-            if (messageObject.getString("message").equals("Require")){
-                requireLists.get(groupID).add(messageObject.getString("userName"));
-                if(Controller.getString(groupID).equals("7014115d-2054-4c5e-99ed-ed786574cd32")){
+                break;
+            case "Join":
+                String userName = messageObject.getString("message");
+                if (groups.get(groupID).size() < 2) {//建组成员为演示者
+                    Controller.put(groupID, userName);
+                }
+                members.put(this.session.getId(), userName);
+                System.out.println("Socket connect,  UserName:" + userName);
+                publicMembers(groupID, "Join", requireLists);//公布新的在线数组和演示者
+
+                break;
+            case "Authority":
+                if (messageObject.getString("message").equals("Require")) {
+                    requireLists.get(groupID).add(messageObject.getString("userName"));
+                    if (Controller.getString(groupID).equals("7014115d-2054-4c5e-99ed-ed786574cd32")) {
+                        ReGrant(groupID);//重新赋予权限
+                    } else {
+                        publicMembers(groupID, "Authority", requireLists);//公布新的请求队列和演示者
+                    }
+                } else if (messageObject.getString("message").equals("Release")) {
                     ReGrant(groupID);//重新赋予权限
                 }
-                else {
-                    publicMembers(groupID,"Authority",requireLists);//公布新的请求队列和演示者
-                }
-            }
-            else if (messageObject.getString("message").equals("Release")){
-                ReGrant(groupID);//重新赋予权限
-            }
+                break;
         }
     }
     @OnClose
@@ -95,10 +102,14 @@ public class ConceptualModelSocket {
         System.out.println("Socket disconnect, sessionID: "+this.session.getId()+" UserName: "+members.getString(this.session.getId()));
         String nowUser=members.getString(this.session.getId());
 //        members.remove(this.session.getId());
-        if(Controller.getString(groupID).equals(nowUser)){//若退出的用户为演示者则重新分配权限
-            ReGrant(groupID);
+        if(groups.get(groupID).size()<1){
+            setNewMessageCache(groupID);
+        }else {
+            if(Controller.getString(groupID).equals(nowUser)){//若退出的用户为演示者则重新分配权限
+                ReGrant(groupID);
+            }
+            publicMembers(groupID,"Left",requireLists);//发布在线用户群组及演示者
         }
-        publicMembers(groupID,"Left",requireLists);//发布在线用户群组及演示者
     }
     @OnError
     public void onError(Session session,Throwable error)
@@ -156,5 +167,13 @@ public class ConceptualModelSocket {
             Controller.put(groupID,"7014115d-2054-4c5e-99ed-ed786574cd32");//设置权限者为空
             publicMembers(groupID,"Authority",requireLists);//公布新的请求队列和演示者
         }
+    }
+
+    private void setNewMessageCache(String groupID){
+        JSONObject messageObject =new JSONObject();
+        messageObject.put("messageType","Message");
+        messageObject.put("concept","<ConceptualScene id=\"c94929c3-dd4c-497a-85be-c495f716bcd4\" name=\"\" version=\"1\"><ElementCollection/><SystemCollection/><RelationCollection/><ConceptItemList/></ConceptualScene>");
+        messageObject.put("message","<mxGraphModel><root><mxCell id=\"0\"/><mxCell id=\"1\" parent=\"0\"/></root></mxGraphModel>");
+        messageCache.put(groupID,messageObject);
     }
 }

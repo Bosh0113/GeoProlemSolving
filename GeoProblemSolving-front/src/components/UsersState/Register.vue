@@ -254,9 +254,6 @@ export default {
       return this.$store.getters.avatar;
     }
   },
-  mounted() {
-    this.$store.getters.avatar = "";
-  },
   data() {
     var validatePass = (rule, value, callback) => {
       if (value === "") {
@@ -400,7 +397,6 @@ export default {
       pwdType: "password" // 密码类型
     };
   },
-  mounted() {},
   methods: {
     handleSubmit(name) {
       this.$refs[name].validate(valid => {

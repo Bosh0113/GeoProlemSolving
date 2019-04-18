@@ -1,6 +1,7 @@
 package cn.edu.njnu.geoproblemsolving.Controller;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Project.ProjectDaoImpl;
+import cn.edu.njnu.geoproblemsolving.Entity.EmailEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.ProjectEntity;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -90,6 +91,12 @@ public class ProjectController {
     public String joinByMail(@RequestParam("projectId") String projectId,@RequestParam("email") String email,@RequestParam("password") String password) {
         ProjectDaoImpl projectDao = new ProjectDaoImpl(mongoTemplate);
         return projectDao.joinByMail(projectId,email,password);
+    }
+
+    @RequestMapping(value = "/applyByMail", produces = {"application/json;charset=UTF-8"},method = RequestMethod.POST)
+    public String sendEmail(@RequestBody EmailEntity emailEntity){
+        ProjectDaoImpl projectDao = new ProjectDaoImpl(mongoTemplate);
+        return projectDao.applyByEmail(emailEntity);
     }
 
     @RequestMapping(value = "/picture",method = RequestMethod.POST)

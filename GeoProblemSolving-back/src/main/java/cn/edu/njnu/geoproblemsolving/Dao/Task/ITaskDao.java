@@ -6,7 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 
 public interface ITaskDao {
 
-    String saveTask(TaskEntity task);
+    Object saveTask(TaskEntity task);
 
     Object inquiryTask(String key,String value);
 

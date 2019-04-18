@@ -9,9 +9,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/email")
 public class EmailController {
 
-    @RequestMapping(value = "/send", produces = {"application/json;charset=UTF-8"},method = RequestMethod.POST)
+    @RequestMapping(value = "/invite", produces = {"application/json;charset=UTF-8"},method = RequestMethod.POST)
     public String sendEmail(@RequestBody EmailEntity emailEntity){
         EmailDaoImpl emailDao=new EmailDaoImpl();
+        String emailContent=emailEntity.getMailContent();
+        emailContent=emailContent+emailEntity.getRecipient();
+        emailEntity.setMailContent(emailContent);
         return emailDao.sendEmail(emailEntity);
     }
 }

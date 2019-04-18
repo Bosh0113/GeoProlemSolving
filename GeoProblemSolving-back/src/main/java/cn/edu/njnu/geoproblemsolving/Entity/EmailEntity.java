@@ -2,7 +2,7 @@ package cn.edu.njnu.geoproblemsolving.Entity;
 
 public class EmailEntity {
 
-    private String recipient;  //xxx@xx.xxx,xx@xx.xxx,xx@xxx.xxx
+    private String recipient;  //xxx@xx.xxx
     private String mailTitle;
     private String mailContent;
 

@@ -24,14 +24,14 @@ public class TaskDaoImpl implements ITaskDao{
     public TaskDaoImpl(MongoTemplate mongoTemplate){this.mongoTemplate=mongoTemplate;}
 
     @Override
-    public String saveTask(TaskEntity task){
+    public Object saveTask(TaskEntity task){
         try {
             Date date=new Date();
             SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
             task.setTaskId(UUID.randomUUID().toString());
             task.setCreateTime(dateFormat.format(date));
             mongoTemplate.save(task);
-            return "Success";
+            return task;
         }catch (Exception e){
             return "Fail";
         }

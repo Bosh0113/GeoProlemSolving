@@ -7,23 +7,22 @@ var LogicalScene = "";
 var GraphUi = null;
 var waitingList = [];
 var graph;
+var userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
+var userName = userInfo.userName;
 (function () {
     var editorUiInit = EditorUi.prototype.init;
 
-        EditorUi.prototype.init = function()
-        {
-            editorUiInit.apply(this, arguments);
-            this.actions.get('export').setEnabled(false);
+    EditorUi.prototype.init = function () {
+        editorUiInit.apply(this, arguments);
+        this.actions.get('export').setEnabled(false);
 
-            // Updates action states which require a backend
-            if (!Editor.useLocalStorage)
-            {
-                mxUtils.post(OPEN_URL, '', mxUtils.bind(this, function(req)
-                {
-                    var enabled = req.getStatus() != 404;
-                }));
-            }
-        };
+        // Updates action states which require a backend
+        if (!Editor.useLocalStorage) {
+            mxUtils.post(OPEN_URL, '', mxUtils.bind(this, function (req) {
+                var enabled = req.getStatus() != 404;
+            }));
+        }
+    };
 
     // Adds required resources (disables loading of fallback properties, this can only
     // be used if we know that all keys are defined in the language specific file)
@@ -46,33 +45,33 @@ var graph;
         $(".geToolbar").append(memberList);
         //定时信息发送器
         var timer = window.setInterval(function () {
-            if (Controller === sessionStorage.getItem("username")) {//判断是否有权发送演示信息
-                for(let i=0;i<graph.mxgraphList.length;i++){
-                    if(graph.mxgraphList[i].uid==$("#viewPanel option:selected").attr("currentUID")){
+            if (Controller === userName) {//判断是否有权发送演示信息
+                for (let i = 0; i < graph.mxgraphList.length; i++) {
+                    if (graph.mxgraphList[i].uid == $("#viewPanel option:selected").attr("currentUID")) {
                         var encoder = new mxCodec();
                         var node = encoder.encode(graph.getModel());
-                        graph.mxgraphList[i].graphXML=mxUtils.getXml(node);
+                        graph.mxgraphList[i].graphXML = mxUtils.getXml(node);
                         break;
                     }
                 }
                 MxGraphList = window.mxgraphXMLStr;
                 LogicalScene = window.logicalSceneXMLStr;
 
-                var selectorOptions=[];
-                $("#viewPanel").children("option").each(function(){
-                    var option={};
-                    option.value=$(this).attr("value");
-                    option.currentuid=$(this).attr("currentuid");
-                    option.innerHTML=$(this).html();
+                var selectorOptions = [];
+                $("#viewPanel").children("option").each(function () {
+                    var option = {};
+                    option.value = $(this).attr("value");
+                    option.currentuid = $(this).attr("currentuid");
+                    option.innerHTML = $(this).html();
                     selectorOptions.push(option);
                 });
-                var selectorData=JSON.stringify(selectorOptions);
+                var selectorData = JSON.stringify(selectorOptions);
 
                 var messageObject = {};
                 messageObject["messageType"] = "Message";
                 messageObject["graphXML"] = MxGraphList;
                 messageObject["logicalXML"] = LogicalScene;
-                messageObject["computationalXML"]=graph.getComputationalSceneXMLStr();
+                messageObject["computationalXML"] = graph.getComputationalSceneXMLStr();
                 messageObject["selectorData"] = selectorData;
                 wsMxgraph.send(JSON.stringify(messageObject));//发送
             }
@@ -98,8 +97,16 @@ var graph;
             // ws.send("用户加入了协同画图......")
             var messageObject = {};
             messageObject["messageType"] = "Join";
-            messageObject["message"] = sessionStorage.getItem("username");
+            messageObject["message"] = userName;
             wsMxgraph.send(JSON.stringify(messageObject));
+            window.setInterval(function () {
+                if (wsMxgraph != null) {
+                    var messageObject = {
+                        messageType: "Ping"
+                    }
+                    wsMxgraph.send(JSON.stringify(messageObject));
+                }
+            }, 20000);
         };
         //接收来自服务器的消息后，触发该方法
         wsMxgraph.onmessage = function (ev) {
@@ -108,21 +115,21 @@ var graph;
                 graph.setMxgraphList(messageObject.graphXML);
                 graph.setLogicalScene(messageObject.logicalXML);
                 graph.setComputationalScene(messageObject.computationalXML)
-                var optionJSONArray=JSON.parse(messageObject.selectorData);
-                var currentUid="";var currentValue="";
+                var optionJSONArray = JSON.parse(messageObject.selectorData);
+                var currentUid = ""; var currentValue = "";
                 $("#viewPanel").empty();
-                for(let i=0;i<optionJSONArray.length;i++){
+                for (let i = 0; i < optionJSONArray.length; i++) {
                     var option = document.createElement("option");
                     option.innerHTML = optionJSONArray[i].innerHTML;
                     option.value = optionJSONArray[i].value;
-                    option.setAttribute("currentUID",optionJSONArray[i].currentuid);
+                    option.setAttribute("currentUID", optionJSONArray[i].currentuid);
                     $("#viewPanel").append(option);
-                    currentUid=optionJSONArray[i].currentuid;
-                    currentValue=optionJSONArray[i].value;
+                    currentUid = optionJSONArray[i].currentuid;
+                    currentValue = optionJSONArray[i].value;
                 }
                 $("#viewPanel").val(currentValue);
-                for(let i=0;i<graph.mxgraphList.length;i++){
-                    if(graph.mxgraphList[i].uid==currentUid){
+                for (let i = 0; i < graph.mxgraphList.length; i++) {
+                    if (graph.mxgraphList[i].uid == currentUid) {
                         var doc = mxUtils.parseXml(graph.mxgraphList[i].graphXML);
                         var dec = new mxCodec(doc);
                         dec.decode(doc.documentElement, graph.getModel());
@@ -192,8 +199,8 @@ var graph;
 })();
 //演示权限转交
 function pTransfer(newController) {
-    if (Controller === sessionStorage.getItem("username")) {
-        if (newController === sessionStorage.getItem("username")) {
+    if (Controller === userName) {
+        if (newController === userName) {
             confirm("You already have demo authority.");
         }
         else {
@@ -216,7 +223,7 @@ function demoRequire() {
     var messageObject = {};
     messageObject["messageType"] = "Authority";
     messageObject["message"] = "Require";
-    messageObject["userName"] = sessionStorage.getItem("username");
+    messageObject["userName"] = userName;
     if (wsMxgraph) {
         wsMxgraph.send(JSON.stringify(messageObject));
     }
@@ -225,14 +232,14 @@ function demoRelease() {
     var messageObject = {};
     messageObject["messageType"] = "Authority";
     messageObject["message"] = "Release";
-    messageObject["userName"] = sessionStorage.getItem("username");
+    messageObject["userName"] = userName;
     if (wsMxgraph) {
         wsMxgraph.send(JSON.stringify(messageObject));
     }
 }
 
 function checkIdentity() {
-    if (Controller == sessionStorage.getItem("username") && waitingList.length < 1) {//若为演示者且不存在申请者
+    if (Controller == userName && waitingList.length < 1) {//若为演示者且不存在申请者
         $('#release').show();
         $('#waiting').hide();
         $('#waitingNum').show();
@@ -244,7 +251,7 @@ function checkIdentity() {
             graph.setEnabled(true);
         }
     }
-    else if (Controller == sessionStorage.getItem("username") && waitingList.length > 0) {//若为演示者且存在申请者
+    else if (Controller == userName && waitingList.length > 0) {//若为演示者且存在申请者
         $('#release').show();
         $('#waiting').show();
         $('#waitingNum').show();
@@ -256,20 +263,20 @@ function checkIdentity() {
         }
         var num = 0;
         for (var i = 0; i < waitingList.length; i++) {
-            if (waitingList[i] == sessionStorage.getItem("username")) {
+            if (waitingList[i] == userName) {
                 continue;
             }
             num++;
         }
         $('#waitingNum').html(num);
-    } else if (Controller != sessionStorage.getItem("username")) { //观众
+    } else if (Controller != userName) { //观众
         var apply = 0;
         num = 0;
         for (i = 0; i < waitingList.length; i++) {
             if (Controller == waitingList[i]) {//若演示者在队列中，则跳过计数
                 continue;
             }
-            if (waitingList[i] == sessionStorage.getItem("username")) {
+            if (waitingList[i] == userName) {
                 apply = 1;//已申请
                 break;
             }
@@ -297,7 +304,7 @@ window.time = 0;
 window.setInterval(function () {
     window.time++;
     if (window.time >= 60) {//60秒无动作则触发
-        if (Controller == sessionStorage.getItem("username")) {//若为演示者则释放权限
+        if (Controller == userName) {//若为演示者则释放权限
             // demoRelease();
         }
     }
@@ -318,12 +325,12 @@ function deleteTask(e) {
         var parentDiv = $(e).parent();
         $.ajax({
             type: "POST",
-            url: "/modelBuilder/computational/delete"+"?taskId="+taskId,
+            url: "/modelBuilder/computational/delete" + "?taskId=" + taskId,
             success: function (data) {
                 if (data == "Success") {
                     parentDiv.remove();
-                    if($('#tasksContent').find('div').length<1){
-                        var str='<div style="height:150px;width:400px;border:solid 1px #d5d5d5;margin:20px;text-align:center;"><h1>No saved task here.</h1></div>';
+                    if ($('#tasksContent').find('div').length < 1) {
+                        var str = '<div style="height:150px;width:400px;border:solid 1px #d5d5d5;margin:20px;text-align:center;"><h1>No saved task here.</h1></div>';
                         $('#tasksContent').html(str);
                     }
                 }

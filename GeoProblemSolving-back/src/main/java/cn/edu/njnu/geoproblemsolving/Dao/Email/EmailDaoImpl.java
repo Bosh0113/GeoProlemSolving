@@ -101,7 +101,7 @@ public class EmailDaoImpl implements IEmailDao{
         message.setSubject(mailTitle,"utf-8");
 
         // 5  邮件正文
-        message.setContent(mailContent+receiveMail, "text/html;charset=UTF-8");
+        message.setContent(mailContent, "text/html;charset=UTF-8");
 
         // 6  设置邮件发送的时间
         message.setSentDate(new Date());

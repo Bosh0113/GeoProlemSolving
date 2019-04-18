@@ -761,7 +761,7 @@ export default {
       },
       //邮件格式
       emailAddStr:
-        "please click the url and join us: " +
+        "\n please click the url and join us: " +
         "http://172.21.212.7:8082/GeoProblemSolving/join/" +
         this.$route.params.id +
         "/",
@@ -935,15 +935,15 @@ export default {
     //前往工作空间
     goWorkspace(id, memberList, isManager) {
       var isMember;
-      if (memberList != []) {
-        memberList.forEach(item => {
-          if (item.userId == this.$store.getters.userId) {
+      if (!isManager && memberList != []) {
+        for(let i=0;i<memberList.length;i++){
+          if(memberList[i].userId == this.$store.getters.userId){
             isMember = true;
+            break;
           } else {
             isMember = false;
           }
-        });
-      } else {
+        }
       }
       if (this.$store.getters.userState) {
         if (isManager || isMember) {
@@ -999,7 +999,7 @@ export default {
           emailFormBody["mailContent"] =
             this.emailInfo.emailContent + this.emailAddStr;
           this.axios
-            .post("/GeoProblemSolving/email/send", emailFormBody)
+            .post("/GeoProblemSolving/email/invite", emailFormBody)
             .then(res => {
               if(res.data=="Success"){
                 this.$Notice.success({
