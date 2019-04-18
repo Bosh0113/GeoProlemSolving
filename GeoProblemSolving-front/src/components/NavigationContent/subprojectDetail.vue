@@ -442,12 +442,9 @@
                           style="word-break:break-word;padding:5px;cursor:pointer;width:80%"
                           @click="showTask(index,taskDoing)"
                         >{{item.description}}</p>
-                        <div style="display:flex;align-items:center">
-                          <!-- 这里取用户头像 -->
-                        </div>
-                        <div style="display:flex;justify-content:flex-end">
-                          <Tag color="primary">{{item.creatorName}}</Tag>
-                        </div>
+                      </div>
+                      <div style="display:flex;justify-content:flex-end">
+                        <Tag color="primary">{{item.creatorName}}</Tag>
                       </div>
                     </Card>
                   </draggable>
@@ -759,12 +756,8 @@ export default {
         description: [
           { required: true, message: "Please select type...", trigger: "blur" }
         ],
-        startTime: [
-          { required: true, type: 'date', trigger: "change" }
-        ],
-        endTime: [
-          { required: true, type: 'date', trigger: "change" }
-        ]
+        startTime: [{ required: true, type: "date", trigger: "change" }],
+        endTime: [{ required: true, type: "date", trigger: "change" }]
       }
     };
   },
