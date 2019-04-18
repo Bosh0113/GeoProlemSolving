@@ -55,7 +55,7 @@ public class ResourceDaoImpl implements IResourceDao {
             Collection<Part> parts = request.getParts();
             for (Part part : parts) {
                 if (part.getName().equals("file")) {
-                    if (part.getSize() < 100 * 1024 * 1024) {
+                    if (part.getSize() < 1024 * 1024 * 1024) {
                         ResourceUploadInfo uploadInfo = new ResourceUploadInfo();
                         String fileNames = part.getSubmittedFileName();
                         String fileName = fileNames.substring(0, fileNames.lastIndexOf("."));
