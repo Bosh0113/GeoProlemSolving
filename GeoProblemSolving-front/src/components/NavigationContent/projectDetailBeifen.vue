@@ -254,32 +254,37 @@
           :mask-closable="false"
           width="800"
         >
-          <Form ref="emailInfo" :model="emailInfo" :rules="emailInfoRule" :label-width="200" inline>
-            <FormItem label="Recipient" prop="inputEmail" style="width:100%">
-              <AutoComplete
+        <Form
+          ref="emailInfo"
+          :model="emailInfo"
+          :rules="emailInfoRule"
+          :label-width="200"
+          inline
+        >
+          <FormItem label="Recipient" prop="inputEmail" style="width:100%">
+            <AutoComplete
                 v-model="emailInfo.inputEmail"
                 @on-search="handleSearch2"
                 placeholder="input email and press enter button the email will be added below"
-                style="width:70%"
-              >
+                style="width:70%">
                 <Option v-for="item in data2" :value="item" :key="item">{{ item }}</Option>
-              </AutoComplete>
-              <!-- <Input v-model="emailInfo.inputEmail" placeholder="input email and press enter button the email will be added below" style="width:70%"/> -->
-            </FormItem>
-            <FormItem label="Title" prop="emailTitle" style="width:100%">
-              <Input
-                v-model="emailInfo.emailTitle"
-                placeholder="set the email title to recivers by your self"
-                style="width:70%"
-              />
-            </FormItem>
-            <FormItem label="Content" prop="emailContent" style="width:100%">
-              <Input type="textarea" style="width:70%" :rows="4" v-model="emailInfo.emailContent"/>
-            </FormItem>
-            <!-- <FormItem>
+            </AutoComplete>
+            <!-- <Input v-model="emailInfo.inputEmail" placeholder="input email and press enter button the email will be added below" style="width:70%"/> -->
+          </FormItem>
+          <FormItem label="Title" prop="emailTitle" style="width:100%">
+            <Input v-model="emailInfo.emailTitle" placeholder="set the email title to recivers by your self" style="width:70%"/>
+          </FormItem>
+          <FormItem label="Content" prop="emailContent" style="width:100%">
+            <Input
+              type="textarea" style="width:70%"
+              :rows="4"
+              v-model="emailInfo.emailContent"
+            />
+          </FormItem>
+          <!-- <FormItem>
             <Button type="primary" @click="invite('emailInfo')">Submit</Button>
-            </FormItem>-->
-          </Form>
+          </FormItem> -->
+        </Form>
         </Modal>
         <div class="whitespace"></div>
         <div style="padding: 20px">
@@ -525,7 +530,12 @@
           </Card>
         </div>
         <!-- 上传文件按钮的模态框 -->
-        <Modal v-model="uploadFileModal" title="upload file" width="600px" :mask-closable="false" @on-ok="filesUpload" @on-cancel="cancel" ok-text="assure" cancel-text="cancel">
+        <Modal
+          v-model="uploadFileModal"
+          title="upload file"
+          width="600px"
+          :mask-closable="false"
+        >
           <div style="display:flex;text-align:center;align-items:center;justify-content:center">
             <!-- 这里定义上传的几种资源类型供用户选择 -->
             <span style="width:20%">File Type</span>
@@ -547,21 +557,29 @@
           </div>
           <br>
           <!-- <input type="file" @change="getFile($event)" style="margin-left:20%" multiple="multiple"> -->
-          <Upload :max-size="1024*1024" multiple type="drag" :before-upload="gatherFile" action="-">
-            <div style="padding: 20px 0">
-              <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
-              <p>Click or drag files here to upload</p>
-            </div>
+          <Upload
+              :max-size="1024*1024"
+              multiple
+              type="drag"
+              :before-upload="handleUpload"
+              action="-"
+              >
+              <div style="padding: 20px 0">
+                  <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
+                  <p>Click or drag files here to upload</p>
+              </div>
           </Upload>
-          <div style="padding:0 10px 0 10px">
-            <ul v-for="(list,index) in file" :key="index" >
-            <li style="display:flex">
-              filename:
-              <span style="font-size:10px;width:90%">{{ list.name }}</span>
-              <Icon type="ios-close" size="20" @click="delFileList(index)" style="display:flex;justify-content:flex-end"></Icon>
-            </li>
-          </ul>
-          </div>
+          <!-- <Upload
+            show-upload-list=true
+            multiple
+            type="drag"
+            action="//jsonplaceholder.typicode.com/posts/">
+            <div style="padding: 20px 0">
+                <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
+                <p>Click or drag files here to upload</p>
+            </div>
+        </Upload> -->
+          <!-- <div slot="footer"></div> -->
         </Modal>
         <br>
       </Col>
@@ -570,7 +588,7 @@
         title="Delete warning "
         @on-ok="deleteProject"
         @on-cancel="cancel"
-        ok-text="submit"
+        ok-text="ok"
         cancel-text="cancel"
       >
         <p>Do you want to delete this project? Please think twice before you choose.</p>
@@ -762,7 +780,7 @@ export default {
       },
       //邮件格式
       emailAddStr:
-        "\n please click the url and join us: " +
+        "please click the url and join us: " +
         "http://172.21.212.7:8082/GeoProblemSolving/join/" +
         this.$route.params.id +
         "/",
@@ -808,9 +826,8 @@ export default {
       subProjectMembers: [],
       errorHint: "email format is not correct , please check it again",
       //关于邮箱提示的
-      value2: "",
-      data2: [],
-      file:[],
+      value2: '',
+      data2: []
     };
   },
   created() {
@@ -938,8 +955,8 @@ export default {
     goWorkspace(id, memberList, isManager) {
       var isMember;
       if (!isManager && memberList != []) {
-        for (let i = 0; i < memberList.length; i++) {
-          if (memberList[i].userId == this.$store.getters.userId) {
+        for(let i=0;i<memberList.length;i++){
+          if(memberList[i].userId == this.$store.getters.userId){
             isMember = true;
             break;
           } else {
@@ -1001,18 +1018,17 @@ export default {
           emailFormBody["mailContent"] =
             this.emailInfo.emailContent + this.emailAddStr;
           this.axios
-            .post("/GeoProblemSolving/email/invite", emailFormBody)
+            .post("/GeoProblemSolving/email/send", emailFormBody)
             .then(res => {
-              if (res.data == "Success") {
+              if(res.data=="Success"){
                 this.$Notice.success({
-                  title: "Email send title",
-                  desc:
-                    "The invitation has been sent,the receiver will process this request later."
+                    title: 'Email send title',
+                    desc: "The invitation has been sent,the receiver will process this request later."
                 });
-              } else {
+              }else{
                 this.$Notice.error({
-                  title: "Email send fail",
-                  desc: "The invitation isn't be sent successfully."
+                    title: 'Email send fail',
+                    desc: "The invitation isn't be sent successfully."
                 });
               }
             })
@@ -1140,7 +1156,6 @@ export default {
       //创建 formData 对象
       let formData = new FormData();
       // 向 formData 对象中添加文件
-      formData.append("file", this.file);
       formData.append("file", this.file);
       formData.append("description", this.fileDescription);
       formData.append("type", this.fileType);
@@ -1351,38 +1366,32 @@ export default {
     authorizeModalShow() {
       this.authorizeModal = true;
     },
-    handleSearch2(value) {
-      this.data2 =
-        !value || value.indexOf("@") >= 0
-          ? []
-          : [
-              value + "@gmail.com",
-              value + "@sina.com",
-              value + "@163.com",
-              value + "@126.com",
-              value + "@qq.com"
-            ];
-      // this.emailInfo.inputEmail = this.value2;
-    },
-    filesUpload() {
-      let that = this;
-      if(that.file.length!=0){
-        var formData = new FormData();
-        for(var i=0; i< that.file.length; i++){
-          formData.append("file",that.file[i]);   // 文件对象
-        }
-        let userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
-        formData.append("description", this.fileDescription);
-        formData.append("type", this.fileType);
-        formData.append("uploaderId",this.$store.getters.userInfo.userId);
-        formData.append("belong", this.currentProjectDetail.title);
-        let scopeObject = {
+    handleSearch2 (value) {
+                this.data2 = !value || value.indexOf('@') >= 0 ? [] : [
+                    value + '@gmail.com',
+                    value + '@sina.com',
+                    value + '@163.com',
+                    value + '@126.com',
+                    value + '@qq.com',
+                ];
+                // this.emailInfo.inputEmail = this.value2;
+            },
+    // 上传文件新方式
+    handleUpload(file) {
+      //上传数据
+      let formData = new FormData();
+      let userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
+      formData.append("file", file);
+      formData.append("description", this.fileDescription);
+      formData.append("type", this.fileType);
+      formData.append("uploaderId", userInfo.userId);
+      formData.append("belong", this.currentProjectDetail.title);
+      let scopeObject = {
         projectId: this.currentProjectDetail.projectId,
         subprojectId: "",
         moduleId: ""
       };
       formData.append("scope", JSON.stringify(scopeObject));
-      }
       this.axios
         .post("/GeoProblemSolving/resource/upload", formData)
         .then(res => {
@@ -1399,21 +1408,8 @@ export default {
           }
         })
         .catch(err => {});
-    },
-    gatherFile(file) {
-      let that = this;
-      if (that.file.length >= 5) {
-        this.$Message.info("最多只能上传5个文件");
-      } else {
-        that.file.push(file);
-      }
       return false;
     },
-    delFileList(index){
-     let that = this;
-     that.file.splice(index, 1);
-     console.log(that.file);
-    }
   }
 };
 </script>

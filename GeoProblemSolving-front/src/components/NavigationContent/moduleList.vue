@@ -999,7 +999,7 @@
         <Input type="textarea" :rows="2" v-model="fileDescription"/>
       </div>
       <br>
-      <input type="file" @change="getFile($event)" style="margin-left:20px">
+      <input type="file" @change="getFile($event)" style="margin-left:20px" multiple="multiple">
     </Modal>
   </div>
 </template>

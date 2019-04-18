@@ -136,7 +136,7 @@
         <Input type="textarea" :rows="2" v-model="fileDescription"/>
       </div>
       <br>
-      <input type="file" @change="getFile($event)" style="margin-left:20%">
+      <input type="file" @change="getFile($event)" style="margin-left:20%" multiple="multiple">
     </Modal>
   </Row>
 </template>
