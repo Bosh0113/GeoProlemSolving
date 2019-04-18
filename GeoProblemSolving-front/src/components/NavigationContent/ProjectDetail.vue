@@ -361,8 +361,8 @@
                           <Button
                             type="success"
                             v-show="subProject['isMember'] == false&&subProject['isManager'] == false"
-                            @click.stop="joinSubProject(subProject)"  
-                            title="Apply"                         
+                            @click.stop="joinSubProject(subProject)"
+                            title="Apply"
                           >
                             <Icon type="md-add"/>
                           </Button>
@@ -371,7 +371,7 @@
                             style="margin-left:10px"
                             v-show="subProject['isManager'] == true"
                             @click.stop="editSubProjectShow(index)"
-                            title="Edit" 
+                            title="Edit"
                           >
                             <Icon type="md-brush"/>
                           </Button>

@@ -91,6 +91,12 @@
                   <div style="display:flex;text-align:center;justify-content:center">
                     <Checkbox v-model="checked">Automatic login within one week</Checkbox>
                   </div>
+                  <div style="display:flex;text-align:center;justify-content:center">
+                <p>
+                  Forget password?
+                  <a @click="sendResetEmail()">Reset</a>
+                </p>
+              </div>
                   <br>
                   <FormItem>
                     <div style="display:flex;align-items:center;justify-content:center">
@@ -160,7 +166,9 @@ export default {
       contentStyle: {
         height: ""
       },
-      checked: false
+      checked: false,
+      changePwdEmailStyle:"This email is used for help you reset your password,you can click this url ",
+      urlAddress:"http://172.21.212.7:8082/GeoProblemSolving/resetPassword/",
     };
   },
   mounted() {
@@ -204,7 +212,9 @@ export default {
                else {
                 this.$Message.success("Success!");
                 this.$store.commit("userLogin", res.data);
-                this.$router.go(-1);
+                // 这里逻辑有问题，需要修改
+                this.$router.push({ path: "/resourceList" });
+                // this.$router.go(-1);
               }
             });
         } else {
@@ -259,6 +269,35 @@ export default {
     },
     goRegister(){
       this.$router.push({name:"Register"});
+    },
+    sendResetEmail() {
+      var emailFormBody = {};
+      emailFormBody["recipient"] = this.formInline.user;
+      emailFormBody["mailTitle"] = "Reset password notification";
+      emailFormBody["mailContent"] =
+        this.changePwdEmailStyle +
+        this.urlAddress + this.formInline.user +
+        " to change your password, thanks.";
+      this.axios
+        .post("/GeoProblemSolving/email/send", emailFormBody)
+        .then(res => {
+          if (res.data == "Success") {
+            this.$Notice.success({
+              title: "Email send title",
+              desc:
+                "The application for change password we have accepted,later you will recieve an email to help you reset it."
+            });
+          } else {
+            this.$Notice.error({
+              title: "Email send fail",
+              desc:
+                "Maybe you input your email wrong,please check out your input."
+            });
+          }
+        })
+        .catch(err => {
+          console.log(err.data);
+        });
     }
   }
 };

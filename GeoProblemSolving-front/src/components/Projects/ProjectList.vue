@@ -38,18 +38,15 @@ img {
   <div>
     <Row>
       <Col span="22" offset="1">
-        <Spin fix  v-show="getFinish">
-            <Icon type="ios-loading" size="100" class="demo-spin-icon-load" color="yellowgreen"></Icon>
-            <div>Loading</div>
+        <Spin fix v-show="getFinish">
+          <Icon type="ios-loading" size="100" class="demo-spin-icon-load" color="yellowgreen"></Icon>
+          <div>Loading</div>
         </Spin>
-        <div style="display:flex;height:60px;justify-content:center">
-        </div>
+        <div style="display:flex;height:60px;justify-content:center"></div>
         <div class="Tabpane" style="display:flex">
           <Tabs v-model="currentTab" @click.native="chooseCurrentType(currentTab)">
-            <TabPane label="Water" name="Water" icon="ios-water">
-            </TabPane>
-            <TabPane label="Soil" name="Soil" icon="md-grid">
-            </TabPane>
+            <TabPane label="Water" name="Water" icon="ios-water"></TabPane>
+            <TabPane label="Soil" name="Soil" icon="md-grid"></TabPane>
             <TabPane label="Ecology" name="Ecology" icon="md-leaf"></TabPane>
             <TabPane label="Atmosphere" name="Atmosphere" icon="md-cloud"></TabPane>
             <TabPane label="Society" name="Society" icon="md-bus"></TabPane>
@@ -63,51 +60,63 @@ img {
               style="margin-right:2.5%;font-size:15px;height:40px"
               icon="md-add"
             >Create</Button>
+            <!-- <Button
+              type="default"
+              style="margin-right:2.5%;font-size:15px;height:40px"
+              icon="md-person-add"
+              class="btnJoin"
+              @click="joinModalShow"
+            >Join</Button>-->
           </div>
         </div>
       </Col>
       <div class="ProjectList">
-          <div v-show="!getFinish">
-            <div v-if="currentProjectList.length < 1">
-              <Col span="22" offset="1">
-                <Card :bordered="false">
-                  <!-- <p slot="title">No Projects in this category</p> -->
-                  <div style="display:flex;justify-content:center">
-                    <Icon type="md-alert" size="40" color="gray"/>
-                  </div>
-                  <br>
-                  <div style="display:flex;justify-content:center">
-                    <h2 style="text-align:center;width:50%">No projects in this category.</h2>
-                  </div>
-                  <br>
-                  <div style="display:flex;justify-content:center">
-                    <h4
-                      style="text-align:center;width:50%;color:lightblue"
-                    >You can click the button right top called create to add a new project. Enriching your description of the project and attracting more people to join.</h4>
-                  </div>
-                </Card>
-              </Col>
-            </div>
-            <div
-              v-for="(item,index) in filteredBlogs"
-              :data="currentProjectList"
-              :key="item.index"
-              style="width:95%;margin-right:5%"
-              v-else
+        <div v-show="!getFinish">
+          <div v-if="currentProjectList.length < 1">
+            <Col span="22" offset="1">
+              <Card :bordered="false">
+                <!-- <p slot="title">No Projects in this category</p> -->
+                <div style="display:flex;justify-content:center">
+                  <Icon type="md-alert" size="40" color="gray"/>
+                </div>
+                <br>
+                <div style="display:flex;justify-content:center">
+                  <h2 style="text-align:center;width:50%">No projects in this category.</h2>
+                </div>
+                <br>
+                <div style="display:flex;justify-content:center">
+                  <h4
+                    style="text-align:center;width:50%;color:lightblue"
+                  >You can click the button right top called create to add a new project. Enriching your description of the project and attracting more people to join in.</h4>
+                </div>
+              </Card>
+            </Col>
+          </div>
+          <div
+            v-for="(item,index) in filteredBlogs"
+            :data="currentProjectList"
+            :key="item.index"
+            style="width:95%;margin-right:5%"
+            v-else
+          >
+            <Col
+              :xs="{ span: 21, offset: 1 }"
+              :md="{ span: 11, offset: 1 }"
+              :lg="{ span: 7,  offset: 1 }"
+              v-if="item.privacy=='Public'"
             >
-              <Col
-                :xs="{ span: 21, offset: 1 }"
-                :md="{ span: 11, offset: 1 }"
-                :lg="{ span: 7,  offset: 1 }"
-                v-if="item.privacy=='Public'"
-              >
-                <div @click="goSingleProject(item.projectId)" style="cursor:pointer">
-                  <Card style="height:auto;margin:20px 0 20px 0">
-                    <span slot="title" class="projectTitle">{{item.title}}</span>
-                    <div
-                      class="operate"
-                      slot="extra"
-                      style="height:40px;display:flex;align-items:center"
+              <div @click="goSingleProject(item.projectId)" style="cursor:pointer">
+                <Card style="height:auto;margin:20px 0 20px 0">
+                  <span slot="title" class="projectTitle">{{item.title}}</span>
+                  <div
+                    class="operate"
+                    slot="extra"
+                    style="height:40px;display:flex;align-items:center"
+                  >
+                    <Button
+                      type="success"
+                      v-show="!item.isMember&&!item.isManager&&UserState"
+                      @click.stop="joinApply(item)"
                     >
                       <Button
                         type="success"
@@ -181,7 +190,20 @@ img {
               </Form>
             </Modal>
           </div>
+        </div>
       </div>
+      <Modal
+        v-model="applyJoinModal"
+        title="join in the project"
+        @on-ok="ok"
+        @on-cancel="cancel"
+        ok-text="assure"
+        cancel-text="cancel"
+      >
+        <p>Content of dialog</p>
+        <p>Content of dialog</p>
+        <p>Content of dialog</p>
+      </Modal>
     </Row>
   </div>
 </template>
@@ -240,7 +262,9 @@ export default {
       search: "",
       // 记录已经申请的情况
       haveApplied: false,
-      getFinish: false
+      getFinish: false,
+      // 申请加入项目的模态框
+      applyJoinModal: false
     };
   },
   methods: {
@@ -321,6 +345,9 @@ export default {
       } else {
         return false;
       }
+    },
+    ok() {
+      this.$Message.info("Clicked ok");
     },
     cancel() {
       this.$Message.info("Clicked cancel");

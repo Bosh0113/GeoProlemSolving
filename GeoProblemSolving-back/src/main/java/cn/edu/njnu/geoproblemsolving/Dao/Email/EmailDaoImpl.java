@@ -13,8 +13,9 @@ import java.util.Properties;
 public class EmailDaoImpl implements IEmailDao{
 
     private static final long serialVersionUID = 1L;
-    private static String myEmailAccount = "zxsrlyc@163.com";
-    private static String myEmailPassword = "lyc123456";
+    private static String myEmailAccount = "geoproblemsolving@163.com";
+    //这里设置为授权码，而不是邮箱密码
+    private static String myEmailPassword = "LYC123456";
     private static String myEmailSMTPHost = "smtp.163.com";
 
     @Override

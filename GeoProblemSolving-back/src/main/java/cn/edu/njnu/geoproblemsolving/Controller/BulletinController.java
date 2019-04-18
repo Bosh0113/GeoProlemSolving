@@ -17,7 +17,7 @@ public class BulletinController {
     private MongoTemplate mongoTemplate;
 
     @RequestMapping(value = "/save", produces = {"application/json;charset=UTF-8"}, method = RequestMethod.POST)
-    public Object saveBulletin(@RequestBody  BulletinEntity bulletinEntity) {
+    public Object saveBulletin(@RequestBody BulletinEntity bulletinEntity) {
         BulletinDao bulletinDao = new BulletinDao(mongoTemplate);
         return bulletinDao.saveBulletin(bulletinEntity);
     }

@@ -239,8 +239,14 @@
                   <!-- v-show="this.$store.getters.userId" -->
                   <!-- v-show="this.subProjectInfo.managerId == this.$store.getters.userId" -->
                 </template>
-                <div style="line-height:60px" type="default" >
-                  <Button style="vertical-align:middle" v-show="giveDeleteProperty(index)" @click="removeMember(member.userId)"><Icon type="md-log-out" :size="20"/></Button>
+                <div style="line-height:60px" type="default">
+                  <Button
+                    style="vertical-align:middle"
+                    v-show="giveDeleteProperty(index)"
+                    @click="removeMember(member.userId,member.userName)"
+                  >
+                    <Icon type="md-log-out" :size="20"/>
+                  </Button>
                 </div>
               </div>
             </div>
@@ -319,8 +325,8 @@
         </Col>
       </div>
       <template v-else-if="order == 1">
-        <Col span="22" offset="1" style="margin-top:20px" :style="{height:sidebarHeight+4+'px'}">
-          <div style="padding: 5px 0;background-color:white" :style="{height:sidebarHeight-6+'px'}">
+        <Col span="22" offset="1" style="margin-top:20px;height:600px">
+          <div style="padding: 5px 0;background-color:white;height:100%">
             <Row type="flex" justify="center">
               <Col span="7">
                 <Card :padding="0" :border="false">
@@ -352,6 +358,7 @@
                           <strong style="color:#57a3f3" class="taskName">{{item.taskName}}</strong>
                         </span>
                         <div style="float:right">
+
                           <span>
                             <Icon
                               type="ios-more"
@@ -368,11 +375,19 @@
                             <Icon type="ios-trash" :size="20" color="gray"/>
                           </span>
                         </div>
+                        <div style="display:flex;">
+                          <p
+                          style="word-break:break-word;padding:5px;cursor:pointer"
+                          @click="editOneTask(index, taskTodo)"
+                        >{{item.description}}</p>
+                        <!-- <div style="display:flex;align-items:flex-end">
+                          <span>{{item.creatorName}}</span>
+                        </div> -->
+                        </div>
+                        <div style="display:flex;justify-content:flex-end">
+                          <Tag color="primary">{{item.creatorName}}</Tag>
+                        </div>
                       </div>
-                      <p
-                        style="word-break:break-word;padding:5px;cursor:pointer"
-                        @click="editOneTask(index, taskTodo)"
-                      >{{item.description}}</p>
                     </Card>
                   </draggable>
                 </Card>
@@ -414,15 +429,15 @@
                           >
                             <Icon type="ios-trash" :size="20" color="gray"/>
                           </span>
-                        </div>
                       </div>
                       <div style="display:flex">
                         <p
-                          style="word-break:break-word;padding:5px;cursor:pointer;width:80%"
+                          style="word-break:break-word;padding:5px;cursor:pointer"
                           @click="editOneTask(index,taskDoing)"
                         >{{item.description}}</p>
-                        <div style="display:flex;align-items:center">
-                          <!-- 这里取用户头像 -->
+                      </div>
+                        <div style="display:flex;justify-content:flex-end">
+                          <Tag color="primary">{{item.creatorName}}</Tag>
                         </div>
                       </div>
                     </Card>
@@ -471,6 +486,9 @@
                           style="word-break:break-word;padding:5px;cursor:pointer"
                           @click="editOneTask(index,taskDone)"
                         >{{item.description}}</p>
+                        <div style="display:flex;justify-content:flex-end">
+                          <Tag color="primary">{{item.creatorName}}</Tag>
+                        </div>
                       </div>
                     </Card>
                   </draggable>
@@ -1074,8 +1092,6 @@ export default {
             } else if (data == "Fail") {
               this.$Message.error("Fail!");
             } else {
-              // 告诉拉进去的人已经进项目
-              // 把通知存库里
               //reply to applicant
               let replyNotice = {};
               // 改apply.content.userId
@@ -1087,7 +1103,7 @@ export default {
                 description:
                   "You have been invited by " +
                   this.subProjectInfo.managerName +
-                  " to join in the sub project: " +
+                  " to join in the sub project:" +
                   this.subProjectInfo.title +
                   " , and now you are a member in this sub project."
               };
@@ -1103,8 +1119,6 @@ export default {
                 .catch(err => {
                   this.$Message.danger("reply fail.");
                 });
-              // this.$emit("sendNotice", this.subProjectInfo.managerId);
-              //发给子项目的管理者
             }
           }
         });
@@ -1412,14 +1426,17 @@ export default {
         this.$router.push({ name: "MemberDetailPage", params: { id: id } });
       }
     },
-    giveDeleteProperty(index){
-      if(this.subProjectInfo.managerId == this.$store.getters.userId&&index!=0){
-        return true
-      }else{
-        return false
+    giveDeleteProperty(index) {
+      if (
+        this.subProjectInfo.managerId == this.$store.getters.userId &&
+        index != 0
+      ) {
+        return true;
+      } else {
+        return false;
       }
     },
-    removeMember(uid){
+    removeMember(uid,uname) {
       // 获取到userId
       console.table(uid);
       this.axios
@@ -1432,11 +1449,7 @@ export default {
         )
         .then(res => {
           if (res.data == "Success") {
-            let projectId = sessionStorage.getItem("projectId");
-            this.$router.push({
-              name: "ProjectDetail",
-              params: { id: projectId }
-            });
+            this.$Message.info("Delete member successfully");
           } else {
             this.$Message.error("Fail!");
           }
@@ -1444,6 +1457,28 @@ export default {
         .catch(err => {
           console.log(err.data);
         });
+        let projectId = sessionStorage.getItem("projectId");
+        let projectName = sessionStorage.getItem("projectName");
+            let removeNotice = {};
+            removeNotice["recipientId"] = uid;
+            removeNotice["type"] = "notice";
+            removeNotice["content"] = {
+              title: "remove notification",
+              description:
+                "You have been expeled from sub project called " +
+                this.subProjectInfo.title + ", which belongs to project "
+                +  projectName + ".",
+            };
+            this.axios
+            .post("/GeoProblemSolving/notice/save", removeNotice)
+            .then(res => {
+              if(res.data=="Success"){
+                this.$emit("sendNotice", uid);
+              }
+            })
+            .catch(err => {
+              console.log("申请失败的原因是：" + err.data);
+            });
     }
   }
 };
