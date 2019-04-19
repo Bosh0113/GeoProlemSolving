@@ -6,34 +6,41 @@
       </div>
       <div class="nav">
         <Button
-          v-for="tab in tabs"
-          :key="tab.name"
-          :label="tab.name"
+          label="Clear"
           class="tab demo-flat-button"
-          :icon="tab.icon"
-          @click="tabfun(tab.fun)"
+          icon="md-close"
+          @click="tabfun('clear')"
         >
-          <span>{{tab.name}}</span>
+          <span>Clear</span>
         </Button>
+        <Button type="default" class="edit-btn" @click="Drawcancel()">
+          <Icon type="md-arrow-round-back"/>
+        </Button>
+        <Button type="default" class="edit-btn" @click="Drawrestore()">
+          <Icon type="md-arrow-round-forward"/>
+        </Button>        
+        <Button type="default" class="edit-btn" @click="canvas_copy()" style="margin-left:10px">Copy</Button>
+        <Button type="default" class="edit-btn" @click="canvas_paste()">Paste</Button>
         <Button
           :label="chooseColorBtn"
           class="tab demo-flat-button"
           icon="ios-color-palette"
           @click="setColor()"
           :color="color.hex"
+          style="margin-left:10px"
         >
           <span>{{this.chooseColorBtn}}</span>
         </Button>
+        <Button
+          label="Download"
+          class="tab demo-flat-button"
+          icon="ios-download"
+          @click="tabfun('save')"
+          style="margin-left:10px"
+        >
+          <span>Download</span>
+        </Button>
         <a href="javascript:void(0);" ref="download" download="picture.png" v-show="false"></a>
-        <Button type="default" class="edit-btn" @click="Drawcancel()">
-          <Icon type="md-arrow-round-back"/>
-        </Button>
-        <Button type="default" class="edit-btn" @click="Drawrestore()">
-          <Icon type="md-arrow-round-forward"/>
-        </Button>
-        <Button type="default" class="edit-btn" @click="canvas_copy()">Copy</Button>
-        <Button type="default" class="edit-btn" @click="canvas_paste()">Paste</Button>
-        <!-- <Button type="default" class="edit-btn" @click="socket()">socket</Button> -->
       </div>
       <PhotoshopPicker
         v-model="color"
@@ -42,11 +49,6 @@
         @ok="setColor()"
         @cancel="falseColor()"
       />
-      <div class="edit_panel">
-        <Tag color="default" class="tag">default</Tag>
-        <Tag color="primary" class="tag">primary</Tag>
-        <Tag color="success" class="tag">success</Tag>
-      </div>
     </div>
     <div class="content">
       <div class="content-left">
@@ -69,7 +71,7 @@
       <div class="content-right">
         <div
           class="body"
-          :style="{width:canvasSize.width + 'px',height: canvasSize.height + 'px' }"
+          :style="{width:canvasSize.width + 'px', height: canvasSize.height + 'px' }"
         >
           <canvas id="canvas" ref="canvas" :style="{cursor:curcursor}"></canvas>
           <canvas id="canvas_bak" ref="canvas_bak" :style="{cursor:curcursor}"></canvas>
@@ -78,7 +80,6 @@
     </div>
   </div>
 </template>
-
 <script>
 import { Photoshop } from "vue-color";
 import { canvas } from "leaflet";
@@ -92,13 +93,13 @@ export default {
       copyimgdata: "",
       //关于协同 --by mzy-- point:记录点集，line 记录线，lines记录线集
       points: [],
-      line: [],
+      line: {},
       lines: [],
       send_line: [],
       //将canvas的宽高设置好
       canvasSize: {
         width: window.screen.availWidth - 320,
-        height: window.screen.availHeight * 0.75
+        height: window.screen.availHeight - 180
       },
       canvas: this.$refs.canvas,
       canvasTop: 67,
@@ -108,7 +109,7 @@ export default {
       context_bak: null,
       ischoosecolor: false,
       toolsToggle: false,
-      chooseColorBtn: "Select Color",
+      chooseColorBtn: "Select color",
       color: {
         hex: "#2196f3",
         hsl: {
@@ -201,7 +202,7 @@ export default {
       this.context_bak = this.canvas_bak.getContext("2d");
     },
     setColor() {
-      this.chooseColorBtn = this.ischoosecolor ? "Select Color" : "Ok";
+      this.chooseColorBtn = this.ischoosecolor ? "Select color" : "Ok";
       this.ischoosecolor = this.ischoosecolor ? false : true;
       //这里选择后需要将属性传递过去
     },
@@ -336,7 +337,7 @@ export default {
         this.context_bak.beginPath(); //开始一条路径
       } else if (graphType == "circle") {
         this.context.beginPath();
-        this.context.moveTo(x, y);
+        // this.context.moveTo(x, y);
         this.context.lineTo(x + 2, y + 2);
         this.context.stroke();
       } else if (graphType == "rubber") {
@@ -459,7 +460,7 @@ export default {
           this.saveImageToAry();
         };
         this.context.beginPath();
-        this.context.moveTo(x, y);
+        // this.context.moveTo(x, y);
         this.context.lineTo(x + 2, y + 2);
         this.context.stroke();
       }
@@ -485,6 +486,13 @@ export default {
           this.canvasSize.width,
           this.canvasSize.height
         );
+
+        this.send_msg = {
+          type:"clear",
+          whoId: this.$store.getters.userId,
+          content: "clear"
+        };
+        this.socketApi.sendSock(this.send_msg, this.getSocketConnect);
       }
     },
     downloadImage() {
@@ -516,6 +524,13 @@ export default {
           this.canvasSize.height
         );
       };
+      
+        // this.send_msg = {
+        //   type:"last",
+        //   whoId: this.$store.getters.userId,
+        //   content: "last"
+        // };
+        // this.socketApi.sendSock(this.send_msg, this.getSocketConnect);
     },
     next() {
       this.cancelIndex--;
@@ -542,6 +557,13 @@ export default {
           this.canvasSize.height
         );
       };
+
+      // this.send_msg = {
+      //     type:"next",
+      //     whoId: this.$store.getters.userId,
+      //     content: "next"
+      //   };
+      //   this.socketApi.sendSock(this.send_msg, this.getSocketConnect);
     },
     //保存历史 用于撤销
     saveImageToAry() {
@@ -639,10 +661,10 @@ export default {
     socket() {
       this.send_line = {
         type:"drawing",
-        content: this.line
+        content: this.line,
+        whoId: this.$store.getters.userId
       };
       this.lines.push(this.send_line);
-
        
       this.socketApi.sendSock(this.send_line, this.getSocketConnect);
     },
@@ -653,10 +675,24 @@ export default {
         console.log(lineData.content);
       } 
       else if(lineData.type === "members"){}
-      else {        
+      else if(lineData.type === "drawing") {        
         //画面协同更新
-        this.line = lineData.content;
-        this.collaDrawLine(this.line);        
+        if(lineData.content !== {}) {
+          this.line = lineData.content;
+          this.collaDrawLine(this.line);  
+        }      
+      }
+      else if(lineData.type === "clear") {        
+        //画面协同更新
+        this.clearContext("1");   
+      }
+      else if(lineData.type == undefined && lineData.length > 0){
+        for(let i = 0;i < lineData.length;i++) {
+          if(lineData[i].content != {}) {
+            this.line = lineData[i].content;
+            this.collaDrawLine(this.line);
+          }
+        }
       }
     },
     collaDrawLine(line) {
@@ -729,7 +765,7 @@ export default {
     window.addEventListener("resize", () => {
       this.canvasSize = {
         width: window.screen.availWidth - 320,
-        height: window.screen.availHeight * 0.75
+        height: window.screen.availHeight -180
       };
     });
     
@@ -835,7 +871,6 @@ canvas {
   display: flex;
 }
 .edit-btn {
-  margin-left: 2.5px;
-  margin-right: 2.5px;
+  margin-right: 5px;
 }
 </style>
