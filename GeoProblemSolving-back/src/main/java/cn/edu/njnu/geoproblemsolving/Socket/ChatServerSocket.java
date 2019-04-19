@@ -2,7 +2,8 @@ package cn.edu.njnu.geoproblemsolving.Socket;
 
 import cn.edu.njnu.geoproblemsolving.Config.GetHttpSessionConfigurator;
 import cn.edu.njnu.geoproblemsolving.Config.MyEndPointConfigure;
-import cn.edu.njnu.geoproblemsolving.Dao.MessageRecords.MessageEventDaoImpl;
+import cn.edu.njnu.geoproblemsolving.Dao.MessageRecords.MessageRecordsDaoImpl;
+import cn.edu.njnu.geoproblemsolving.Dao.MessageRecords.MessageRecordsDaoImpl;
 import cn.edu.njnu.geoproblemsolving.Entity.MessageRecordsEntity;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ChatServerSocket {
 
     private static final Map<String,Map<String,Session>> rooms=new ConcurrentHashMap<>();
+    private static JSONObject messageJson=new JSONObject();
+    private static ArrayList<String> messagesArray = new ArrayList<>(); //信息缓存，用来发给新加入者
 
     @Autowired
     MongoTemplate mongoTemplate;
@@ -40,6 +43,14 @@ public class ChatServerSocket {
             rooms.get(roomId).put(httpSession.getAttribute("userId").toString(), session);
         }
         broadcastMembersToRoom(roomId);
+
+        if (messageJson.containsKey(roomId)) {
+            try {
+                session.getBasicRemote().sendText(messageJson.get(roomId).toString());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
     //接收消息后所调用的方法
     @OnMessage
@@ -50,13 +61,19 @@ public class ChatServerSocket {
         if (messageType.equals("message")) {
             broadcastMessageToRoom(roomId, message, session);
 
+            // 添加消息至缓存
+            messagesArray.add(message);
+            messageJson.put(roomId, messagesArray.toString());
+
             // 将历史消息进行存储
             try {
-                MessageEventDaoImpl messageEventDao = new MessageEventDaoImpl(mongoTemplate);
-                MessageRecordsEntity messageEventEntity = new MessageRecordsEntity();
-                messageEventEntity.setRoomId(roomId);
-                messageEventEntity.setContent(message);
-                messageEventDao.saveMessageEvent(messageEventEntity);
+                MessageRecordsDaoImpl messageRecordsDao = new MessageRecordsDaoImpl(mongoTemplate);
+                MessageRecordsEntity messageRecordsEntity = new MessageRecordsEntity();
+                messageRecordsEntity.setRoomId(roomId);
+                messageRecordsEntity.setUserId(messageObject.getString("fromid"));
+                messageRecordsEntity.setContent(message);
+                messageRecordsEntity.setType("message");
+                messageRecordsDao.saveMessageRecords(messageRecordsEntity);
             }
             catch (Exception ex) {
                 throw ex;
@@ -73,6 +90,12 @@ public class ChatServerSocket {
             }
         }
         broadcastMembersToRoom(roomId);
+
+        //最后一个人退出后清理消息缓存
+        if(rooms.get(roomId).size()<1){
+            messagesArray.clear();
+            messageJson.put(roomId, messagesArray.toString());
+        }
     }
     @OnError
     public void onError(@PathParam("roomId") String roomId, Session session,Throwable error)

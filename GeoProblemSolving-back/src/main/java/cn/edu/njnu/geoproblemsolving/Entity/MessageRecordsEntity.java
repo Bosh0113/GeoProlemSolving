@@ -7,8 +7,9 @@ public class MessageRecordsEntity {
 
     private String messageId;
     private String roomId; //查询条件Id
-    private String content;
     private String userId;
+    private String type;
+    private String content;
     private String createTime;
 
     public void setUserId(String userId) {
@@ -23,16 +24,24 @@ public class MessageRecordsEntity {
         this.content = content;
     }
 
+    public void setType(String type) {
+        this.type = type;
+    }
+
     public void setRoomId(String roomId) {
         this.roomId = roomId;
     }
 
-    public void setMessageId(String historyId) {
-        this.messageId = historyId;
+    public void setMessageId(String messageId) {
+        this.messageId = messageId;
     }
 
     public String getCreateTime() {
         return createTime;
+    }
+
+    public String getType() {
+        return type;
     }
 
     public String getContent() {
