@@ -13,7 +13,7 @@ img {
   height: 40px;
   line-height: 40px;
   font-size: 20px;
-  max-width: 200px;
+  max-width: 80%;
   display: inline-block;
   overflow: hidden;
   text-overflow: ellipsis;

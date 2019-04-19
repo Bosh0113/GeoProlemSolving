@@ -20,6 +20,9 @@ public class DrawServerSocket {
     private Session session=null;
     private static final Map<String,Map<String,DrawServerSocket>> rooms =new ConcurrentHashMap<>();
 
+    private static JSONObject drawingJson=new JSONObject();
+    private static ArrayList<String> drawingArray = new ArrayList<>(); //信息缓存，用来发给新加入者
+
     //定义了当一个新用户连接成功后所调用的方法
     @OnOpen
     public void onOpen(@PathParam("roomId") String roomId, Session session,EndpointConfig config)
@@ -34,7 +37,14 @@ public class DrawServerSocket {
         else {
             rooms.get(roomId).put(httpSession.getAttribute("userId").toString(), this);
         }
-//        broadcastMembersToRoom(roomId);
+
+        if (drawingJson.containsKey(roomId)) {
+            try {
+                session.getBasicRemote().sendText(drawingJson.get(roomId).toString());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
 
     }
     //接收消息后所调用的方法
@@ -42,7 +52,21 @@ public class DrawServerSocket {
     public void onMessage(@PathParam("roomId") String roomId, String message)
     {
         JSONObject messageObject = JSONObject.parseObject(message);
-        broadcastMessageToRoom(roomId, message);
+        String messageType = messageObject.getString("type");
+
+        if (messageType.equals("drawing") || messageType.equals("clear")) {
+            if (messageType.equals("drawing")) {
+                // 添加消息至缓存
+                drawingArray.add(message);
+                drawingJson.put(roomId, drawingArray.toString());
+            }
+            else {
+                drawingArray.clear();
+                drawingJson.put(roomId, drawingArray.toString());
+            }
+
+            broadcastMessageToRoom(roomId, message);
+        }
     }
     @OnClose
     public void onClose(@PathParam("roomId") String roomId)
@@ -53,7 +77,14 @@ public class DrawServerSocket {
                 break;
             }
         }
-//        broadcastMembersToRoom(roomId);
+
+        //最后一个人退出后清理消息缓存
+        if(rooms.get(roomId).size()<1){
+            drawingArray.clear();
+            drawingJson.put(roomId, drawingArray.toString());
+        }
+
+        // broadcastMembersToRoom(roomId);
     }
     @OnError
     public void onError(@PathParam("roomId") String roomId,Throwable error)
@@ -64,7 +95,8 @@ public class DrawServerSocket {
                 break;
             }
         }
-//        broadcastMembersToRoom(roomId);
+
+        // broadcastMembersToRoom(roomId);
     }
 
 

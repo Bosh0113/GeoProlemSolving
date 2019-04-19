@@ -213,8 +213,8 @@ export default {
                 this.$Message.success("Success!");
                 this.$store.commit("userLogin", res.data);
                 // 这里逻辑有问题，需要修改
-                this.$router.push({ path: "/resourceList" });
-                // this.$router.go(-1);
+                // this.$router.push({ path: "/resourceList" });
+                this.$router.go(-1);
               }
             });
         } else {
