@@ -95,9 +95,9 @@
 .taskFormItem span {
   text-align: center;
 }
-#taskContainer{
+#taskContainer {
   padding: 10px;
-  background-color:white;
+  background-color: white;
 }
 .taskList {
   min-height: 60px;
@@ -339,8 +339,8 @@
             id="taskContainer"
             :style="{minHeight:taskContainerHeight+'px'}"
           >
-            <Row type="flex" justify="center">
-              <Col span="8">
+            <Row type="flex" justify="space-around">
+              <Col span="7">
                 <Card :padding="0" :border="false">
                   <h3 slot="title">Todo</h3>
                   <Button
@@ -388,12 +388,10 @@
                             <Icon type="ios-trash" :size="20" color="gray"/>
                           </span>
                         </div>
-                        <div style="display:flex;">
-                          <p
-                            style="word-break:break-word;padding:5px;cursor:pointer"
-                            @click="showTask(index, taskTodo)"
-                          >{{item.description}}</p>
-                        </div>
+                        <p
+                          style="word-break:break-word;padding:5px;cursor:pointer"
+                          @click="showTask(index, taskTodo)"
+                        >{{item.description}}</p>
                         <div style="display:flex;justify-content:flex-end">
                           <Tag color="default" style="cursor:default">{{item.creatorName}}</Tag>
                         </div>
@@ -402,7 +400,7 @@
                   </draggable>
                 </Card>
               </Col>
-              <Col span="8">
+              <Col span="7">
                 <Card :padding="0" :border="false">
                   <h3 slot="title">Doing</h3>
                   <draggable
@@ -436,18 +434,17 @@
                           </span>
                           <span
                             style="margin-left:5px;margin-right:3px;cursor: pointer;color:gray;"
+                            title="Delete"
                             @click="taskRemoveAssure(index,taskDoing)"
                           >
                             <Icon type="ios-trash" :size="20" color="gray"/>
                           </span>
                         </div>
                       </div>
-                      <div style="display:flex">
-                        <p
-                          style="word-break:break-word;padding:5px;cursor:pointer;width:80%"
-                          @click="showTask(index,taskDoing)"
-                        >{{item.description}}</p>
-                      </div>
+                      <p
+                        style="word-break:break-word;padding:5px;cursor:pointer"
+                        @click="showTask(index,taskDoing)"
+                      >{{item.description}}</p>
                       <div style="display:flex;justify-content:flex-end">
                           <Tag color="default" style="cursor:default">{{item.managerName}}</Tag>
                       </div>
@@ -455,7 +452,7 @@
                   </draggable>
                 </Card>
               </Col>
-              <Col span="8">
+              <Col span="7">
                 <Card :padding="0" :border="false">
                   <h3 slot="title">Done</h3>
                   <draggable
@@ -493,6 +490,7 @@
                           </span>
                           <span
                             style="margin-left:5px;margin-right:3px;cursor: pointer;color:gray;"
+                            title="Delete"
                             @click="taskRemoveAssure(index,taskDone)"
                           >
                             <Icon type="ios-trash" :size="20" color="gray"/>
@@ -788,12 +786,16 @@ export default {
       if (!vm.$store.getters.userState) {
         next("/login");
       } else {
-        if (
-          !(
-            vm.subProjectInfo.managerId == vm.$store.getters.userId ||
-            vm.subProjectInfo.isMember
-          )
-        ) {
+        var userId = vm.$store.getters.userId;
+        var members = vm.subProjectInfo.members;
+        var isMember = false;
+        for (var i = 0; i < members.length; i++) {
+          if ((members[i].userId = userId)) {
+            isMember = true;
+            break;
+          }
+        }
+        if (!(vm.subProjectInfo.managerId == userId || isMember)) {
           alert("No access");
           // next(`/project/${vm.$store.getters.currentProjectId}`);
           vm.$router.go(-1);
@@ -829,6 +831,15 @@ export default {
         JSON.stringify(subProjectInfo) != "{}" &&
         subProjectInfo.subProjectId == subProjectId
       ) {
+        var userId = this.$store.getters.userId;
+        var members = subProjectInfo.members;
+        subProjectInfo.isMember = false;
+        for (var i = 0; i < members.length; i++) {
+          if ((members[i].userId = userId)) {
+            subProjectInfo.isMember = true;
+            break;
+          }
+        }
         this.$set(this, "subProjectInfo", subProjectInfo);
         this.inviteAble = false;
         this.showMembers();
@@ -948,9 +959,10 @@ export default {
       }
       let roomId = this.subProjectInfo.subProjectId + "task";
       // var subprojectSocketURL =
-        // "ws://localhost:8081/GeoProblemSolving/Module/" + roomId;
+      // "ws://localhost:8081/GeoProblemSolving/Module/" + roomId;
       // var subprojectSocketURL = "ws://202.195.237.252:8082/GeoProblemSolving/Module/" + roomId;
-      var subprojectSocketURL = "ws://172.21.212.7:8082/GeoProblemSolving/Module/" + roomId;
+      var subprojectSocketURL =
+        "ws://172.21.212.7:8082/GeoProblemSolving/Module/" + roomId;
       this.subprojectSocket = new WebSocket(subprojectSocketURL);
       this.subprojectSocket.onopen = this.onOpen;
       this.subprojectSocket.onmessage = this.onMessage;
@@ -1261,7 +1273,7 @@ export default {
           taskForm["creatorId"] = this.$store.getters.userId;
           taskForm["creatorName"] = this.$store.getters.userName;
           taskForm["managerName"] = this.$store.getters.userName;
-          taskForm["importance"] = this.formValidate.importanceCheck?1:0;
+          taskForm["importance"] = this.formValidate.importanceCheck ? 1 : 0;
           taskForm["subProjectId"] = this.subProjectInfo.subProjectId;
           taskForm["state"] = "todo";
           taskForm["order"] = this.taskTodo.length;
@@ -1289,7 +1301,7 @@ export default {
     addNewTask(newTaskObject) {
       this.taskTodo.push(newTaskObject);
     },
-    changeImportance(task){
+    changeImportance(task) {
       let taskForm = new URLSearchParams();
       taskForm.append("taskId", task.taskId);
       taskForm.append("importance", task.importance);
@@ -1325,7 +1337,7 @@ export default {
             let taskInfoRes = res.data[0];
             taskInfoRes.startTime = new Date(taskInfoRes.startTime);
             taskInfoRes.endTime = new Date(taskInfoRes.endTime);
-            taskInfoRes.importanceCheck = taskInfoRes.importance?true:false;
+            taskInfoRes.importanceCheck = taskInfoRes.importance ? true : false;
             this.$set(this, "formValidate", taskInfoRes);
             this.editTaskModal = true;
           } else {
@@ -1360,7 +1372,7 @@ export default {
         });
     },
     updateTaskList(taskObject) {
-      taskObject.importanceCheck = taskObject.importance?1:0;
+      taskObject.importanceCheck = taskObject.importance ? 1 : 0;
       switch (taskObject.state) {
         case "todo": {
           let taskList = this.taskTodo;
@@ -1404,7 +1416,7 @@ export default {
           taskForm.append("description", this.formValidate.description);
           taskForm.append("startTime", new Date(this.formValidate.startTime));
           taskForm.append("endTime", new Date(this.formValidate.endTime));
-          let importance = this.formValidate.importanceCheck?1:0;
+          let importance = this.formValidate.importanceCheck ? 1 : 0;
           taskForm.append("importance", importance);
           this.axios
             .post("/GeoProblemSolving/task/update", taskForm)
@@ -1417,7 +1429,7 @@ export default {
                 this.socketMsg.content = "edited a new task.";
                 this.socketMsg.time = new Date().toLocaleString();
                 this.sendMessage(this.socketMsg);
-                this.editTaskModal=false;
+                this.editTaskModal = false;
               } else {
                 this.$Message.error("Fail!");
               }

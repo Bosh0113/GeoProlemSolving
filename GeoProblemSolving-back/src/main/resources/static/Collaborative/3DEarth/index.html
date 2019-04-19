@@ -131,8 +131,10 @@
   </div>
   <script>
     var viewer = new Cesium.Viewer('cesiumContainer', {
-      // timeline:false, //时间轴
-      // animation:false //动画控件
+      timeline:false, //时间轴
+      animation:false, //动画控件
+      geocoder:false,
+      navigationHelpButton:false,
       terrainProvider: Cesium.createWorldTerrain()
     });
     // viewer.scene.globe.enableLighting = true;//开启照明，即昼夜效果
