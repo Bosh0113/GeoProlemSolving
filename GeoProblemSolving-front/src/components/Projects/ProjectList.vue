@@ -60,13 +60,6 @@ img {
               style="margin-right:2.5%;font-size:15px;height:40px"
               icon="md-add"
             >Create</Button>
-            <!-- <Button
-              type="default"
-              style="margin-right:2.5%;font-size:15px;height:40px"
-              icon="md-person-add"
-              class="btnJoin"
-              @click="joinModalShow"
-            >Join</Button>-->
           </div>
         </div>
       </Col>
@@ -113,12 +106,12 @@ img {
                     slot="extra"
                     style="height:40px;display:flex;align-items:center"
                   >
-                    <Button
+                    <!-- <Button
                       type="success"
                       v-show="!item.isMember&&!item.isManager&&UserState"
                       @click.stop="joinApply(item)"
                     >
-                    </Button>
+                    </Button> -->
                       <Button
                         type="success"
                         v-show="!item.isMember&&!item.isManager&&UserState"
@@ -193,20 +186,7 @@ img {
           </div>
         </div>
       </div>
-      <Modal
-        v-model="applyJoinModal"
-        title="join in the project"
-        @on-ok="ok"
-        @on-cancel="cancel"
-        ok-text="assure"
-        cancel-text="cancel"
-      >
-        <p>Content of dialog</p>
-        <p>Content of dialog</p>
-        <p>Content of dialog</p>
-      </Modal>
     </Row>
-
 </template>
 <script>
 import Avatar from "vue-avatar";

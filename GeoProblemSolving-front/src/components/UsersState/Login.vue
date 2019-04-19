@@ -212,9 +212,7 @@ export default {
                else {
                 this.$Message.success("Success!");
                 this.$store.commit("userLogin", res.data);
-                // 这里逻辑有问题，需要修改
-                this.$router.push({ path: "/resourceList" });
-                // this.$router.go(-1);
+                this.$router.go(-1);
               }
             });
         } else {
@@ -283,15 +281,15 @@ export default {
         .then(res => {
           if (res.data == "Success") {
             this.$Notice.success({
-              title: "Email send title",
+              title: "Email send success",
               desc:
-                "The application for change password we have accepted,later you will recieve an email to help you reset it."
+                "We have accepted your application for retrieving password, you will receive an email to help you reset it later."
             });
           } else {
             this.$Notice.error({
               title: "Email send fail",
               desc:
-                "Maybe you input your email wrong,please check out your input."
+                "Maybe you input a wrong email , please check it out."
             });
           }
         })

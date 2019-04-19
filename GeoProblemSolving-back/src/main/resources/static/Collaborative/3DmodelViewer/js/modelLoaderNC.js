@@ -34,7 +34,7 @@ $("#modelFile").change(function () {
 function uploadFun() {
 
     sessionStorage.setItem("projectId","NWU4ZDA2ZjktZTk2OC00YjkzLWI1NTMtZDNjM2IxMDQ1N2Q2OTI=");
-    sessionStorage.setItem("subprojectId","21aee7ab-d004-4203-a687-64076e4d93f5");
+    sessionStorage.setItem("subProjectId","21aee7ab-d004-4203-a687-64076e4d93f5");
     sessionStorage.setItem("moduleId","f99e1aa9-311d-4e8f-9f19-de479f4d9d4a");
 
     var formData = new FormData();
@@ -46,7 +46,7 @@ function uploadFun() {
     formData.append("belong", userInfo.userName);
     var scopeObject = {
         projectId: sessionStorage.getItem("projectId"),
-        subprojectId: sessionStorage.getItem("subprojectId"),
+        subProjectId: sessionStorage.getItem("subProjectId"),
         moduleId: sessionStorage.getItem("moduleId")
     };
     formData.append("scope", JSON.stringify(scopeObject));

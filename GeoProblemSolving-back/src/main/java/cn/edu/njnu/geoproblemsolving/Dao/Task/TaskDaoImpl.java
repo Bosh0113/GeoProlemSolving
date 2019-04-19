@@ -2,6 +2,7 @@ package cn.edu.njnu.geoproblemsolving.Dao.Task;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Method.CommonMethod;
 import cn.edu.njnu.geoproblemsolving.Entity.TaskEntity;
+import cn.edu.njnu.geoproblemsolving.Entity.UserEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -54,11 +55,11 @@ public class TaskDaoImpl implements ITaskDao{
     }
 
     @Override
-    public Object inquiryTodo(String subprojectId){
+    public Object inquiryTodo(String subProjectId){
         try {
             Query query=new Query();
             Criteria criteria=new Criteria();
-            criteria.andOperator(Criteria.where("subprojectId").is(subprojectId),Criteria.where("state").is("todo"));
+            criteria.andOperator(Criteria.where("subProjectId").is(subProjectId),Criteria.where("state").is("todo"));
             query.addCriteria(criteria);
             query.with(new Sort(Sort.Direction.ASC,"order"));
             return mongoTemplate.find(query,TaskEntity.class);
@@ -68,11 +69,11 @@ public class TaskDaoImpl implements ITaskDao{
     }
 
     @Override
-    public Object inquiryDoing(String subprojectId){
+    public Object inquiryDoing(String subProjectId){
         try {
             Query query=new Query();
             Criteria criteria=new Criteria();
-            criteria.andOperator(Criteria.where("subprojectId").is(subprojectId),Criteria.where("state").is("doing"));
+            criteria.andOperator(Criteria.where("subProjectId").is(subProjectId),Criteria.where("state").is("doing"));
             query.addCriteria(criteria);
             query.with(new Sort(Sort.Direction.ASC,"order"));
             return mongoTemplate.find(query,TaskEntity.class);
@@ -82,11 +83,11 @@ public class TaskDaoImpl implements ITaskDao{
     }
 
     @Override
-    public Object inquiryDone(String subprojectId){
+    public Object inquiryDone(String subProjectId){
         try {
             Query query=new Query();
             Criteria criteria=new Criteria();
-            criteria.andOperator(Criteria.where("subprojectId").is(subprojectId),Criteria.where("state").is("done"));
+            criteria.andOperator(Criteria.where("subProjectId").is(subProjectId),Criteria.where("state").is("done"));
             query.addCriteria(criteria);
             query.with(new Sort(Sort.Direction.ASC,"order"));
             return mongoTemplate.find(query,TaskEntity.class);
@@ -116,8 +117,30 @@ public class TaskDaoImpl implements ITaskDao{
                 int order = Integer.valueOf(request.getParameter("order"));
                  update.set("order",order);
             }catch (Exception ignored){}
+            try{
+                int importance = Integer.valueOf(request.getParameter("importance"));
+                update.set("importance",importance);
+            }catch (Exception ignored){}
             mongoTemplate.updateFirst(query,update,TaskEntity.class);
             return mongoTemplate.findOne(query,TaskEntity.class);
+        }catch (Exception e){
+            return "Fail";
+        }
+    }
+
+    public String addCreatorNameAndManagerName(){
+        try {
+            List<TaskEntity> taskEntityList = mongoTemplate.findAll(TaskEntity.class);
+            for (TaskEntity taskEntity:taskEntityList){
+                Query queryCreator = Query.query(Criteria.where("userId").is(taskEntity.getCreatorId()));
+                UserEntity creator = mongoTemplate.findOne(queryCreator,UserEntity.class);
+                Update updateTask = new Update();
+                updateTask.set("creatorName",creator.getUserName());
+                updateTask.set("managerName",creator.getUserName());
+                Query queryTask = Query.query(Criteria.where("taskId").is(taskEntity.getTaskId()));
+                mongoTemplate.updateFirst(queryTask,updateTask,TaskEntity.class);
+            }
+            return "Success";
         }catch (Exception e){
             return "Fail";
         }
