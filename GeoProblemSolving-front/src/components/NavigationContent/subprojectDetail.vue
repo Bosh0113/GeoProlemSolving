@@ -329,12 +329,12 @@
           span="22"
           offset="1"
           style="margin-top:20px"
-          :style="{height:taskContainerHeight+14+'px'}"
+          :style="{minHeight:taskContainerHeight+14+'px'}"
         >
           <div
             id="taskContainer"
             style="padding: 10px 0;background-color:white"
-            :style="{height:taskContainerHeight+'px'}"
+            :style="{minHeight:taskContainerHeight+'px'}"
           >
             <Row type="flex" justify="center" id="taskList">
               <Col span="7">
@@ -804,14 +804,6 @@ export default {
         top: 50,
         duration: 2
       });
-    },
-    // 动态task改变样式
-    taskReSize() {
-      let taskHeight = $("#taskList")[0].offsetHeight;
-      this.taskContainerHeight = taskHeight + 45;
-      if (this.taskContainerHeight < this.sidebarHeight) {
-        this.taskContainerHeight = this.sidebarHeight;
-      }
     },
     //初始化函数，作用是控制侧边栏的高度，设置右边通知栏弹出时候的距顶高度以及延迟的时间
     init() {
@@ -1391,8 +1383,6 @@ export default {
         .then(res => {
           if (res.data != "None" && res.data != "Fail") {
             this.$set(this, "taskTodo", res.data);
-
-            this.taskReSize();
           } else {
             this.$Message.error("Fail!");
           }
@@ -1411,8 +1401,6 @@ export default {
         .then(res => {
           if (res.data != "None" && res.data != "Fail") {
             this.$set(this, "taskDoing", res.data);
-
-            this.taskReSize();
           } else {
             this.$Message.error("Fail!");
           }
@@ -1431,8 +1419,6 @@ export default {
         .then(res => {
           if (res.data != "None" && res.data != "Fail") {
             this.$set(this, "taskDone", res.data);
-
-            this.taskReSize();
           } else {
             this.$Message.error("Fail!");
           }
@@ -1489,8 +1475,6 @@ export default {
       this.socketMsg.content = "changed the task schedule.";
       this.socketMsg.time = new Date().toLocaleString();
       this.sendMessage(this.socketMsg);
-
-      this.taskReSize();
     },
     taskRemoveAssure(index, taskList) {
       this.taskDeleteModal = true;
