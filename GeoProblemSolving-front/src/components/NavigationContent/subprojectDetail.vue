@@ -425,7 +425,7 @@
                           <strong style="color:#57a3f3" class="taskName">{{item.taskName}}</strong>
                         </span>
                         <div style="float:right">
-                          <Rate v-model="item.importance" :count="1" clearable title="Importance"/>
+                          <Rate v-model="item.importance" :count="1" clearable title="Importance" @on-change="changeImportance(item)"/>
                           <span>
                             <Icon
                               type="ios-create"
@@ -482,7 +482,7 @@
                           >{{item.taskName}}</strong>
                         </span>
                         <div style="float:right">
-                          <Rate v-model="item.importance" :count="1" clearable title="Importance"/>
+                          <Rate v-model="item.importance" :count="1" clearable title="Importance" @on-change="changeImportance(item)"/>
                           <span>
                             <Icon
                               type="ios-create"
