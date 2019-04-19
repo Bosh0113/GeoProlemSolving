@@ -367,7 +367,7 @@
                           <Icon type="ios-list" color="gray" :size="20"/>
                         </span>
                         <span style="padding:5px">
-                          <strong style="color:#57a3f3" class="taskName">{{item.taskName}}</strong>
+                          <strong style="color:#57a3f3" class="taskName" :title="item.taskName">{{item.taskName}}</strong>
                         </span>
                         <div style="float:right">
                           <Rate v-model="item.importance" :count="1" clearable title="Importance" @on-change="changeImportance(item)"/>
@@ -421,7 +421,7 @@
                           <Icon type="ios-information-circle-outline" color="gray" :size="20"/>
                         </span>
                         <span style="padding:5px">
-                          <strong style="color:#57a3f3" class="taskName">{{item.taskName}}</strong>
+                          <strong style="color:#57a3f3" class="taskName" :title="item.taskName">{{item.taskName}}</strong>
                         </span>
                         <div style="float:right">
                           <Rate v-model="item.importance" :count="1" clearable title="Importance" @on-change="changeImportance(item)"/>
