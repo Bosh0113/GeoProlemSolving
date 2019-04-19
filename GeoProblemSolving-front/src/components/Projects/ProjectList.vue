@@ -45,12 +45,16 @@ img {
         <div style="display:flex;height:60px;justify-content:center"></div>
         <div class="Tabpane" style="display:flex">
           <Tabs v-model="currentTab" @click.native="chooseCurrentType(currentTab)">
-            <TabPane label="Water" name="Water" icon="ios-water"></TabPane>
-            <TabPane label="Soil" name="Soil" icon="md-grid"></TabPane>
-            <TabPane label="Ecology" name="Ecology" icon="md-leaf"></TabPane>
-            <TabPane label="Atmosphere" name="Atmosphere" icon="md-cloud"></TabPane>
-            <TabPane label="Society" name="Society" icon="md-bus"></TabPane>
-            <TabPane label="Others" name="Others" icon="md-globe"></TabPane>
+            <TabPane label="All" name="All" icon="ios-list"></TabPane>
+            <TabPane label="Terrestrial System" name="Terrestrial System" icon="md-globe"></TabPane>
+            <TabPane label="Coastal System" name="Coastal System" icon="ios-boat"></TabPane>
+            <TabPane label="Marine System" name="Marine System" icon="ios-water"></TabPane>
+            <TabPane label="Climate System" name="Climate System" icon="ios-partly-sunny"></TabPane>
+            <TabPane label="Ecological System" name="Ecological System" icon="ios-leaf"></TabPane>
+            <TabPane label="Geological System" name="Geological System" icon="ios-analytics"></TabPane>
+            <TabPane label="Human-Activity" name="Human-Activity" icon="ios-people"></TabPane>
+            <TabPane label="GIS & RS" name="GIS & RS" icon="ios-globe"></TabPane>
+            <TabPane label="General" name="General" icon="ios-grid"></TabPane>
           </Tabs>
           <div style="width:40%;display:flex;justify-content:flex-end">
             <Button
@@ -193,8 +197,7 @@ import Avatar from "vue-avatar";
 export default {
   mounted() {
     // 作用是在一开始就到后台获取water资源类型的项目，作为默认值
-    let initObject = { key: "category", value: "Water" };
-    this.getSpecificTypeProjects(initObject);
+    this.getAllProjects();
   },
   computed: {
     filteredBlogs: function() {
@@ -254,45 +257,82 @@ export default {
       if (data === this.justChooseTab) {
       } else {
         switch (data) {
-          case "Water":
-            let waterObject = { key: "category", value: "Water" };
-            this.getSpecificTypeProjects(waterObject);
-            this.justChooseTab = "Water";
+          case "All":
+            this.justChooseTab = "All";
+            this.getAllProjects();
             break;
-          case "Soil":
-            let soilObject = { key: "category", value: "Soil" };
-            this.getSpecificTypeProjects(soilObject);
-            this.justChooseTab = "Soil";
+          case "Terrestrial System":
+            let Terrestrial = { key: "category", value: "Terrestrial System" };
+            this.getSpecificTypeProjects(Terrestrial);
+            this.justChooseTab = "Terrestrial System";
             break;
-          case "Ecology":
-            let ecologyObject = { key: "category", value: "Ecology" };
-            this.getSpecificTypeProjects(ecologyObject);
-            this.justChooseTab = "Ecology";
+          case "Coastal System":
+            let Coastal = { key: "category", value: "Coastal System" };
+            this.getSpecificTypeProjects(Coastal);
+            this.justChooseTab = "Coastal System";
             break;
-          case "Atmosphere":
-            let atmosphereObject = { key: "category", value: "Atmosphere" };
-            this.getSpecificTypeProjects(atmosphereObject);
-            this.justChooseTab = "Atmosphere";
+          case "Marine System":
+            let Marine = { key: "category", value: "Marine System" };
+            this.getSpecificTypeProjects(Marine);
+            this.justChooseTab = "Marine System";
             break;
-          case "Society":
-            let societyObject = { key: "category", value: "Society" };
-            this.getSpecificTypeProjects(societyObject);
-            this.justChooseTab = "Society";
+          case "Climate System":
+            let Climate = { key: "category", value: "Climate System" };
+            this.getSpecificTypeProjects(Climate);
+            this.justChooseTab = "Climate System";
             break;
-          case "Others":
-            let othersObject = { key: "category", value: "Others" };
-            this.getSpecificTypeProjects(othersObject);
-            this.justChooseTab = "Others";
+          case "Ecological System":
+            let Ecological = { key: "category", value: "Ecological System" };
+            this.getSpecificTypeProjects(Ecological);
+            this.justChooseTab = "Ecological System";
+            break;
+          case "Geological System":
+            let Geological = { key: "category", value: "Geological System" };
+            this.getSpecificTypeProjects(Geological);
+            this.justChooseTab = "Geological System";
+            break;
+          case "Human-Activity":
+            let Human = { key: "category", value: "Human-Activity" };
+            this.getSpecificTypeProjects(Human);
+            this.justChooseTab = "Human-Activity";
+            break;
+          case "GIS & RS":
+            let GIS = { key: "category", value: "GIS & RS" };
+            this.getSpecificTypeProjects(GIS);
+            this.justChooseTab = "GIS & RS";
+            break;
+          case "General":
+            let General = { key: "category", value: "General" };
+            this.getSpecificTypeProjects(General);
+            this.justChooseTab = "General";
             break;
         }
       }
+    },
+    getAllProjects(){
+      this.getFinish = true;
+      this.axios
+        .get(
+          "/GeoProblemSolving/project/inquiryAll")
+        .then(res => {
+          //结束等待
+          this.getFinish = false;
+          if (res.data === "None") {
+            this.currentProjectList = [];
+          } else {
+            this.judgeMember(res.data);
+          }
+        })
+        .catch(err => {
+          console.log(err.data);
+        });
     },
     getSpecificTypeProjects(data) {
       //显示等待
       this.getFinish = true;
       this.axios
         .get(
-          "/GeoProblemSolving/project/inquiry" +
+          "/GeoProblemSolving/project/inquiryByType" +
             "?key=" +
             data["key"] +
             "&value=" +
@@ -310,7 +350,6 @@ export default {
         .catch(err => {
           console.log(err.data);
         });
-      return this.currentProjectList;
     },
     newProject() {
       if (!this.$store.getters.userState) {

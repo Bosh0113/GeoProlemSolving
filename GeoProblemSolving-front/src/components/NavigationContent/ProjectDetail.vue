@@ -810,7 +810,7 @@ export default {
       //关于邮箱提示的
       value2: "",
       data2: [],
-      file:[],
+      file: []
     };
   },
   created() {
@@ -830,13 +830,16 @@ export default {
       if (!vm.$store.getters.userState) {
         next("/login");
       } else {
-        if (
-          !(
-            vm.currentProjectDetail.isManager ||
-            vm.currentProjectDetail.isMember ||
-            vm.currentProjectDetail.managerId == vm.$store.getters.userId
-          )
-        ) {
+        var userId = vm.$store.getters.userId;
+        var members = vm.currentProjectDetail.members;
+        var isMember = false;
+        for (var i = 0; i < members.length; i++) {
+          if (members[i].userId == userId) {
+            isMember = true;
+            break;
+          }
+        }
+        if (!(isMember || vm.currentProjectDetail.managerId == userId)) {
           alert("No access");
           next("/projectlist");
           // vm.$router.go(-1);
@@ -1366,22 +1369,22 @@ export default {
     },
     filesUpload() {
       let that = this;
-      if(that.file.length!=0){
+      if (that.file.length != 0) {
         var formData = new FormData();
-        for(var i=0; i< that.file.length; i++){
-          formData.append("file",that.file[i]);   // 文件对象
+        for (var i = 0; i < that.file.length; i++) {
+          formData.append("file", that.file[i]); // 文件对象
         }
         let userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
         formData.append("description", this.fileDescription);
         formData.append("type", this.fileType);
-        formData.append("uploaderId",this.$store.getters.userInfo.userId);
+        formData.append("uploaderId", this.$store.getters.userInfo.userId);
         formData.append("belong", this.currentProjectDetail.title);
         let scopeObject = {
-        projectId: this.currentProjectDetail.projectId,
-        subprojectId: "",
-        moduleId: ""
-      };
-      formData.append("scope", JSON.stringify(scopeObject));
+          projectId: this.currentProjectDetail.projectId,
+          subprojectId: "",
+          moduleId: ""
+        };
+        formData.append("scope", JSON.stringify(scopeObject));
       }
       this.axios
         .post("/GeoProblemSolving/resource/upload", formData)
@@ -1409,10 +1412,10 @@ export default {
       }
       return false;
     },
-    delFileList(index){
-     let that = this;
-     that.file.splice(index, 1);
-     console.log(that.file);
+    delFileList(index) {
+      let that = this;
+      that.file.splice(index, 1);
+      console.log(that.file);
     }
   }
 };

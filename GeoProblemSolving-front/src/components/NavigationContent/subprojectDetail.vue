@@ -790,7 +790,7 @@ export default {
         var members = vm.subProjectInfo.members;
         var isMember = false;
         for (var i = 0; i < members.length; i++) {
-          if ((members[i].userId = userId)) {
+          if ((members[i].userId == userId)) {
             isMember = true;
             break;
           }
@@ -835,7 +835,7 @@ export default {
         var members = subProjectInfo.members;
         subProjectInfo.isMember = false;
         for (var i = 0; i < members.length; i++) {
-          if ((members[i].userId = userId)) {
+          if ((members[i].userId == userId)) {
             subProjectInfo.isMember = true;
             break;
           }
