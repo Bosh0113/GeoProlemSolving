@@ -95,6 +95,10 @@
 .taskFormItem span {
   text-align: center;
 }
+#taskContainer{
+  padding: 10px;
+  background-color:white;
+}
 .taskList {
   min-height: 60px;
   background: #f7f7f7;
@@ -267,7 +271,7 @@
               <Modal
                 v-model="quitModal"
                 width="400px"
-                title="Quit subProject"
+                title="Quit Sub-Project"
                 @on-ok="quitSubProject()"
                 @on-cancel="cancel"
               >
@@ -276,7 +280,7 @@
               <Modal
                 v-model="inviteModal"
                 width="400px"
-                title="Invite group member join in the subProject"
+                title="Invite group members join the sub-project"
                 @on-ok="inviteMembers"
                 ok-text="ok"
                 cancel-text="cancel"
@@ -333,11 +337,10 @@
         >
           <div
             id="taskContainer"
-            style="padding: 10px 0;background-color:white"
             :style="{minHeight:taskContainerHeight+'px'}"
           >
-            <Row type="flex" justify="center" id="taskList">
-              <Col span="7">
+            <Row type="flex" justify="center">
+              <Col span="8">
                 <Card :padding="0" :border="false">
                   <h3 slot="title">Todo</h3>
                   <Button
@@ -358,7 +361,7 @@
                     @add="addMoveTask(taskTodo,'todo')"
                     @remove="removeMoveTask(taskTodo,'todo')"
                   >
-                    <Card v-for="(item,index) in taskTodo" :key="index" :padding="3">
+                    <Card v-for="(item,index) in taskTodo" :key="index" :padding="3" style="margin:5px">
                       <div>
                         <span style="float:left;padding:0 2.5px">
                           <Icon type="ios-list" color="gray" :size="20"/>
@@ -367,9 +370,10 @@
                           <strong style="color:#57a3f3" class="taskName">{{item.taskName}}</strong>
                         </span>
                         <div style="float:right">
+                          <Rate v-model="item.importance" :count="1" clearable title="Importance" @on-change="changeImportance(item)"/>
                           <span title="Edit">
                             <Icon
-                              type="ios-more"
+                              type="ios-create"
                               color="gray"
                               :size="20"
                               style="cursor:pointer"
@@ -391,14 +395,14 @@
                           >{{item.description}}</p>
                         </div>
                         <div style="display:flex;justify-content:flex-end">
-                          <Tag color="primary">{{item.creatorName}}</Tag>
+                          <Tag color="default" style="cursor:default">{{item.creatorName}}</Tag>
                         </div>
                       </div>
                     </Card>
                   </draggable>
                 </Card>
               </Col>
-              <Col span="7" style="margin-left:20px">
+              <Col span="8">
                 <Card :padding="0" :border="false">
                   <h3 slot="title">Doing</h3>
                   <draggable
@@ -411,7 +415,7 @@
                     @add="addMoveTask(taskDoing,'doing')"
                     @remove="removeMoveTask(taskDoing,'doing')"
                   >
-                    <Card v-for="(item,index)  in taskDoing" :key="index" :padding="3">
+                    <Card v-for="(item,index)  in taskDoing" :key="index" :padding="3" style="margin:5px">
                       <div>
                         <span style="float:left;padding:0 2.5px">
                           <Icon type="ios-information-circle-outline" color="gray" :size="20"/>
@@ -420,9 +424,10 @@
                           <strong style="color:#57a3f3" class="taskName">{{item.taskName}}</strong>
                         </span>
                         <div style="float:right">
+                          <Rate v-model="item.importance" :count="1" clearable title="Importance"/>
                           <span>
                             <Icon
-                              type="ios-more"
+                              type="ios-create"
                               color="gray"
                               :size="20"
                               style="cursor:pointer"
@@ -444,13 +449,13 @@
                         >{{item.description}}</p>
                       </div>
                       <div style="display:flex;justify-content:flex-end">
-                        <Tag color="primary">{{item.creatorName}}</Tag>
+                          <Tag color="default" style="cursor:default">{{item.managerName}}</Tag>
                       </div>
                     </Card>
                   </draggable>
                 </Card>
               </Col>
-              <Col span="7" style="margin-left:20px">
+              <Col span="8">
                 <Card :padding="0" :border="false">
                   <h3 slot="title">Done</h3>
                   <draggable
@@ -463,7 +468,7 @@
                     @add="addMoveTask(taskDone,'done')"
                     @remove="removeMoveTask(taskDone,'done')"
                   >
-                    <Card v-for="(item,index) in taskDone" :key="index" :padding="3">
+                    <Card v-for="(item,index) in taskDone" :key="index" :padding="3" style="margin:5px">
                       <div>
                         <span style="float:left;padding:0 2.5px">
                           <Icon type="md-checkmark-circle-outline"/>
@@ -476,9 +481,10 @@
                           >{{item.taskName}}</strong>
                         </span>
                         <div style="float:right">
+                          <Rate v-model="item.importance" :count="1" clearable title="Importance"/>
                           <span>
                             <Icon
-                              type="ios-more"
+                              type="ios-create"
                               color="gray"
                               :size="20"
                               style="cursor:pointer"
@@ -497,7 +503,7 @@
                           @click="showTask(index,taskDone)"
                         >{{item.description}}</p>
                         <div style="display:flex;justify-content:flex-end">
-                          <Tag color="primary">{{item.creatorName}}</Tag>
+                          <Tag color="default" style="cursor:default">{{item.managerName}}</Tag>
                         </div>
                       </div>
                     </Card>
@@ -507,11 +513,12 @@
             </Row>
           </div>
         </Col>
+        <BackTop></BackTop>
       </template>
     </Row>
     <Modal
       v-model="taskDeleteModal"
-      title="Delete task"
+      title="Delete Task"
       @on-ok="taskRemove()"
       @on-cancel="cancel()"
     >
@@ -519,11 +526,7 @@
     </Modal>
     <Modal
       v-model="createTaskModal"
-      title="Create task panel"
-      @on-ok="createTask('formValidate')"
-      @on-cancel="cancel()"
-      ok-text="ok"
-      cancel-text="cancel"
+      title="Create Task"
       width="800px"
     >
       <Form
@@ -567,11 +570,18 @@
             style="width: 560px"
           ></DatePicker>
         </FormItem>
+        <FormItem label="" prop="importance">
+          <Checkbox v-model="formValidate.importanceCheck">Important Task</Checkbox>
+        </FormItem>
       </Form>
+      <div slot="footer">
+        <Button type="text" @click="createTaskModal=false">Cancel</Button>
+        <Button type="primary" @click="createTask('formValidate')">Create</Button>
+      </div>
     </Modal>
     <Modal
       v-model="editTaskModal"
-      title="Edit task panel"
+      title="Edit Task"
       @on-ok="updateTask('formValidate')"
       @on-cancel="cancel()"
       ok-text="Ok"
@@ -619,22 +629,23 @@
             style="width: 560px"
           ></DatePicker>
         </FormItem>
-        <FormItem label="Status" prop="state">
-          <RadioGroup v-model="formValidate.state" disabled>
-            <Radio label="todo"></Radio>
-            <Radio label="doing"></Radio>
-            <Radio label="done"></Radio>
-          </RadioGroup>
+        <FormItem label="" prop="importance">
+          <Checkbox v-model="formValidate.importanceCheck">Important Task</Checkbox>
         </FormItem>
       </Form>
+      <div slot="footer">
+        <Button type="text" @click="editTaskModal=false">Cancel</Button>
+        <Button type="primary" @click="updateTask('formValidate')">Update</Button>
+      </div>
     </Modal>
-    <Modal v-model="taskDetailModal" title="Task detail" width="800px">
+    <Modal v-model="taskDetailModal" title="Task Detail" width="800px">
       <div class="taskFormItem">
         <span style="width:15%">Task name</span>
         <Input
           style="width: 600px"
           :placeholder="this.taskPlaceHolder.name"
           v-model="taskInfo.taskName"
+          readonly
         />
       </div>
       <div class="taskFormItem">
@@ -646,6 +657,7 @@
           :rows="4"
           v-model="taskInfo.description"
           :autosize="{minRows: 6}"
+          readonly
         />
       </div>
       <div class="taskFormItem">
@@ -656,6 +668,7 @@
           :placeholder="this.taskPlaceHolder.startTime"
           style="width: 600px"
           v-model="taskInfo.startTime"
+          readonly
         ></DatePicker>
       </div>
       <div class="taskFormItem" style="margin-bottom:10px">
@@ -666,6 +679,7 @@
           :placeholder="this.taskPlaceHolder.endTime"
           style="width: 600px"
           v-model="taskInfo.endTime"
+          readonly
         ></DatePicker>
       </div>
       <div slot="footer"></div>
@@ -747,7 +761,7 @@ export default {
         description: "",
         startTime: "",
         endTime: "",
-        state: "todo"
+        importanceCheck: false
       },
       ruleValidate: {
         taskName: [
@@ -933,10 +947,10 @@ export default {
         this.subprojectSocket = null;
       }
       let roomId = this.subProjectInfo.subProjectId + "task";
-      var subprojectSocketURL =
-        "ws://localhost:8081/GeoProblemSolving/Module/" + roomId;
+      // var subprojectSocketURL =
+        // "ws://localhost:8081/GeoProblemSolving/Module/" + roomId;
       // var subprojectSocketURL = "ws://202.195.237.252:8082/GeoProblemSolving/Module/" + roomId;
-      // var subprojectSocketURL = "ws://172.21.212.7:8082/GeoProblemSolving/Module/" + roomId;
+      var subprojectSocketURL = "ws://172.21.212.7:8082/GeoProblemSolving/Module/" + roomId;
       this.subprojectSocket = new WebSocket(subprojectSocketURL);
       this.subprojectSocket.onopen = this.onOpen;
       this.subprojectSocket.onmessage = this.onMessage;
@@ -1126,6 +1140,7 @@ export default {
       this.inviteModal = true;
     },
     inviteMembers() {
+      var that = this;
       for (let i = 0; i < this.inviteList.length; i++) {
         $.ajax({
           url:
@@ -1144,13 +1159,34 @@ export default {
             } else if (data == "Fail") {
               this.$Message.error("Fail!");
             } else {
-              //reply to applicant
+              that.axios
+                .get(
+                  "/GeoProblemSolving/user/inquiry" +
+                    "?key=" +
+                    "userId" +
+                    "&value=" +
+                    that.inviteList[i]
+                )
+                .then(res => {
+                  if (res.data != "Fail" && res.data != "None") {
+                    that.participants.push(res.data);
+                    this.$set(
+                      this.subProjectInfo,
+                      "members",
+                      this.participants
+                    );
+                    this.$store.commit(
+                      "setSubProjectInfo",
+                      this.subProjectInfo
+                    );
+                  }
+                })
+                .catch(err => {});
+              //notice
               let replyNotice = {};
-              // 改apply.content.userId
-              replyNotice["recipientId"] = this.inviteList[i]; // 改apply.content.userId
+              replyNotice["recipientId"] = this.inviteList[i];
               replyNotice["type"] = "notice";
               replyNotice["content"] = {
-                // 改
                 title: "Join subProject",
                 description:
                   "You have been invited by " +
@@ -1224,7 +1260,9 @@ export default {
           taskForm["endTime"] = new Date(this.formValidate.endTime);
           taskForm["creatorId"] = this.$store.getters.userId;
           taskForm["creatorName"] = this.$store.getters.userName;
-          taskForm["subprojectId"] = this.subProjectInfo.subProjectId;
+          taskForm["managerName"] = this.$store.getters.userName;
+          taskForm["importance"] = this.formValidate.importanceCheck?1:0;
+          taskForm["subProjectId"] = this.subProjectInfo.subProjectId;
           taskForm["state"] = "todo";
           taskForm["order"] = this.taskTodo.length;
           this.axios
@@ -1238,8 +1276,8 @@ export default {
                 this.socketMsg.content = "created a new task.";
                 this.socketMsg.time = new Date().toLocaleString();
                 this.sendMessage(this.socketMsg);
-
                 this.addNewTask(res.data);
+                this.createTaskModal = false;
               }
             })
             .catch(err => {});
@@ -1250,6 +1288,28 @@ export default {
     },
     addNewTask(newTaskObject) {
       this.taskTodo.push(newTaskObject);
+    },
+    changeImportance(task){
+      let taskForm = new URLSearchParams();
+      taskForm.append("taskId", task.taskId);
+      taskForm.append("importance", task.importance);
+      this.axios
+        .post("/GeoProblemSolving/task/update", taskForm)
+        .then(res => {
+          if (res.data != "None" && res.data != "Fail") {
+            this.socketMsg.whoid = this.$store.getters.userId;
+            this.socketMsg.who = this.$store.getters.userName;
+            this.socketMsg.type = "tasks";
+            this.socketMsg.content = "Changed the importance of one task.";
+            this.socketMsg.time = new Date().toLocaleString();
+            this.sendMessage(this.socketMsg);
+          } else {
+            this.$Message.error("Fail!");
+          }
+        })
+        .catch(err => {
+          console.log(err.data);
+        });
     },
     //打开task编辑器
     editOneTask(index, taskList) {
@@ -1265,6 +1325,7 @@ export default {
             let taskInfoRes = res.data[0];
             taskInfoRes.startTime = new Date(taskInfoRes.startTime);
             taskInfoRes.endTime = new Date(taskInfoRes.endTime);
+            taskInfoRes.importanceCheck = taskInfoRes.importance?true:false;
             this.$set(this, "formValidate", taskInfoRes);
             this.editTaskModal = true;
           } else {
@@ -1299,6 +1360,7 @@ export default {
         });
     },
     updateTaskList(taskObject) {
+      taskObject.importanceCheck = taskObject.importance?1:0;
       switch (taskObject.state) {
         case "todo": {
           let taskList = this.taskTodo;
@@ -1342,7 +1404,8 @@ export default {
           taskForm.append("description", this.formValidate.description);
           taskForm.append("startTime", new Date(this.formValidate.startTime));
           taskForm.append("endTime", new Date(this.formValidate.endTime));
-          taskForm.append("state", this.formValidate.state);
+          let importance = this.formValidate.importanceCheck?1:0;
+          taskForm.append("importance", importance);
           this.axios
             .post("/GeoProblemSolving/task/update", taskForm)
             .then(res => {
@@ -1354,6 +1417,7 @@ export default {
                 this.socketMsg.content = "edited a new task.";
                 this.socketMsg.time = new Date().toLocaleString();
                 this.sendMessage(this.socketMsg);
+                this.editTaskModal=false;
               } else {
                 this.$Message.error("Fail!");
               }
@@ -1377,7 +1441,7 @@ export default {
       this.axios
         .get(
           "/GeoProblemSolving/task/inquiryTodo?" +
-            "subprojectId=" +
+            "subProjectId=" +
             this.subProjectInfo.subProjectId
         )
         .then(res => {
@@ -1395,7 +1459,7 @@ export default {
       this.axios
         .get(
           "/GeoProblemSolving/task/inquiryDoing?" +
-            "subprojectId=" +
+            "subProjectId=" +
             this.subProjectInfo.subProjectId
         )
         .then(res => {
@@ -1413,7 +1477,7 @@ export default {
       this.axios
         .get(
           "/GeoProblemSolving/task/inquiryDone?" +
-            "subprojectId=" +
+            "subProjectId=" +
             this.subProjectInfo.subProjectId
         )
         .then(res => {
@@ -1443,27 +1507,53 @@ export default {
       this.taskOrderUpdate(taskList, type);
     },
     taskOrderUpdate(taskList, type) {
+      let thisUserName = this.$store.getters.userName;
+      let stateChangeIndex = 0;
       let count = taskList.length;
       for (let i = 0; i < taskList.length; i++) {
         let thisTask = taskList[i];
         if (thisTask.order != i || thisTask.state != type) {
-          let taskUpdateObj = new URLSearchParams();
-          taskUpdateObj.append("taskId", taskList[i]["taskId"]);
-          taskUpdateObj.append("order", i);
-          taskUpdateObj.append("state", type);
-          this.axios
-            .post("/GeoProblemSolving/task/update", taskUpdateObj)
-            .then(res => {
-              count--;
-              if (res.data != "Fail") {
-                if (this.MoveCount == 0 && count == 1) {
-                  this.endMove();
+          if (thisTask.state != type) {
+            stateChangeIndex = i;
+            let taskUpdateObj = new URLSearchParams();
+            taskUpdateObj.append("taskId", taskList[i]["taskId"]);
+            taskUpdateObj.append("order", i);
+            taskUpdateObj.append("state", type);
+            taskUpdateObj.append("managerName", thisUserName);
+            this.axios
+              .post("/GeoProblemSolving/task/update", taskUpdateObj)
+              .then(res => {
+                count--;
+                if (res.data != "Fail") {
+                  //更新数组
+                  taskList[stateChangeIndex].managerName = thisUserName;
+                  if (this.MoveCount == 0 && count == 1) {
+                    this.endMove();
+                  }
                 }
-              }
-            })
-            .catch(err => {
-              console.log(err.data);
-            });
+              })
+              .catch(err => {
+                console.log(err.data);
+              });
+          } else {
+            let taskUpdateObj = new URLSearchParams();
+            taskUpdateObj.append("taskId", taskList[i]["taskId"]);
+            taskUpdateObj.append("order", i);
+            taskUpdateObj.append("state", type);
+            this.axios
+              .post("/GeoProblemSolving/task/update", taskUpdateObj)
+              .then(res => {
+                count--;
+                if (res.data != "Fail") {
+                  if (this.MoveCount == 0 && count == 1) {
+                    this.endMove();
+                  }
+                }
+              })
+              .catch(err => {
+                console.log(err.data);
+              });
+          }
         }
       }
     },
@@ -1525,7 +1615,6 @@ export default {
     },
     removeMember(uid, uname) {
       // 获取到userId
-      console.table(uid);
       this.axios
         .get(
           "/GeoProblemSolving/subProject/quit" +
@@ -1536,37 +1625,46 @@ export default {
         )
         .then(res => {
           if (res.data == "Success") {
-            this.$Message.info("Delete member successfully");
+            var members = this.participants;
+            for (var i = 0; i < members.length; i++) {
+              if (members[i].userId == uid) {
+                this.participants.splice(i, 1);
+                break;
+              }
+            }
+            this.$set(this.subProjectInfo, "members", this.participants);
+            this.$store.commit("setSubProjectInfo", this.subProjectInfo);
+            this.$Message.info("Remove member successfully");
+            //notice
+            let projectName = sessionStorage.getItem("projectName");
+            let removeNotice = {};
+            removeNotice["recipientId"] = uid;
+            removeNotice["type"] = "notice";
+            removeNotice["content"] = {
+              title: "remove notification",
+              description:
+                "You have been expeled from sub project called " +
+                this.subProjectInfo.title +
+                ", which belongs to project " +
+                projectName +
+                "."
+            };
+            this.axios
+              .post("/GeoProblemSolving/notice/save", removeNotice)
+              .then(res => {
+                if (res.data == "Success") {
+                  this.$emit("sendNotice", uid);
+                }
+              })
+              .catch(err => {
+                console.log("申请失败的原因是：" + err.data);
+              });
           } else {
             this.$Message.error("Fail!");
           }
         })
         .catch(err => {
           console.log(err.data);
-        });
-      let projectId = sessionStorage.getItem("projectId");
-      let projectName = sessionStorage.getItem("projectName");
-      let removeNotice = {};
-      removeNotice["recipientId"] = uid;
-      removeNotice["type"] = "notice";
-      removeNotice["content"] = {
-        title: "remove notification",
-        description:
-          "You have been expeled from sub project called " +
-          this.subProjectInfo.title +
-          ", which belongs to project " +
-          projectName +
-          "."
-      };
-      this.axios
-        .post("/GeoProblemSolving/notice/save", removeNotice)
-        .then(res => {
-          if (res.data == "Success") {
-            this.$emit("sendNotice", uid);
-          }
-        })
-        .catch(err => {
-          console.log("申请失败的原因是：" + err.data);
         });
     }
   }

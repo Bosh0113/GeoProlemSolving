@@ -241,7 +241,6 @@
           </Col>
         </Row>
       </Content>
-      <Footer>Footer</Footer>
     </Layout>
     <!-- <app-header></app-header> -->
   </div>

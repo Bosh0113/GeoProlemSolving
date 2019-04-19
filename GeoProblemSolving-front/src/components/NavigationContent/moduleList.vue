@@ -1354,11 +1354,11 @@ export default {
       if (this.subprojectSocket != null) {
         this.subprojectSocket = null;
       }
-      let subprojectId = this.subProjectInfo.subProjectId;
-      var subprojectSocketURL =
-        "ws://localhost:8081/GeoProblemSolving/Module/" + subprojectId;
-      // var subprojectSocketURL = "ws://202.195.237.252:8082/GeoProblemSolving/Module/" + subprojectId;
-      // var subprojectSocketURL = "ws://172.21.212.7:8082/GeoProblemSolving/Module/" + subprojectId;
+      let subProjectId = this.subProjectInfo.subProjectId;
+      // var subprojectSocketURL =
+        // "ws://localhost:8081/GeoProblemSolving/Module/" + subProjectId;
+      // var subprojectSocketURL = "ws://202.195.237.252:8082/GeoProblemSolving/Module/" + subProjectId;
+      var subprojectSocketURL = "ws://172.21.212.7:8082/GeoProblemSolving/Module/" + subProjectId;
       this.subprojectSocket = new WebSocket(subprojectSocketURL);
       this.subprojectSocket.onopen = this.onOpen;
       this.subprojectSocket.onmessage = this.onMessage;
@@ -1899,7 +1899,7 @@ export default {
           this.sleep(1000).then(() => {
             let scopeObject = {
               projectId: sessionStorage.getItem("projectId"),
-              subprojectId: sessionStorage.getItem("subProjectId"),
+              subProjectId: sessionStorage.getItem("subProjectId"),
               moduleId: this.currentModule.moduleId
             };
             formData.append("scope", JSON.stringify(scopeObject));

@@ -6,17 +6,31 @@ import java.util.Date;
 
 @Document(collection = "Task")
 public class TaskEntity {
-    private String subprojectId;
+    private String subProjectId;
     private String taskId;
     private String taskName;
     private String description;
     private Date startTime;
     private Date endTime;
     private String state;   //_todo; doing; done.
+    private int importance;      //0;1.
     private String creatorId;
     private String creatorName;
+    private String managerName;
     private String createTime;
     private int order;
+
+    public String getSubProjectId() {
+        return subProjectId;
+    }
+
+    public int getImportance() {
+        return importance;
+    }
+
+    public String getManagerName() {
+        return managerName;
+    }
 
     public String getCreatorName() {
         return creatorName;
@@ -42,9 +56,6 @@ public class TaskEntity {
         return taskId;
     }
 
-    public String getSubprojectId() {
-        return subprojectId;
-    }
 
     public Date getEndTime() {
         return endTime;
@@ -86,9 +97,6 @@ public class TaskEntity {
         this.creatorId = creatorId;
     }
 
-    public void setSubprojectId(String subprojectId) {
-        this.subprojectId = subprojectId;
-    }
 
     public void setEndTime(Date endTime) {
         this.endTime = endTime;
@@ -104,5 +112,17 @@ public class TaskEntity {
 
     public void setOrder(int order) {
         this.order = order;
+    }
+
+    public void setManagerName(String managerName) {
+        this.managerName = managerName;
+    }
+
+    public void setSubProjectId(String subProjectId) {
+        this.subProjectId = subProjectId;
+    }
+
+    public void setImportance(int importance) {
+        this.importance = importance;
     }
 }

@@ -241,7 +241,7 @@ export default {
       formData.append("belong", this.$store.getters.userName);
       let scopeObject = {
         projectId: "",
-        subprojectId: "",
+        subProjectId: "",
         moduleId: ""
       };
       formData.append("scope", JSON.stringify(scopeObject));

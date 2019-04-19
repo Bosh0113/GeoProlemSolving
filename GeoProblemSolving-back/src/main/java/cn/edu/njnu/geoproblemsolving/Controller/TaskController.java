@@ -29,21 +29,21 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/inquiryTodo", method = RequestMethod.GET)
-    public Object inquiryTodo(@RequestParam("subprojectId") String subprojectId){
+    public Object inquiryTodo(@RequestParam("subProjectId") String subProjectId){
         TaskDaoImpl taskDao=new TaskDaoImpl(mongoTemplate);
-        return taskDao.inquiryTodo(subprojectId);
+        return taskDao.inquiryTodo(subProjectId);
     }
 
     @RequestMapping(value = "/inquiryDoing", method = RequestMethod.GET)
-    public Object inquiryDoing(@RequestParam("subprojectId") String subprojectId){
+    public Object inquiryDoing(@RequestParam("subProjectId") String subProjectId){
         TaskDaoImpl taskDao=new TaskDaoImpl(mongoTemplate);
-        return taskDao.inquiryDoing(subprojectId);
+        return taskDao.inquiryDoing(subProjectId);
     }
 
     @RequestMapping(value = "/inquiryDone", method = RequestMethod.GET)
-    public Object inquiryDone(@RequestParam("subprojectId") String subprojectId){
+    public Object inquiryDone(@RequestParam("subProjectId") String subProjectId){
         TaskDaoImpl taskDao=new TaskDaoImpl(mongoTemplate);
-        return taskDao.inquiryDone(subprojectId);
+        return taskDao.inquiryDone(subProjectId);
     }
 
     @RequestMapping(value = "/delete", method = RequestMethod.GET)
@@ -56,5 +56,11 @@ public class TaskController {
     public Object updateTask(HttpServletRequest request){
         TaskDaoImpl taskDao=new TaskDaoImpl(mongoTemplate);
         return taskDao.updateTask(request);
+    }
+
+    @RequestMapping(value = "/updateKey", method = RequestMethod.GET)
+    public String updateKey(){
+        TaskDaoImpl taskDao = new TaskDaoImpl(mongoTemplate);
+        return taskDao.addCreatorNameAndManagerName();
     }
 }

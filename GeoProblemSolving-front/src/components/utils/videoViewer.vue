@@ -122,7 +122,7 @@ export default {
       formData.append("belong", userInfo.userName);
       let scopeObject = {
         projectId: sessionStorage.getItem("projectId"),
-        subprojectId: sessionStorage.getItem("subprojectId"),
+        subProjectId: sessionStorage.getItem("subProjectId"),
         moduleId: sessionStorage.getItem("moduleId")
       };
       formData.append("scope", JSON.stringify(scopeObject));
