@@ -98,7 +98,7 @@
                     v-show="joinedProjectsList!=[]"
                   >
                     <Col :lg="{span:11, offset:1}" :md="{span:22, offset:1}">
-                      <div class="participatoryProjectCard" @click="goSingleProject(item.projectId)">
+                      <div>
                         <Card style="height:320px;margin-top:20px;">
                         <p
                           slot="title"
@@ -134,7 +134,7 @@
                     :key="index"
                   >
                     <Col :lg="{span:11, offset:1}" :md="{span:22, offset:1}">
-                    <div class="manageProjectsCard" @click="goSingleProject(mProject.projectId)">
+                    <div>
                       <Card style="height:320px;margin-top:20px">
                         <p
                           slot="title"
@@ -338,9 +338,6 @@ body {
 .participatoryProjectCard:hover,{
   cursor:pointer;
 }
-.manageProjectsCard:hover{
-  cursor:pointer;
-}
 </style>
 <script>
 import Avatar from "vue-avatar";
@@ -437,8 +434,6 @@ export default {
           if(res.data!="None" && res.data!=""){
             //判断是否为空
             this.userManagerProjectList = res.data;
-            // console.log("用户管理的项目是");
-            // console.table(this.userManagerProjectList);
           }
           // 打印用户所管理的项目
 

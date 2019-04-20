@@ -207,15 +207,17 @@ export default {
             localStorage.setItem("password", "");
             localStorage.setItem("statusRecord", false);
           }
+          var email = this.formInline.user
           var passwordFro = this.formInline.password;
           var passwordAES = this.encrypto(passwordFro);
+          var passwordAESURI = window.encodeURIComponent(passwordAES);
           this.axios
             .get(
               "/GeoProblemSolving/user/login" +
                 "?email=" +
-                this.formInline.user +
+                email +
                 "&password=" +
-                passwordAES
+                passwordAESURI
             )
             .then(res => {
               if (res.data === "Email") {

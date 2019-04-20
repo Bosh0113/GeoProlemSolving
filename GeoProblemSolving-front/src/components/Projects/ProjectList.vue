@@ -51,14 +51,14 @@ img {
         <div class="Tabpane" style="display:flex">
           <Tabs v-model="currentTab" @click.native="chooseCurrentType(currentTab)">
             <TabPane label="All" name="All" icon="ios-list"></TabPane>
-            <TabPane label="Terrestrial System" name="Terrestrial System" icon="md-globe"></TabPane>
-            <TabPane label="Coastal System" name="Coastal System" icon="ios-boat"></TabPane>
-            <TabPane label="Marine System" name="Marine System" icon="ios-water"></TabPane>
-            <TabPane label="Climate System" name="Climate System" icon="ios-partly-sunny"></TabPane>
-            <TabPane label="Ecological System" name="Ecological System" icon="ios-leaf"></TabPane>
-            <TabPane label="Geological System" name="Geological System" icon="ios-analytics"></TabPane>
-            <TabPane label="Human-Activity" name="Human-Activity" icon="ios-people"></TabPane>
-            <TabPane label="GIS & RS" name="GIS & RS" icon="ios-globe"></TabPane>
+            <TabPane label="Terrestrial" name="Terrestrial" icon="md-globe"></TabPane>
+            <TabPane label="Coastal" name="Coastal" icon="ios-boat"></TabPane>
+            <TabPane label="Marine" name="Marine" icon="ios-water"></TabPane>
+            <TabPane label="Climate" name="Climate" icon="ios-partly-sunny"></TabPane>
+            <TabPane label="Ecological" name="Ecological" icon="ios-leaf"></TabPane>
+            <TabPane label="Geological" name="Geological" icon="ios-analytics"></TabPane>
+            <TabPane label="Human-Activity" name="Human" icon="ios-people"></TabPane>
+            <TabPane label="GIS & RS" name="GISRS" icon="ios-globe"></TabPane>
             <TabPane label="General" name="General" icon="ios-grid"></TabPane>
           </Tabs>
           <div style="width:40%;display:flex;justify-content:flex-end">
@@ -260,45 +260,45 @@ export default {
             this.justChooseTab = "All";
             this.getAllProjects();
             break;
-          case "Terrestrial System":
-            let Terrestrial = { key: "category", value: "Terrestrial System" };
+          case "Terrestrial":
+            let Terrestrial = { key: "category", value: "Terrestrial" };
             this.getSpecificTypeProjects(Terrestrial);
-            this.justChooseTab = "Terrestrial System";
+            this.justChooseTab = "Terrestrial";
             break;
-          case "Coastal System":
-            let Coastal = { key: "category", value: "Coastal System" };
+          case "Coastal":
+            let Coastal = { key: "category", value: "Coastal" };
             this.getSpecificTypeProjects(Coastal);
-            this.justChooseTab = "Coastal System";
+            this.justChooseTab = "Coastal";
             break;
-          case "Marine System":
-            let Marine = { key: "category", value: "Marine System" };
+          case "Marine":
+            let Marine = { key: "category", value: "Marine" };
             this.getSpecificTypeProjects(Marine);
-            this.justChooseTab = "Marine System";
+            this.justChooseTab = "Marine";
             break;
-          case "Climate System":
-            let Climate = { key: "category", value: "Climate System" };
+          case "Climate":
+            let Climate = { key: "category", value: "Climate" };
             this.getSpecificTypeProjects(Climate);
-            this.justChooseTab = "Climate System";
+            this.justChooseTab = "Climate";
             break;
-          case "Ecological System":
-            let Ecological = { key: "category", value: "Ecological System" };
+          case "Ecological":
+            let Ecological = { key: "category", value: "Ecological" };
             this.getSpecificTypeProjects(Ecological);
-            this.justChooseTab = "Ecological System";
+            this.justChooseTab = "Ecological";
             break;
-          case "Geological System":
-            let Geological = { key: "category", value: "Geological System" };
+          case "Geological":
+            let Geological = { key: "category", value: "Geological" };
             this.getSpecificTypeProjects(Geological);
-            this.justChooseTab = "Geological System";
+            this.justChooseTab = "Geological";
             break;
-          case "Human-Activity":
-            let Human = { key: "category", value: "Human-Activity" };
+          case "Human":
+            let Human = { key: "category", value: "Human" };
             this.getSpecificTypeProjects(Human);
-            this.justChooseTab = "Human-Activity";
+            this.justChooseTab = "Human";
             break;
-          case "GIS & RS":
-            let GIS = { key: "category", value: "GIS & RS" };
+          case "GISRS":
+            let GIS = { key: "category", value: "GISRS" };
             this.getSpecificTypeProjects(GIS);
-            this.justChooseTab = "GIS & RS";
+            this.justChooseTab = "GISRS";
             break;
           case "General":
             let General = { key: "category", value: "General" };
