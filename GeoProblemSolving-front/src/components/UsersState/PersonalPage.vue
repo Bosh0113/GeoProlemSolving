@@ -652,7 +652,10 @@ export default {
     //获取用户的详细信息
     getUserProfile() {
       this.userDetail = Object.assign({},this.$store.getters.userInfo);
-      this.joinedProjectsNameList = this.userDetail.joinedProjects;
+      delete this.userDetail.password;
+      delete this.userDetail.joinedProjects;
+      delete this.userDetail.manageProjects;
+      this.joinedProjectsNameList = this.$store.getters.userInfo.joinedProjects;
     },
     //获取用户参与的项目列表
     getParticipatoryList(projectIds) {
@@ -692,7 +695,7 @@ export default {
           "/GeoProblemSolving/project/inquiry" +
             "?key=managerId" +
             "&value=" +
-            this.userId
+            this.userDetail.userId
         )
         .then(res => {
           if (res.data != "None" && res.data != "Fail") {
