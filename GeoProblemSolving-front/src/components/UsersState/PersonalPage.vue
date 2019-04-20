@@ -406,14 +406,6 @@ export default {
       }
     });
   },
-  updated(){
-    var userInfo = this.$store.getters.userInfo;
-    var userDetail = this.userDetail;
-    var personalInfoItem = this.personalInfoItem;
-    console.log("userInfo: "+userInfo.userName);
-    console.log("userDetail: "+userDetail.userName);
-    console.log("personalInfoItem: "+personalInfoItem.userName);
-  },
   mounted() {
     // 获取用户资源
     this.getUserProfile();
@@ -639,7 +631,7 @@ export default {
     //获取用户的详细信息
     getUserProfile() {
       this.userDetail = Object.assign({},this.$store.getters.userInfo);
-      this.joinedProjectsNameList = userInfo.joinedProjects;
+      this.joinedProjectsNameList = this.userDetail.joinedProjects;
     },
     //获取用户参与的项目列表
     getParticipatoryList(projectIds) {
