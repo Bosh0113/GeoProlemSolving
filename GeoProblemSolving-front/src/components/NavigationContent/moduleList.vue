@@ -263,7 +263,10 @@
       <Row style="margin-top:20px" :style="{height:sidebarHeight+30+'px'}">
         <Col span="22" offset="1">
           <Card class="noModule">
-            <div @click="addModal = true" style="cursor:pointer">
+            <div @click="addModal = true" style="cursor:pointer" v-if="this.$store.getters.userInfo.userId == this.subProjectInfo.managerId">
+              <h1>Start your work!</h1>
+            </div>
+            <div v-else>
               <h1>Start your work!</h1>
             </div>
           </Card>

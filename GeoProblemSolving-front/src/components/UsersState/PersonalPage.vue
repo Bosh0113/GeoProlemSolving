@@ -631,6 +631,9 @@ export default {
     //获取用户的详细信息
     getUserProfile() {
       this.userDetail = Object.assign({},this.$store.getters.userInfo);
+      delete this.userDetail.password;
+      delete this.userDetail.joinedProjects;
+      delete this.userDetail.manageProjects;
       this.joinedProjectsNameList = this.userDetail.joinedProjects;
     },
     //获取用户参与的项目列表
