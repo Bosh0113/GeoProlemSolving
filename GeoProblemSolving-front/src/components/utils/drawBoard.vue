@@ -5,12 +5,7 @@
         <span>Drawing</span>
       </div>
       <div class="nav">
-        <Button
-          label="Clear"
-          class="tab demo-flat-button"
-          icon="md-close"
-          @click="tabfun('clear')"
-        >
+        <Button label="Clear" class="tab demo-flat-button" icon="md-close" @click="tabfun('clear')">
           <span>Clear</span>
         </Button>
         <Button type="default" class="edit-btn" @click="Drawcancel()">
@@ -18,7 +13,7 @@
         </Button>
         <Button type="default" class="edit-btn" @click="Drawrestore()">
           <Icon type="md-arrow-round-forward"/>
-        </Button>        
+        </Button>
         <Button type="default" class="edit-btn" @click="canvas_copy()" style="margin-left:10px">Copy</Button>
         <Button type="default" class="edit-btn" @click="canvas_paste()">Paste</Button>
         <Button
@@ -34,13 +29,21 @@
         <Button
           label="Download"
           class="tab demo-flat-button"
-          icon="ios-download"
+          icon="md-cloud-download"
           @click="tabfun('save')"
           style="margin-left:10px"
         >
           <span>Download</span>
         </Button>
         <a href="javascript:void(0);" ref="download" download="picture.png" v-show="false"></a>
+        <Button
+          label="Download"
+          class="tab demo-flat-button"
+          icon="ios-download"
+          @click="tabfun('resource')"
+        >
+          <span>Save to resources</span>
+        </Button>
       </div>
       <PhotoshopPicker
         v-model="color"
@@ -54,16 +57,14 @@
       <div class="content-left">
         <div class="setterSize">
           <span>Thickness of line:{{penSize}}</span>
-          <mu-slider v-model="penSize" :step="1" :max="30"/>
+          <Slider v-model="penSize" :step="1" :max="30"></Slider>
           <span>Dotted length:{{lineType[0]}}</span>
-          <mu-slider v-model="lineType[0]" :step="1" :max="100"/>
+          <Slider v-model="lineType[0]" :step="1" :max="100"></Slider>
           <span>Dotted interval:{{lineType[1]}}</span>
-          <mu-slider v-model="lineType[1]" :step="1" :max="100"/>
+          <Slider v-model="lineType[1]" :step="1" :max="100"></Slider>
         </div>
         <div v-for="tool in tools" :key="tool.index">
           <div class="setting_style" @click="drawType(tool)" :class="{'selected':tool.ischoose}">
-            <!-- 这里图标可能会不显示 -->
-            <!-- <mu-icon size="30" :value="tool.icon" class="icon_style"></mu-icon> -->
             <span class="font_style">{{tool.name}}</span>
           </div>
         </div>
@@ -78,13 +79,41 @@
         </div>
       </div>
     </div>
+    <Modal
+      v-model="uploadFileModal"
+      title="Save to resource"
+      @on-ok="save2Resource('formValidate')"
+      ok-text="Submit"
+      cancel-text="Cancel"
+      width="600px"
+    >
+      <Form
+        ref="formValidate"
+        :model="formValidate"
+        :rules="ruleValidate"
+        :label-width="80"
+        style="margin-left:20px"
+      >
+        <FormItem label="Name" prop="fileName">
+          <Input v-model="formValidate.fileName" placeholder="*.png" style="width: 400px"/>
+        </FormItem>
+        <FormItem label="Description" prop="fileDescription">
+          <Input
+            v-model="formValidate.fileDescription"
+            type="textarea"
+            placeholder="Enter something..."
+            style="width: 400px"
+          />
+        </FormItem>
+      </Form>
+    </Modal>
   </div>
 </template>
 <script>
 import { Photoshop } from "vue-color";
 import { canvas } from "leaflet";
 import * as socketApi from "./../../api/socket.js";
-import MuseUI from "./../../utils/MuseUI";
+// import MuseUI from "./../../utils/MuseUI";
 export default {
   name: "draw",
   data() {
@@ -137,8 +166,8 @@ export default {
       lineType: [0, 0],
       canDraw: false,
       curcursor: "auto",
-      cancelList: [],
-      cancelIndex: 0,
+      canvasList: [],
+      storeCanvasList: [],
       tools: [
         {
           name: "Pencil",
@@ -188,7 +217,20 @@ export default {
           icon: "ios-download",
           fun: "save"
         }
-      ]
+      ],
+      uploadFileModal: false,
+      formValidate: {
+        fileName: "",
+        fileDescription: ""
+      },
+      ruleValidate: {
+        fileName: [
+          { required: true, message: "Please select type...", trigger: "blur" }
+        ],
+        fileDescription: [
+          { required: false, message: "Drawing tool", trigger: "blur" }
+        ]
+      }
     };
   },
   methods: {
@@ -242,18 +284,84 @@ export default {
     tabfun(fun) {
       if (fun === "clear") {
         this.clearContext("1");
-        
+
         this.lines = [];
         this.send_msg = {
-          type:"clear",
+          type: "clear",
           whoId: this.$store.getters.userId,
           content: "clear"
         };
         this.socketApi.sendSock(this.send_msg, this.getSocketConnect);
-
       } else if (fun === "save") {
         this.downloadImage();
+      } else if (fun === "resource") {
+        this.uploadFileModal = true;
       }
+    },
+    getBlobBydataURI(dataurl) {
+      var arr = dataurl.split(","),
+        mime = arr[0].match(/:(.*?);/)[1],
+        bstr = atob(arr[1]),
+        n = bstr.length,
+        u8arr = new Uint8Array(n);
+      while (n--) {
+        u8arr[n] = bstr.charCodeAt(n);
+      }
+      return new Blob([u8arr], { type: mime });
+    },
+    save2Resource(name) {
+      this.$refs[name].validate(valid => {
+        if (valid) {
+          let imageUrl = this.canvas.toDataURL();
+
+          let filename = "";
+          if (!/\.(png)$/.test(this.formValidate.fileName.toLowerCase())) {
+            filename = this.formValidate.fileName + ".png";
+          } else {
+            filename = this.formValidate.fileName;
+          }
+          let description = "";
+          if (this.formValidate.fileDescription == "") {
+            description = "Drawing tool resource";
+          } else {
+            description = this.formValidate.fileDescription;
+          }
+
+          // base64 转blob
+          let imageForm = new FormData();
+          let userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
+          let imageBlob = this.getBlobBydataURI(imageUrl);
+          var fileOfBlob = new File([imageBlob], filename);
+
+          imageForm.append("file", fileOfBlob);
+          imageForm.append("description", description);
+          imageForm.append("type", "Image");
+          imageForm.append("uploaderId", userInfo.userId);
+          imageForm.append("belong", userInfo.userName);
+          let scopeObject = {
+            projectId: sessionStorage.getItem("projectId"),
+            subProjectId: sessionStorage.getItem("subProjectId"),
+            moduleId: sessionStorage.getItem("moduleId")
+          };
+          imageForm.append("scope", JSON.stringify(scopeObject));
+
+          let that = this;
+          this.axios
+            .post("/GeoProblemSolving/resource/upload", imageForm)
+            .then(res => {
+              if (res.data != "Size over" && res.data.length > 0) {
+                that.$Notice.open({
+                  title: "Upload notification title",
+                  desc: "File uploaded successfully",
+                  duration: 2
+                });
+              }
+            })
+            .catch(err => {});
+        } else {
+          this.$Message.error("Please enter the necessary information!");
+        }
+      });
     },
     draw_graph(graphType) {
       this.canvas_bak.style.zIndex = 1; //蒙版设置在顶层
@@ -287,8 +395,8 @@ export default {
       //鼠标离开 把蒙版canvas的图片生成到canvas中
       let mouseup = e => {
         e = e || window.event;
-        
-        if(this.isMouseDown) {
+
+        if (this.isMouseDown) {
           let x = e.clientX - this.canvasLeft;
           let y = e.clientY - this.canvasTop;
 
@@ -297,16 +405,16 @@ export default {
 
         this.isMouseDown = false;
 
-        // 协同 
+        // 协同
         let line = {
           Graphtype: graphType,
           Linetype: this.lineType,
           Color: this.color.hex,
           Pensize: this.penSize,
           Points: this.points
-        };        
+        };
         this.send_line = {
-          type:"drawing",
+          type: "drawing",
           content: line,
           whoId: this.$store.getters.userId
         };
@@ -315,7 +423,7 @@ export default {
       };
       // 鼠标移动
       let mousemove = e => {
-        if(this.isMouseDown) {
+        if (this.isMouseDown) {
           e = e || window.event; //为了使多种浏览器兼容
           let x = e.clientX - this.canvasLeft;
           let y = e.clientY - this.canvasTop;
@@ -466,7 +574,7 @@ export default {
       let image = new Image(); //创建一个image对象
       if (graphType != "rubber") {
         image.src = this.canvas_bak.toDataURL(); //方法返回一个包含图片展示的data URI.参数是type与encoderOptions，分别表示图片格式与图片质量，0到1之间
-         
+
         // 相当于给浏览器缓存了一张图片
         // iamge onload事件在图片加载完后立即执行
         image.onload = () => {
@@ -518,17 +626,16 @@ export default {
       this.$refs.download.click();
     },
     cancel() {
-      if(this.cancelIndex < this.cancelList.length) {
-        this.cancelIndex++;
+      if (this.canvasList.length > 0) {
         this.context.clearRect(
           0,
           0,
           this.canvasSize.width,
           this.canvasSize.height
         );
+        this.storeCanvasList.push(this.canvasList.pop());
+        let url = this.canvasList[this.canvasList.length - 1];
         let image = new Image();
-        let index = this.cancelList.length - 1 - this.cancelIndex;
-        let url = this.cancelList[index];
         image.src = url;
         image.onload = () => {
           this.context.drawImage(
@@ -543,21 +650,19 @@ export default {
             this.canvasSize.height
           );
         };
-      }  
+      }
     },
     next() {
-      if(this.cancelIndex > 0) {
-
-        this.cancelIndex--;
+      if (this.storeCanvasList.length > 0) {
         let image = new Image();
-        let index = this.cancelList.length - 1 - this.cancelIndex;
         this.context.clearRect(
           0,
           0,
           this.canvasSize.width,
           this.canvasSize.height
         );
-        let url = this.cancelList[index];
+        let url = this.storeCanvasList.pop();
+        this.canvasList.push(url);
         image.src = url;
         image.onload = () => {
           this.context.drawImage(
@@ -576,9 +681,9 @@ export default {
     },
     //保存历史 用于撤销
     saveImageToAry() {
-      this.cancelIndex = 0;
       let dataUrl = this.canvas.toDataURL();
-      this.cancelList.push(dataUrl);
+      this.canvasList.push(dataUrl);
+      this.storeCanvasList = [];
     },
     // 处理文件拖入事件，防止浏览器默认事件带来的重定向
     handleDragOver(evt) {
@@ -651,29 +756,28 @@ export default {
       };
     },
     Drawcancel() {
-      if(this.lines.length > 0) {
+      if (this.lines.length > 0) {
         this.cancel();
 
         this.send_msg = {
-          type:"last",
+          type: "last",
           whoId: this.$store.getters.userId,
           content: "last"
         };
-        this.socketApi.sendSock(this.send_msg, this.getSocketConnect);      
+        this.socketApi.sendSock(this.send_msg, this.getSocketConnect);
         this.storeLines.push(this.lines.pop());
       }
     },
     Drawrestore() {
-
-      if(this.storeLines.length > 0) {
-        this.next(); 
+      if (this.storeLines.length > 0) {
+        this.next();
         this.send_msg = {
-          type:"next",
+          type: "next",
           whoId: this.$store.getters.userId,
-          content: this.storeLines[this.storeLines.length -1]
+          content: this.storeLines[this.storeLines.length - 1]
         };
         this.socketApi.sendSock(this.send_msg, this.getSocketConnect);
-      
+
         this.lines.push(this.storeLines.pop());
       }
     },
@@ -693,41 +797,38 @@ export default {
 
       if (lineData.from === "Test") {
         console.log(lineData.content);
-      } 
-      else if(lineData.type === "members"){}
-      else if(lineData.type === "drawing") {        
+      } else if (lineData.type === "members") {
+      } else if (lineData.type === "drawing") {
         //画面协同更新
-        if(lineData.content !== {}) {
+        if (lineData.content !== {}) {
           let line = lineData.content;
-          this.collaDrawLine(line); 
-          // 存储笔划 
+          this.collaDrawLine(line);
+          // 存储笔划
           this.lines.push(line);
-        }      
-      }
-      else if(lineData.type === "clear") {        
+
+          this.storeCanvasList = [];
+        }
+      } else if (lineData.type === "clear") {
         //画面协同更新
         this.clearContext("1");
         this.lines = [];
-      }
-      else if(lineData.type === "last") {        
+      } else if (lineData.type === "last") {
         //画面协同更新
         this.cancel();
 
-        if(this.lines.length > 0) {        
+        if (this.lines.length > 0) {
           this.storeLines.push(this.lines.pop());
         }
-      }
-      else if(lineData.type === "next") {
+      } else if (lineData.type === "next") {
         //画面协同更新
         this.next();
 
-        if(this.storeLines.length > 0) {        
+        if (this.storeLines.length > 0) {
           this.lines.push(this.storeLines.pop());
         }
-      }
-      else if(lineData.type == undefined && lineData.length > 0){
-        for(let i = 0;i < lineData.length;i++) {
-          if(lineData[i].content != {}) {
+      } else if (lineData.type == undefined && lineData.length > 0) {
+        for (let i = 0; i < lineData.length; i++) {
+          if (lineData[i].content != {}) {
             let line = lineData[i].content;
             this.collaDrawLine(line);
             // 存储笔划
@@ -771,12 +872,12 @@ export default {
       this.socketApi.initWebSocket("DrawServer/" + roomId);
 
       this.send_msg = {
-        type:"test",
+        type: "test",
         from: "Test",
         content: "TestChat"
       };
       this.socketApi.sendSock(this.send_msg, this.getSocketConnect);
-    },
+    }
   },
   components: {
     PhotoshopPicker: Photoshop
@@ -785,14 +886,12 @@ export default {
     // alert(this.isSubProjectMember);
     next(vm => {
       if (!vm.$store.getters.userState || vm.$store.getters.userId == "") {
-        vm.$router.push({name:"Login"});
+        vm.$router.push({ name: "Login" });
       } else {
-
       }
     });
   },
-  created() {
-  },
+  created() {},
   beforeDestroy() {
     this.socketApi.close();
   },
@@ -806,10 +905,9 @@ export default {
     window.addEventListener("resize", () => {
       this.canvasSize = {
         width: window.screen.availWidth - 320,
-        height: window.screen.availHeight -180
+        height: window.screen.availHeight - 180
       };
     });
-    
   }
 };
 </script>

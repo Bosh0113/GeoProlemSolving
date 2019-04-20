@@ -970,8 +970,8 @@
       v-model="uploadFileModal"
       title="Upload resource"
       @on-ok="submitFile('formValidate3')"
-      ok-text="submit"
-      cancel-text="cancel"
+      ok-text="Submit"
+      cancel-text="Cancel"
       width="600px"
       :mask-closable="false"
     >
