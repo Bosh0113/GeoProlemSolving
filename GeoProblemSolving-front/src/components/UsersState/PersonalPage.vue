@@ -56,7 +56,7 @@
                 <br>
                 <div
                   style="padding:10px;font-size:12px;border:1px dotted lightgray"
-                >{{this.userDetail.introduction}}</div>
+                >{{userDetail.introduction}}</div>
                 <div class="whitespace"></div>
                 <div style="display:flex;justify-content:center">
                   <Button type="success" style="height:40px" @click="editModalShow()" title="Edit">
@@ -557,7 +557,7 @@ export default {
     //获取用户的详细信息
     getUserProfile() {
       this.userDetail = this.$store.getters.userInfo;
-      this.personalInfoItem = this.$store.getters.userInfo;
+      // this.personalInfoItem = this.$store.getters.userInfo;
       this.joinedProjectsNameList = this.userDetail.joinedProjects;
     },
     //获取用户参与的项目列表
