@@ -36,6 +36,7 @@
             :theme="sidebarTheme"
             active-name="1"
             width="auto"
+            style="border:1px solid lightgray;z-index:0"
             :style="{height:sidebarTreeHeight}"
             @on-select="onMenuSelect"
           >
@@ -144,7 +145,7 @@
 export default {
   data() {
     return {
-      sidebarTreeHeight: "",
+      sidebarTreeHeight: "800px",
       searchResourceInput: "",
       // 侧边栏的颜色主题
       sidebarTheme: "light",
@@ -167,21 +168,24 @@ export default {
         },
         {
           title: "Belong",
-          key: "belong"
+          key: "belong",
+          width:120,
         },
         {
           title: "Type",
           key: "type",
-          sortable: true
+          sortable: true,
+          width:120,
         },
         {
           title: "Uploader",
           key: "uploader"
         },
         {
-          title: "Uploader Time",
+          title: "Time",
           key: "uploadTime",
-          sortable: true
+          sortable: true,
+          width:200
         },
         {
           title: "Action",
@@ -203,7 +207,7 @@ export default {
   },
   methods: {
     initLayout() {
-      this.sidebarTreeHeight = window.innerHeight - 80 + "px";
+      this.sidebarTreeHeight = window.innerHeight - 120 + "px";
     },
     onMenuSelect(name) {
       this.uploaderArray = [];

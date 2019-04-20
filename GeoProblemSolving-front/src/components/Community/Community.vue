@@ -56,7 +56,7 @@
                     v-model="modal1"
                     title="Leave your comment about this topic"
                     @on-ok="submit"
-                    @on-cancel="cancel"
+                    @on-cancel=""
                   >
                     <Input
                       v-model="commentContent"

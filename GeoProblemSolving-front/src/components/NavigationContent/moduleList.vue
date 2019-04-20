@@ -205,7 +205,7 @@
                 <Button
                   type="default"
                   @click="editModalShow()"
-                  icon="md-brush"
+                  icon="ios-create"
                   class="editBtn"
                   title="Edit this module"
                 >Edit</Button>
@@ -349,7 +349,7 @@
                     </h2>
                     <div slot="extra" style="display:flex;align-items:center" v-if="this.$store.getters.userInfo.userId == this.subProjectInfo.managerId">
                      <span @click="noticeModalShow=true" style="cursor:pointer" title="add a notice"><Icon type="md-add" /></span>
-                     <span @click="noticeDetailShow()" style="cursor:pointer;margin-left:10px" title="edit" ><Icon type="md-brush" /></span>
+                     <span @click="noticeDetailShow()" style="cursor:pointer;margin-left:10px" title="edit" ><Icon type="ios-create" /></span>
                      <span @click="deleteNotice()" style="cursor:pointer;margin-left:10px" title="remove" ><Icon type="ios-trash" /></span>
                     </div>
                     <div>
@@ -367,8 +367,8 @@
                     v-model="noticeModalShow"
                     title="Create a new notice"
                     @on-ok="createNotice"
-                    @on-cancel="cancel"
-                    ok-text="assure"
+                    @on-cancel=""
+                    ok-text="Confirm"
                     cancel-text="cancel">
                       <Form :model="formItem" :label-width="60">
                       <FormItem label="title">
@@ -384,8 +384,8 @@
                     v-model="noticeDetailShowModal"
                     title="Notice detail update"
                     @on-ok="editNotice()"
-                    @on-cancel="cancel"
-                    ok-text="assure"
+                    @on-cancel=""
+                    ok-text="Confirm"
                     cancel-text="cancel">
                   <Form :model="editFormItem" :label-width="60">
                       <FormItem label="title">
@@ -532,7 +532,7 @@
               <Button type="info" class="util-btn" shape="circle" @click="drawerOpen = true">
                 <Icon type="ios-albums" size="20" class="util-btn-icon"/>
               </Button>
-              <Drawer :closable="false" v-model="drawerOpen" width="450" style="font-size:30px">
+              <Drawer :closable="false" v-model="drawerOpen" width="360" style="font-size:30px">
                 <!-- tab contains collaborative and non-collaborative -->
                 <Tabs value="General">
                   <TabPane label="General tools" name="General">
@@ -544,7 +544,7 @@
                     <div class="tool-panel">
                       <div class="singl_tool_style">
                         <Icon
-                          type="md-brush"
+                          type="ios-create"
                           size="60"
                           @click.native="toolPanel('draw')"
                           title="DrawBoard"
@@ -578,16 +578,8 @@
                           color="#2d8cf0"
                         />
                       </div>
-                      <div class="singl_tool_style">
-                        <Icon
-                          type="ios-create"
-                          size="60"
-                          @click.native="toolPanel('graphEditor')"
-                          title="Graph Editor"
-                          color="#eca01c"
-                        />
-                      </div>
                     </div>
+
                     <div class="tool-panel">
                       <div class="singl_tool_style">
                         <Icon
@@ -596,6 +588,15 @@
                           @click.native="toolPanel('3DmodelViewer')"
                           title="3D model Viewer"
                           color="#561cec"
+                        />
+                      </div>
+                      <div class="singl_tool_style">
+                        <Icon
+                          type="ios-create"
+                          size="60"
+                          @click.native="toolPanel('graphEditor')"
+                          title="Graph Editor"
+                          color="#eca01c"
                         />
                       </div>
                     </div>
@@ -607,7 +608,7 @@
                     <div class="tool-panel">
                       <div class="singl_tool_style">
                         <Icon
-                          type="md-brush"
+                          type="ios-create"
                           size="60"
                           @click.native="toolPanel('nc-draw')"
                           title="DrawBoard"
@@ -1399,7 +1400,7 @@ export default {
       // module 更新
       else if (messageJson.type == "module") {
         this.getAllModules("init");
-      } 
+      }
       else if (messageJson.type == "members") {
         // 比较 判断人员动态 更新records
 
@@ -2086,7 +2087,7 @@ export default {
       if (type == "map") {
         toolURL =
           '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/map" style="width: 100%;height:100%"></iframe>';
-        toolName = "Map";  
+        toolName = "Map";
 
       } else if (type == "draw") {
         toolURL =
@@ -2159,13 +2160,13 @@ export default {
         toolName = "Chart";
       } else if (type == "cn-tableEditor") {
         toolURL =
-          '<iframe src="/GeoProblemSolving/Collaborative/jexcelTool/excelToolSingle.html' +          
+          '<iframe src="/GeoProblemSolving/Collaborative/jexcelTool/excelToolSingle.html' +
           '" style="width: 100%;height:100%"></iframe>';
-          toolName = "Table editor"; 
+          toolName = "Table editor";
 
       } else if (type == "nc-3DmodelViewer") {
         toolURL =
-          '<iframe src="/GeoProblemSolving/Collaborative/3DmodelViewer/indexSingle.html' +          
+          '<iframe src="/GeoProblemSolving/Collaborative/3DmodelViewer/indexSingle.html' +
           '" style="width: 100%;height:100%"></iframe>';
         toolName = "3D model viewer";
       } else if (type == "nc-video") {
@@ -2196,7 +2197,7 @@ export default {
         whoid: this.$store.getters.userId,
         type: "tools",
         toolType: type,
-        content: "is using a tool: " + type,
+        content: "used a tool: " + type,
         moduleId: this.currentModule.moduleId,
         time: new Date().toLocaleString()
       };
