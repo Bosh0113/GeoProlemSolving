@@ -634,7 +634,7 @@ export default {
       delete this.userDetail.password;
       delete this.userDetail.joinedProjects;
       delete this.userDetail.manageProjects;
-      this.joinedProjectsNameList = this.userDetail.joinedProjects;
+      this.joinedProjectsNameList = this.$store.getters.userInfo.joinedProjects;
     },
     //获取用户参与的项目列表
     getParticipatoryList(projectIds) {
