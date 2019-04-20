@@ -480,6 +480,7 @@
                 @click="uploadFileModalShow()"
                 class="uploadBtn"
                 title="upload resource"
+
               >
                 <Icon type="md-cloud-upload" size="20"/>
               </Button>
@@ -807,7 +808,10 @@ export default {
       //关于邮箱提示的
       value2: "",
       data2: [],
-      file: []
+      file: [],
+      // 关于进度条
+      xhr: new XMLHttpRequest(),
+      showProgress: false,
     };
   },
   created() {
