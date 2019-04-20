@@ -98,14 +98,11 @@
   background-color: #ed4014;
   color: white;
 }
+
 .subProjectBtn,
 .uploadBtn,
 .inviteBtn {
   color: black;
-}
-.popCenter {
-  margin: 10px auto;
-  overflow: hidden;
 }
 /* 编辑项目用到的样式 */
 .editStyle {
@@ -164,7 +161,7 @@
               <div slot="extra" style="height:40px;line-height:40px;display:flex;width:50%">
                 <Button
                   type="default"
-                  icon="md-brush"
+                  icon="ios-create"
                   @click="editModalShow(currentProjectDetail['projectId'])"
                   v-show="judgeIsManager(projectManager.userId)"
                 ></Button>
@@ -215,7 +212,7 @@
         <div class="memberPanel">
           <Card :bordered="false">
             <p slot="title" style="font-size:25px;height:40px;line-height:40px;">Members</p>
-            <div slot="extra" style="height:40px" class="popCenter">
+            <div slot="extra" style="height:40px">
               <Poptip trigger="hover" content="Invite other members" placement="right">
                 <Button
                   class="inviteBtn"
@@ -285,15 +282,15 @@
         <div style="padding: 20px">
           <Card :bordered="false">
             <p slot="title" style="font-size:25px;height:40px;line-height:40px">Subprojects</p>
-            <div slot="extra" style="height:40px" class="popCenter">
-              <Poptip trigger="hover" content="add new subproject" placement="right">
+            <div slot="extra" style="height:40px">
+              <Poptip trigger="hover" content="Invite other members" placement="right">
                 <Button
                   class="subProjectBtn"
                   @click="subProjectModal = true"
                   v-show="this.currentProjectDetail.isManager||this.currentProjectDetail.isMember"
                 >
                   <Icon type="md-add" size="20"/>
-                </Button>
+              </Button>
               </Poptip>
               <Modal
                 v-model="subProjectModal"
@@ -331,7 +328,7 @@
             <div class="subprojectPanel">
               <div class="subProjectListStyle">
                 <div v-for="(subProject,index) in subProjectList" :key="subProject.index">
-                  <Col :lg="{span:11,offset:1}" :md="24" :sm="24" :xs="24">
+                  <Col :lg="{span:6}" :md="24" :sm="24" :xs="24">
                     <div
                       @click="goWorkspace(subProject.subProjectId,subProject.members,subProject.isManager)"
                       style="cursor:pointer"
@@ -368,7 +365,7 @@
                             @click.stop="editSubProjectShow(index)"
                             title="Edit"
                           >
-                            <Icon type="md-brush"/>
+                            <Icon type="ios-create"/>
                           </Button>
                           <Button
                             type="default"
@@ -409,7 +406,7 @@
                 ok-text="ok"
                 cancel-text="cancel"
                 @on-ok="handOverSubProject()"
-                @on-cancel="cancel"
+                @on-cancel=""
                 width="500px"
                 :mask-closable="false"
               >
@@ -460,10 +457,10 @@
               <Modal
                 v-model="deleteSubProjectModal"
                 title="Delete sub project"
-                ok-text="assure"
+                ok-text="Confirm"
                 cancel-text="cancel"
                 @on-ok="deleteSubProject()"
-                @on-cancel="cancel"
+                @on-cancel=""
                 width="800px"
                 :mask-closable="false"
               >
@@ -483,6 +480,7 @@
                 @click="uploadFileModalShow()"
                 class="uploadBtn"
                 title="upload resource"
+
               >
                 <Icon type="md-cloud-upload" size="20"/>
               </Button>
@@ -525,7 +523,7 @@
           </Card>
         </div>
         <!-- 上传文件按钮的模态框 -->
-        <Modal v-model="uploadFileModal" title="upload file" width="600px" :mask-closable="false" @on-ok="filesUpload" @on-cancel="cancel" ok-text="assure" cancel-text="cancel">
+        <Modal v-model="uploadFileModal" title="upload file" width="600px" :mask-closable="false" @on-ok="filesUpload" @on-cancel="" ok-text="Confirm" cancel-text="cancel">
           <div style="display:flex;text-align:center;align-items:center;justify-content:center">
             <!-- 这里定义上传的几种资源类型供用户选择 -->
             <span style="width:20%">File Type</span>
@@ -569,7 +567,7 @@
         v-model="removeProjectModal"
         title="Delete warning "
         @on-ok="deleteProject"
-        @on-cancel="cancel"
+        @on-cancel=""
         ok-text="submit"
         cancel-text="cancel"
       >
@@ -581,8 +579,8 @@
       v-model="editProjectModal"
       title="Edit Project"
       @on-ok="editProjectSubmit()"
-      @on-cancel="cancel"
-      ok-text="assure"
+      @on-cancel=""
+      ok-text="Confirm"
       cancel-text="cancel"
       :mask-closable="false"
       width="900px"
@@ -592,12 +590,15 @@
         <div class="editStyle">
           <span>Category</span>
           <RadioGroup style="margin-left:5%;width:100%" v-model="editType">
-            <Radio label="Society"></Radio>
-            <Radio label="Atmosphere"></Radio>
-            <Radio label="Ecology"></Radio>
-            <Radio label="Soil"></Radio>
-            <Radio label="Water"></Radio>
-            <Radio label="Others"></Radio>
+            <Radio label="Terrestrial">Terrestrial System</Radio>
+            <Radio label="Coastal">Coastal System</Radio>
+            <Radio label="Marine">Marine System</Radio>
+            <Radio label="Climate">Climate System</Radio>
+            <Radio label="Ecological">Ecological System</Radio>
+            <Radio label="Geological">Geological System</Radio>
+            <Radio label="Human">Human-Activity</Radio>
+            <Radio label="GISRS">GIS & RS</Radio>
+            <Radio label="General">General</Radio>
           </RadioGroup>
         </div>
         <div class="editStyle">
@@ -641,9 +642,6 @@
             style="margin-left:2.5%"
             @click="addTag(inputTag)"
           >Add Tag</Button>
-          <!-- <div style="margin-left:5%">
-            <Tag color="primary" @on-close="deleteTag(index)" v-show="editTags!=''">{{item}}</Tag>
-          </div>-->
         </div>
         <div style="width:80%;margin-left:20%">
           <Tag
@@ -810,7 +808,10 @@ export default {
       //关于邮箱提示的
       value2: "",
       data2: [],
-      file:[],
+      file: [],
+      // 关于进度条
+      xhr: new XMLHttpRequest(),
+      showProgress: false,
     };
   },
   created() {
@@ -830,13 +831,16 @@ export default {
       if (!vm.$store.getters.userState) {
         next("/login");
       } else {
-        if (
-          !(
-            vm.currentProjectDetail.isManager ||
-            vm.currentProjectDetail.isMember ||
-            vm.currentProjectDetail.managerId == vm.$store.getters.userId
-          )
-        ) {
+        var userId = vm.$store.getters.userId;
+        var members = vm.currentProjectDetail.members;
+        var isMember = false;
+        for (var i = 0; i < members.length; i++) {
+          if (members[i].userId == userId) {
+            isMember = true;
+            break;
+          }
+        }
+        if (!(isMember || vm.currentProjectDetail.managerId == userId)) {
           alert("No access");
           next("/projectlist");
           // vm.$router.go(-1);
@@ -1207,14 +1211,18 @@ export default {
       }
     },
     editModalShow(id) {
-      // this.
       this.editProjectModal = true;
       let editProjectInfo = this.currentProjectDetail;
       this.editTitle = editProjectInfo.title;
       this.editIntroduction = editProjectInfo.introduction;
       this.editDescription = editProjectInfo.description;
       this.editType = editProjectInfo.category;
-      this.editTags = editProjectInfo["tag"].split(",");
+      var tags = editProjectInfo["tag"].split(",");
+      if (tags[0] == "") {
+        this.editTags = [];
+      } else {
+        this.editTags = tags;
+      }
       this.editPrivacy = editProjectInfo.privacy;
       this.editProjectId = editProjectInfo.projectId;
     },
@@ -1366,22 +1374,22 @@ export default {
     },
     filesUpload() {
       let that = this;
-      if(that.file.length!=0){
+      if (that.file.length != 0) {
         var formData = new FormData();
-        for(var i=0; i< that.file.length; i++){
-          formData.append("file",that.file[i]);   // 文件对象
+        for (var i = 0; i < that.file.length; i++) {
+          formData.append("file", that.file[i]); // 文件对象
         }
         let userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
         formData.append("description", this.fileDescription);
         formData.append("type", this.fileType);
-        formData.append("uploaderId",this.$store.getters.userInfo.userId);
+        formData.append("uploaderId", this.$store.getters.userInfo.userId);
         formData.append("belong", this.currentProjectDetail.title);
         let scopeObject = {
-        projectId: this.currentProjectDetail.projectId,
-        subprojectId: "",
-        moduleId: ""
-      };
-      formData.append("scope", JSON.stringify(scopeObject));
+          projectId: this.currentProjectDetail.projectId,
+          subprojectId: "",
+          moduleId: ""
+        };
+        formData.append("scope", JSON.stringify(scopeObject));
       }
       this.axios
         .post("/GeoProblemSolving/resource/upload", formData)
@@ -1413,7 +1421,8 @@ export default {
      let that = this;
      that.file.splice(index, 1);
      console.log(that.file);
-    }
+    },
+
   }
 };
 </script>

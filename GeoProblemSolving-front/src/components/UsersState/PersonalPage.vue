@@ -6,62 +6,60 @@
           <Col :lg="5" :md="8" :sm="10" :xs="12">
             <div class="detailSidebar" :style="{height:detailSidebarHeight}">
               <div class="user-img">
-                <img v-bind:src="userDetail.avatar" class="u_img"
-                  v-if="userDetail.avatar!=''&&userDetail.avatar!='undefined'">
+                <img
+                  v-bind:src="userDetail.avatar"
+                  class="u_img"
+                  v-if="userDetail.avatar!=''&&userDetail.avatar!='undefined'"
+                >
                 <avatar
                   class="avatarStyle"
                   :username="userDetail.userName"
                   :size="200"
                   :rounded="false"
-                  v-else>
-                </avatar>
+                  v-else
+                ></avatar>
               </div>
-              <div class="single-info">
+              <div class="single-info" title="User Name">
                 <Icon type="ios-contact-outline" :size="20"/>
                 <span>{{userDetail.userName}}</span>
               </div>
-              <div class="user-info">
-                <div class="single-info" >
-                  <!-- <span>email:</span> -->
+                <div class="single-info" title="Email">
                   <Icon type="ios-mail-outline" :size="20"/>
                   <span>{{userDetail.email}}</span>
                 </div>
-                <div class="single-info">
+                <div class="single-info" title="Mobile Phone">
                   <Icon type="ios-call-outline" :size="20"/>
                   <span>{{userDetail.mobilePhone}}</span>
                 </div>
-                <div class="single-info">
+                <div class="single-info" title="Job Title">
                   <Icon type="ios-hammer-outline" :size="20"/>
                   <span>{{userDetail.jobTitle}}</span>
                 </div>
-                <div class="single-info">
+                <div class="single-info" title="City&Country">
                   <Icon type="ios-compass-outline" :size="20"/>
-                  <span>{{userDetail.country}}&nbsp{{userDetail.city}}</span>
+                  <span>{{userDetail.city}}&nbsp{{userDetail.country}}</span>
                 </div>
-                <div class="single-info">
+                <div class="single-info" title="Organization">
                   <Icon type="ios-home-outline" :size="20"/>
                   <span>{{userDetail.organization}}</span>
                 </div>
-                <div class="single-info">
+                <div class="single-info" title="Direction">
                   <Icon type="ios-contract" :size="20"/>
                   <span>{{userDetail.direction}}</span>
                 </div>
-                <div class="single-info">
+                <div class="single-info"  title="Home Page">
                   <Icon type="md-link" :size="20"/>
                   <span>{{userDetail.homePage}}</span>
                 </div>
                 <br>
-                <div style="padding:10px;font-size:12px;border:1px dotted lightgray">
-                  {{this.userDetail.introduction}}
+                <div style="padding:10px;font-size:12px;border:1px dotted lightgray"  title="Introduction">
+                  {{userDetail.introduction}}
                 </div>
                 <div class="whitespace"></div>
                 <div style="display:flex;justify-content:center">
-                  <Button
-                    type="success"
-                    style="height:40px"
-                    @click="editModalShow()"
-                    title="Edit"
-                  ><Icon type="md-create" :size="20"/></Button>
+                  <Button type="success" style="height:40px" @click="editModalShow()" title="Edit">
+                    <Icon type="md-create" :size="20"/>
+                  </Button>
                   <Drawer
                     title="Profile Edit Panel"
                     placement="left"
@@ -69,7 +67,11 @@
                     v-model="editProfileModal"
                     width="600px"
                   >
-                    <Form :model="personalInfoItem" :label-width="80">
+                    <Form
+                    ref="personalInfoItem"
+                    :model="personalInfoItem"
+                    :rules="ruleValidate"
+                    :label-width="80">
                       <FormItem label="Name" prop="userName">
                         <Input
                           v-model="personalInfoItem.userName"
@@ -86,6 +88,7 @@
                         <Input
                           v-model="personalInfoItem.email"
                           :class="{InputStyle: inputstyle}"
+                          disabled
                         ></Input>
                       </FormItem>
                       <FormItem label="Phone" prop="mobilePhone">
@@ -95,16 +98,10 @@
                         ></Input>
                       </FormItem>
                       <FormItem label="Country" prop="country">
-                        <Input
-                          v-model="personalInfoItem.country"
-                          :class="{InputStyle: inputstyle}"
-                        ></Input>
+                        <Input v-model="personalInfoItem.country" :class="{InputStyle: inputstyle}"></Input>
                       </FormItem>
                       <FormItem label="City" prop="city">
-                        <Input
-                          v-model="personalInfoItem.city"
-                          :class="{InputStyle: inputstyle}"
-                        ></Input>
+                        <Input v-model="personalInfoItem.city" :class="{InputStyle: inputstyle}"></Input>
                       </FormItem>
                       <FormItem label="Agency" prop="organization">
                         <Input
@@ -134,9 +131,9 @@
                       </FormItem>
                       <FormItem label="Avatar" prop="avatar">
                         <div>
-                          <div class="demo-upload-list" v-if="userDetail.avatar!=''">
+                          <div class="demo-upload-list" v-if="personalInfoItem.avatar!=''">
                             <template>
-                              <img v-bind:src="userDetail.avatar" class="avatarImage">
+                              <img v-bind:src="personalInfoItem.avatar" class="avatarImage">
                               <div class="demo-upload-list-cover">
                                 <Icon type="ios-eye-outline" @click.native="handleView()"></Icon>
                                 <Icon type="ios-trash-outline" @click.native="handleRemove()"></Icon>
@@ -152,18 +149,17 @@
                             <input @change="uploadPhoto($event)" type="file" class="uploadAvatar">
                           </div>
                           <Modal title="View Image" v-model="visible">
-                            <img :src="userDetail.avatar" v-if="visible" style="width: 100%">
+                            <img :src="personalInfoItem.avatar" v-if="visible" style="width: 100%">
                           </Modal>
                         </div>
                       </FormItem>
                       <FormItem>
-                        <Button type="success" @click="submitProfileEdit(personalInfoItem)">Submit</Button>
-                        <Button @click style="margin-left: 50%" type="primary">Reset</Button>
+                        <Button type="success" @click="submitProfileEdit('personalInfoItem')">Submit</Button>
+                        <Button @click="resetForm()" style="margin-left: 50%" type="primary">Reset</Button>
                       </FormItem>
                     </Form>
                   </Drawer>
                 </div>
-              </div>
             </div>
           </Col>
           <Col
@@ -173,154 +169,175 @@
             :xs="{span:11,offset:1}"
           >
             <div class="rightContent">
-              <Tabs value="Overview">
-                <TabPane label="Overview" name="Overview">
-                  <Col :lg="{span:22,offset:1}" :md="{span:22,offset:1}" :sm="{span:22,offset:1}">
-                    <Card>
-                      <p slot="title">History Line</p>
-                      <Timeline
-                        class="timeLineStyle"
-                      >
-                        <TimelineItem v-for="(item,index) in userEventList" :key="index">
-                          <strong>
-                            <p class="time">{{item.createTime}}</p>
-                          </strong>
-                          <p class="content">{{item.description}}</p>
-                        </TimelineItem>
-                      </Timeline>
-                    </Card>
-                    <br>
-                    <div style="margin-bottom:40px">
+              <div class="parent">
+                <Tabs value="Overview" style="font-size:20px">
+                  <TabPane label="Overview" name="Overview">
+                    <Col :lg="{span:22,offset:1}" :md="{span:22,offset:1}" :sm="{span:22,offset:1}">
                       <Card>
-                        <p slot="title">Resource List</p>
-                        <div style="overflow-y:scroll;height:500px">
-                          <Table :data="userResourceList" :columns="resourceColumn" class="table">
-                            <template slot-scope="{ row }" slot="name">
-                              <strong>{{ row.name }}</strong>
-                            </template>
-                            <template slot-scope="{ row, index }" slot="action">
-                              <Button
-                                type="success"
-                                size="small"
-                                style="margin-right: 10px"
-                                :href="userResourceList[index].pathURL"
-                                title="download"
-                                @click="download(index)"
-                              >
-                                <Icon type="md-download"/>
-                              </Button>
-                              <Button type="warning" size="small" style="margin-right: 10px">
-                                <Icon type="md-share" @click="processResourceModalShow(index)" title="share"/>
-                              </Button>
-                              <Button
-                                type="error"
-                                size="small"
-                                @click="deleteResource(userResourceList[index].resourceId)"
-                              >
-                                <Icon type="md-close"/>
-                              </Button>
-                            </template>
-                          </Table>
-                        </div>
+                        <p slot="title">History line</p>
+                        <Timeline class="timeLineStyle">
+                          <div v-if="userEventList.length==0">
+                            <div style="display:flex;justify-content:center">
+                              <Icon type="md-alert" size="40" color="gray"/>
+                            </div>
+                            <br>
+                            <div style="display:flex;justify-content:center">
+                              <h3
+                                style="text-align:center;width:80%"
+                              >Sorry,there are no events here.Once you upload or join in some projects,here will list your events timeline.</h3>
+                            </div>
+                          </div>
+
+                          <TimelineItem
+                            v-for="(item,index) in userEventList"
+                            :key="index"
+                            v-show="userEventList.length>0"
+                          >
+                            <strong>
+                              <p class="time">{{item.createTime}}</p>
+                            </strong>
+                            <p class="content">{{item.description}}</p>
+                          </TimelineItem>
+                        </Timeline>
                       </Card>
-                    </div>
-                  </Col>
-                </TabPane>
-                <TabPane label="Participatory Project" name="Participatory">
-                  <Card :bordered="false" v-if="joinedProjectsList.length == 0">
+                      <br>
+                      <div style="margin-bottom:40px">
+                        <Card>
+                          <p slot="title">Resource list</p>
+                          <div style="overflow-y:scroll;height:500px">
+                            <Table :data="userResourceList" :columns="resourceColumn" class="table">
+                              <template slot-scope="{ row }" slot="name">
+                                <strong>{{ row.name }}</strong>
+                              </template>
+                              <template slot-scope="{ row, index }" slot="action">
+                                <Button
+                                  type="success"
+                                  size="small"
+                                  style="margin-right: 10px"
+                                  :href="userResourceList[index].pathURL"
+                                  title="download"
+                                  @click="download(index)"
+                                >
+                                  <Icon type="md-download"/>
+                                </Button>
+                                <Button type="warning" size="small" style="margin-right: 10px">
+                                  <Icon
+                                    type="md-share"
+                                    @click="processResourceModalShow(index)"
+                                    title="share"
+                                  />
+                                </Button>
+                                <Button
+                                  type="error"
+                                  size="small"
+                                  @click="deleteResource(userResourceList[index].resourceId)"
+                                >
+                                  <Icon type="md-close"/>
+                                </Button>
+                              </template>
+                            </Table>
+                          </div>
+                        </Card>
+                      </div>
+                    </Col>
+                  </TabPane>
+                  <TabPane label="Joined projects" name="Participatory">
+                    <Card :bordered="false" v-if="joinedProjectsList.length == 0">
                       <div style="display:flex;justify-content:center">
                         <Icon type="md-alert" size="40" color="gray"/>
                       </div>
                       <br>
-                      <div style="display:flex;justify-content:center" >
-                        <h2 style="text-align:center;width:50%">Sorry, you didn't participate in any projects.</h2>
+                      <div style="display:flex;justify-content:center">
+                        <h3
+                          style="text-align:center;width:80%"
+                        >Sorry, you didn't participate in any projects.</h3>
                       </div>
-                  </Card>
-                  <div
-                    v-for="(item,index) in joinedProjectsList"
-                    :key="index"
-                    v-show="joinedProjectsList!=[]"
-                  >
-                    <Col :lg="{span:11, offset:1}" :md="{span:22, offset:1}">
-                      <div class="participatoryProjectCard" @click="goSingleProject(item.projectId)">
-                        <Card style="height:320px;margin-top:20px;">
-                        <p
-                          slot="title"
-                          style="height:40x"
-                          class="projectsTitle"
-                        >{{item.title}}</p>
-                        <Button slot="extra" @click.stop="quitModalShow(item)">Quit</Button>
-                        <p
-                          style="height:200px;text-indent:2em;overflow-y:auto;word-break:break-word"
-                        >{{item.introduction}}</p>
-                        <br>
-                        <div style="height:40px">
-                          <span style="float:left">CreateTime:</span>
-                          <span style="float:right">{{item.createTime}}</span>
+                    </Card>
+                    <div
+                      v-for="(item,index) in joinedProjectsList"
+                      :key="index"
+                      v-show="joinedProjectsList!=[]"
+                    >
+                      <Col :lg="{span:11, offset:1}" :md="{span:22, offset:1}">
+                        <div
+                          class="participatoryProjectCard"
+                          @click="goSingleProject(item.projectId)"
+                        >
+                          <Card style="height:320px;margin-top:20px;">
+                            <p slot="title" style="height:40x" class="projectsTitle">{{item.title}}</p>
+                            <Button slot="extra" @click.stop="quitModalShow(item)">Quit</Button>
+                            <p
+                              style="height:200px;text-indent:2em;overflow-y:auto;word-break:break-word"
+                            >{{item.introduction}}</p>
+                            <br>
+                            <div style="height:40px">
+                              <span style="float:left">CreateTime:</span>
+                              <span style="float:right">{{item.createTime}}</span>
+                            </div>
+                          </Card>
                         </div>
-                      </Card>
-                      </div>
-
-                    </Col>
-                  </div>
-                </TabPane>
-                <TabPane label="Management Project" name="Management">
-                  <Card :bordered="false" v-if="userManagerProjectList.length == 0">
+                      </Col>
+                    </div>
+                  </TabPane>
+                  <TabPane label="Managed projects" name="Management">
+                    <Card :bordered="false" v-if="userManagerProjectList.length == 0">
                       <div style="display:flex;justify-content:center">
                         <Icon type="md-alert" size="40" color="gray"/>
                       </div>
                       <br>
-                      <div style="display:flex;justify-content:center" >
-                        <h2 style="text-align:center;width:50%">Sorry, you didn't created any projects.</h2>
+                      <div style="display:flex;justify-content:center">
+                        <h3
+                          style="text-align:center;width:80%"
+                        >Sorry, you didn't created any projects.</h3>
                       </div>
-                  </Card>
-                  <div
-                    v-for="(mProject,index) in userManagerProjectList"
-                    v-show="userManagerProjectList!='None'"
-                    :key="index"
-                  >
-                    <Col :lg="{span:11, offset:1}" :md="{span:22, offset:1}">
-                    <div class="manageProjectsCard" @click="goSingleProject(mProject.projectId)">
-                      <Card style="height:320px;margin-top:20px">
-                        <p
-                          slot="title"
-                          class="projectsTitle"
-                        >{{mProject.title}}</p>
-                        <Button
-                          class="authorBtn"
-                          type="default"
-                          slot="extra"
-                          title="Privilege change"
-                          style="margin:-5px 5px 0 5px"
-                          @click.stop="authorizeModalShow(index)"
-                          icon="md-happy"
-                        ></Button>
-                        <Button
-                          class="deleteBtn"
-                          type="default"
-                          slot="extra"
-                          style="margin:-5px 5px 0 5px"
-                          @click.stop="deleteProjectModalShow(mProject.projectId)"
-                          icon="md-close"
-                          title="remove"
-                        ></Button>
-                        <!-- 表头结束 -->
-                        <p
-                          style="height:200px;text-indent:2em;overflow-y:auto;word-break:break-word"
-                        >{{mProject.introduction}}</p>
-                        <!-- <hr> -->
-                        <br>
-                        <div>
-                          <span style="float:left">CreateTime:</span>
-                          <span style="float:right">{{mProject.createTime}}</span>
+                    </Card>
+                    <div
+                      v-for="(mProject,index) in userManagerProjectList"
+                      v-show="userManagerProjectList!='None'"
+                      :key="index"
+                    >
+                      <Col :lg="{span:11, offset:1}" :md="{span:22, offset:1}">
+                        <div
+                          class="manageProjectsCard"
+                          @click="goSingleProject(mProject.projectId)"
+                        >
+                          <Card style="height:320px;margin-top:20px">
+                            <p slot="title" class="projectsTitle">{{mProject.title}}</p>
+                            <Button
+                              class="authorBtn"
+                              type="default"
+                              slot="extra"
+                              title="Privilege change"
+                              style="margin:-5px 5px 0 5px"
+                              @click.stop="authorizeModalShow(index)"
+                              icon="md-happy"
+                            ></Button>
+                            <Button
+                              class="deleteBtn"
+                              type="default"
+                              slot="extra"
+                              style="margin:-5px 5px 0 5px"
+                              @click.stop="deleteProjectModalShow(mProject.projectId)"
+                              icon="md-close"
+                              title="remove"
+                            ></Button>
+                            <!-- 表头结束 -->
+                            <p
+                              style="height:200px;text-indent:2em;overflow-y:auto;word-break:break-word"
+                            >{{mProject.introduction}}</p>
+                            <!-- <hr> -->
+                            <br>
+                            <div>
+                              <span style="float:left">CreateTime:</span>
+                              <span style="float:right">{{mProject.createTime}}</span>
+                            </div>
+                          </Card>
                         </div>
-                      </Card>
+                      </Col>
                     </div>
-
-                    </Col>
-                  </div>
-                </TabPane>
-              </Tabs>
+                  </TabPane>
+                </Tabs>
+              </div>
             </div>
           </Col>
         </Row>
@@ -332,7 +349,7 @@
       v-model="authorizeProjectModal"
       @on-ok="authorize()"
       @on-cancel="cancel()"
-      ok-text="assure"
+      ok-text="Confirm"
       cancel-text="cancel"
     >
       <p style="slot">Hand the project to others</p>
@@ -357,38 +374,44 @@
       <p>Once you exit the project, you will not be able to participate in the collaborative process, confirm the exit?</p>
     </Modal>
     <Modal
-        v-model="processResourceModal"
-        title="share resource in other projects"
-        @on-ok="processResource()"
-        @on-cancel="cancel"
-        ok-text="assure"
-        cancel-text="cancel"
-        >
-        <!-- todo:这里需要过滤参与的项目以及管理的项目重新渲染 -->
-        <div>
-          <h3>Participatory Projects</h3>
-          <!-- 多选框 -->
-          <RadioGroup v-model="selectShareProject">
-          <span @click="selectPID(item.projectId, item.title)" v-for="(item,index) in joinedProjectsNameList" v-bind:key="index">
-           <Radio :key="item.index" :label="item.title" ></Radio>
+      v-model="processResourceModal"
+      title="share resource in other projects"
+      @on-ok="processResource()"
+      @on-cancel
+      ok-text="Confirm"
+      cancel-text="cancel"
+    >
+      <!-- todo:这里需要过滤参与的项目以及管理的项目重新渲染 -->
+      <div>
+        <h3>Participatory Projects</h3>
+        <!-- 多选框 -->
+        <RadioGroup v-model="selectShareProject">
+          <span
+            @click="selectPID(item.projectId, item.title)"
+            v-for="(item,index) in joinedProjectsNameList"
+            v-bind:key="index"
+          >
+            <Radio :key="item.index" :label="item.title"></Radio>
           </span>
         </RadioGroup>
-          <!-- <div v-for="(item,index)in joinedProjectsNameList" :key="item.index">{{item.title}}</div> -->
-        </div>
-        <div>
-          <h3>Management Projects</h3>
-          <RadioGroup v-model="selectShareProject">
-            <span @click="selectPID(item.projectId, item.title)" v-for="(item,index) in userManagerProjectList" v-bind:key="index">
-              <Radio :key="item.index" :label="item.title"></Radio>
-            </span>
-          </RadioGroup>
-        </div>
-        <div style="margin-top:5px">
-          <Icon type="ios-information-circle-outline" color="lightblue"/>
-          <span>
-            the resource will be shared in the project you choosed.
+        <!-- <div v-for="(item,index)in joinedProjectsNameList" :key="item.index">{{item.title}}</div> -->
+      </div>
+      <div>
+        <h3>Management Projects</h3>
+        <RadioGroup v-model="selectShareProject">
+          <span
+            @click="selectPID(item.projectId, item.title)"
+            v-for="(item,index) in userManagerProjectList"
+            v-bind:key="index"
+          >
+            <Radio :key="item.index" :label="item.title"></Radio>
           </span>
-        </div>
+        </RadioGroup>
+      </div>
+      <div style="margin-top:5px">
+        <Icon type="ios-information-circle-outline" color="lightblue"/>
+        <span>the resource will be shared in the project you choosed.</span>
+      </div>
     </Modal>
   </div>
 </template>
@@ -405,7 +428,7 @@ export default {
     });
   },
   mounted() {
-     // 获取用户资源
+    // 获取用户资源
     this.getUserProfile();
     //获取用户资源
     this.getUserResource();
@@ -417,39 +440,22 @@ export default {
     this.readPersonalEvent();
     // 初始化样式的高度
     this.initStyle();
-
-
-  },
-  computed: {
-    username() {
-      return this.$store.getters.userName;
-    },
-    avatar() {
-      return this.$store.getters.avatar;
-    },
-    userId() {
-      return this.$store.getters.userId;
-    }
   },
   components: {
     Avatar
   },
   data() {
+    var validatePass = (rule, value, callback) => {
+      if (value === "") {
+        callback(new Error("Please enter your password again"));
+      } else if (value !== this.formValidate.password) {
+        callback(new Error("The two passwords are inconsistent!"));
+      } else {
+        callback();
+      }
+    };
     return {
-      userDetail: {
-        userName: "",
-        email: "",
-        jobTitle: "",
-        mobilePhone: "",
-        gender: "",
-        country: "",
-        city: "",
-        organization: "",
-        introduction: "",
-        direction: "",
-        homePage: "",
-        avatar: ""
-      },
+      userDetail: {},
       resourceColumn: [
         {
           type: "selection",
@@ -504,6 +510,111 @@ export default {
         homePage: "",
         avatar: ""
       },
+      ruleValidate: {
+        userName: [
+          {
+            required: true,
+            message: "The name cannot be empty",
+            trigger: "blur"
+          }
+        ],
+        email: [
+          {
+            required: true,
+            message: "Mailbox cannot be empty",
+            trigger: "blur"
+          },
+          {
+            type: "email",
+            message: "Incorrect email format",
+            trigger: "blur"
+          }
+        ],
+        password: [
+          {
+            required: true,
+            min: 6,
+            message: "Password must more than 6 words",
+            trigger: "blur"
+          }
+        ],
+        confimPassword: [
+          {
+            required: true,
+            validator: validatePass,
+            trigger: "blur"
+          }
+        ],
+        jobTitle: [
+          {
+            required: true,
+            message: "Job Title cannot be empty",
+            trigger: "blur"
+          }
+        ],
+        gender: [
+          {
+            required: true,
+            message: "Please select gender",
+            trigger: "change"
+          }
+        ],
+        mobilePhone: [
+          {
+            required: false,
+            message: "Please enter your phone number",
+            trigger: "blur"
+          }
+        ],
+        country: [
+          {
+            required: false,
+            message: "Please enter your country",
+            trigger: "blur"
+          }
+        ],
+        city: [
+          {
+            required: false,
+            message: "Please enter your city",
+            trigger: "blur"
+          }
+        ],
+        organization: [
+          {
+            required: false,
+            message: "Please enter your affiliation",
+            trigger: "blur"
+          }
+        ],
+        introduction: [
+          {
+            required: false,
+            message: "Please enter a personal introduction",
+            trigger: "blur"
+          },
+          {
+            type: "string",
+            min: 20,
+            message: "Introduce no less than 20 words",
+            trigger: "blur"
+          }
+        ],
+        field: [
+          {
+            required: false,
+            message: "Please enter your research field",
+            trigger: "blur"
+          }
+        ],
+        homePage: [
+          {
+            required: false,
+            message: "Please enter your home page url",
+            trigger: "blur"
+          }
+        ]
+      },
       //用来验证个人信息维护表单填写规范的依据
       //输入框的样式
       inputstyle: true,
@@ -526,23 +637,25 @@ export default {
       // 处理资源的模态框激活
       processResourceModal: false,
       // 选中资源的索引
-      selectResourceIndex:"",
+      selectResourceIndex: "",
       // 选中的将要分享资源的项目名
-      selectShareProject:"",
-      selectShareProjectId:"",
-      selectShareProjectName:""
+      selectShareProject: "",
+      selectShareProjectId: "",
+      selectShareProjectName: ""
     };
   },
   methods: {
     // 初始化侧边栏样式
-    initStyle(){
+    initStyle() {
       this.detailSidebarHeight = window.innerHeight - 60 + "px";
     },
     //获取用户的详细信息
     getUserProfile() {
-      this.userDetail = this.$store.getters.userInfo;
-      this.personalInfoItem = this.$store.getters.userInfo;
-      this.joinedProjectsNameList = this.userDetail.joinedProjects;
+      this.userDetail = Object.assign({},this.$store.getters.userInfo);
+      delete this.userDetail.password;
+      delete this.userDetail.joinedProjects;
+      delete this.userDetail.manageProjects;
+      this.joinedProjectsNameList = this.$store.getters.userInfo.joinedProjects;
     },
     //获取用户参与的项目列表
     getParticipatoryList(projectIds) {
@@ -582,7 +695,7 @@ export default {
           "/GeoProblemSolving/project/inquiry" +
             "?key=managerId" +
             "&value=" +
-            this.userId
+            this.userDetail.userId
         )
         .then(res => {
           if (res.data != "None" && res.data != "Fail") {
@@ -729,7 +842,6 @@ export default {
         this.axios
           .get("/GeoProblemSolving/project/delete?" + "projectId=" + pid)
           .then(res => {
-            this.$store.commit("getUserInfo");
             var newManageProjects = [];
             var oldManageProjects = this.userManagerProjectList;
             for (var i = 0; i < oldManageProjects.length; i++) {
@@ -748,6 +860,7 @@ export default {
       this.$Message.info("cancel");
     },
     editModalShow() {
+      this.personalInfoItem = Object.assign({},this.userDetail);
       this.editProfileModal = true;
     },
     //处理修改用户头像信息相关的函数
@@ -777,33 +890,40 @@ export default {
     handleRemove() {
       this.$store.commit("uploadAvatar", "");
     },
-    submitProfileEdit(data) {
-      // var changedProfile = {};
-      var changedProfile = new URLSearchParams();
-      changedProfile.append("userId", this.$store.getters.userId);
-      //筛选出需要修改的信息
-      for (var item in data) {
-        if (data[item] != "") {
-          changedProfile.append(item, data[item]);
-        }
-      }
-      this.axios
-        .post("/GeoProblemSolving/user/update", changedProfile)
-        .then(res => {
-          if (res.data !== "Fail") {
-            // this.drawerClose = true;
-            this.$Notice.success({
-              title: "notification",
-              desc: "Profile update successfully"
-            });
-            let userInfo = res.data;
-            userInfo.userState = true;
-            this.$store.commit("setUserInfo", userInfo);
-            this.$set(this, "userDetail", userInfo);
-            sessionStorage.setItem("userInfo", JSON.stringify(userInfo));
+    submitProfileEdit(name) {
+      this.$refs[name].validate(valid => {
+        if (valid) {
+          var data = this.personalInfoItem;
+          var changedProfile = new URLSearchParams();
+          changedProfile.append("userId", this.$store.getters.userId);
+          //筛选出需要修改的信息
+          for (var item in data) {
+            if (data[item] != "") {
+              changedProfile.append(item, data[item]);
+            }
           }
-        })
-        .catch(err => {});
+          this.axios
+            .post("/GeoProblemSolving/user/update", changedProfile)
+            .then(res => {
+              if (res.data !== "Fail") {
+                // this.drawerClose = true;
+                this.$Notice.success({
+                  title: "notification",
+                  desc: "Profile update successfully"
+                });
+                let userInfo = res.data;
+                userInfo.userState = true;
+                this.$store.commit("setUserInfo", userInfo);
+                this.$set(this, "userDetail", userInfo);
+                sessionStorage.setItem("userInfo", JSON.stringify(userInfo));
+              }
+            })
+            .catch(err => {});
+        }
+      });
+    },
+    resetForm() {
+      this.personalInfoItem = Object.assign({},this.userDetail);
     },
     //点击跳转到指定项目的函数
     goSingleProject(id) {
@@ -888,19 +1008,22 @@ export default {
       shareForm.append("scope", JSON.stringify(scopeObject));
       if (scopeObject.projectId != "") {
         this.axios
-        .post("/GeoProblemSolving/resource/share", shareForm)
-        .then(res => {
-          if (res.data != "Fail") {
-            this.$Notice.open({
-              title: "Upload notification title",
-              desc: "File shared to " + this.selectShareProject + " successfully.",
-              duration: 2
-            });
-            // 保存记录
-            this.addUploadEvent( this.selectShareProjectId);
-          }
-        })
-        .catch(err => {});
+          .post("/GeoProblemSolving/resource/share", shareForm)
+          .then(res => {
+            if (res.data != "Fail") {
+              this.$Notice.open({
+                title: "Upload notification title",
+                desc:
+                  "File shared to " +
+                  this.selectShareProject +
+                  " successfully.",
+                duration: 2
+              });
+              // 保存记录
+              this.addUploadEvent(this.selectShareProjectId);
+            }
+          })
+          .catch(err => {});
       }
       // uploaderId
     },
@@ -931,7 +1054,7 @@ export default {
       this.processResourceModal = true;
       this.selectResourceIndex = index;
     },
-    selectPID(id, name){
+    selectPID(id, name) {
       this.selectShareProjectId = id;
       this.selectShareProjectName = name;
     }
@@ -955,8 +1078,8 @@ export default {
   padding: 10px;
 }
 /* 注册时未上传头像的用户头像显示样式 */
-.avatarStyle{
-  margin:0 auto;
+.avatarStyle {
+  margin: 0 auto;
 }
 /* 用户头像结束 */
 body {
@@ -1060,9 +1183,15 @@ body {
   cursor: pointer;
 }
 /* 时间轴样式 */
-.timeLineStyle{
-  margin-left:5%;
-  max-height:300px;
-  overflow-y:auto
+.timeLineStyle {
+  margin-left: 5%;
+  max-height: 300px;
+  overflow-y: auto;
+}
+</style>
+<style>
+.parent .ivu-tabs-nav-container {
+  font-size: 15px !important;
+  font-weight:bold;
 }
 </style>

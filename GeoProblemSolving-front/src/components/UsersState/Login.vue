@@ -94,7 +94,17 @@
                   <div style="display:flex;text-align:center;justify-content:center">
                 <p>
                   Forget password?
-                  <a @click="sendResetEmail()">Reset</a>
+                  <!-- <a @click="sendResetEmail()">Reset</a> -->
+                  <a @click="resetModalSHow=true">Reset</a>
+                  <Modal v-model="resetModalSHow" @on-ok="sendResetEmail" @on-cancel="" ok-text="Confirm" cancel-text="cancel" title="Reset password board">
+                    <div style="display:flex;align-items:center">
+                      <span style="width:100px;text-align:center">reciever: </span><Input v-model="formInline.user" style="width: 300px" />
+                    </div>
+                    <div style="display:flex;align-items:center;padding:20px">
+                      <Icon type="ios-information-circle-outline" :size="20" color="lightblue"/>
+                      <p style="margin-left:5px">We will send you an email with a url you can visit it and reset your password,if you agree,you can click the Confirm button and you will get an email soon.</p>
+                    </div>
+                  </Modal>
                 </p>
               </div>
                   <br>
@@ -169,9 +179,14 @@ export default {
       checked: false,
       changePwdEmailStyle:"This email is used for help you reset your password,you can click this url ",
       urlAddress:"http://172.21.212.7:8082/GeoProblemSolving/resetPassword/",
+      resetModalSHow:false,
     };
   },
   mounted() {
+    this.$Notice.config({
+    top: 100,
+    duration: 1
+    });
     this.contentStyle.height = window.innerHeight - 60 + "px";
     this.loginStyle.marginTop = window.innerHeight / 5 + "px";
     this.getlocalStorage();
@@ -192,15 +207,17 @@ export default {
             localStorage.setItem("password", "");
             localStorage.setItem("statusRecord", false);
           }
+          var email = this.formInline.user
           var passwordFro = this.formInline.password;
           var passwordAES = this.encrypto(passwordFro);
+          var passwordAESURI = window.encodeURIComponent(passwordAES);
           this.axios
             .get(
               "/GeoProblemSolving/user/login" +
                 "?email=" +
-                this.formInline.user +
+                email +
                 "&password=" +
-                passwordAES
+                passwordAESURI
             )
             .then(res => {
               if (res.data === "Email") {
@@ -210,9 +227,13 @@ export default {
                 this.$Message.error("Invalid account or password.");
               }
                else {
-                this.$Message.success("Success!");
+                 this.$Message.info("Login Success");
+                // this.$Message.success("Success!");
                 this.$store.commit("userLogin", res.data);
-                this.$router.go(-1);
+                setTimeout(this.goBack,500);
+                // 这里逻辑有问题，需要修改
+                // this.$router.push({ path: "/login" });
+                // this.$router.go(-1);
               }
             });
         } else {
@@ -221,6 +242,9 @@ export default {
           );
         }
       });
+    },
+    goBack(){
+      this.$router.go(-1);
     },
     register: function() {
       this.$router.push({ name: "Register" });
@@ -283,7 +307,7 @@ export default {
             this.$Notice.success({
               title: "Email send success",
               desc:
-                "We have accepted your application for retrieving password, you will receive an email to help you reset it later."
+                "The email has been sent successfully."
             });
           } else {
             this.$Notice.error({

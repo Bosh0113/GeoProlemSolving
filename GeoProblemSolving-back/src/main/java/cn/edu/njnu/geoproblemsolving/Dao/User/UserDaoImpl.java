@@ -69,21 +69,23 @@ public class UserDaoImpl implements IUserDao {
             CommonMethod method = new CommonMethod();
             Update update = method.setUpdate(request);
             mongoTemplate.updateFirst(query, update, UserEntity.class);
-            return mongoTemplate.findOne(query, UserEntity.class);
+            UserEntity newUser = mongoTemplate.findOne(query, UserEntity.class);
+            newUser.setPassword("");
+            return newUser;
         } catch (Exception e) {
             return "Fail";
         }
     }
 
     @Override
-    public Object updatePassword(String email,String password){
+    public Object updatePassword(String email, String password) {
         try {
-            if (!isRegistered(email)){
+            if (!isRegistered(email)) {
                 return "None";
-            }else {
+            } else {
                 Query query = new Query(Criteria.where("email").is(email));
-                Update updatePassword=new Update();
-                updatePassword.set("password",password);
+                Update updatePassword = new Update();
+                updatePassword.set("password", password);
                 mongoTemplate.updateFirst(query, updatePassword, UserEntity.class);
                 return mongoTemplate.findOne(query, UserEntity.class);
             }
@@ -94,57 +96,55 @@ public class UserDaoImpl implements IUserDao {
 
     @Override
     public Object login(String email, String password) {
-        if(isRegistered(email)){
-            AESUtils aesUtils=new AESUtils();
-            password=aesUtils.decrypt(password);
-            if (verifyPassword(email,password)){
+        if (isRegistered(email)) {
+            AESUtils aesUtils = new AESUtils();
+            password = aesUtils.decrypt(password);
+            if (verifyPassword(email, password)) {
                 Query query = new Query(Criteria.where("email").is(email));
                 UserEntity user = mongoTemplate.findOne(query, UserEntity.class);
                 user.setPassword("");
                 return user;
-            }
-            else {
+            } else {
                 return "Password";
             }
-        }
-        else {
+        } else {
             return "Email";
         }
     }
 
     @Override
-    public Boolean isRegistered(String email){
+    public Boolean isRegistered(String email) {
         Query query = new Query(Criteria.where("email").is(email));
         return !mongoTemplate.find(query, UserEntity.class).isEmpty();
     }
 
     @Override
-    public Boolean verifyPassword(String email,String password){
+    public Boolean verifyPassword(String email, String password) {
         Query query = new Query(Criteria.where("email").is(email).and("password").is(password));
         return !mongoTemplate.find(query, UserEntity.class).isEmpty();
     }
 
-    public String updateKey(){
+    public String updateKey() {
         try {
             List<UserEntity> userList = mongoTemplate.findAll(UserEntity.class);
-            for (UserEntity user:userList){
+            for (UserEntity user : userList) {
                 String userId = user.getUserId();
                 Query queryUser = Query.query(Criteria.where("userId").is(userId));
                 JSONArray manageProjects = new JSONArray();
                 Query queryProject = Query.query(Criteria.where("managerId").is(userId));
-                List<ProjectEntity> projectEntityList=mongoTemplate.find(queryProject,ProjectEntity.class);
-                for (ProjectEntity projectEntity:projectEntityList){
-                    JSONObject projectInfo =new JSONObject();
-                    projectInfo.put("title",projectEntity.getTitle());
-                    projectInfo.put("projectId",projectEntity.getProjectId());
+                List<ProjectEntity> projectEntityList = mongoTemplate.find(queryProject, ProjectEntity.class);
+                for (ProjectEntity projectEntity : projectEntityList) {
+                    JSONObject projectInfo = new JSONObject();
+                    projectInfo.put("title", projectEntity.getTitle());
+                    projectInfo.put("projectId", projectEntity.getProjectId());
                     manageProjects.add(projectInfo);
                 }
                 Update updateUser = new Update();
-                updateUser.set("manageProjects",manageProjects);
-                mongoTemplate.updateFirst(queryUser,updateUser,UserEntity.class);
+                updateUser.set("manageProjects", manageProjects);
+                mongoTemplate.updateFirst(queryUser, updateUser, UserEntity.class);
             }
             return "Success";
-        }catch (Exception e){
+        } catch (Exception e) {
             return "Fail";
         }
     }

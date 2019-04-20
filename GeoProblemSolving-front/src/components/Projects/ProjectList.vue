@@ -1,31 +1,36 @@
+<style>
+  /* .ivu-card-head{
+    height:55px !important;
+    padding:10px !important;
+    display:flex;
+    align-items:center
+  } */
+</style>
 <style scoped>
 img {
-  /* padding:10px; */
-  max-width: 100%;
-  max-height: 100%;
-  /* 用css替代图片，使图片显示为其灰度版本 */
-  /* filter: grayscale(100%); */
+  width: 100%;
+  height:auto;
 }
 .whitespace {
   height: 20px;
 }
 .projectTitle {
-  height: 40px;
-  line-height: 40px;
+  height: 30px;
+  line-height: 30px;
   font-size: 20px;
-  max-width: 80%;
+  max-width: 200px;
+  padding-left:5px;
   display: inline-block;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.btnCreate:hover {
+.btnCreate:hover,.joinProjectBtn:hover {
   background-color: #19be6b;
   color: white;
 }
-.btnJoin:hover {
-  background-color: #57a3f3;
-  color: white;
+.joinProjectBtn{
+  /* margin-top:-4px; */
 }
 /* Loading动画的特效 */
 .demo-spin-icon-load {
@@ -45,12 +50,16 @@ img {
         <div style="display:flex;height:60px;justify-content:center"></div>
         <div class="Tabpane" style="display:flex">
           <Tabs v-model="currentTab" @click.native="chooseCurrentType(currentTab)">
-            <TabPane label="Water" name="Water" icon="ios-water"></TabPane>
-            <TabPane label="Soil" name="Soil" icon="md-grid"></TabPane>
-            <TabPane label="Ecology" name="Ecology" icon="md-leaf"></TabPane>
-            <TabPane label="Atmosphere" name="Atmosphere" icon="md-cloud"></TabPane>
-            <TabPane label="Society" name="Society" icon="md-bus"></TabPane>
-            <TabPane label="Others" name="Others" icon="md-globe"></TabPane>
+            <TabPane label="All" name="All" icon="ios-list"></TabPane>
+            <TabPane label="Terrestrial" name="Terrestrial" icon="md-globe"></TabPane>
+            <TabPane label="Coastal" name="Coastal" icon="ios-boat"></TabPane>
+            <TabPane label="Marine" name="Marine" icon="ios-water"></TabPane>
+            <TabPane label="Climate" name="Climate" icon="ios-partly-sunny"></TabPane>
+            <TabPane label="Ecological" name="Ecological" icon="ios-leaf"></TabPane>
+            <TabPane label="Geological" name="Geological" icon="ios-analytics"></TabPane>
+            <TabPane label="Human-Activity" name="Human" icon="ios-people"></TabPane>
+            <TabPane label="GIS & RS" name="GISRS" icon="ios-globe"></TabPane>
+            <TabPane label="General" name="General" icon="ios-grid"></TabPane>
           </Tabs>
           <div style="width:40%;display:flex;justify-content:flex-end">
             <Button
@@ -95,7 +104,7 @@ img {
             <Col
               :xs="{ span: 21, offset: 1 }"
               :md="{ span: 11, offset: 1 }"
-              :lg="{ span: 7,  offset: 1 }"
+              :lg="{ span: 5,  offset: 1 }"
               v-if="item.privacy=='Public'"
             >
               <div @click="goSingleProject(item.projectId)" style="cursor:pointer">
@@ -104,63 +113,57 @@ img {
                   <div
                     class="operate"
                     slot="extra"
-                    style="height:40px;display:flex;align-items:center"
+                    style="display:flex;align-items:center"
                   >
-                    <!-- <Button
-                      type="success"
-                      v-show="!item.isMember&&!item.isManager&&UserState"
-                      @click.stop="joinApply(item)"
-                    >
-                    </Button> -->
                       <Button
-                        type="success"
+                        class="joinProjectBtn"
+                        type="default"
+                        title="join in project"
                         v-show="!item.isMember&&!item.isManager&&UserState"
                         @click.stop="joinApplyModalShow(item)"
                       >
-                        <Icon type="md-add"/>
+                        <Icon type="md-add" :size="20"/>
                       </Button>
                       <br>
                       <Icon
                         type="md-person"
-                        :size="30"
+                        :size="20"
                         v-show="item.isMember||item.isManager"
                         :id="item.projectId"
                       />
                     </div>
-                    <div style="display:flex;align-items:center;height:60px">
-                      <strong>Description</strong>
-                      <span style="padding: 0 10px;word-break:break-word;overflow: hidden;
+                    <div style="display:flex;align-items:center;height:20px">
+                      <strong style="text-align: center"><Poptip trigger="hover" :content="item.description" placement="bottom-right" width="250" word-wrap  >Description</Poptip></strong>
+                        <p style="padding: 0 10px;word-break:break-word;overflow: hidden;
                             white-space: nowrap;
                             text-overflow: ellipsis;
                             max-width: 400px;">
-                      {{item.description}}</span>
+                      {{item.description}}</p>
                     </div>
-                    <div style="height:300px;display:flex;justify-content:center">
+                    <div style="height:200px;display:flex;justify-content:center;margin-top:10px">
                       <img :src="item.picture" v-if="item.picture!=''&&item.picture!='undefined'">
                       <avatar
                         :username="item.title"
-                        :size="300"
+                        :size="150"
                         :title="item.title"
                         :rounded="false"
                         v-else
                       ></avatar>
                     </div>
-                    <div class="whitespace"></div>
-                    <div style="height:30px;align-items:center;display:flex;justify-content:flex-start">
-
-                      <Icon type="md-body" :size="20"/>Manager
+                    <div style="height:15px;margin-top:10px;align-items:center;display:flex;justify-content:flex-start">
+                      <Icon type="md-body" :size="15"/>Manager
                       <span style="height:20px;margin-left:5%">
                         <strong>{{item.managerName}}</strong>
                       </span>
                     </div>
-                    <div style="height:30px;align-items:center;display:flex;justify-content:flex-start;margin-top:10px">
-                      <Icon type="md-clock" :size="20"/>Creation Time
+                    <div style="height:15px;align-items:center;display:flex;justify-content:flex-start;margin-top:10px">
+                      <Icon type="md-clock" :size="15"/>Time
                       <span style="height:20px;margin-left:5%">
                         <strong>{{item.createTime.split(' ')[0]}}</strong>
                       </span>
                     </div>
-                    <div style="height:30px;align-items:center;display:flex;justify-content:flex-start;margin-top:10px">
-                      <Icon type="md-pricetags" :size="20"/>Tag
+                    <div style="height:15px;align-items:center;display:flex;justify-content:flex-start;margin-top:10px">
+                      <Icon type="md-pricetags" :size="15"/>Tags
                       <span style="height:20px;margin-left:5%">
                         <strong v-for="tag in item.tag">{{tag}}</strong>
                       </span>
@@ -175,7 +178,7 @@ img {
               ok-text="Apply"
               cancel-text="Cancel"
               @on-ok="joinApply('applyValidate')"
-              @on-cancel="cancel"
+              @on-cancel=""
             >
               <Form ref="applyValidate" :model="applyValidate" :rules="applyRuleValidate" :label-width="80">
                 <FormItem label="Reason" prop="reason">
@@ -193,8 +196,7 @@ import Avatar from "vue-avatar";
 export default {
   mounted() {
     // 作用是在一开始就到后台获取water资源类型的项目，作为默认值
-    let initObject = { key: "category", value: "Water" };
-    this.getSpecificTypeProjects(initObject);
+    this.getAllProjects();
   },
   computed: {
     filteredBlogs: function() {
@@ -254,45 +256,82 @@ export default {
       if (data === this.justChooseTab) {
       } else {
         switch (data) {
-          case "Water":
-            let waterObject = { key: "category", value: "Water" };
-            this.getSpecificTypeProjects(waterObject);
-            this.justChooseTab = "Water";
+          case "All":
+            this.justChooseTab = "All";
+            this.getAllProjects();
             break;
-          case "Soil":
-            let soilObject = { key: "category", value: "Soil" };
-            this.getSpecificTypeProjects(soilObject);
-            this.justChooseTab = "Soil";
+          case "Terrestrial":
+            let Terrestrial = { key: "category", value: "Terrestrial" };
+            this.getSpecificTypeProjects(Terrestrial);
+            this.justChooseTab = "Terrestrial";
             break;
-          case "Ecology":
-            let ecologyObject = { key: "category", value: "Ecology" };
-            this.getSpecificTypeProjects(ecologyObject);
-            this.justChooseTab = "Ecology";
+          case "Coastal":
+            let Coastal = { key: "category", value: "Coastal" };
+            this.getSpecificTypeProjects(Coastal);
+            this.justChooseTab = "Coastal";
             break;
-          case "Atmosphere":
-            let atmosphereObject = { key: "category", value: "Atmosphere" };
-            this.getSpecificTypeProjects(atmosphereObject);
-            this.justChooseTab = "Atmosphere";
+          case "Marine":
+            let Marine = { key: "category", value: "Marine" };
+            this.getSpecificTypeProjects(Marine);
+            this.justChooseTab = "Marine";
             break;
-          case "Society":
-            let societyObject = { key: "category", value: "Society" };
-            this.getSpecificTypeProjects(societyObject);
-            this.justChooseTab = "Society";
+          case "Climate":
+            let Climate = { key: "category", value: "Climate" };
+            this.getSpecificTypeProjects(Climate);
+            this.justChooseTab = "Climate";
             break;
-          case "Others":
-            let othersObject = { key: "category", value: "Others" };
-            this.getSpecificTypeProjects(othersObject);
-            this.justChooseTab = "Others";
+          case "Ecological":
+            let Ecological = { key: "category", value: "Ecological" };
+            this.getSpecificTypeProjects(Ecological);
+            this.justChooseTab = "Ecological";
+            break;
+          case "Geological":
+            let Geological = { key: "category", value: "Geological" };
+            this.getSpecificTypeProjects(Geological);
+            this.justChooseTab = "Geological";
+            break;
+          case "Human":
+            let Human = { key: "category", value: "Human" };
+            this.getSpecificTypeProjects(Human);
+            this.justChooseTab = "Human";
+            break;
+          case "GISRS":
+            let GIS = { key: "category", value: "GISRS" };
+            this.getSpecificTypeProjects(GIS);
+            this.justChooseTab = "GISRS";
+            break;
+          case "General":
+            let General = { key: "category", value: "General" };
+            this.getSpecificTypeProjects(General);
+            this.justChooseTab = "General";
             break;
         }
       }
+    },
+    getAllProjects(){
+      this.getFinish = true;
+      this.axios
+        .get(
+          "/GeoProblemSolving/project/inquiryAll")
+        .then(res => {
+          //结束等待
+          this.getFinish = false;
+          if (res.data === "None") {
+            this.currentProjectList = [];
+          } else {
+            this.judgeMember(res.data);
+          }
+        })
+        .catch(err => {
+          console.log(err.data);
+        });
     },
     getSpecificTypeProjects(data) {
       //显示等待
       this.getFinish = true;
       this.axios
         .get(
-          "/GeoProblemSolving/project/inquiry" +
+          "/GeoProblemSolving/project/inquiryByType" +
             "?key=" +
             data["key"] +
             "&value=" +
@@ -310,7 +349,6 @@ export default {
         .catch(err => {
           console.log(err.data);
         });
-      return this.currentProjectList;
     },
     newProject() {
       if (!this.$store.getters.userState) {

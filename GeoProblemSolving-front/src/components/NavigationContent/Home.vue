@@ -88,10 +88,29 @@ img {
 .image {
   background-image: "./../../assets/images/1.jpg";
 }
+.feature{
+  height:480px;
+  display:flex;;
+  margin-bottom:40px;
+}
+.textContent{
+  flex:1;
+  /* background-color: lightblue; */
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center
+}
+.imgContent{
+  flex:2;
+  height:100%;
+  /* background-color: lightgray; */
+}
+
 </style>
 <template>
   <div class="home">
-    <Row>
+    <!-- <Row>
       <Col span = "20" offset ="2" style="margin-top:60px">
         <Carousel v-model="imagelist" loop >
         <CarouselItem>
@@ -116,33 +135,40 @@ img {
         </CarouselItem>
     </Carousel>
       </Col>
-    </Row>
+    </Row> -->
     <Row>
       <div class="feature_part">
         <Col span="20" offset="2">
-          <div>
-            <div class="feature_title">Features Page</div>
-            <div class="feature_content">
-              <div class="single_feature">
-                <div class="single_feature_image">image</div>
-                <div class="single_feature_content">Introduction</div>
-              </div>
-              <div class="single_feature">
-                <div class="single_feature_image">image</div>
-                <div class="single_feature_content">Introduction</div>
-              </div>
-              <div class="single_feature">
-                <div class="single_feature_image">image</div>
-                <div class="single_feature_content">Introduction</div>
-              </div>
-              <div class="single_feature">
-                <div class="single_feature_image">image</div>
-                <div class="single_feature_content">Introduction</div>
-              </div>
-            </div>
+        <div class="feature">
+           <div class="imgContent">
+             <img src="./../../assets/images/projects.png"/>
           </div>
+          <div class="textContent">
+            <div>
+              <h3 style="font-size: 2.1875rem;text-align:center">{{this.createProjectsTitle}}</h3>
+              <p style="font-size: 1rem;padding:20px 60px 20px 60px;text-align:center">Choose proper area to create projects so as to solve complex  geographical problems.</p>
+            </div>
+            </div>
+        </div>
+        <div class="feature">
+          <div class="textContent">
+            <div>
+              <h3 style="font-size: 2.1875rem;text-align:center">{{this.manageProjectsTitle}}</h3>
+              <p style="font-size: 1rem;padding:20px 60px 20px 60px;text-align:center">Freely create to-do items, doing items and done items, update project progress freely.</p>
+            </div>
+            </div>
+          <div class="imgContent">
+            <img src="./../../assets/images/task.png"/>
+          </div>
+        </div>
+        <div class="feature">
+           <div class="Carsoule"></div>
+
+        </div>
+
         </Col>
       </div>
+
     </Row>
     <Row>
         <div class="function_part">
@@ -213,6 +239,8 @@ export default {
   data() {
     return {
       // msg: "Welcome to Home",
+      manageProjectsTitle:"Manage projects easily",
+      createProjectsTitle:"Create projects in different areas",
       imagelist: 0,
       image_index: 0,
       example_show_lists: [

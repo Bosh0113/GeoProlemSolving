@@ -97,12 +97,15 @@ h1 {
       <!-- 选择类别 -->
       <FormItem prop="category" label="category" :label-width="100">
           <RadioGroup v-model="formInline.category" style="width:80%">
-            <Radio label="Water"></Radio>
-            <Radio label="Soil"></Radio>
-            <Radio label="Ecology"></Radio>
-            <Radio label="Atmosphere"></Radio>
-            <Radio label="Society"></Radio>
-            <Radio label="Others"></Radio>
+            <Radio label="Terrestrial">Terrestrial System</Radio>
+            <Radio label="Coastal">Coastal System</Radio>
+            <Radio label="Marine">Marine System</Radio>
+            <Radio label="Climate">Climate System</Radio>
+            <Radio label="Ecological">Ecological System</Radio>
+            <Radio label="Geological">Geological System</Radio>
+            <Radio label="Human">Human-Activity</Radio>
+            <Radio label="GISRS">GIS & RS</Radio>
+            <Radio label="General">General</Radio>
           </RadioGroup>
       </FormItem>
       <FormItem prop="title" label="title" :label-width="100">

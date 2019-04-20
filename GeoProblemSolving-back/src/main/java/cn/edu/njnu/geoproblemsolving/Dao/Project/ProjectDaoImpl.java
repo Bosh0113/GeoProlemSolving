@@ -56,13 +56,13 @@ public class ProjectDaoImpl implements IProjectDao {
         UserEntity userInfo = mongoTemplate.findOne(query, UserEntity.class);
         project.setManagerName(userInfo.getUserName());
         JSONArray manageProjects = userInfo.getManageProjects();
-        JSONObject projectInfo=new JSONObject();
-        projectInfo.put("projectId",project.getProjectId());
-        projectInfo.put("title",project.getTitle());
+        JSONObject projectInfo = new JSONObject();
+        projectInfo.put("projectId", project.getProjectId());
+        projectInfo.put("title", project.getTitle());
         manageProjects.add(projectInfo);
         Update updateUser = new Update();
-        updateUser.set("manageProjects",manageProjects);
-        mongoTemplate.updateFirst(query,updateUser,UserEntity.class);
+        updateUser.set("manageProjects", manageProjects);
+        mongoTemplate.updateFirst(query, updateUser, UserEntity.class);
         mongoTemplate.save(project);
         // encode
         if (projectId.length() == 36) {
@@ -70,6 +70,41 @@ public class ProjectDaoImpl implements IProjectDao {
             projectId = EncodeUtil.encode((projectId + randomID).getBytes());
         }
         return projectId;
+    }
+
+    @Override
+    public Object readAllProjects() {
+        try {
+            Query queryProjects = Query.query(Criteria.where("privacy").is("Public"));
+            List<ProjectEntity> projectEntityList = mongoTemplate.find(queryProjects, ProjectEntity.class);
+            if (!projectEntityList.isEmpty()) {
+                projectEntityList = encodeProjetId(projectEntityList);
+                return projectEntityList;
+            } else {
+                return "None";
+            }
+        } catch (Exception e) {
+            return "Fail";
+        }
+    }
+
+    @Override
+    public Object readByType(String key, String value) {
+        try {
+            Query queryProjects = new Query();
+            Criteria criteria = new Criteria();
+            criteria.andOperator(Criteria.where("privacy").is("Public"), Criteria.where(key).is(value));
+            queryProjects.addCriteria(criteria);
+            List<ProjectEntity> projectEntityList = mongoTemplate.find(queryProjects, ProjectEntity.class);
+            if (!projectEntityList.isEmpty()){
+                projectEntityList = encodeProjetId(projectEntityList);
+                return projectEntityList;
+            }else {
+                return "None";
+            }
+        } catch (Exception e) {
+            return "Fail";
+        }
     }
 
     @Override
@@ -87,22 +122,7 @@ public class ProjectDaoImpl implements IProjectDao {
             return "None";
         } else {
             List<ProjectEntity> projectEntities = mongoTemplate.find(query, ProjectEntity.class);
-
-            for (int i = 0; i < projectEntities.size(); i++) {
-                // get
-                ProjectEntity projectEntity = projectEntities.get(i);
-                String projectId = projectEntity.getProjectId();
-
-                // encode
-                if (projectId.length() == 36) {
-                    String randomID = UUID.randomUUID().toString().substring(0, 2);
-                    projectId = EncodeUtil.encode((projectId + randomID).getBytes());
-                }
-
-                // set
-                projectEntity.setProjectId(projectId);
-            }
-
+            projectEntities = encodeProjetId(projectEntities);
             return projectEntities;
         }
     }
@@ -117,26 +137,26 @@ public class ProjectDaoImpl implements IProjectDao {
             value = projectId.substring(0, projectId.length() - 2);
         }
         Query query = Query.query(Criteria.where(key).is(value));
-        ProjectEntity projectEntity=mongoTemplate.findOne(query,ProjectEntity.class);
-        JSONArray members =projectEntity.getMembers();
-        for (int i=0;i<members.size();i++) {
+        ProjectEntity projectEntity = mongoTemplate.findOne(query, ProjectEntity.class);
+        JSONArray members = projectEntity.getMembers();
+        for (int i = 0; i < members.size(); i++) {
             JSONObject memberObject = members.getJSONObject(i);
             quitProject(value, memberObject.getString("userId"));
         }
-        String managerId=projectEntity.getManagerId();
-        Query queryManager=Query.query(Criteria.where("userId").is(managerId));
-        UserEntity managerObject=mongoTemplate.findOne(queryManager,UserEntity.class);
-        JSONArray manageProjects=managerObject.getManageProjects();
-        for (int i=0;i<manageProjects.size();i++){
-            JSONObject manageProject =manageProjects.getJSONObject(i);
-            if(manageProject.get("projectId").equals(value)){
+        String managerId = projectEntity.getManagerId();
+        Query queryManager = Query.query(Criteria.where("userId").is(managerId));
+        UserEntity managerObject = mongoTemplate.findOne(queryManager, UserEntity.class);
+        JSONArray manageProjects = managerObject.getManageProjects();
+        for (int i = 0; i < manageProjects.size(); i++) {
+            JSONObject manageProject = manageProjects.getJSONObject(i);
+            if (manageProject.get("projectId").equals(value)) {
                 manageProjects.remove(i);
                 break;
             }
         }
-        Update updateManager =new Update();
-        updateManager.set("manageProjects",manageProjects);
-        mongoTemplate.updateFirst(queryManager,updateManager,UserEntity.class);
+        Update updateManager = new Update();
+        updateManager.set("manageProjects", manageProjects);
+        mongoTemplate.updateFirst(queryManager, updateManager, UserEntity.class);
         mongoTemplate.remove(query, "Project");
     }
 
@@ -155,7 +175,7 @@ public class ProjectDaoImpl implements IProjectDao {
             Update update = method.setUpdate(request);
             update.set("projectId", projectId);
             mongoTemplate.updateFirst(query, update, ProjectEntity.class);
-            return mongoTemplate.findOne(query,ProjectEntity.class);
+            return mongoTemplate.findOne(query, ProjectEntity.class);
         } catch (Exception e) {
             return "Fail";
         }
@@ -230,7 +250,7 @@ public class ProjectDaoImpl implements IProjectDao {
                 updateUser.set("joinedProjects", newJoinedProjects);
                 mongoTemplate.updateFirst(queryUser, updateUser, UserEntity.class);
 
-                quitSubProjectFromProject(projectId,userId);
+                quitSubProjectFromProject(projectId, userId);
                 return "Success";
             } else {
                 return "None";
@@ -252,7 +272,7 @@ public class ProjectDaoImpl implements IProjectDao {
 
             Query query = new Query(Criteria.where("projectId").is(projectId));
             ProjectEntity project = mongoTemplate.findOne(query, ProjectEntity.class);
-            quitProject(projectId,userId);
+            quitProject(projectId, userId);
             JSONArray members = project.getMembers();
             CommonMethod method = new CommonMethod();
             JSONArray newMembers = method.quitGroup(members, userId, "userId");
@@ -261,31 +281,31 @@ public class ProjectDaoImpl implements IProjectDao {
             foreManager.put("userName", project.getManagerName());
             newMembers.add(foreManager);
             Query oldManagerQuery = Query.query(Criteria.where("userId").is(project.getManagerId()));
-            UserEntity oldManagerObject=mongoTemplate.findOne(oldManagerQuery,UserEntity.class);
-            JSONArray oldManageProjects=oldManagerObject.getManageProjects();
-            for (int i=0;i<oldManageProjects.size();i++){
-                JSONObject oldManageProject=oldManageProjects.getJSONObject(i);
-                if(oldManageProject.get("projectId").equals(projectId)){
+            UserEntity oldManagerObject = mongoTemplate.findOne(oldManagerQuery, UserEntity.class);
+            JSONArray oldManageProjects = oldManagerObject.getManageProjects();
+            for (int i = 0; i < oldManageProjects.size(); i++) {
+                JSONObject oldManageProject = oldManageProjects.getJSONObject(i);
+                if (oldManageProject.get("projectId").equals(projectId)) {
                     oldManageProjects.remove(i);
                     break;
                 }
             }
-            Update updateOldManager=new Update();
-            updateOldManager.set("manageProjects",oldManageProjects);
+            Update updateOldManager = new Update();
+            updateOldManager.set("manageProjects", oldManageProjects);
             Query newManagerQuery = Query.query(Criteria.where("userId").is(userId));
             UserEntity newManager = mongoTemplate.findOne(newManagerQuery, UserEntity.class);
-            JSONArray newManageProjects=newManager.getManageProjects();
-            JSONObject newManageProject=new JSONObject();
-            newManageProject.put("projectId",project.getProjectId());
-            newManageProject.put("title",project.getTitle());
+            JSONArray newManageProjects = newManager.getManageProjects();
+            JSONObject newManageProject = new JSONObject();
+            newManageProject.put("projectId", project.getProjectId());
+            newManageProject.put("title", project.getTitle());
             newManageProjects.add(newManageProject);
-            JSONArray oldManageJoinedProjects= oldManagerObject.getJoinedProjects();
+            JSONArray oldManageJoinedProjects = oldManagerObject.getJoinedProjects();
             oldManageJoinedProjects.add(newManageProject);
-            updateOldManager.set("joinedProjects",oldManageJoinedProjects);
-            mongoTemplate.updateFirst(oldManagerQuery,updateOldManager,UserEntity.class);
-            Update updateNewManager =new Update();
-            updateNewManager.set("manageProjects",newManageProjects);
-            mongoTemplate.updateFirst(newManagerQuery,updateNewManager,UserEntity.class);
+            updateOldManager.set("joinedProjects", oldManageJoinedProjects);
+            mongoTemplate.updateFirst(oldManagerQuery, updateOldManager, UserEntity.class);
+            Update updateNewManager = new Update();
+            updateNewManager.set("manageProjects", newManageProjects);
+            mongoTemplate.updateFirst(newManagerQuery, updateNewManager, UserEntity.class);
             Update update = new Update();
             update.set("managerId", newManager.getUserId());
             update.set("managerName", newManager.getUserName());
@@ -298,23 +318,23 @@ public class ProjectDaoImpl implements IProjectDao {
     }
 
     @Override
-    public String joinByMail(String projectId, String email, String password){
+    public String joinByMail(String projectId, String email, String password) {
         try {
             // decode
             if (projectId.length() > 36) {
                 String pId = new String(EncodeUtil.decode(projectId));
                 projectId = pId.substring(0, pId.length() - 2);
             }
-            UserDaoImpl userDao=new UserDaoImpl(mongoTemplate);
-            UserEntity userEntity=new UserEntity();
-            if (userDao.isRegistered(email)){
-                if (userDao.verifyPassword(email,password)){
+            UserDaoImpl userDao = new UserDaoImpl(mongoTemplate);
+            UserEntity userEntity = new UserEntity();
+            if (userDao.isRegistered(email)) {
+                if (userDao.verifyPassword(email, password)) {
                     Query query = new Query(Criteria.where("email").is(email));
-                    userEntity=mongoTemplate.findOne(query,UserEntity.class);
-                }else {
+                    userEntity = mongoTemplate.findOne(query, UserEntity.class);
+                } else {
                     return "Password";
                 }
-            }else {
+            } else {
                 userEntity.setUserId(UUID.randomUUID().toString());
                 userEntity.setUserName(email);
                 userEntity.setEmail(email);
@@ -322,50 +342,50 @@ public class ProjectDaoImpl implements IProjectDao {
                 userEntity.setJoinedProjects(new JSONArray());
                 userDao.saveUser(userEntity);
             }
-            String userId=userEntity.getUserId();
-            String result=joinProject(projectId,userId).toString();
-            if (!result.equals("Success")){
+            String userId = userEntity.getUserId();
+            String result = joinProject(projectId, userId).toString();
+            if (!result.equals("Success")) {
                 return result;
             }
             return "Success";
-        }catch (Exception e){
+        } catch (Exception e) {
             return "Fail";
         }
     }
 
     @Override
-    public String applyByEmail(EmailEntity emailEntity){
+    public String applyByEmail(EmailEntity emailEntity) {
         try {
             String userId = emailEntity.getRecipient();
             Query queryUser = Query.query(Criteria.where("userId").is(userId));
-            UserEntity manager = mongoTemplate.findOne(queryUser,UserEntity.class);
+            UserEntity manager = mongoTemplate.findOne(queryUser, UserEntity.class);
             emailEntity.setRecipient(manager.getEmail());
             String EmailContent = emailEntity.getMailContent();
-            EmailContent = EmailContent+"You can click this url and enter the site to process this application: "+
-            "http://172.21.212.7:8082/GeoProblemSolving/home";
+            EmailContent = EmailContent + "You can click this url and enter the site to process this application: " +
+                    "http://172.21.212.7:8082/GeoProblemSolving/home";
             emailEntity.setMailContent(EmailContent);
-            EmailDaoImpl emailDao=new EmailDaoImpl();
+            EmailDaoImpl emailDao = new EmailDaoImpl();
             emailDao.sendEmail(emailEntity);
             return "Success";
-        }catch (Exception e){
+        } catch (Exception e) {
             return "Fail";
         }
     }
 
     @Override
-    public String uploadPicture(HttpServletRequest request){
+    public String uploadPicture(HttpServletRequest request) {
         try {
-            InetAddress address=InetAddress.getLocalHost();
+            InetAddress address = InetAddress.getLocalHost();
             String ip = address.getHostAddress();
-            String servicePath =request.getSession().getServletContext().getRealPath("/");
+            String servicePath = request.getSession().getServletContext().getRealPath("/");
             if (!ServletFileUpload.isMultipartContent(request)) {
                 System.out.println("File is not multimedia.");
                 return "Fail";
             }
             Collection<Part> parts = request.getParts();
-            String pathURL="Fail";
-            for(Part part:parts){
-                if (part.getName().equals("picture")){
+            String pathURL = "Fail";
+            for (Part part : parts) {
+                if (part.getName().equals("picture")) {
                     String fileNames = part.getSubmittedFileName();
                     String fileName = fileNames.substring(0, fileNames.lastIndexOf("."));
                     String suffix = fileNames.substring(fileNames.lastIndexOf(".") + 1);
@@ -380,9 +400,9 @@ public class ProjectDaoImpl implements IProjectDao {
                     for (int i = 0; i < 5; i++) {
                         randomNum = randomNum * 10 + (int) (Math.random() * 10 + 1);
                     }
-                    String newFileTitle=saveName + randomNum + "." + suffix;
+                    String newFileTitle = saveName + randomNum + "." + suffix;
                     String localPath = temp + "\\" + newFileTitle;
-                    System.out.println("图片上传到本地路径："+localPath);
+                    System.out.println("图片上传到本地路径：" + localPath);
                     File file = new File(localPath);
                     FileOutputStream fileOutputStream = new FileOutputStream(file);
                     InputStream inputStream = part.getInputStream();
@@ -396,53 +416,69 @@ public class ProjectDaoImpl implements IProjectDao {
 
                     String reqPath = request.getRequestURL().toString();
                     pathURL = reqPath.replaceAll("localhost", ip) + "/" + newFileTitle;
-                    String regexGetUrl="(/GeoProblemSolving[\\S]*)";
-                    Pattern regexPattern=Pattern.compile(regexGetUrl);
-                    Matcher matcher=regexPattern.matcher(pathURL);
-                    if (matcher.find()){
-                        pathURL=matcher.group(1);
+                    String regexGetUrl = "(/GeoProblemSolving[\\S]*)";
+                    Pattern regexPattern = Pattern.compile(regexGetUrl);
+                    Matcher matcher = regexPattern.matcher(pathURL);
+                    if (matcher.find()) {
+                        pathURL = matcher.group(1);
                     }
 //                    System.out.println("图片的请求地址："+pathURL);
                     break;
                 }
             }
             return pathURL;
-        }catch (Exception e){
+        } catch (Exception e) {
             return "Fail";
         }
     }
 
-    private void quitSubProjectFromProject(String projectId,String userId){
+    private void quitSubProjectFromProject(String projectId, String userId) {
         Query querySubProjects = Query.query(Criteria.where("projectId").is(projectId));
-        List<SubProjectEntity> subProjectList=mongoTemplate.find(querySubProjects,SubProjectEntity.class);
-        for (SubProjectEntity subProject:subProjectList){
+        List<SubProjectEntity> subProjectList = mongoTemplate.find(querySubProjects, SubProjectEntity.class);
+        for (SubProjectEntity subProject : subProjectList) {
             Query query = Query.query(Criteria.where("subProjectId").is(subProject.getSubProjectId()));
-            JSONArray members=subProject.getMembers();
+            JSONArray members = subProject.getMembers();
             String managerId = subProject.getManagerId();
-            if (managerId.equals(userId)){
-                if (members.size()>0){
+            if (managerId.equals(userId)) {
+                if (members.size() > 0) {
                     JSONObject firstMember = members.getJSONObject(0);
                     members.remove(0);
                     Update update = new Update();
-                    update.set("managerId",firstMember.get("userId"));
-                    update.set("managerName",firstMember.get("userName"));
-                    update.set("members",members);
-                    mongoTemplate.updateFirst(query,update,SubProjectEntity.class);
-                }else {
-                    mongoTemplate.remove(query,SubProjectEntity.class);
+                    update.set("managerId", firstMember.get("userId"));
+                    update.set("managerName", firstMember.get("userName"));
+                    update.set("members", members);
+                    mongoTemplate.updateFirst(query, update, SubProjectEntity.class);
+                } else {
+                    mongoTemplate.remove(query, SubProjectEntity.class);
                 }
-            }else {
-                for (int i=0;i<members.size();i++){
+            } else {
+                for (int i = 0; i < members.size(); i++) {
                     JSONObject member = members.getJSONObject(i);
-                    if (member.getString("userId").equals(userId)){
+                    if (member.getString("userId").equals(userId)) {
                         members.remove(i);
-                        Update update =new Update();
-                        update.set("members",member);
-                        mongoTemplate.updateFirst(query,update,SubProjectEntity.class);
+                        Update update = new Update();
+                        update.set("members", member);
+                        mongoTemplate.updateFirst(query, update, SubProjectEntity.class);
                         break;
                     }
                 }
             }
         }
+    }
+
+    private List<ProjectEntity> encodeProjetId(List<ProjectEntity> projectEntityList) {
+
+        for (ProjectEntity projectEntity : projectEntityList) {
+            // get
+            String projectId = projectEntity.getProjectId();
+            // encode
+            if (projectId.length() == 36) {
+                String randomID = UUID.randomUUID().toString().substring(0, 2);
+                projectId = EncodeUtil.encode((projectId + randomID).getBytes());
+            }
+            // set
+            projectEntity.setProjectId(projectId);
+        }
+        return projectEntityList;
     }
 }

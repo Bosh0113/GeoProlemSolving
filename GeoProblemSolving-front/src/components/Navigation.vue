@@ -12,18 +12,31 @@
 .header span {
   font-size: 15px;
 }
-.header {
+.container{
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+header {
   height: 60px;
   top:0;
   z-index:100;
   position:fixed;
   width:100%;
+  flex: 0 0 auto;
 }
-.footer{
+.content{
+  flex: 1 0 auto;
+  margin-top:60px;
+  margin-bottom:20px;
+  min-height:800px;
+}
+footer{
   background-color:#515a6e;
   height:60px;
   width:100%;
   bottom:0;
+  flex: 0 0 auto;
 }
 .userState {
   position: absolute;
@@ -37,8 +50,8 @@
 }
 </style>
 <template>
-  <div class="mainPart">
-    <div class="header">
+  <div class="container">
+    <header>
       <img src="@/assets/images/OGMS.png" id="logo" class="pic" @click="goHome" style="cursor:pointer">
       <div class="navPart">
         <Menu
@@ -104,14 +117,14 @@
             </Menu>
         </div>
       </div>
-    </div>
-    <div class="content" style="margin-top:60px;margin-bottom:70px">
-      <router-view @sendNotice="sendMessage" @readNotification="readNotification"></router-view>
-    </div>
-    <div class="footer">
+    </header>
+    <section class="content">
+     <router-view @sendNotice="sendMessage" @readNotification="readNotification"></router-view>
+    </section>
+    <footer>
       <h2 style="text-align:center;color:white;font-weight:bold;margin-top:15px"><i>Open Geographic Modeling and Simulation</i></h2>
       <h4 style="text-align:center;color:white">copyright@2013-2019 OpenGMS.all rights reserved</h4>
-    </div>
+    </footer>
   </div>
 </template>
 <script>
@@ -125,10 +138,12 @@ export default {
       unreadNoticeCount: 0,
       timer: null,
       //导航栏宽度
-      headerWidth: ""
+      headerWidth: "",
+      // contentHeight:"",
     };
   },
   mounted() {
+    // this.contentHeight = window.innerHeight-120+'px';
     if (this.$store.getters.userState) {
       this.setTimer();
       this.initWebSocket();
