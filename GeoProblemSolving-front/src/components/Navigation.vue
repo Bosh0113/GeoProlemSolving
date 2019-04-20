@@ -52,11 +52,11 @@
           <MenuItem name="home" class="menuItem" style="margin-left:30%">
             <span>Home</span>
           </MenuItem>
-          <MenuItem name="project">
-            <span>Project</span>
+          <MenuItem name="projects">
+            <span>Projects</span>
           </MenuItem>
-          <MenuItem name="Public Resource">
-            <span>Public Resource</span>
+          <MenuItem name="resources">
+            <span>Resources</span>
           </MenuItem>
           <MenuItem name="community">
             <span>Community</span>
@@ -158,9 +158,9 @@ export default {
     turnContent(name) {
       if (name === "home") {
         this.$router.replace({ name: "Home" });
-      } else if (name == "project") {
-        this.$router.replace({ name: "Project" });
-      } else if (name == "Public Resource") {
+      } else if (name == "projects") {
+        this.$router.replace({ name: "Projects" });
+      } else if (name == "resources") {
         this.$router.replace({ name: "resourceList" });
       } else if (name == "community") {
         this.$router.replace({ name: "Community" });

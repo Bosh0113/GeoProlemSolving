@@ -54,14 +54,20 @@ public class DrawServerSocket {
         JSONObject messageObject = JSONObject.parseObject(message);
         String messageType = messageObject.getString("type");
 
-        if (messageType.equals("drawing") || messageType.equals("clear")) {
-            if (messageType.equals("drawing")) {
+        if (!messageType.equals("ping")) {
+            if (messageType.equals("drawing") || messageType.equals("next")) {
                 // 添加消息至缓存
                 drawingArray.add(message);
                 drawingJson.put(roomId, drawingArray.toString());
             }
-            else {
+            else if(messageType.equals("clear")) {
                 drawingArray.clear();
+                drawingJson.put(roomId, drawingArray.toString());
+            }
+            else if(messageType.equals("last")) {
+                if(drawingArray.size()>0){
+                    drawingArray.remove(drawingArray.size()-1);
+                }
                 drawingJson.put(roomId, drawingArray.toString());
             }
 

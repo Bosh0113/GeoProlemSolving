@@ -91,10 +91,10 @@ export default {
     return {
       //关于复制
       copyimgdata: "",
-      //关于协同 --by mzy-- point:记录点集，line 记录线，lines记录线集
+      //关于协同 -- point:记录点集，line 记录线，lines记录线集
       points: [],
-      line: {},
       lines: [],
+      storeLines: [], // 用于前进后退
       send_line: [],
       //将canvas的宽高设置好
       canvasSize: {
@@ -110,6 +110,7 @@ export default {
       ischoosecolor: false,
       toolsToggle: false,
       chooseColorBtn: "Select color",
+      isMouseDown: false,
       color: {
         hex: "#2196f3",
         hsl: {
@@ -241,6 +242,15 @@ export default {
     tabfun(fun) {
       if (fun === "clear") {
         this.clearContext("1");
+        
+        this.lines = [];
+        this.send_msg = {
+          type:"clear",
+          whoId: this.$store.getters.userId,
+          content: "clear"
+        };
+        this.socketApi.sendSock(this.send_msg, this.getSocketConnect);
+
       } else if (fun === "save") {
         this.downloadImage();
       }
@@ -271,48 +281,63 @@ export default {
           this.penSize,
           this.color.hex
         );
+
+        this.isMouseDown = true;
       };
       //鼠标离开 把蒙版canvas的图片生成到canvas中
       let mouseup = e => {
         e = e || window.event;
-        let x = e.clientX - this.canvasLeft;
-        let y = e.clientY - this.canvasTop;
+        
+        if(this.isMouseDown) {
+          let x = e.clientX - this.canvasLeft;
+          let y = e.clientY - this.canvasTop;
 
-        this.drawOnMouseup(x, y, graphType);
+          this.drawOnMouseup(x, y, graphType);
+        }
 
-        // 协同  -by mzy
-        this.line = {
+        this.isMouseDown = false;
+
+        // 协同 
+        let line = {
           Graphtype: graphType,
           Linetype: this.lineType,
           Color: this.color.hex,
           Pensize: this.penSize,
           Points: this.points
+        };        
+        this.send_line = {
+          type:"drawing",
+          content: line,
+          whoId: this.$store.getters.userId
         };
-        this.socket();
+        this.socketApi.sendSock(this.send_line, this.getSocketConnect);
+        this.lines.push(line);
       };
       // 鼠标移动
       let mousemove = e => {
-        e = e || window.event; //为了使吸纳多种浏览器兼容
-        let x = e.clientX - this.canvasLeft;
-        let y = e.clientY - this.canvasTop;
+        if(this.isMouseDown) {
+          e = e || window.event; //为了使多种浏览器兼容
+          let x = e.clientX - this.canvasLeft;
+          let y = e.clientY - this.canvasTop;
 
-        //记录轨迹 --by mzy
-        let point = {
-          X: x,
-          Y: y
-        };
-        this.points.push(point);
+          //记录轨迹 --by mzy
+          let point = {
+            X: x,
+            Y: y
+          };
+          this.points.push(point);
 
-        this.drawOnMousemove(
-          x,
-          y,
-          startX,
-          startY,
-          graphType,
-          this.lineType,
-          this.penSize,
-          this.color.hex
-        );
+          this.drawOnMousemove(
+            x,
+            y,
+            startX,
+            startY,
+            graphType,
+            this.lineType,
+            this.penSize,
+            this.color.hex
+          );
+        }
       };
       //鼠标离开区域以外 除了涂鸦 都清空
       let mouseout = () => {
@@ -486,13 +511,6 @@ export default {
           this.canvasSize.width,
           this.canvasSize.height
         );
-
-        this.send_msg = {
-          type:"clear",
-          whoId: this.$store.getters.userId,
-          content: "clear"
-        };
-        this.socketApi.sendSock(this.send_msg, this.getSocketConnect);
       }
     },
     downloadImage() {
@@ -500,70 +518,61 @@ export default {
       this.$refs.download.click();
     },
     cancel() {
-      this.cancelIndex++;
-      this.context.clearRect(
-        0,
-        0,
-        this.canvasSize.width,
-        this.canvasSize.height
-      );
-      let image = new Image();
-      let index = this.cancelList.length - 1 - this.cancelIndex;
-      let url = this.cancelList[index];
-      image.src = url;
-      image.onload = () => {
-        this.context.drawImage(
-          image,
-          0,
-          0,
-          image.width,
-          image.height,
+      if(this.cancelIndex < this.cancelList.length) {
+        this.cancelIndex++;
+        this.context.clearRect(
           0,
           0,
           this.canvasSize.width,
           this.canvasSize.height
         );
-      };
-      
-        // this.send_msg = {
-        //   type:"last",
-        //   whoId: this.$store.getters.userId,
-        //   content: "last"
-        // };
-        // this.socketApi.sendSock(this.send_msg, this.getSocketConnect);
+        let image = new Image();
+        let index = this.cancelList.length - 1 - this.cancelIndex;
+        let url = this.cancelList[index];
+        image.src = url;
+        image.onload = () => {
+          this.context.drawImage(
+            image,
+            0,
+            0,
+            image.width,
+            image.height,
+            0,
+            0,
+            this.canvasSize.width,
+            this.canvasSize.height
+          );
+        };
+      }  
     },
     next() {
-      this.cancelIndex--;
-      this.context.clearRect(
-        0,
-        0,
-        this.canvasSize.width,
-        this.canvasSize.height
-      );
-      let image = new Image();
-      let index = this.cancelList.length - 1 - this.cancelIndex;
-      let url = this.cancelList[index];
-      image.src = url;
-      image.onload = () => {
-        this.context.drawImage(
-          image,
-          0,
-          0,
-          image.width,
-          image.height,
+      if(this.cancelIndex > 0) {
+
+        this.cancelIndex--;
+        let image = new Image();
+        let index = this.cancelList.length - 1 - this.cancelIndex;
+        this.context.clearRect(
           0,
           0,
           this.canvasSize.width,
           this.canvasSize.height
         );
-      };
-
-      // this.send_msg = {
-      //     type:"next",
-      //     whoId: this.$store.getters.userId,
-      //     content: "next"
-      //   };
-      //   this.socketApi.sendSock(this.send_msg, this.getSocketConnect);
+        let url = this.cancelList[index];
+        image.src = url;
+        image.onload = () => {
+          this.context.drawImage(
+            image,
+            0,
+            0,
+            image.width,
+            image.height,
+            0,
+            0,
+            this.canvasSize.width,
+            this.canvasSize.height
+          );
+        };
+      }
     },
     //保存历史 用于撤销
     saveImageToAry() {
@@ -642,10 +651,31 @@ export default {
       };
     },
     Drawcancel() {
-      this.cancel();
+      if(this.lines.length > 0) {
+        this.cancel();
+
+        this.send_msg = {
+          type:"last",
+          whoId: this.$store.getters.userId,
+          content: "last"
+        };
+        this.socketApi.sendSock(this.send_msg, this.getSocketConnect);      
+        this.storeLines.push(this.lines.pop());
+      }
     },
     Drawrestore() {
-      this.next();
+
+      if(this.storeLines.length > 0) {
+        this.next(); 
+        this.send_msg = {
+          type:"next",
+          whoId: this.$store.getters.userId,
+          content: this.storeLines[this.storeLines.length -1]
+        };
+        this.socketApi.sendSock(this.send_msg, this.getSocketConnect);
+      
+        this.lines.push(this.storeLines.pop());
+      }
     },
     canvas_copy() {
       var context = document.getElementById("canvas").getContext("2d");
@@ -658,16 +688,6 @@ export default {
       context.putImageData(this.copyimgdata, 300, 0);
       this.canvas_bak.onmouseup();
     },
-    socket() {
-      this.send_line = {
-        type:"drawing",
-        content: this.line,
-        whoId: this.$store.getters.userId
-      };
-      this.lines.push(this.send_line);
-       
-      this.socketApi.sendSock(this.send_line, this.getSocketConnect);
-    },
     getSocketConnect(data) {
       let lineData = data;
 
@@ -678,19 +698,40 @@ export default {
       else if(lineData.type === "drawing") {        
         //画面协同更新
         if(lineData.content !== {}) {
-          this.line = lineData.content;
-          this.collaDrawLine(this.line);  
+          let line = lineData.content;
+          this.collaDrawLine(line); 
+          // 存储笔划 
+          this.lines.push(line);
         }      
       }
       else if(lineData.type === "clear") {        
         //画面协同更新
-        this.clearContext("1");   
+        this.clearContext("1");
+        this.lines = [];
+      }
+      else if(lineData.type === "last") {        
+        //画面协同更新
+        this.cancel();
+
+        if(this.lines.length > 0) {        
+          this.storeLines.push(this.lines.pop());
+        }
+      }
+      else if(lineData.type === "next") {
+        //画面协同更新
+        this.next();
+
+        if(this.storeLines.length > 0) {        
+          this.lines.push(this.storeLines.pop());
+        }
       }
       else if(lineData.type == undefined && lineData.length > 0){
         for(let i = 0;i < lineData.length;i++) {
           if(lineData[i].content != {}) {
-            this.line = lineData[i].content;
-            this.collaDrawLine(this.line);
+            let line = lineData[i].content;
+            this.collaDrawLine(line);
+            // 存储笔划
+            this.lines.push(line);
           }
         }
       }
