@@ -592,12 +592,15 @@
         <div class="editStyle">
           <span>Category</span>
           <RadioGroup style="margin-left:5%;width:100%" v-model="editType">
-            <Radio label="Society"></Radio>
-            <Radio label="Atmosphere"></Radio>
-            <Radio label="Ecology"></Radio>
-            <Radio label="Soil"></Radio>
-            <Radio label="Water"></Radio>
-            <Radio label="Others"></Radio>
+            <Radio label="Terrestrial">Terrestrial System</Radio>
+            <Radio label="Coastal">Coastal System</Radio>
+            <Radio label="Marine">Marine System</Radio>
+            <Radio label="Climate">Climate System</Radio>
+            <Radio label="Ecological">Ecological System</Radio>
+            <Radio label="Geological">Geological System</Radio>
+            <Radio label="Human">Human-Activity</Radio>
+            <Radio label="GISRS">GIS & RS</Radio>
+            <Radio label="General">General</Radio>
           </RadioGroup>
         </div>
         <div class="editStyle">
@@ -641,9 +644,6 @@
             style="margin-left:2.5%"
             @click="addTag(inputTag)"
           >Add Tag</Button>
-          <!-- <div style="margin-left:5%">
-            <Tag color="primary" @on-close="deleteTag(index)" v-show="editTags!=''">{{item}}</Tag>
-          </div>-->
         </div>
         <div style="width:80%;margin-left:20%">
           <Tag
@@ -1210,14 +1210,18 @@ export default {
       }
     },
     editModalShow(id) {
-      // this.
       this.editProjectModal = true;
       let editProjectInfo = this.currentProjectDetail;
       this.editTitle = editProjectInfo.title;
       this.editIntroduction = editProjectInfo.introduction;
       this.editDescription = editProjectInfo.description;
       this.editType = editProjectInfo.category;
-      this.editTags = editProjectInfo["tag"].split(",");
+      var tags = editProjectInfo["tag"].split(",");
+      if (tags[0] == "") {
+        this.editTags = [];
+      } else {
+        this.editTags = tags;
+      }
       this.editPrivacy = editProjectInfo.privacy;
       this.editProjectId = editProjectInfo.projectId;
     },

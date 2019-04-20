@@ -53,10 +53,10 @@
             <span>Home</span>
           </MenuItem>
           <MenuItem name="project">
-            <span>Project</span>
+            <span>Projects</span>
           </MenuItem>
           <MenuItem name="Public Resource">
-            <span>Public Resource</span>
+            <span>Resource</span>
           </MenuItem>
           <MenuItem name="community">
             <span>Community</span>

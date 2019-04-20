@@ -16,43 +16,41 @@
                   v-else>
                 </avatar>
               </div>
-              <div class="single-info">
+              <div class="single-info" title="User Name">
                 <Icon type="ios-contact-outline" :size="20"/>
                 <span>{{userDetail.userName}}</span>
               </div>
-              <div class="user-info">
-                <div class="single-info" >
-                  <!-- <span>email:</span> -->
+                <div class="single-info" title="Email">
                   <Icon type="ios-mail-outline" :size="20"/>
                   <span>{{userDetail.email}}</span>
                 </div>
-                <div class="single-info">
+                <div class="single-info" title="Mobile Phone">
                   <Icon type="ios-call-outline" :size="20"/>
                   <span>{{userDetail.mobilePhone}}</span>
                 </div>
-                <div class="single-info">
+                <div class="single-info" title="Job Title">
                   <Icon type="ios-hammer-outline" :size="20"/>
                   <span>{{userDetail.jobTitle}}</span>
                 </div>
-                <div class="single-info">
+                <div class="single-info" title="City&Country">
                   <Icon type="ios-compass-outline" :size="20"/>
-                  <span>{{userDetail.country}}&nbsp{{userDetail.city}}</span>
+                  <span>{{userDetail.city}}&nbsp{{userDetail.country}}</span>
                 </div>
-                <div class="single-info">
+                <div class="single-info" title="Organization">
                   <Icon type="ios-home-outline" :size="20"/>
                   <span>{{userDetail.organization}}</span>
                 </div>
-                <div class="single-info">
+                <div class="single-info" title="Direction">
                   <Icon type="ios-contract" :size="20"/>
                   <span>{{userDetail.direction}}</span>
                 </div>
-                <div class="single-info">
+                <div class="single-info"  title="Home Page">
                   <Icon type="md-link" :size="20"/>
                   <span>{{userDetail.homePage}}</span>
                 </div>
                 <br>
-                <div style="padding:10px;font-size:12px;border:1px dotted lightgray">
-                  {{this.userDetail.introduction}}
+                <div style="padding:10px;font-size:12px;border:1px dotted lightgray"  title="Introduction">
+                  {{userDetail.introduction}}
                 </div>
                 <div class="whitespace"></div>
                 <div style="display:flex;justify-content:center">
@@ -69,7 +67,11 @@
                     v-model="editProfileModal"
                     width="600px"
                   >
-                    <Form :model="personalInfoItem" :label-width="80">
+                    <Form
+                    ref="personalInfoItem"
+                    :model="personalInfoItem"
+                    :rules="ruleValidate"
+                    :label-width="80">
                       <FormItem label="Name" prop="userName">
                         <Input
                           v-model="personalInfoItem.userName"
@@ -86,6 +88,7 @@
                         <Input
                           v-model="personalInfoItem.email"
                           :class="{InputStyle: inputstyle}"
+                          disabled
                         ></Input>
                       </FormItem>
                       <FormItem label="Phone" prop="mobilePhone">
@@ -134,9 +137,9 @@
                       </FormItem>
                       <FormItem label="Avatar" prop="avatar">
                         <div>
-                          <div class="demo-upload-list" v-if="userDetail.avatar!=''">
+                          <div class="demo-upload-list" v-if="personalInfoItem.avatar!=''">
                             <template>
-                              <img v-bind:src="userDetail.avatar" class="avatarImage">
+                              <img v-bind:src="personalInfoItem.avatar" class="avatarImage">
                               <div class="demo-upload-list-cover">
                                 <Icon type="ios-eye-outline" @click.native="handleView()"></Icon>
                                 <Icon type="ios-trash-outline" @click.native="handleRemove()"></Icon>
@@ -152,18 +155,17 @@
                             <input @change="uploadPhoto($event)" type="file" class="uploadAvatar">
                           </div>
                           <Modal title="View Image" v-model="visible">
-                            <img :src="userDetail.avatar" v-if="visible" style="width: 100%">
+                            <img :src="personalInfoItem.avatar" v-if="visible" style="width: 100%">
                           </Modal>
                         </div>
                       </FormItem>
                       <FormItem>
-                        <Button type="success" @click="submitProfileEdit(personalInfoItem)">Submit</Button>
-                        <Button @click style="margin-left: 50%" type="primary">Reset</Button>
+                        <Button type="success" @click="submitProfileEdit('personalInfoItem')">Submit</Button>
+                        <Button @click="resetForm()" style="margin-left: 50%" type="primary">Reset</Button>
                       </FormItem>
                     </Form>
                   </Drawer>
                 </div>
-              </div>
             </div>
           </Col>
           <Col
@@ -404,8 +406,16 @@ export default {
       }
     });
   },
+  updated(){
+    var userInfo = this.$store.getters.userInfo;
+    var userDetail = this.userDetail;
+    var personalInfoItem = this.personalInfoItem;
+    console.log("userInfo: "+userInfo.userName);
+    console.log("userDetail: "+userDetail.userName);
+    console.log("personalInfoItem: "+personalInfoItem.userName);
+  },
   mounted() {
-     // 获取用户资源
+    // 获取用户资源
     this.getUserProfile();
     //获取用户资源
     this.getUserResource();
@@ -417,39 +427,22 @@ export default {
     this.readPersonalEvent();
     // 初始化样式的高度
     this.initStyle();
-
-
-  },
-  computed: {
-    username() {
-      return this.$store.getters.userName;
-    },
-    avatar() {
-      return this.$store.getters.avatar;
-    },
-    userId() {
-      return this.$store.getters.userId;
-    }
   },
   components: {
     Avatar
   },
   data() {
+    var validatePass = (rule, value, callback) => {
+      if (value === "") {
+        callback(new Error("Please enter your password again"));
+      } else if (value !== this.formValidate.password) {
+        callback(new Error("The two passwords are inconsistent!"));
+      } else {
+        callback();
+      }
+    };
     return {
-      userDetail: {
-        userName: "",
-        email: "",
-        jobTitle: "",
-        mobilePhone: "",
-        gender: "",
-        country: "",
-        city: "",
-        organization: "",
-        introduction: "",
-        direction: "",
-        homePage: "",
-        avatar: ""
-      },
+      userDetail: {},
       resourceColumn: [
         {
           type: "selection",
@@ -504,6 +497,111 @@ export default {
         homePage: "",
         avatar: ""
       },
+      ruleValidate: {
+        userName: [
+          {
+            required: true,
+            message: "The name cannot be empty",
+            trigger: "blur"
+          }
+        ],
+        email: [
+          {
+            required: true,
+            message: "Mailbox cannot be empty",
+            trigger: "blur"
+          },
+          {
+            type: "email",
+            message: "Incorrect email format",
+            trigger: "blur"
+          }
+        ],
+        password: [
+          {
+            required: true,
+            min: 6,
+            message: "Password must more than 6 words",
+            trigger: "blur"
+          }
+        ],
+        confimPassword: [
+          {
+            required: true,
+            validator: validatePass,
+            trigger: "blur"
+          }
+        ],
+        jobTitle: [
+          {
+            required: true,
+            message: "Job Title cannot be empty",
+            trigger: "blur"
+          }
+        ],
+        gender: [
+          {
+            required: true,
+            message: "Please select gender",
+            trigger: "change"
+          }
+        ],
+        mobilePhone: [
+          {
+            required: false,
+            message: "Please enter your phone number",
+            trigger: "blur"
+          }
+        ],
+        country: [
+          {
+            required: false,
+            message: "Please enter your country",
+            trigger: "blur"
+          }
+        ],
+        city: [
+          {
+            required: false,
+            message: "Please enter your city",
+            trigger: "blur"
+          }
+        ],
+        organization: [
+          {
+            required: false,
+            message: "Please enter your affiliation",
+            trigger: "blur"
+          }
+        ],
+        introduction: [
+          {
+            required: false,
+            message: "Please enter a personal introduction",
+            trigger: "blur"
+          },
+          {
+            type: "string",
+            min: 20,
+            message: "Introduce no less than 20 words",
+            trigger: "blur"
+          }
+        ],
+        field: [
+          {
+            required: false,
+            message: "Please enter your research field",
+            trigger: "blur"
+          }
+        ],
+        homePage: [
+          {
+            required: false,
+            message: "Please enter your home page url",
+            trigger: "blur"
+          }
+        ]
+      },
       //用来验证个人信息维护表单填写规范的依据
       //输入框的样式
       inputstyle: true,
@@ -526,23 +624,22 @@ export default {
       // 处理资源的模态框激活
       processResourceModal: false,
       // 选中资源的索引
-      selectResourceIndex:"",
+      selectResourceIndex: "",
       // 选中的将要分享资源的项目名
-      selectShareProject:"",
-      selectShareProjectId:"",
-      selectShareProjectName:""
+      selectShareProject: "",
+      selectShareProjectId: "",
+      selectShareProjectName: ""
     };
   },
   methods: {
     // 初始化侧边栏样式
-    initStyle(){
+    initStyle() {
       this.detailSidebarHeight = window.innerHeight - 60 + "px";
     },
     //获取用户的详细信息
     getUserProfile() {
-      this.userDetail = this.$store.getters.userInfo;
-      this.personalInfoItem = this.$store.getters.userInfo;
-      this.joinedProjectsNameList = this.userDetail.joinedProjects;
+      this.userDetail = Object.assign({},this.$store.getters.userInfo);
+      this.joinedProjectsNameList = userInfo.joinedProjects;
     },
     //获取用户参与的项目列表
     getParticipatoryList(projectIds) {
@@ -729,7 +826,6 @@ export default {
         this.axios
           .get("/GeoProblemSolving/project/delete?" + "projectId=" + pid)
           .then(res => {
-            this.$store.commit("getUserInfo");
             var newManageProjects = [];
             var oldManageProjects = this.userManagerProjectList;
             for (var i = 0; i < oldManageProjects.length; i++) {
@@ -748,6 +844,7 @@ export default {
       this.$Message.info("cancel");
     },
     editModalShow() {
+      this.personalInfoItem = Object.assign({},this.userDetail);
       this.editProfileModal = true;
     },
     //处理修改用户头像信息相关的函数
@@ -777,33 +874,40 @@ export default {
     handleRemove() {
       this.$store.commit("uploadAvatar", "");
     },
-    submitProfileEdit(data) {
-      // var changedProfile = {};
-      var changedProfile = new URLSearchParams();
-      changedProfile.append("userId", this.$store.getters.userId);
-      //筛选出需要修改的信息
-      for (var item in data) {
-        if (data[item] != "") {
-          changedProfile.append(item, data[item]);
-        }
-      }
-      this.axios
-        .post("/GeoProblemSolving/user/update", changedProfile)
-        .then(res => {
-          if (res.data !== "Fail") {
-            // this.drawerClose = true;
-            this.$Notice.success({
-              title: "notification",
-              desc: "Profile update successfully"
-            });
-            let userInfo = res.data;
-            userInfo.userState = true;
-            this.$store.commit("setUserInfo", userInfo);
-            this.$set(this, "userDetail", userInfo);
-            sessionStorage.setItem("userInfo", JSON.stringify(userInfo));
+    submitProfileEdit(name) {
+      this.$refs[name].validate(valid => {
+        if (valid) {
+          var data = this.personalInfoItem;
+          var changedProfile = new URLSearchParams();
+          changedProfile.append("userId", this.$store.getters.userId);
+          //筛选出需要修改的信息
+          for (var item in data) {
+            if (data[item] != "") {
+              changedProfile.append(item, data[item]);
+            }
           }
-        })
-        .catch(err => {});
+          this.axios
+            .post("/GeoProblemSolving/user/update", changedProfile)
+            .then(res => {
+              if (res.data !== "Fail") {
+                // this.drawerClose = true;
+                this.$Notice.success({
+                  title: "notification",
+                  desc: "Profile update successfully"
+                });
+                let userInfo = res.data;
+                userInfo.userState = true;
+                this.$store.commit("setUserInfo", userInfo);
+                this.$set(this, "userDetail", userInfo);
+                sessionStorage.setItem("userInfo", JSON.stringify(userInfo));
+              }
+            })
+            .catch(err => {});
+        }
+      });
+    },
+    resetForm() {
+      this.personalInfoItem = Object.assign({},this.userDetail);
     },
     //点击跳转到指定项目的函数
     goSingleProject(id) {
@@ -888,19 +992,22 @@ export default {
       shareForm.append("scope", JSON.stringify(scopeObject));
       if (scopeObject.projectId != "") {
         this.axios
-        .post("/GeoProblemSolving/resource/share", shareForm)
-        .then(res => {
-          if (res.data != "Fail") {
-            this.$Notice.open({
-              title: "Upload notification title",
-              desc: "File shared to " + this.selectShareProject + " successfully.",
-              duration: 2
-            });
-            // 保存记录
-            this.addUploadEvent( this.selectShareProjectId);
-          }
-        })
-        .catch(err => {});
+          .post("/GeoProblemSolving/resource/share", shareForm)
+          .then(res => {
+            if (res.data != "Fail") {
+              this.$Notice.open({
+                title: "Upload notification title",
+                desc:
+                  "File shared to " +
+                  this.selectShareProject +
+                  " successfully.",
+                duration: 2
+              });
+              // 保存记录
+              this.addUploadEvent(this.selectShareProjectId);
+            }
+          })
+          .catch(err => {});
       }
       // uploaderId
     },
@@ -931,7 +1038,7 @@ export default {
       this.processResourceModal = true;
       this.selectResourceIndex = index;
     },
-    selectPID(id, name){
+    selectPID(id, name) {
       this.selectShareProjectId = id;
       this.selectShareProjectName = name;
     }
@@ -955,8 +1062,8 @@ export default {
   padding: 10px;
 }
 /* 注册时未上传头像的用户头像显示样式 */
-.avatarStyle{
-  margin:0 auto;
+.avatarStyle {
+  margin: 0 auto;
 }
 /* 用户头像结束 */
 body {
@@ -1060,9 +1167,9 @@ body {
   cursor: pointer;
 }
 /* 时间轴样式 */
-.timeLineStyle{
-  margin-left:5%;
-  max-height:300px;
-  overflow-y:auto
+.timeLineStyle {
+  margin-left: 5%;
+  max-height: 300px;
+  overflow-y: auto;
 }
 </style>

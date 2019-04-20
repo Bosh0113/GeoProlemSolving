@@ -2149,19 +2149,19 @@ export default {
         // toolURL =
         //   '<iframe src="http://localhost:8080/nc/map" style="width: 100%;height:100%"></iframe>';
         toolURL =
-          '<iframe src="http://172.21.212.7:8082/nc/map" style="width: 100%;height:100%"></iframe>';
+          '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/nc/map" style="width: 100%;height:100%"></iframe>';
         toolName = "Map";
       } else if (type == "nc-draw") {
         // toolURL =
         //   '<iframe src="http://localhost:8080/nc/draw" style="width: 100%;height:100%"></iframe>';
         toolURL =
-          '<iframe src="http://172.21.212.7:8082/nc/draw" style="width: 100%;height:100%"></iframe>';
+          '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/nc/draw" style="width: 100%;height:100%"></iframe>';
         toolName = "Drawing";
       } else if (type == "nc-chart") {
         // toolURL =
         //   '<iframe src="http://localhost:8080/nc/charts" style="width: 100%;height:100%"></iframe>';
         toolURL =
-          '<iframe src="http://172.21.212.7:8082/nc/charts" style="width: 100%;height:100%"></iframe>';
+          '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/nc/charts" style="width: 100%;height:100%"></iframe>';
         toolName = "Chart";
       } else if (type == "cn-tableEditor") {
         toolURL =
@@ -2178,13 +2178,13 @@ export default {
         // toolURL =
         //   '<iframe src="http://localhost:8080/video" style="width: 100%;height:100%"></iframe>';
         toolURL =
-          '<iframe src="http://172.21.212.7:8082/video" style="width: 100%;height:100%"></iframe>';
+          '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/video" style="width: 100%;height:100%"></iframe>';
         toolName = "Video player";
       } else if (type == "nc-pdf") {
         // toolURL =
         //   '<iframe src="http://localhost:8080/pdfview" style="width: 100%;height:100%"></iframe>';
         toolURL =
-          '<iframe src="http://172.21.212.7:8082/pdfview" style="width: 100%;height:100%"></iframe>';
+          '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/pdfview" style="width: 100%;height:100%"></iframe>';
         toolName = "Pdf viewer";
       }
 
@@ -2239,7 +2239,6 @@ export default {
       .then(res=> {
         if(res.data!="Fail"){
           this.currentModuleNoticeList = res.data;
-          console.table(this.currentModuleNoticeList.length);
         }
       })
       .catch(err=>{
