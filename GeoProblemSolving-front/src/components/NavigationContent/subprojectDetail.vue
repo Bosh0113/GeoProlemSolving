@@ -115,7 +115,7 @@
 }
 </style>
 <template>
-  <div style="background-color:#dcdee2">
+  <div style="background-color:#dcdee2" :style="{height:contentHeight}">
     <Row>
       <Col span="22" offset="1">
         <Card>
@@ -241,13 +241,13 @@
                   <!-- v-show="this.subProjectInfo.managerId == this.$store.getters.userId" -->
                 </template>
                 <div style="line-height:60px" type="default">
-                  <Button
-                    style="vertical-align:middle"
+                  <span
+                    style="cursor:pointer"
+                    title="quit"
                     v-show="giveDeleteProperty(index)"
-                    @click="removeMember(member.userId,member.userName)"
-                  >
+                    @click="removeMember(member.userId,member.userName)">
                     <Icon type="md-log-out" :size="20"/>
-                  </Button>
+                  </span>
                 </div>
               </div>
             </div>
@@ -273,7 +273,7 @@
                 width="400px"
                 title="Quit Sub-Project"
                 @on-ok="quitSubProject()"
-                @on-cancel="cancel"
+                @on-cancel=""
               >
                 <h2>Are you sure to quit this subproject?</h2>
               </Modal>
@@ -284,7 +284,7 @@
                 @on-ok="inviteMembers"
                 ok-text="ok"
                 cancel-text="cancel"
-                @on-cancel="cancel"
+                @on-cancel=""
               >
                 <div>
                   <p>Members:</p>
@@ -770,13 +770,15 @@ export default {
         ],
         startTime: [{ required: true, type: "date", trigger: "change" }],
         endTime: [{ required: true, type: "date", trigger: "change" }]
-      }
+      },
+      contentHeight:"",
     };
   },
   created() {
     this.init();
   },
   mounted() {
+    this.contentHeight = window.innerHeight + 'px';
     window.addEventListener("resize", this.initSize);
     this.inquiryTask();
   },
@@ -814,7 +816,7 @@ export default {
     initSize() {
       //侧边栏的高度随着屏幕的高度自适应
       this.sidebarHeight = window.innerHeight - 227;
-      this.taskContainerHeight = this.sidebarHeight;
+      this.taskContainerHeight = this.sidebarHeight + 10;
       //通知栏的属性设置，top表示距离顶部的距离，duration表示持续的时间
       this.$Notice.config({
         top: 50,

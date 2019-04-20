@@ -12,31 +12,18 @@
 .header span {
   font-size: 15px;
 }
-.container{
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-header {
+.header {
   height: 60px;
   top:0;
   z-index:100;
   position:fixed;
   width:100%;
-  flex: 0 0 auto;
 }
-.content{
-  flex: 1 0 auto;
-  margin-top:60px;
-  margin-bottom:20px;
-  min-height:800px;
-}
-footer{
+.footer{
   background-color:#515a6e;
   height:60px;
   width:100%;
   bottom:0;
-  flex: 0 0 auto;
 }
 .userState {
   position: absolute;
@@ -48,10 +35,17 @@ footer{
 .navPart {
   width: 85%;
 }
+.footer{
+  background-color:#515a6e;
+  height:60px;
+  width:100%;
+  bottom:0;
+  position:fixed;
+}
 </style>
 <template>
-  <div class="container">
-    <header>
+  <div class="mainPart">
+    <div class="header">
       <img src="@/assets/images/OGMS.png" id="logo" class="pic" @click="goHome" style="cursor:pointer">
       <div class="navPart">
         <Menu
@@ -65,8 +59,8 @@ footer{
           <MenuItem name="home" class="menuItem" style="margin-left:30%">
             <span>Home</span>
           </MenuItem>
-          <MenuItem name="projects">
-            <span>Projects</span>
+          <MenuItem name="project">
+            <span>Project</span>
           </MenuItem>
           <MenuItem name="Public Resource">
             <span>Public Resource</span>
@@ -117,14 +111,14 @@ footer{
             </Menu>
         </div>
       </div>
-    </header>
-    <section class="content">
-     <router-view @sendNotice="sendMessage" @readNotification="readNotification"></router-view>
-    </section>
-    <footer>
+    </div>
+    <div class="content" style="margin-top:60px;margin-bottom:50px">
+      <router-view @sendNotice="sendMessage" @readNotification="readNotification"></router-view>
+    </div>
+    <div class="footer">
       <h2 style="text-align:center;color:white;font-weight:bold;margin-top:15px"><i>Open Geographic Modeling and Simulation</i></h2>
       <h4 style="text-align:center;color:white">copyright@2013-2019 OpenGMS.all rights reserved</h4>
-    </footer>
+    </div>
   </div>
 </template>
 <script>
@@ -173,7 +167,7 @@ export default {
     turnContent(name) {
       if (name === "home") {
         this.$router.replace({ name: "Home" });
-      } else if (name == "projects") {
+      } else if (name == "project") {
         this.$router.replace({ name: "Project" });
       } else if (name == "Public Resource") {
         this.$router.replace({ name: "resourceList" });

@@ -164,7 +164,7 @@
               <div slot="extra" style="height:40px;line-height:40px;display:flex;width:50%">
                 <Button
                   type="default"
-                  icon="md-brush"
+                  icon="ios-create"
                   @click="editModalShow(currentProjectDetail['projectId'])"
                   v-show="judgeIsManager(projectManager.userId)"
                 ></Button>
@@ -373,7 +373,7 @@
                             @click.stop="editSubProjectShow(index)"
                             title="Edit"
                           >
-                            <Icon type="md-brush"/>
+                            <Icon type="ios-create"/>
                           </Button>
                           <Button
                             type="default"
@@ -414,7 +414,7 @@
                 ok-text="ok"
                 cancel-text="cancel"
                 @on-ok="handOverSubProject()"
-                @on-cancel="cancel"
+                @on-cancel=""
                 width="500px"
                 :mask-closable="false"
               >
@@ -465,10 +465,10 @@
               <Modal
                 v-model="deleteSubProjectModal"
                 title="Delete sub project"
-                ok-text="assure"
+                ok-text="Confirm"
                 cancel-text="cancel"
                 @on-ok="deleteSubProject()"
-                @on-cancel="cancel"
+                @on-cancel=""
                 width="800px"
                 :mask-closable="false"
               >
@@ -587,7 +587,7 @@
         v-model="removeProjectModal"
         title="Delete warning "
         @on-ok="deleteProject"
-        @on-cancel="cancel"
+        @on-cancel=""
         ok-text="ok"
         cancel-text="cancel"
       >
@@ -599,8 +599,8 @@
       v-model="editProjectModal"
       title="Edit Project"
       @on-ok="editProjectSubmit()"
-      @on-cancel="cancel"
-      ok-text="assure"
+      @on-cancel=""
+      ok-text="Confirm"
       cancel-text="cancel"
       :mask-closable="false"
       width="900px"

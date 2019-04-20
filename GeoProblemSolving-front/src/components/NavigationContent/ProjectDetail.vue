@@ -98,14 +98,11 @@
   background-color: #ed4014;
   color: white;
 }
+
 .subProjectBtn,
 .uploadBtn,
 .inviteBtn {
   color: black;
-}
-.popCenter {
-  margin: 10px auto;
-  overflow: hidden;
 }
 /* 编辑项目用到的样式 */
 .editStyle {
@@ -164,7 +161,7 @@
               <div slot="extra" style="height:40px;line-height:40px;display:flex;width:50%">
                 <Button
                   type="default"
-                  icon="md-brush"
+                  icon="ios-create"
                   @click="editModalShow(currentProjectDetail['projectId'])"
                   v-show="judgeIsManager(projectManager.userId)"
                 ></Button>
@@ -215,7 +212,7 @@
         <div class="memberPanel">
           <Card :bordered="false">
             <p slot="title" style="font-size:25px;height:40px;line-height:40px;">Members</p>
-            <div slot="extra" style="height:40px" class="popCenter">
+            <div slot="extra" style="height:40px">
               <Poptip trigger="hover" content="Invite other members" placement="right">
                 <Button
                   class="inviteBtn"
@@ -285,15 +282,15 @@
         <div style="padding: 20px">
           <Card :bordered="false">
             <p slot="title" style="font-size:25px;height:40px;line-height:40px">Subprojects</p>
-            <div slot="extra" style="height:40px" class="popCenter">
-              <Poptip trigger="hover" content="add new subproject" placement="right">
+            <div slot="extra" style="height:40px">
+              <Poptip trigger="hover" content="Invite other members" placement="right">
                 <Button
                   class="subProjectBtn"
                   @click="subProjectModal = true"
                   v-show="this.currentProjectDetail.isManager||this.currentProjectDetail.isMember"
                 >
                   <Icon type="md-add" size="20"/>
-                </Button>
+              </Button>
               </Poptip>
               <Modal
                 v-model="subProjectModal"
@@ -331,7 +328,7 @@
             <div class="subprojectPanel">
               <div class="subProjectListStyle">
                 <div v-for="(subProject,index) in subProjectList" :key="subProject.index">
-                  <Col :lg="{span:11,offset:1}" :md="24" :sm="24" :xs="24">
+                  <Col :lg="{span:6}" :md="24" :sm="24" :xs="24">
                     <div
                       @click="goWorkspace(subProject.subProjectId,subProject.members,subProject.isManager)"
                       style="cursor:pointer"
@@ -368,7 +365,7 @@
                             @click.stop="editSubProjectShow(index)"
                             title="Edit"
                           >
-                            <Icon type="md-brush"/>
+                            <Icon type="ios-create"/>
                           </Button>
                           <Button
                             type="default"
@@ -409,7 +406,7 @@
                 ok-text="ok"
                 cancel-text="cancel"
                 @on-ok="handOverSubProject()"
-                @on-cancel="cancel"
+                @on-cancel=""
                 width="500px"
                 :mask-closable="false"
               >
@@ -460,10 +457,10 @@
               <Modal
                 v-model="deleteSubProjectModal"
                 title="Delete sub project"
-                ok-text="assure"
+                ok-text="Confirm"
                 cancel-text="cancel"
                 @on-ok="deleteSubProject()"
-                @on-cancel="cancel"
+                @on-cancel=""
                 width="800px"
                 :mask-closable="false"
               >
@@ -525,7 +522,7 @@
           </Card>
         </div>
         <!-- 上传文件按钮的模态框 -->
-        <Modal v-model="uploadFileModal" title="upload file" width="600px" :mask-closable="false" @on-ok="filesUpload" @on-cancel="cancel" ok-text="assure" cancel-text="cancel">
+        <Modal v-model="uploadFileModal" title="upload file" width="600px" :mask-closable="false" @on-ok="filesUpload" @on-cancel="" ok-text="Confirm" cancel-text="cancel">
           <div style="display:flex;text-align:center;align-items:center;justify-content:center">
             <!-- 这里定义上传的几种资源类型供用户选择 -->
             <span style="width:20%">File Type</span>
@@ -569,7 +566,7 @@
         v-model="removeProjectModal"
         title="Delete warning "
         @on-ok="deleteProject"
-        @on-cancel="cancel"
+        @on-cancel=""
         ok-text="submit"
         cancel-text="cancel"
       >
@@ -581,8 +578,8 @@
       v-model="editProjectModal"
       title="Edit Project"
       @on-ok="editProjectSubmit()"
-      @on-cancel="cancel"
-      ok-text="assure"
+      @on-cancel=""
+      ok-text="Confirm"
       cancel-text="cancel"
       :mask-closable="false"
       width="900px"
@@ -1412,11 +1409,12 @@ export default {
       }
       return false;
     },
-    delFileList(index) {
-      let that = this;
-      that.file.splice(index, 1);
-      console.log(that.file);
-    }
+    delFileList(index){
+     let that = this;
+     that.file.splice(index, 1);
+     console.log(that.file);
+    },
+
   }
 };
 </script>
