@@ -133,7 +133,8 @@ img {
                         <p style="padding: 0 10px;word-break:break-word;overflow: hidden;
                             white-space: nowrap;
                             text-overflow: ellipsis;
-                            max-width: 400px;">
+                            max-width: 400px;"
+                            :title="item.description">
                       {{item.description}}</p>
                       <!-- </Poptip> -->
                     </div>

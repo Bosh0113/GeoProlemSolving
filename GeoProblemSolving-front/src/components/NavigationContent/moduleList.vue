@@ -974,8 +974,8 @@
       v-model="uploadFileModal"
       title="Upload resource"
       @on-ok="submitFile('formValidate3')"
-      ok-text="submit"
-      cancel-text="cancel"
+      ok-text="Submit"
+      cancel-text="Cancel"
       width="600px"
       :mask-closable="false"
     >
@@ -2198,11 +2198,15 @@ export default {
         contentSize: "1000 600",
         content: toolURL,
         disableOnMaximized: true,
+        resizeit: {
+          minWidth:1000,
+          minHeight:600,
+        },
         callback: function() {
           // this.content.style.padding = "20px";
         }
       });
-      panel.resizeit("disable");
+      // panel.resizeit("disable");
       $(".jsPanel-content").css("font-size", "0");
       // 生成records, 同步
       let record = {

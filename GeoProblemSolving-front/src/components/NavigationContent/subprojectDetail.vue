@@ -115,7 +115,7 @@
 }
 </style>
 <template>
-  <div style="background-color:#dcdee2" :style="{height:contentHeight}">
+  <div style="background-color:#dcdee2" :style="{height:contentHeight-240}">
     <Row>
       <Col span="22" offset="1">
         <Card>
@@ -779,7 +779,7 @@ export default {
   },
   mounted() {
     this.contentHeight = window.innerHeight + 'px';
-    window.addEventListener("resize", this.initSize);
+    // window.addEventListener("resize", this.initSize);
     this.inquiryTask();
   },
   // add by mzy for navigation guards

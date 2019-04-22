@@ -51,11 +51,11 @@
       <div class="content-left">
         <div class="setterSize">
           <span>Thickness of line:{{penSize}}</span>
-          <mu-slider v-model="penSize" :step="1" :max="30"/>
+           <Slider v-model="penSize" :step="1" :max="30"></Slider>
           <span>Dotted length:{{lineType[0]}}</span>
-          <mu-slider v-model="lineType[0]" :step="1" :max="100"/>
+          <Slider  v-model="lineType[0]" :step="1" :max="100"></Slider>
           <span>Dotted interval:{{lineType[1]}}</span>
-          <mu-slider v-model="lineType[1]" :step="1" :max="100"/>
+          <Slider  v-model="lineType[1]" :step="1" :max="100"></Slider>
         </div>
         <div v-for="tool in tools" :key="tool.index">
           <div class="setting_style" @click="drawType(tool)" :class="{'selected':tool.ischoose}">
@@ -81,7 +81,7 @@
 <script>
 import { Photoshop } from "vue-color";
 import { canvas } from "leaflet";
-import MuseUI from "./../../../utils/MuseUI";
+// import MuseUI from "./../../../utils/MuseUI";
 export default {
   name: "draw",
   data() {

@@ -10,7 +10,7 @@ const routes = [{
   path: '/', name: 'Navigation', component: resolve=>(require(["@/components/Navigation"],resolve)), children: [
     { path: '', redirect: 'home', component: resolve=>(require(["@/components/NavigationContent/Home"],resolve)) },
     { path: 'home', name: 'Home', component: resolve=>(require(["@/components/NavigationContent/Home"],resolve)) },
-    { path: 'projectlist', name: 'Project', component: resolve=>(require(["@/components/Projects/ProjectList"],resolve)) },
+    { path: 'projectlist', name: 'Projects', component: resolve=>(require(["@/components/Projects/ProjectList"],resolve)) },
     { path: 'project/:id', name: 'ProjectDetail', component: resolve=>(require(["@/components/NavigationContent/ProjectDetail"],resolve)) },
     { path: 'project/:id/workspace', name: 'workspace', component: resolve=>(require(["@/components/NavigationContent/moduleList"],resolve)) },
     { path: 'project/:id/subproject', name: 'subproject', component: resolve=>(require(["@/components/NavigationContent/subprojectDetail"],resolve)) },
@@ -38,6 +38,9 @@ const routes = [{
 { path: '/pdfview', name: 'pdfViewer', component: resolve=>(require(["@/components/utils/pdfViewer"],resolve)) },
 { path: '/join/:id/:email', name: 'joinProject', component: resolve=>(require(["@/components/createNew/joinNewProject"],resolve)) },
 { path: '/resetPassword/:email', name: 'resetPassword', component: resolve=>(require(["@/components/UsersState/ResetPwd"],resolve)) },
+// { path: '/upload', name: 'upload', component: resolve=>(require(["@/components/NavigationContent/testUpload"],resolve)) },
+{ path: '/toolStyle', name: 'tool', component: resolve=>(require(["@/components/utils/singleUtils/toolStyle"],resolve)) },
+
 
 ]
 export default new Router({

@@ -110,6 +110,28 @@ img {
 </style>
 <template>
   <div class="home">
+    <Row>
+      <div style="height:500px;background: linear-gradient(135deg, #0079BF, #5067C5);">
+
+        <div style="display:flex;align-items:center;height:100%">
+          <Col span="10" offset="2">
+          <h3 style="color:white;font-size: 3rem;text-align:center">
+            A Platform for Solving Complex Geographic Problems
+          </h3>
+           </Col>
+        </div>
+        <Col span="10">
+
+        </Col>
+        <!-- <div style="width:40%;display:flex;justify-content:center;align-items:center">
+          <div style="padding:100px;">
+            <h1 style="color:white;font-size: 3rem;">
+            A platform for solving complex geographic problems
+            </h1>
+          </div>
+          </div> -->
+      </div>
+    </Row>
     <!-- <Row>
       <Col span = "20" offset ="2" style="margin-top:60px">
         <Carousel v-model="imagelist" loop >
@@ -160,6 +182,18 @@ img {
           <div class="imgContent">
             <img src="./../../assets/images/task.png"/>
           </div>
+        </div>
+        <div class="feature">
+          <div class="imgContent">
+            <img src="./../../assets/images/tools.png"/>
+          </div>
+          <div class="textContent">
+            <div>
+              <h3 style="font-size: 2.1875rem;text-align:center">{{this.toolsTitle}}</h3>
+              <p style="font-size: 1rem;padding:20px 60px 20px 60px;text-align:center">Variable tools help you process data or design geographical concepts in different scene.</p>
+            </div>
+            </div>
+
         </div>
         <div class="feature">
            <div class="Carsoule"></div>
@@ -241,6 +275,7 @@ export default {
       // msg: "Welcome to Home",
       manageProjectsTitle:"Manage projects easily",
       createProjectsTitle:"Create projects in different areas",
+      toolsTitle:"Multi-purpose tools",
       imagelist: 0,
       image_index: 0,
       example_show_lists: [
