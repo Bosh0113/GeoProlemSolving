@@ -1,12 +1,7 @@
-<style>
-  /* .ivu-card-head{
-    height:55px !important;
-    padding:10px !important;
-    display:flex;
-    align-items:center
-  } */
-</style>
 <style scoped>
+.top,.bottom{
+        text-align: center;
+    }
 img {
   width: 100%;
   height:auto;
@@ -104,11 +99,11 @@ img {
             <Col
               :xs="{ span: 21, offset: 1 }"
               :md="{ span: 11, offset: 1 }"
-              :lg="{ span: 5,  offset: 1 }"
+              :lg="{ span: 5 }"
               v-if="item.privacy=='Public'"
             >
               <div @click="goSingleProject(item.projectId)" style="cursor:pointer">
-                <Card style="height:auto;margin:20px 0 20px 0">
+                <Card style="height:auto;margin:20px -15px">
                   <span slot="title" class="projectTitle">{{item.title}}</span>
                   <div
                     class="operate"
@@ -133,18 +128,20 @@ img {
                       />
                     </div>
                     <div style="display:flex;align-items:center;height:20px">
-                      <strong style="text-align: center"><Poptip trigger="hover" :content="item.description" placement="bottom-right" width="250" word-wrap  >Description</Poptip></strong>
+                         <strong style="text-align: center">Description</strong>
+                        <!-- <Poptip trigger="hover" :content="item.description" placement="bottom-right" width="250" word-wrap> -->
                         <p style="padding: 0 10px;word-break:break-word;overflow: hidden;
                             white-space: nowrap;
                             text-overflow: ellipsis;
                             max-width: 400px;">
                       {{item.description}}</p>
+                      <!-- </Poptip> -->
                     </div>
                     <div style="height:200px;display:flex;justify-content:center;margin-top:10px">
                       <img :src="item.picture" v-if="item.picture!=''&&item.picture!='undefined'">
                       <avatar
                         :username="item.title"
-                        :size="150"
+                        :size="200"
                         :title="item.title"
                         :rounded="false"
                         v-else

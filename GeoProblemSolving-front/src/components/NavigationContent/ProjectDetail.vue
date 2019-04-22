@@ -840,7 +840,11 @@ export default {
             break;
           }
         }
-        if (!(isMember || vm.currentProjectDetail.managerId == userId)) {
+        vm.currentProjectDetail.isMember = isMember;
+        if( vm.currentProjectDetail.managerId == userId){
+          vm.currentProjectDetail.isManager = true;
+        }
+        if (!(isMember || vm.currentProjectDetail.isManager)) {
           alert("No access");
           next("/projectlist");
           // vm.$router.go(-1);
