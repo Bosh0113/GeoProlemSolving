@@ -2198,11 +2198,15 @@ export default {
         contentSize: "1000 600",
         content: toolURL,
         disableOnMaximized: true,
+        resizeit: {
+          minWidth:1000,
+          minHeight:600,
+        },
         callback: function() {
           // this.content.style.padding = "20px";
         }
       });
-      panel.resizeit("disable");
+      // panel.resizeit("disable");
       $(".jsPanel-content").css("font-size", "0");
       // 生成records, 同步
       let record = {

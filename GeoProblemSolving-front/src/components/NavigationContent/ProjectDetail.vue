@@ -273,9 +273,6 @@
             <FormItem label="Content" prop="emailContent" style="width:100%">
               <Input type="textarea" style="width:70%" :rows="4" v-model="emailInfo.emailContent"/>
             </FormItem>
-            <!-- <FormItem>
-            <Button type="primary" @click="invite('emailInfo')">Submit</Button>
-            </FormItem>-->
           </Form>
         </Modal>
         <div class="whitespace"></div>
@@ -334,9 +331,43 @@
                       style="cursor:pointer"
                     >
                       <Card class="subProjectStyle">
-                        <span slot="title" class="subProjectTitle">{{subProject["title"]}}</span>
-                        <div slot="extra" style="height:auto;display:flex;align-items:center">
-                          <Button
+                        <div style="width:70%" class="subProjectTitle" slot="title">
+                          <span>{{subProject["title"]}}</span>
+                        </div>
+                        <!-- <span  class="subProjectTitle"></span> -->
+                        <div slot="extra" style="height:40px;;width:30%;display:flex;align-items:center">
+                          <div style="display:flex">
+                            <span
+                              v-show="subProject['isManager'] == true"
+                              @click.stop="handOverSubProjectShow(index)"
+                              title="Exchange manager"
+                            >
+                            <Icon type="md-person" :size="20"/>
+                            </span>
+                            <span
+                              v-show="subProject['isMember'] == false&&subProject['isManager'] == false"
+                              @click.stop="joinSubProject(subProject)"
+                              title="Apply"
+                            >
+                              <Icon type="md-add"/>
+                            </span>
+                            <span
+                              style="margin-left:10px"
+                              v-show="subProject['isManager'] == true"
+                              @click.stop="editSubProjectShow(index)"
+                              title="Edit">
+                              <Icon type="ios-create" :size="20"/>
+                            </span>
+                            <span
+                              style="margin-left:10px"
+                              v-show="subProject['isManager'] == true"
+                              @click.stop="deleteSubProjectShow(index)"
+                              title="Delete"
+                            >
+                              <Icon type="md-close" :size="20"/>
+                            </span>
+                          </div>
+                          <!-- <Button
                             type="default"
                             v-show="subProject['isManager'] == true"
                             @click.stop="handOverSubProjectShow(index)"
@@ -375,26 +406,24 @@
                             title="Delete"
                           >
                             <Icon type="md-close"/>
-                          </Button>
+                          </Button> -->
                         </div>
-                        <p class="subProjectDescription">{{subProject["description"]}}</p>
-                        <!-- <hr> -->
+                          <p class="subProjectDescription">{{subProject["description"]}}</p>
                         <br>
                         <div
-                          style="height:30px;align-items:center;display:flex;justify-content:flex-start"
+                          style="height:20px;align-items:center;display:flex;justify-content:flex-start"
                         >
                           <Icon type="md-body" :size="20"/>Manager
                           <span style="height:20px;margin-left:5%">{{subProject.managerName}}</span>
                         </div>
                         <div
-                          style="height:30px;margin-top:10px;align-items:center;display:flex;justify-content:flex-start"
+                          style="height:20px;margin-top:5px;align-items:center;display:flex;justify-content:flex-start"
                         >
                           <Icon type="md-clock" :size="20"/>Creation Time
                           <span
                             style="height:20px;margin-left:5%"
                           >{{subProject.createTime.split(' ')[0]}}</span>
                         </div>
-                        <div class="whitespace"></div>
                       </Card>
                     </div>
                   </Col>

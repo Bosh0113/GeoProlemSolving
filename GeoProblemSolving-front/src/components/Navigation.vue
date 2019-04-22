@@ -84,7 +84,7 @@ footer{
           </MenuItem>
         </Menu>
         <div class="userState">
-            <Menu mode="horizontal" theme="dark" @on-select="unlogin" style="z-index:0" v-show="!userState">
+            <Menu mode="horizontal" theme="dark" @on-select="unlogin" style="z-index:0" v-show="!userState"  class="menuItem">
               <MenuItem name="login">
                 <span>Login</span>
               </MenuItem>
@@ -92,7 +92,7 @@ footer{
                  <span>Sign up</span>
               </MenuItem>
             </Menu>
-            <Menu mode="horizontal" theme="dark" @on-select="logged" style="z-index:0"  v-show="userState">
+            <Menu mode="horizontal" theme="dark" @on-select="logged" style="z-index:0"  v-show="userState"  class="menuItem">
               <MenuItem name="notification">
                 <Badge :count="unreadNoticeCount" id="noticeBadge">
                   <Icon type="ios-notifications-outline" size="25"></Icon>

@@ -133,7 +133,8 @@ img {
                       />
                     </div>
                     <div style="display:flex;align-items:center;height:20px">
-                      <strong style="text-align: center"><Poptip trigger="hover" :content="item.description" placement="bottom-right" width="250" word-wrap  >Description</Poptip></strong>
+                     <strong style="text-align: center"><Poptip trigger="hover" :content="item.description" title="title" width="250" placement="bottom-right" word-wrap>Description</Poptip></strong>
+                     <!-- <Poptip trigger="hover" :content="item.description" title="title" width="250" placement="bottom-right" word-wrap>Description</Poptip> -->
                         <p style="padding: 0 10px;word-break:break-word;overflow: hidden;
                             white-space: nowrap;
                             text-overflow: ellipsis;
