@@ -37,6 +37,7 @@ footer{
   width:100%;
   bottom:0;
   flex: 0 0 auto;
+
 }
 .userState {
   position: absolute;
@@ -47,6 +48,10 @@ footer{
 }
 .navPart {
   width: 85%;
+}
+.menuItem span{
+  font-size:1.2em;
+  font-weight:bold;
 }
 </style>
 <template>
@@ -65,13 +70,13 @@ footer{
           <MenuItem name="home" class="menuItem" style="margin-left:30%">
             <span>Home</span>
           </MenuItem>
-          <MenuItem name="projects">
+          <MenuItem name="projects" class="menuItem">
             <span>Projects</span>
           </MenuItem>
-          <MenuItem name="resources">
-            <span>Resources</span>
+          <MenuItem name="Public Resource" class="menuItem">
+            <span>Public Resource</span>
           </MenuItem>
-          <MenuItem name="community">
+          <MenuItem name="community" class="menuItem">
             <span>Community</span>
           </MenuItem>
           <MenuItem name="help" class="menuItem">
@@ -122,8 +127,8 @@ footer{
      <router-view @sendNotice="sendMessage" @readNotification="readNotification"></router-view>
     </section>
     <footer>
-      <h2 style="text-align:center;color:white;font-weight:bold;margin-top:15px"><i>Open Geographic Modeling and Simulation</i></h2>
-      <h4 style="text-align:center;color:white">copyright@2013-2019 OpenGMS.all rights reserved</h4>
+      <h2 style="text-align:center;color:white;font-weight:bold;margin-top:10px"><i>Open Geographic Modeling and Simulation</i></h2>
+      <p style="text-align:center;color:white;font-size:.8em">copyright@2013-2019 OpenGMS.all rights reserved</p>
     </footer>
   </div>
 </template>

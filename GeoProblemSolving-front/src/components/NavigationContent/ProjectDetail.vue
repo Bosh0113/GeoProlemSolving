@@ -545,7 +545,7 @@
           </div>
           <br>
           <!-- <input type="file" @change="getFile($event)" style="margin-left:20%" multiple="multiple"> -->
-          <Upload :max-size="1024*1024" multiple type="drag" :before-upload="gatherFile" action="-">
+          <Upload :max-size="1024*1024" multiple type="drag" :before-upload="gatherFile" action="-" ::on-progress="handleOnProgress3">
             <div style="padding: 20px 0">
               <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
               <p>Click or drag files here to upload</p>
@@ -1422,7 +1422,17 @@ export default {
      that.file.splice(index, 1);
      console.log(that.file);
     },
-
+    handleOnProgress3(event,file,fileList){
+      console.log(event)
+      console.log(file.percentage)
+      console.log(fileList)
+      //this.isUpload3 = true
+      if(file.percentage<100){
+        window.onbeforeunload = function(event){
+          return '文件正在上传中，您确定要离开此页面吗？'
+        }
+      }
+    }
   }
 };
 </script>
