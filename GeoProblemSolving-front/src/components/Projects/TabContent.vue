@@ -1,0 +1,290 @@
+<style scoped>
+.top,.bottom{
+    text-align: center;
+}
+img {
+  width: 100%;
+  height:auto;
+}
+.whitespace {
+  height: 20px;
+}
+.projectTitle {
+  height: 30px;
+  line-height: 30px;
+  font-size: 20px;
+  max-width: 200px;
+  padding-left:5px;
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.btnCreate:hover,.joinProjectBtn:hover {
+  background-color: #19be6b;
+  color: white;
+}
+</style>
+<template>
+    <div class="TabContent">
+        <div class="projectCard"
+        v-for="(item,index) in projectList"
+        :key="item.index"
+        v-show="item.category == projectType||projectType == 'All' "
+        style="width:95%;margin-right:5%">
+          <Col
+            :xs="{ span: 21, offset: 1 }"
+            :md="{ span: 11, offset: 1 }"
+            :lg="{ span: 5 }">
+            <div @click="goSingleProject(item.projectId)" style="cursor:pointer">
+                <Card style="height:auto;margin:20px -15px">
+                <span slot="title" class="projectTitle" :title="item.title">{{item.title}}</span>
+                <div
+                    class="operate"
+                    slot="extra"
+                    style="display:flex;align-items:center"
+                >
+				  <Button
+					class="joinProjectBtn"
+					type="default"
+					title="join in project"
+					v-show="!item.isMember&&!item.isManager&&UserState"
+					@click.stop="joinApplyModalShow(item)"
+				  >
+					<Icon type="md-add" :size="20"/>
+				  </Button>
+				  <br>
+				  <Icon
+					type="md-person"
+					:size="20"
+					v-show="item.isMember||item.isManager"
+					:id="item.projectId"
+				  />
+				</div>
+				<div style="display:flex;align-items:center;height:20px">
+					 <strong style="text-align: center">Description</strong>
+					<p style="padding: 0 10px;word-break:break-word;overflow: hidden;
+						white-space: nowrap;
+						text-overflow: ellipsis;
+						max-width: 400px;"
+						:title="item.description">
+				  {{item.description}}</p>
+				</div>
+				<div style="height:200px;display:flex;justify-content:center;margin-top:10px">
+				  <img :src="item.picture" v-if="item.picture!=''&&item.picture!='undefined'">
+				  <avatar
+					:username="item.title"
+					:size="200"
+					:title="item.title"
+					:rounded="false"
+					v-else
+				  ></avatar>
+				</div>
+				<div style="height:15px;margin-top:10px;align-items:center;display:flex;justify-content:flex-start">
+				  <Icon type="md-body" :size="15"/>Manager
+				  <span style="height:20px;margin-left:5%">
+					<strong>{{item.managerName}}</strong>
+				  </span>
+				</div>
+				<div style="height:15px;align-items:center;display:flex;justify-content:flex-start;margin-top:10px">
+				  <Icon type="md-clock" :size="15"/>Time
+				  <span style="height:20px;margin-left:5%">
+					<strong>{{item.createTime.split(' ')[0]}}</strong>
+				  </span>
+				</div>
+				<div style="height:15px;align-items:center;display:flex;justify-content:flex-start;margin-top:10px">
+				  <Icon type="md-pricetags" :size="15"/>Tags
+				  <span style="height:20px;margin-left:5%">
+					<strong v-for="tag in item.tag">{{tag}}</strong>
+				  </span>
+				</div>
+			  </Card>
+			</div>
+          </Col>
+        </div>
+        <Modal
+		  v-model="applyJoinModal"
+		  title="Apply to join the project"
+		  ok-text="Apply"
+		  cancel-text="Cancel"
+		  @on-ok="joinApply('applyValidate')"
+		  @on-cancel=""
+		>
+		  <Form ref="applyValidate" :model="applyValidate" :rules="applyRuleValidate" :label-width="80">
+			<FormItem label="Reason" prop="reason">
+			  <Input v-model="applyValidate.reason" type="textarea" :rows="4" placeholder="Enter The Reason For Application ..." />
+			</FormItem>
+		  </Form>
+		</Modal>
+    </div>
+</template>
+<script>
+import Avatar from "vue-avatar"
+export default {
+  props: ["projectList", "projectType"],
+  computed: {
+    UserState() {
+      return this.$store.getters.userState;
+    }
+  },
+  components: {
+    Avatar,
+  },
+  data() {
+    return {
+      //加入项目
+      applyProjectInfo: {},
+      applyValidate: {
+        reason: ""
+      },
+      applyRuleValidate: {
+        reason: [
+          {
+            required: true,
+            message: "Please enter the reason for application",
+            trigger: "blur"
+          },
+          {
+            type: "string",
+            min: 5,
+            message: "Introduce no less than 5 words",
+            trigger: "blur"
+          }
+        ]
+      },
+      applyJoinModal: false,
+      // 记录已经申请的情况
+      haveApplied: false,
+      // 申请加入项目的模态框
+      applyJoinModal: false
+    };
+  },
+  methods: {
+    showJoinApplyBtn(item) {
+      var state = this.$store.getters.userState;
+      if (!item.isMember && !item.isManager && state) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    ok() {
+      this.$Message.info("Clicked ok");
+    },
+    cancel() {
+      this.$Message.info("Clicked cancel");
+    },
+    //进入项目详情页面的函数
+    goSingleProject(id) {
+      let isManager, isMember;
+      for (let i = 0; i < this.projectList.length; i++) {
+        if (this.projectList[i]["projectId"] === id) {
+          let projectInfo = this.projectList[i];
+          isManager = projectInfo["isManager"];
+          isMember = projectInfo["isMember"];
+          this.$store.commit("setProjectInfo", projectInfo);
+          break;
+        }
+      }
+      if (this.$store.getters.userState) {
+        if (isManager || isMember) {
+          this.$router.push({ path: `project/${id}` });
+        } else {
+          this.$Notice.error({
+            title: "No access",
+            desc:
+              "You need to click + button at the north right corner to apply join the project",
+            duration: 5
+          });
+        }
+      } else {
+        this.$router.push({ path: "/login" });
+      }
+    },
+    joinApplyModalShow(applyProjectInfo) {
+      this.$set(this, "applyProjectInfo", applyProjectInfo);
+      this.applyValidate.reason = "";
+      this.applyJoinModal = true;
+    },
+    joinApply(name) {
+      this.$refs[name].validate(valid => {
+        if (valid) {
+          var data = this.applyProjectInfo;
+          if (
+            this.haveApplied == true &&
+            data.projectId == sessionStorage.getItem("applyId")
+          ) {
+            this.$Notice.warning({
+              title: "repeat apply warning",
+              desc: "You have apply success, no need to click again!"
+            });
+          } else {
+            if (this.$store.getters.userState) {
+              let joinForm = {};
+              sessionStorage.setItem("applyId", data.projectId);
+              joinForm["recipientId"] = data.managerId;
+              joinForm["type"] = "apply";
+              joinForm["content"] = {
+                userName: this.$store.getters.userName,
+                userId: this.$store.getters.userId,
+                title: "Group application",
+                description:
+                  "User " +
+                  this.$store.getters.userName +
+                  " apply to join your project: " +
+                  data.title +
+                  " ." +
+                  " The reason for application is: " +
+                  this.applyValidate.reason,
+                projectId: data.projectId,
+                projectTitle: data.title,
+                scope: "project",
+                approve: "unknow"
+              };
+              this.axios
+                .post("/GeoProblemSolving/notice/save", joinForm)
+                .then(res => {
+                  this.$Notice.open({
+                    title: "Apply Successfully",
+                    desc:
+                      "The project's manager will process your apply in time,you can get a notification later to tell you the result.",
+                    duration: 5
+                  });
+                  this.$emit("sendNotice", data.managerId);
+                  this.haveApplied = true;
+                })
+                .catch(err => {
+                  console.log("申请失败的原因是：" + err.data);
+                });
+
+              let emailObject = {
+                recipient: joinForm.recipientId,
+                mailTitle:  "Group application",
+                mailContent: joinForm.content.description+'<br>'
+              };
+              this.axios
+              .post("/GeoProblemSolving/project/applyByMail",emailObject)
+              .then(res=>{
+                if(res.data=="Success"){
+                  console.log("Email Success.");
+                }else{
+                  console.log("Email fail.");
+                }
+              })
+              .catch(err=>{
+                console.log("Email fail.");
+              })
+            } else {
+              this.$Message.error("you must have an account before you apply");
+              this.$router.push({ name: "Login" });
+            }
+          }
+        } else {
+          this.$Message.error("Fail!");
+        }
+      });
+    }
+  },
+};
+</script>
+
