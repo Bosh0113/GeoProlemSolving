@@ -208,6 +208,16 @@ public class ResourceDaoImpl implements IResourceDao {
     }
 
     @Override
+    public Object readPublicResource(){
+        try {
+            Query query = Query.query(Criteria.where("privacy").is("public"));
+            return mongoTemplate.find(query,ResourceEntity.class);
+        }catch (Exception e){
+            return "Fail";
+        }
+    }
+
+    @Override
     public String deleteResource(String key, String value) {
         try {
             Query query = new Query(Criteria.where(key).is(value));

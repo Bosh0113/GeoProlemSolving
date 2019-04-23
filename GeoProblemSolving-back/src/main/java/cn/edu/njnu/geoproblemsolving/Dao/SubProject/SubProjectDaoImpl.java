@@ -29,7 +29,7 @@ public class SubProjectDaoImpl implements ISubProjectDao {
     }
 
     @Override
-    public String createSubProject(SubProjectEntity subProject) {
+    public Object createSubProject(SubProjectEntity subProject) {
         try {
             Date data = new Date();
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
@@ -48,7 +48,8 @@ public class SubProjectDaoImpl implements ISubProjectDao {
             UserEntity managerInfo = mongoTemplate.findOne(queryUser, UserEntity.class);
             subProject.setManagerName(managerInfo.getUserName());
             mongoTemplate.save(subProject);
-            return subProject.getSubProjectId();
+            subProject.setProjectId(pid);
+            return subProject;
         } catch (Exception e) {
             return "Fail";
         }
@@ -102,14 +103,14 @@ public class SubProjectDaoImpl implements ISubProjectDao {
     }
 
     @Override
-    public String updateSubProject(HttpServletRequest request) {
+    public Object updateSubProject(HttpServletRequest request) {
         try {
             String subProjectId = request.getParameter("subProjectId");
             Query query = new Query(Criteria.where("subProjectId").is(subProjectId));
             CommonMethod method = new CommonMethod();
             Update update = method.setUpdate(request);
             mongoTemplate.updateFirst(query, update, SubProjectEntity.class);
-            return "Success";
+            return mongoTemplate.findOne(query,SubProjectEntity.class);
         } catch (Exception e) {
             return "Fail";
         }

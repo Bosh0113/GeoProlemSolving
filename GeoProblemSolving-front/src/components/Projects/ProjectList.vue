@@ -24,18 +24,12 @@ img {
   background-color: #19be6b;
   color: white;
 }
-.joinProjectBtn{
-  /* margin-top:-4px; */
-}
 /* Loading动画的特效 */
 .demo-spin-icon-load {
   animation: ani-demo-spin 1s linear infinite;
 }
 </style>
 <template>
-  <!-- tab栏分页 -->
-  <!-- 外层div -->
-
     <Row>
       <Col span="22" offset="1">
         <Spin fix v-show="getFinish">
@@ -104,7 +98,7 @@ img {
             >
               <div @click="goSingleProject(item.projectId)" style="cursor:pointer">
                 <Card style="height:auto;margin:20px -15px">
-                  <span slot="title" class="projectTitle">{{item.title}}</span>
+                  <span slot="title" class="projectTitle" :title="item.title">{{item.title}}</span>
                   <div
                     class="operate"
                     slot="extra"
