@@ -20,11 +20,6 @@
         </Drawer>
       </div>
     </div>
-    <div class="toolContent">
-      <h1 style="text-align:center">
-        Tools float here.
-      </h1>
-      </div>
   </div>
 </template>
 <style scoped>

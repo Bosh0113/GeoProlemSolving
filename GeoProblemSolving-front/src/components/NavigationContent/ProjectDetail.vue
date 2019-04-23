@@ -11,7 +11,6 @@
   align-items: center;
   justify-content: center;
   height: 300px;
-  /* background-color:lightgray; */
 }
 .detail_image img {
   max-width: 90%;
@@ -334,7 +333,6 @@
                         <div style="width:70%" class="subProjectTitle" slot="title">
                           <span>{{subProject["title"]}}</span>
                         </div>
-                        <!-- <span  class="subProjectTitle"></span> -->
                         <div slot="extra" style="height:40px;;width:30%;display:flex;align-items:center">
                           <div style="display:flex">
                             <span
@@ -367,14 +365,6 @@
                               <Icon type="md-close" :size="20"/>
                             </span>
                           </div>
-                          <!-- <Button
-                            type="default"
-                            v-show="subProject['isManager'] == true"
-                            @click.stop="handOverSubProjectShow(index)"
-                            title="Exchange manager"
-                          >
-                            <Icon type="md-person"/>
-                          </Button>
                           <Icon
                             type="md-person"
                             v-show="subProject['isMember'] == true"
@@ -533,19 +523,8 @@
                   <strong>{{ row.name }}</strong>
                 </template>
                 <template slot-scope="{ row, index }" slot="action">
-                  <Button
-                    type="success"
-                    size="small"
-                    style="margin-right: 5px"
-                    :href="projectResourceList[index].pathURL"
-                    @click="show(index)"
-                    title="download"
-                  >
-                    <Icon type="md-download"/>
-                  </Button>
-                  <Button type="warning" size="small" style="margin-right: 5px" title="View">
-                    <Icon type="md-eye"/>
-                  </Button>
+                    <a :href="projectResourceList[index].pathURL" :download="projectResourceList[index].name"><Icon type="md-download" :size="20"/></a>
+                    <a @click="show(index)" style="margin-left: 10px" title="View"><Icon type="md-eye" :size="20" /></a>
                 </template>
               </Table>
             </div>
@@ -573,7 +552,6 @@
             <Input type="textarea" :rows="2" v-model="fileDescription"/>
           </div>
           <br>
-          <!-- <input type="file" @change="getFile($event)" style="margin-left:20%" multiple="multiple"> -->
           <Upload :max-size="1024*1024" multiple type="drag" :before-upload="gatherFile" action="-" ::on-progress="handleOnProgress3">
             <div style="padding: 20px 0">
               <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
@@ -615,7 +593,6 @@
       width="900px"
     >
       <div style="flex">
-        <!-- <span>Category</span> -->
         <div class="editStyle">
           <span>Category</span>
           <RadioGroup style="margin-left:5%;width:100%" v-model="editType">
@@ -1168,6 +1145,7 @@ export default {
     },
     getFile(event) {
       this.file = event.target.files[0];
+
       // this.file = event.target.files;
     },
     //上传文件
@@ -1446,6 +1424,7 @@ export default {
       if (that.file.length >= 5) {
         this.$Message.info("最多只能上传5个文件");
       } else {
+        console.table(this.file);
         that.file.push(file);
       }
       return false;

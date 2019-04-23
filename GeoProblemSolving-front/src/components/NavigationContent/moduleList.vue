@@ -674,6 +674,15 @@
                           color="gray"
                         />
                       </div>
+                      <div class="singl_tool_style">
+                        <Icon
+                          type="md-clipboard"
+                          size="60"
+                          @click.native="toolPanel('Doc Edit')"
+                          title="doc editor"
+                          color="gray"
+                        />
+                      </div>
                     </div>
                   </TabPane>
                   <TabPane label="Special tools" name="Special">
@@ -2190,6 +2199,10 @@ export default {
         toolURL =
           '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/pdfview" style="width: 100%;height:100%"></iframe>';
         toolName = "Pdf viewer";
+      }else if(type == "Doc Edit"){
+        toolURL =
+          '<iframe src="http://localhost:8080/tinymce" style="width: 100%;height:100%"></iframe>';
+        toolName = "doc editor";
       }
 
       var panel = jsPanel.create({
