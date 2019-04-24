@@ -115,7 +115,7 @@
 }
 </style>
 <template>
-  <div style="background-color:#dcdee2" :style="{height:contentHeight-240}">
+  <div style="background-color:#dcdee2" >
     <Row>
       <Col span="22" offset="1">
         <Card>

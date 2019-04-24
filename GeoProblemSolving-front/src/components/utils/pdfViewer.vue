@@ -11,8 +11,11 @@
 }
 </style>
 <template>
-  <div>
-    <div :style="{height:windowHeight+'px'}" style="width:240px;float:left">
+  <div style="display:flex">
+    <div style="z-index:20">
+      <toolStyle></toolStyle>
+    </div>
+    <div :style="{height:windowHeight+'px'}" style="width:240px;flex:1;float:left;z-index:10;margin-left:40px">
       <Menu theme="light" :open-names="['1','2']" :active-name="activeItem" :style="{height:windowHeight-50+'px'}" style="overflow-y:scroll">
         <Submenu name="1">
           <template slot="title">
@@ -52,7 +55,9 @@
   </div>
 </template>
 <script>
+import toolStyle from "./toolStyle";
 export default {
+  components:{toolStyle},
   data() {
     return {
       windowHeight: "",
@@ -171,7 +176,7 @@ export default {
               that.documentList.push(pdfItem);
               that.activeItem="2-"+(that.documentList.length-1);
             }
-            
+
           }
         })
         .catch(err => {});

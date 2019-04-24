@@ -30,7 +30,7 @@
 <template>
   <Row>
     <Col span="22" offset="1">
-      <div class="main">
+      <div class="main" :style={height:contentHeight}>
         <div class="sidebarTree">
           <Menu
             :theme="sidebarTheme"
@@ -77,7 +77,10 @@
                     <strong>{{ row.name }}</strong>
                   </template>
                   <template slot-scope="{ row, index }" slot="action">
-                    <Button
+                     <a :href="specifiedResourceList[index].pathURL" :download="specifiedResourceList[index].name"><Icon type="md-download" :size="20" color="yellowgreen"/></a>
+                     <a @click="download(index)" style="margin-left: 10px" title="View"><Icon type="md-eye" :size="20" color="orange"/></a>
+                     <a @click="deleteResource(index)" :disabled="judgeDelete(index)" style="margin-left: 10px"><Icon type="md-close" :size="20" color="red"/></a>
+                    <!-- <Button
                       type="success"
                       size="small"
                       style="margin-right: 5px"
@@ -92,7 +95,7 @@
                       :disabled="judgeDelete(index)"
                     >
                       <Icon type="md-close"/>
-                    </Button>
+                    </Button> -->
                   </template>
                 </Table>
                 <div style="display:flex;margin-top:20px;justify-content:center">
@@ -145,7 +148,7 @@
 export default {
   data() {
     return {
-      sidebarTreeHeight: "800px",
+      sidebarTreeHeight: "",
       searchResourceInput: "",
       // 侧边栏的颜色主题
       sidebarTheme: "light",
@@ -169,13 +172,13 @@ export default {
         {
           title: "Belong",
           key: "belong",
-          width:120,
+          width:100,
         },
         {
           title: "Type",
           key: "type",
           sortable: true,
-          width:120,
+          width:100,
         },
         {
           title: "Uploader",
@@ -185,11 +188,12 @@ export default {
           title: "Time",
           key: "uploadTime",
           sortable: true,
-          width:200
+          width:150
         },
         {
           title: "Action",
-          slot: "action"
+          slot: "action",
+          width:220,
         }
       ],
       uploaderArray: [],
@@ -198,7 +202,8 @@ export default {
       uploadModal: false,
       file: "",
       fileDescription: "",
-      fileType: ""
+      fileType: "",
+      contentHeight:""
     };
   },
   mounted() {
@@ -207,14 +212,18 @@ export default {
   },
   methods: {
     initLayout() {
-      this.sidebarTreeHeight = window.innerHeight - 120 + "px";
+      this.sidebarTreeHeight = window.innerHeight - 180 + "px";
+      this.contentHeight = window.innerHeight-120 + 'px';
     },
     onMenuSelect(name) {
       this.uploaderArray = [];
       this.specifiedResourceList = [];
       this.axios
+        // .get(
+        //   "/GeoProblemSolving/resource/inquiry" + "?key=type" + "&value=" + name
+        // )
         .get(
-          "/GeoProblemSolving/resource/inquiry" + "?key=type" + "&value=" + name
+          "/GeoProblemSolving/resource/allPublic"
         )
         .then(res => {
           if (res.data != "None") {

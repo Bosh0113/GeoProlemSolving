@@ -683,6 +683,16 @@
                           color="gray"
                         />
                       </div>
+                      <div class="singl_tool_style">
+
+                        <Icon
+                          type="logo-youtube"
+                          size="60"
+                          @click.native="toolPanel('video Tool')"
+                          title="video Tool"
+                          color="gray"
+                        />
+                      </div>
                     </div>
                   </TabPane>
                   <TabPane label="Special tools" name="Special">
@@ -2098,7 +2108,8 @@ export default {
 
       if (type == "map") {
         toolURL =
-          '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/map" style="width: 100%;height:100%"></iframe>';
+        // http://localhost:8080/tinymce
+          '<iframe src="http://localhost:8080/map" style="width: 100%;height:100%"></iframe>';
         toolName = "Map";
 
       } else if (type == "draw") {
@@ -2204,6 +2215,11 @@ export default {
           '<iframe src="http://localhost:8080/tinymce" style="width: 100%;height:100%"></iframe>';
         toolName = "doc editor";
       }
+      else if(type == "video Tool"){
+        toolURL =
+          '<iframe src="/GeoProblemSolving/Collaborative/vedioChat/WebRtcTest.html" style="width: 100%;height:100%"></iframe>';
+        toolName = "video Tool";
+      }
 
       var panel = jsPanel.create({
         theme: "primary",
@@ -2212,8 +2228,8 @@ export default {
         content: toolURL,
         disableOnMaximized: true,
         resizeit: {
-          minWidth:1000,
-          minHeight:600,
+          minWidth:1200,
+          minHeight:900,
         },
         callback: function() {
           // this.content.style.padding = "20px";

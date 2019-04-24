@@ -35,15 +35,14 @@ img {
 <template>
   <!-- tab栏分页 -->
   <!-- 外层div -->
-
-    <Row>
+    <Row style="margin-bottom:100px">
       <Col span="22" offset="1">
         <Spin fix v-show="getFinish">
           <Icon type="ios-loading" size="100" class="demo-spin-icon-load" color="yellowgreen"></Icon>
           <div>Loading</div>
         </Spin>
-        <div style="display:flex;height:60px;justify-content:center"></div>
-        <div class="Tabpane" style="display:flex">
+        <!-- <div style="display:flex;height:60px;justify-content:center"></div> -->
+        <div class="Tabpane" style="display:flex;margin-top:10px">
           <Tabs v-model="currentTab" @click.native="chooseCurrentType(currentTab)">
             <TabPane label="All" name="All" icon="ios-list"></TabPane>
             <TabPane label="Terrestrial" name="Terrestrial" icon="md-globe"></TabPane>
@@ -67,7 +66,7 @@ img {
           </div>
         </div>
       </Col>
-      <div class="ProjectList">
+      <div class="ProjectList" >
         <div v-show="!getFinish">
           <div v-if="currentProjectList.length < 1">
             <Col span="22" offset="1">

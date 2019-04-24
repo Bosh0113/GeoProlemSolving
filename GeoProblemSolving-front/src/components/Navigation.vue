@@ -28,7 +28,7 @@ header {
 .content{
   flex: 1 0 auto;
   margin-top:60px;
-  margin-bottom:20px;
+  /* margin-bottom:20px; */
   min-height:800px;
 }
 footer{
@@ -73,8 +73,8 @@ footer{
           <MenuItem name="projects" class="menuItem">
             <span>Projects</span>
           </MenuItem>
-          <MenuItem name="Public Resource" class="menuItem">
-            <span>Public Resource</span>
+          <MenuItem name="resources" class="menuItem">
+            <span> Resources</span>
           </MenuItem>
           <MenuItem name="community" class="menuItem">
             <span>Community</span>

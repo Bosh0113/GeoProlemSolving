@@ -2,7 +2,6 @@
  * Webrtc相关
  */
 $(document).ready(function () {
-
     var localView = document.getElementById('vedio-box1');
     var remoteView = document.getElementById('vedio-box2');
     var requestBtn = $("#send-request");
@@ -12,7 +11,6 @@ $(document).ready(function () {
     var hangupBtn = $("#send-hangup");
     var localStream;
     var remoteStream;
-
     //A端：是否收到了B端接受视频的应答；B端：是否应达了A端的视频请求
     var isResponsed = false;
     var isAvailable = true;
@@ -33,9 +31,9 @@ $(document).ready(function () {
     var ws;
     if(WebSocket)
     {
+        // 223.2.44.124
         ws = new WebSocket("wss://223.2.44.124:8083/GeoProblemSolving/vedioSocket/"+usrId);
     }
-
 
     $("#send-request").on("click",function () {
         displayBtn(cancelBtn);
@@ -106,19 +104,18 @@ $(document).ready(function () {
             } else {
                 localView.src = window.URL.createObjectURL(localStream);
             }
+            await peerConnection.createOffer().then( offer => {
+                return peerConnection.setLocalDescription(new RTCSessionDescription(offer));
+            })
+            ws.send(JSON.stringify({
+                "type": "offer",
+                "data": {
+                    "desc": peerConnection.localDescription
+                }
+            }));
         } catch (err) {
-            alert("系统未检测到摄像头!");
             console.error(err);
         }
-        await peerConnection.createOffer().then( offer => {
-            return peerConnection.setLocalDescription(new RTCSessionDescription(offer));
-        })
-        ws.send(JSON.stringify({
-            "type": "offer",
-            "data": {
-                "desc": peerConnection.localDescription
-            }
-        }));
     }
 
     function initiate() {
@@ -263,24 +260,19 @@ $(document).ready(function () {
                     {
                         await peerConnection.setRemoteDescription(message.data.desc);
                     }
-                    try {
-                        localStream = await navigator.mediaDevices.getUserMedia(constraints);
-                        if ('srcObject' in localView) { // 判断是否支持 srcObject 属性
-                            localView.srcObject = localStream;
-                        } else {
-                            localView.src = window.URL.createObjectURL(localStream);
-                        }
-                        //将本地视频流加入remoteConnection
-                        await localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+                    localStream = await navigator.mediaDevices.getUserMedia(constraints);
+                    if ('srcObject' in localView) { // 判断是否支持 srcObject 属性
+                        localView.srcObject = localStream;
+                    } else {
+                        localView.src = window.URL.createObjectURL(localStream);
                     }
-                    catch (e) {
-                        alert("系统未检测到摄像头！");
-                        console.error(e);
-                    }
-
+                    //将本地视频流加入remoteConnection
+                    await localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+                    
                     await peerConnection.createAnswer().then(function (answer) {
                         peerConnection.setLocalDescription(new RTCSessionDescription(answer))
                     });
+
                     ws.send(JSON.stringify({
                         "type": "answer",
                         "data": {

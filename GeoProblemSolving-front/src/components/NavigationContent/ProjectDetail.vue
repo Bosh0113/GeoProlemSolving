@@ -147,6 +147,7 @@
 <template>
   <div class="main">
     <Row>
+      <!-- <Col span="3" style="background-color:lightblue" :style="{height:sidebarHeight}">111</Col> -->
       <Col span="22" offset="1">
         <div class="whitespace"></div>
         <div class="whitespace"></div>
@@ -158,21 +159,24 @@
                 style="font-size:25px;height:40px;line-height:40px;max-width:50%"
               >{{currentProjectDetail["title"]}}</p>
               <div slot="extra" style="height:40px;line-height:40px;display:flex;width:50%">
-                <Button
+                <span
                   type="default"
-                  icon="ios-create"
+                  title="edit"
                   @click="editModalShow(currentProjectDetail['projectId'])"
                   v-show="judgeIsManager(projectManager.userId)"
-                ></Button>
-                <Button
-                  class="deleteBtn"
+                  style="cursor:pointer"
+                >
+                  <Icon type="ios-create" :size="30"></Icon>
+                </span>
+                <span
                   type="default"
-                  icon="md-close"
                   title="remove"
-                  style="margin-left:20px"
+                  style="margin-left:20px;cursor:pointer"
                   @click="deleteProjectShow()"
                   v-show="judgeIsManager(projectManager.userId)"
-                ></Button>
+                >
+                  <Icon type="md-close" :size="30"></Icon>
+                </span>
               </div>
               <Row>
                 <Col :xs="12" :sm="10" :md="9" :lg="8">
@@ -286,7 +290,7 @@
                   v-show="this.currentProjectDetail.isManager||this.currentProjectDetail.isMember"
                 >
                   <Icon type="md-add" size="20"/>
-              </Button>
+                </Button>
               </Poptip>
               <Modal
                 v-model="subProjectModal"
@@ -333,14 +337,17 @@
                         <div style="width:70%" class="subProjectTitle" slot="title">
                           <span>{{subProject["title"]}}</span>
                         </div>
-                        <div slot="extra" style="height:40px;;width:30%;display:flex;align-items:center">
+                        <div
+                          slot="extra"
+                          style="height:40px;;width:30%;display:flex;align-items:center"
+                        >
                           <div style="display:flex">
                             <span
                               v-show="subProject['isManager'] == true"
                               @click.stop="handOverSubProjectShow(index)"
                               title="Exchange manager"
                             >
-                            <Icon type="md-person" :size="20"/>
+                              <Icon type="md-person" :size="20"/>
                             </span>
                             <span
                               v-show="subProject['isMember'] == false&&subProject['isManager'] == false"
@@ -353,7 +360,8 @@
                               style="margin-left:10px"
                               v-show="subProject['isManager'] == true"
                               @click.stop="editSubProjectShow(index)"
-                              title="Edit">
+                              title="Edit"
+                            >
                               <Icon type="ios-create" :size="20"/>
                             </span>
                             <span
@@ -365,40 +373,8 @@
                               <Icon type="md-close" :size="20"/>
                             </span>
                           </div>
-                          <Icon
-                            type="md-person"
-                            v-show="subProject['isMember'] == true"
-                            :size="30"
-                            style="margin-top:5px"
-                          />
-                          <Button
-                            type="success"
-                            v-show="subProject['isMember'] == false&&subProject['isManager'] == false"
-                            @click.stop="joinSubProject(subProject)"
-                            title="Apply"
-                          >
-                            <Icon type="md-add"/>
-                          </Button>
-                          <Button
-                            type="default"
-                            style="margin-left:10px"
-                            v-show="subProject['isManager'] == true"
-                            @click.stop="editSubProjectShow(index)"
-                            title="Edit"
-                          >
-                            <Icon type="ios-create"/>
-                          </Button>
-                          <Button
-                            type="default"
-                            style="margin-left:10px"
-                            v-show="subProject['isManager'] == true"
-                            @click.stop="deleteSubProjectShow(index)"
-                            title="Delete"
-                          >
-                            <Icon type="md-close"/>
-                          </Button> -->
                         </div>
-                          <p class="subProjectDescription">{{subProject["description"]}}</p>
+                        <p class="subProjectDescription">{{subProject["description"]}}</p>
                         <br>
                         <div
                           style="height:20px;align-items:center;display:flex;justify-content:flex-start"
@@ -425,7 +401,7 @@
                 ok-text="ok"
                 cancel-text="cancel"
                 @on-ok="handOverSubProject()"
-                @on-cancel=""
+                @on-cancel
                 width="500px"
                 :mask-closable="false"
               >
@@ -479,7 +455,7 @@
                 ok-text="Confirm"
                 cancel-text="cancel"
                 @on-ok="deleteSubProject()"
-                @on-cancel=""
+                @on-cancel
                 width="800px"
                 :mask-closable="false"
               >
@@ -499,7 +475,6 @@
                 @click="uploadFileModalShow()"
                 class="uploadBtn"
                 title="upload resource"
-
               >
                 <Icon type="md-cloud-upload" size="20"/>
               </Button>
@@ -522,19 +497,43 @@
                 <template slot-scope="{ row }" slot="name">
                   <strong>{{ row.name }}</strong>
                 </template>
+
                 <template slot-scope="{ row, index }" slot="action">
-                    <a :href="projectResourceList[index].pathURL" :download="projectResourceList[index].name"><Icon type="md-download" :size="20"/></a>
-                    <a @click="show(index)" style="margin-left: 10px" title="View"><Icon type="md-eye" :size="20" /></a>
+                  <a
+                    :href="projectResourceList[index].pathURL"
+                    :download="projectResourceList[index].name"
+                  >
+                    <Icon type="md-download" :size="20"/>
+                  </a>
+                  <a @click="show(index)" style="margin-left: 10px" title="View">
+                    <Icon type="md-eye" :size="20"/>
+                  </a>
                 </template>
               </Table>
             </div>
           </Card>
         </div>
         <!-- 上传文件按钮的模态框 -->
-        <Modal v-model="uploadFileModal" title="upload file" width="600px" :mask-closable="false" @on-ok="filesUpload" @on-cancel="" ok-text="Confirm" cancel-text="cancel">
+        <Modal
+          v-model="uploadFileModal"
+          title="upload file"
+          width="600px"
+          :mask-closable="false"
+          @on-ok="filesUpload"
+          @on-cancel
+          ok-text="Confirm"
+          cancel-text="cancel"
+        >
+          <div style="display:flex;text-align:center;align-items:center">
+            <span style="width:20%">privacy</span>
+            <RadioGroup v-model="privacy" style="width:40%">
+              <Radio label="public"></Radio>
+              <Radio label="privacy"></Radio>
+            </RadioGroup>
+          </div>
           <div style="display:flex;text-align:center;align-items:center;justify-content:center">
             <!-- 这里定义上传的几种资源类型供用户选择 -->
-            <span style="width:20%">File Type</span>
+            <span style="width:20%">Type</span>
             <RadioGroup v-model="fileType" style="width:80%">
               <Radio label="image"></Radio>
               <Radio label="video"></Radio>
@@ -552,20 +551,36 @@
             <Input type="textarea" :rows="2" v-model="fileDescription"/>
           </div>
           <br>
-          <Upload :max-size="1024*1024" multiple type="drag" :before-upload="gatherFile" action="-" ::on-progress="handleOnProgress3">
+          <Upload
+            :max-size="1024*1024"
+            multiple
+            type="drag"
+            :before-upload="gatherFile"
+            action="-"
+            ::on-progress="handleOnProgress3"
+          >
             <div style="padding: 20px 0">
               <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
               <p>Click or drag files here to upload</p>
             </div>
           </Upload>
           <div style="padding:0 10px 0 10px">
-            <ul v-for="(list,index) in file" :key="index" >
-            <li style="display:flex">
-              filename:
-              <span style="font-size:10px;width:90%">{{ list.name }}</span>
-              <Icon type="ios-close" size="20" @click="delFileList(index)" style="display:flex;justify-content:flex-end"></Icon>
-            </li>
-          </ul>
+            <ul v-for="(list,index) in file" :key="index">
+              <li style="display:flex">
+                filename:
+                <span style="font-size:10px;width:20%">{{ list.name }}</span>
+                size:
+                <span
+                  style="font-size:10px;width:70%"
+                >{{Math.round(list.size/1024)}}kb</span>
+                <Icon
+                  type="ios-close"
+                  size="20"
+                  @click="delFileList(index)"
+                  style="display:flex;justify-content:flex-end"
+                ></Icon>
+              </li>
+            </ul>
           </div>
         </Modal>
         <br>
@@ -574,7 +589,7 @@
         v-model="removeProjectModal"
         title="Delete warning "
         @on-ok="deleteProject"
-        @on-cancel=""
+        @on-cancel
         ok-text="submit"
         cancel-text="cancel"
       >
@@ -586,7 +601,7 @@
       v-model="editProjectModal"
       title="Edit Project"
       @on-ok="editProjectSubmit()"
-      @on-cancel=""
+      @on-cancel
       ok-text="Confirm"
       cancel-text="cancel"
       :mask-closable="false"
@@ -673,6 +688,17 @@
           </RadioGroup>
         </div>
       </div>
+    </Modal>
+    <!-- progressModalShow -->
+    <Modal
+      v-model="progressModalShow"
+      title="Upload Progress"
+      @on-ok
+      @on-cancel
+      ok-text="ok"
+      cancel-text="close"
+    >
+      <Progress :percent="uploadProgress"></Progress>
     </Modal>
   </div>
 </template>
@@ -772,6 +798,8 @@ export default {
         "/",
       //上传文件相关的
       uploadFileModal: false,
+      // 默认是公开的
+      privacy: "public",
       file: "",
       fileDescription: "",
       fileType: "",
@@ -818,6 +846,11 @@ export default {
       // 关于进度条
       xhr: new XMLHttpRequest(),
       showProgress: false,
+      //侧边tab栏的高度
+      sidebarHeight: "",
+      // 进度条模态框
+      progressModalShow: false,
+      uploadProgress:0,
     };
   },
   created() {
@@ -830,6 +863,7 @@ export default {
       duration: 3
     });
     this.getProjectDetail();
+    this.sidebarHeight = window.innerHeight + "px";
   },
   // add by mzy for navigation guards
   beforeRouteEnter: (to, from, next) => {
@@ -847,7 +881,7 @@ export default {
           }
         }
         vm.currentProjectDetail.isMember = isMember;
-        if( vm.currentProjectDetail.managerId == userId){
+        if (vm.currentProjectDetail.managerId == userId) {
           vm.currentProjectDetail.isManager = true;
         }
         if (!(isMember || vm.currentProjectDetail.isManager)) {
@@ -915,8 +949,6 @@ export default {
       sessionStorage.setItem("projectId", that.currentProjectDetail.projectId);
       sessionStorage.setItem("projectName", that.currentProjectDetail.title);
       //将tag进行分割
-      // var arr = that.currentProjectDetail.tag.split(',');
-      // that.currentProjectDetail.tag = arr;
     },
     managerIdentity(managerId) {
       if (managerId === this.$store.getters.userId) {
@@ -1148,45 +1180,7 @@ export default {
 
       // this.file = event.target.files;
     },
-    //上传文件
-    submitFile() {
-      // event.preventDefault();
-      //取消默认行为
-      //创建 formData 对象
-      let formData = new FormData();
-      // 向 formData 对象中添加文件
-      formData.append("file", this.file);
-      formData.append("file", this.file);
-      formData.append("description", this.fileDescription);
-      formData.append("type", this.fileType);
-      formData.append("uploaderId", this.$store.getters.userId);
-      // 添加字段属于那个项目
-      formData.append("belong", this.currentProjectDetail.title);
-      let scopeObject = {
-        projectId: this.currentProjectDetail.projectId,
-        subProjectId: "",
-        moduleId: ""
-      };
-      formData.append("scope", JSON.stringify(scopeObject));
-      //这里还要添加其他的字段
-      this.axios
-        .post("/GeoProblemSolving/resource/upload", formData)
-        .then(res => {
-          if (res.data != "Size over" && res.data.length > 0) {
-            this.$Notice.open({
-              title: "Upload notification title",
-              desc: "File uploaded successfully",
-              duration: 2
-            });
-            //这里重新获取一次该项目下的全部资源
-            this.addUploadEvent(this.currentProjectDetail.projectId);
-            this.getAllResource();
-            // 创建一个函数根据pid去后台查询该项目下的资源
-          }
-          // console.log(res.data);
-        })
-        .catch(err => {});
-    },
+
     //获取全部资源的方法
     getAllResource() {
       // url是请求的网址
@@ -1401,9 +1395,20 @@ export default {
           moduleId: ""
         };
         formData.append("scope", JSON.stringify(scopeObject));
+        formData.append("privacy", this.privacy);
+        this.progressModalShow = true;
       }
-      this.axios
-        .post("/GeoProblemSolving/resource/upload", formData)
+      this.axios({
+        url: "/GeoProblemSolving/resource/upload",
+        method: "post",
+        onUploadProgress: progressEvent => {
+          this.uploadProgress = (progressEvent.loaded / progressEvent.total * 100 | 0);
+          // let complete = (progressEvent.loaded / progressEvent.total * 100 | 0) + '%'
+          console.log(progressEvent);
+          console.log(this.uploadProgress);
+        },
+        data:formData
+      })
         .then(res => {
           if (res.data != "Size over" && res.data.length > 0) {
             this.$Notice.open({
@@ -1426,23 +1431,27 @@ export default {
       } else {
         console.table(this.file);
         that.file.push(file);
+        that.file.map(element => {
+          element["fileSize"] = Math.round((element.size / 1024) * 100) / 100;
+        });
+        console.log(that.file);
       }
       return false;
     },
-    delFileList(index){
-     let that = this;
-     that.file.splice(index, 1);
-     console.log(that.file);
+    delFileList(index) {
+      let that = this;
+      that.file.splice(index, 1);
+      console.log(that.file);
     },
-    handleOnProgress3(event,file,fileList){
-      console.log(event)
-      console.log(file.percentage)
-      console.log(fileList)
+    handleOnProgress3(event, file, fileList) {
+      console.log(event);
+      console.log(file.percentage);
+      console.log(fileList);
       //this.isUpload3 = true
-      if(file.percentage<100){
-        window.onbeforeunload = function(event){
-          return '文件正在上传中，您确定要离开此页面吗？'
-        }
+      if (file.percentage < 100) {
+        window.onbeforeunload = function(event) {
+          return "文件正在上传中，您确定要离开此页面吗？";
+        };
       }
     }
   }
