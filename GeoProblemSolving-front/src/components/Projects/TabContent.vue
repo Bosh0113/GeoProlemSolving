@@ -205,14 +205,6 @@ export default {
     };
   },
   methods: {
-    showJoinApplyBtn(item) {
-      var state = this.$store.getters.userState;
-      if (!item.isMember && !item.isManager && state) {
-        return true;
-      } else {
-        return false;
-      }
-    },
     ok() {
       this.$Message.info("Clicked ok");
     },
