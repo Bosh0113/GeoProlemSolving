@@ -97,9 +97,14 @@ img {
                     </div>
                     <div style="height:15px;align-items:center;display:flex;justify-content:flex-start;margin-top:10px">
                     <Icon type="md-pricetags" :size="15"/>Tags
-                    <span style="height:20px;margin-left:5%">
-                        <strong v-for="tag in item.tag">{{tag}}</strong>
-                    </span>
+                        <strong style="
+                          margin-left:5%;
+                          display: inline-block;
+                          overflow: hidden;
+                          white-space: nowrap;
+                          text-overflow: ellipsis;">
+                          {{item.tag}}
+                        </strong>
                     </div>
                 </Card>
                 </div>
@@ -168,15 +173,18 @@ export default {
     return {
       selectedProjectInfo: {},
       projectInfoModal: false,
-      columns:[{
-        title: 'Key',
-        key: 'key',
-        width: '150px'
-      },{
-        title:'Value',
-        key:'value'
-      }],
-      projectInfoShow:[],
+      columns: [
+        {
+          title: "Key",
+          key: "key",
+          width: "150px"
+        },
+        {
+          title: "Value",
+          key: "value"
+        }
+      ],
+      projectInfoShow: [],
       //加入项目
       applyProjectInfo: {},
       applyValidate: {
@@ -214,59 +222,57 @@ export default {
     //进入项目详情页面的函数
     projectInfoModalShow(projectInfo) {
       this.selectedProjectInfo = projectInfo;
-      var category="";
-      if(projectInfo.category!='Human'&&projectInfo.category!='GISRS'){
-        category=projectInfo.category;
-      }
-      else if(projectInfo.category=='Human'){
-        category = 'Human-Activity';
-      }
-      else if(projectInfo.category=='GISRS'){
-        category = 'GIS & RS';
+      var category = "";
+      if (projectInfo.category != "Human" && projectInfo.category != "GISRS") {
+        category = projectInfo.category;
+      } else if (projectInfo.category == "Human") {
+        category = "Human-Activity";
+      } else if (projectInfo.category == "GISRS") {
+        category = "GIS & RS";
       }
       var membersName = "";
       var members = projectInfo.members;
-      for(var i=0;i<members.length;i++){
-        if(i==0){
-          membersName=members[i].userName;
-        }
-        else{
-          membersName=membersName+","+ members[i].userName;
+      for (var i = 0; i < members.length; i++) {
+        if (i == 0) {
+          membersName = members[i].userName;
+        } else {
+          membersName = membersName + "," + members[i].userName;
         }
       }
-      this.projectInfoShow=[
+      this.projectInfoShow = [
         {
-          key:'Category',
+          key: "Category",
           value: category
         },
         {
-          key:'Title',
+          key: "Title",
           value: projectInfo.title
         },
         {
-          key:'Description',
+          key: "Description",
           value: projectInfo.description
         },
         {
-          key:'Introduction',
+          key: "Introduction",
           value: projectInfo.introduction
         },
         {
-          key:'Tag',
+          key: "Tag",
           value: projectInfo.tag
         },
         {
-          key:'Manager',
+          key: "Manager",
           value: projectInfo.managerName
         },
         {
-          key:'Members',
+          key: "Members",
           value: membersName
-        },{
-          key:'Created Time',
+        },
+        {
+          key: "Created Time",
           value: projectInfo.createTime
         }
-      ]
+      ];
       this.projectInfoModal = true;
     },
     goSingleProject() {
