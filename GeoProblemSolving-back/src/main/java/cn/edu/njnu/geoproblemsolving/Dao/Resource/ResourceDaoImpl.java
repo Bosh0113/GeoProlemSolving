@@ -142,6 +142,7 @@ public class ResourceDaoImpl implements IResourceDao {
                         resourceEntity.setName(fileNames);
                         resourceEntity.setDescription(request.getParameter("description"));
                         resourceEntity.setBelong(request.getParameter("belong"));
+                        resourceEntity.setPrivacy(request.getParameter("privacy"));
                         resourceEntity.setType(request.getParameter("type"));
                         resourceEntity.setFileSize(fileSize);
                         resourceEntity.setPathURL(pathURL);

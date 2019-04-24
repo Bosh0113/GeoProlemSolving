@@ -46,7 +46,7 @@ img {
             >Create New Project</Button>
           </div>
         <div style="display:flex">
-          <Tabs value="All">
+          <Tabs value="All" type="card">
             <TabPane label="All" name="All" icon="ios-list">
               <project-list :projectList = currentProjectList projectType="All"></project-list>
             </TabPane>

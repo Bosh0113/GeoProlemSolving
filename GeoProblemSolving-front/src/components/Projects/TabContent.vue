@@ -1,10 +1,11 @@
 <style scoped>
-.top,.bottom{
-    text-align: center;
+.top,
+.bottom {
+  text-align: center;
 }
 img {
   width: 100%;
-  height:auto;
+  height: auto;
 }
 .whitespace {
   height: 20px;
@@ -14,112 +15,134 @@ img {
   line-height: 30px;
   font-size: 20px;
   max-width: 200px;
-  padding-left:5px;
+  padding-left: 5px;
   display: inline-block;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.btnCreate:hover,.joinProjectBtn:hover {
+.btnCreate:hover,
+.joinProjectBtn:hover {
   background-color: #19be6b;
   color: white;
 }
 </style>
 <template>
-    <div class="TabContent">
-        <div class="projectCard"
-        v-for="(item,index) in projectList"
-        :key="item.index"
-        v-show="item.category == projectType||projectType == 'All' "
-        style="width:95%;margin-right:5%">
-          <Col
-            :xs="{ span: 21, offset: 1 }"
-            :md="{ span: 11, offset: 1 }"
-            :lg="{ span: 5 }">
-            <div @click="goSingleProject(item.projectId)" style="cursor:pointer">
-                <Card style="height:auto;margin:20px -15px">
-                <span slot="title" class="projectTitle" :title="item.title">{{item.title}}</span>
-                <div
-                    class="operate"
-                    slot="extra"
-                    style="display:flex;align-items:center"
-                >
-				  <Button
-					class="joinProjectBtn"
-					type="default"
-					title="join in project"
-					v-show="!item.isMember&&!item.isManager&&UserState"
-					@click.stop="joinApplyModalShow(item)"
-				  >
-					<Icon type="md-add" :size="20"/>
-				  </Button>
-				  <br>
-				  <Icon
-					type="md-person"
-					:size="20"
-					v-show="item.isMember||item.isManager"
-					:id="item.projectId"
-				  />
-				</div>
-				<div style="display:flex;align-items:center;height:20px">
-					 <strong style="text-align: center">Description</strong>
-					<p style="padding: 0 10px;word-break:break-word;overflow: hidden;
-						white-space: nowrap;
-						text-overflow: ellipsis;
-						max-width: 400px;"
-						:title="item.description">
-				  {{item.description}}</p>
-				</div>
-				<div style="height:200px;display:flex;justify-content:center;margin-top:10px">
-				  <img :src="item.picture" v-if="item.picture!=''&&item.picture!='undefined'">
-				  <avatar
-					:username="item.title"
-					:size="200"
-					:title="item.title"
-					:rounded="false"
-					v-else
-				  ></avatar>
-				</div>
-				<div style="height:15px;margin-top:10px;align-items:center;display:flex;justify-content:flex-start">
-				  <Icon type="md-body" :size="15"/>Manager
-				  <span style="height:20px;margin-left:5%">
-					<strong>{{item.managerName}}</strong>
-				  </span>
-				</div>
-				<div style="height:15px;align-items:center;display:flex;justify-content:flex-start;margin-top:10px">
-				  <Icon type="md-clock" :size="15"/>Time
-				  <span style="height:20px;margin-left:5%">
-					<strong>{{item.createTime.split(' ')[0]}}</strong>
-				  </span>
-				</div>
-				<div style="height:15px;align-items:center;display:flex;justify-content:flex-start;margin-top:10px">
-				  <Icon type="md-pricetags" :size="15"/>Tags
-				  <span style="height:20px;margin-left:5%">
-					<strong v-for="tag in item.tag">{{tag}}</strong>
-				  </span>
-				</div>
-			  </Card>
-			</div>
-          </Col>
+    <div>
+        <div class="TabContent" v-if="projectList.length>0">
+            <div class="projectCard"
+            v-for="(item,index) in projectList"
+            :key="item.index"
+            v-show="item.category == projectType||projectType == 'All' "
+            style="width:95%;margin-right:5%">
+            <Col
+                :xs="{ span: 21, offset: 1 }"
+                :md="{ span: 11, offset: 1 }"
+                :lg="{ span: 5 }">
+                <div @click="goSingleProject(item.projectId)" style="cursor:pointer">
+                    <Card style="height:auto;margin:20px -15px">
+                    <span slot="title" class="projectTitle" :title="item.title">{{item.title}}</span>
+                    <div
+                        class="operate"
+                        slot="extra"
+                        style="display:flex;align-items:center"
+                    >
+                    <Button
+                        class="joinProjectBtn"
+                        type="default"
+                        title="join in project"
+                        v-show="!item.isMember&&!item.isManager&&UserState"
+                        @click.stop="joinApplyModalShow(item)"
+                    >
+                        <Icon type="md-add" :size="20"/>
+                    </Button>
+                    <br>
+                    <Icon
+                        type="md-person"
+                        :size="20"
+                        v-show="item.isMember||item.isManager"
+                        :id="item.projectId"
+                    />
+                    </div>
+                    <div style="display:flex;align-items:center;height:20px">
+                        <strong style="text-align: center">Description</strong>
+                        <p style="padding: 0 10px;word-break:break-word;overflow: hidden;
+                            white-space: nowrap;
+                            text-overflow: ellipsis;
+                            max-width: 400px;"
+                            :title="item.description">
+                    {{item.description}}</p>
+                    </div>
+                    <div style="height:200px;display:flex;justify-content:center;margin-top:10px">
+                    <img :src="item.picture" v-if="item.picture!=''&&item.picture!='undefined'">
+                    <avatar
+                        :username="item.title"
+                        :size="200"
+                        :title="item.title"
+                        :rounded="false"
+                        v-else
+                    ></avatar>
+                    </div>
+                    <div style="height:15px;margin-top:10px;align-items:center;display:flex;justify-content:flex-start">
+                    <Icon type="md-body" :size="15"/>Manager
+                    <span style="height:20px;margin-left:5%">
+                        <strong>{{item.managerName}}</strong>
+                    </span>
+                    </div>
+                    <div style="height:15px;align-items:center;display:flex;justify-content:flex-start;margin-top:10px">
+                    <Icon type="md-clock" :size="15"/>Time
+                    <span style="height:20px;margin-left:5%">
+                        <strong>{{item.createTime.split(' ')[0]}}</strong>
+                    </span>
+                    </div>
+                    <div style="height:15px;align-items:center;display:flex;justify-content:flex-start;margin-top:10px">
+                    <Icon type="md-pricetags" :size="15"/>Tags
+                    <span style="height:20px;margin-left:5%">
+                        <strong v-for="tag in item.tag">{{tag}}</strong>
+                    </span>
+                    </div>
+                </Card>
+                </div>
+            </Col>
+            </div>
+            <div v-show="projectType!='All'">
+                <Col span="22" offset="1">
+                    <Card :bordered="false">
+                        <div style="display:flex;justify-content:center">
+                        <Icon type="md-alert" size="40" color="gray"/>
+                        </div>
+                        <br>
+                        <div style="display:flex;justify-content:center">
+                        <h2 style="text-align:center;width:50%">No more projects in this category.</h2>
+                        </div>
+                        <br>
+                        <div style="display:flex;justify-content:center">
+                        <h4
+                            style="text-align:center;width:50%;color:lightblue"
+                        >You can click the button right top to add a new project.<br>Enriching your description of the project and attracting more people to join in.</h4>
+                        </div>
+                    </Card>
+                </Col>
+            </div>
         </div>
         <Modal
-		  v-model="applyJoinModal"
-		  title="Apply to join the project"
-		  ok-text="Apply"
-		  cancel-text="Cancel"
-		  @on-ok="joinApply('applyValidate')"
-		  @on-cancel=""
-		>
-		  <Form ref="applyValidate" :model="applyValidate" :rules="applyRuleValidate" :label-width="80">
-			<FormItem label="Reason" prop="reason">
-			  <Input v-model="applyValidate.reason" type="textarea" :rows="4" placeholder="Enter The Reason For Application ..." />
-			</FormItem>
-		  </Form>
-		</Modal>
+        v-model="applyJoinModal"
+        title="Apply to join the project"
+        ok-text="Apply"
+        cancel-text="Cancel"
+        @on-ok="joinApply('applyValidate')"
+        @on-cancel=""
+        >
+        <Form ref="applyValidate" :model="applyValidate" :rules="applyRuleValidate" :label-width="80">
+            <FormItem label="Reason" prop="reason">
+            <Input v-model="applyValidate.reason" type="textarea" :rows="4" placeholder="Enter The Reason For Application ..." />
+            </FormItem>
+        </Form>
+        </Modal>
     </div>
 </template>
 <script>
-import Avatar from "vue-avatar"
+import Avatar from "vue-avatar";
 export default {
   props: ["projectList", "projectType"],
   computed: {
@@ -128,7 +151,7 @@ export default {
     }
   },
   components: {
-    Avatar,
+    Avatar
   },
   data() {
     return {
@@ -259,21 +282,21 @@ export default {
 
               let emailObject = {
                 recipient: joinForm.recipientId,
-                mailTitle:  "Group application",
-                mailContent: joinForm.content.description+'<br>'
+                mailTitle: "Group application",
+                mailContent: joinForm.content.description + "<br>"
               };
               this.axios
-              .post("/GeoProblemSolving/project/applyByMail",emailObject)
-              .then(res=>{
-                if(res.data=="Success"){
-                  console.log("Email Success.");
-                }else{
+                .post("/GeoProblemSolving/project/applyByMail", emailObject)
+                .then(res => {
+                  if (res.data == "Success") {
+                    console.log("Email Success.");
+                  } else {
+                    console.log("Email fail.");
+                  }
+                })
+                .catch(err => {
                   console.log("Email fail.");
-                }
-              })
-              .catch(err=>{
-                console.log("Email fail.");
-              })
+                });
             } else {
               this.$Message.error("you must have an account before you apply");
               this.$router.push({ name: "Login" });
@@ -284,7 +307,7 @@ export default {
         }
       });
     }
-  },
+  }
 };
 </script>
 
