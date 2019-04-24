@@ -39,7 +39,7 @@ img {
                 :xs="{ span: 21, offset: 1 }"
                 :md="{ span: 11, offset: 1 }"
                 :lg="{ span: 5 }">
-                <div @click="goSingleProject(item.projectId)" style="cursor:pointer">
+                <div @click="projectInfoModalShow(item)" style="cursor:pointer">
                     <Card style="height:auto;margin:20px -15px">
                     <span slot="title" class="projectTitle" :title="item.title">{{item.title}}</span>
                     <div
@@ -126,6 +126,17 @@ img {
             </div>
         </div>
         <Modal
+        v-model="projectInfoModal"
+        title="Project Info"
+        width="800px">
+          <Table stripe border :columns="columns" :data="projectInfoShow" :show-header="false"></Table>
+          <div slot="footer">
+            <Button @click="projectInfoModal=false">Cancel</Button>
+            <Button type="success" @click="joinApplyModalShow(this.selectedProjectInfo)" v-show="!selectedProjectInfo.isMember&&!selectedProjectInfo.isManager&&UserState" >Apply</Button>
+            <Button type="primary" @click="goSingleProject()" v-show="UserState&&(selectedProjectInfo.isMember||selectedProjectInfo.isManager)">Goto</Button>
+          </div>
+        </Modal>
+        <Modal
         v-model="applyJoinModal"
         title="Apply to join the project"
         ok-text="Apply"
@@ -155,6 +166,17 @@ export default {
   },
   data() {
     return {
+      selectedProjectInfo: {},
+      projectInfoModal: false,
+      columns:[{
+        title: 'Key',
+        key: 'key',
+        width: '150px'
+      },{
+        title:'Value',
+        key:'value'
+      }],
+      projectInfoShow:[],
       //加入项目
       applyProjectInfo: {},
       applyValidate: {
@@ -198,7 +220,65 @@ export default {
       this.$Message.info("Clicked cancel");
     },
     //进入项目详情页面的函数
-    goSingleProject(id) {
+    projectInfoModalShow(projectInfo) {
+      this.selectedProjectInfo = projectInfo;
+      var category="";
+      if(projectInfo.category!='Human'&&projectInfo.category!='GISRS'){
+        category=projectInfo.category;
+      }
+      else if(projectInfo.category=='Human'){
+        category = 'Human-Activity';
+      }
+      else if(projectInfo.category=='GISRS'){
+        category = 'GIS & RS';
+      }
+      var membersName = "";
+      var members = projectInfo.members;
+      for(var i=0;i<members.length;i++){
+        if(i==0){
+          membersName=members[i].userName;
+        }
+        else{
+          membersName=membersName+","+ members[i].userName;
+        }
+      }
+      this.projectInfoShow=[
+        {
+          key:'Category',
+          value: category
+        },
+        {
+          key:'Title',
+          value: projectInfo.title
+        },
+        {
+          key:'Description',
+          value: projectInfo.description
+        },
+        {
+          key:'Introduction',
+          value: projectInfo.introduction
+        },
+        {
+          key:'Tag',
+          value: projectInfo.tag
+        },
+        {
+          key:'Manager',
+          value: projectInfo.managerName
+        },
+        {
+          key:'Members',
+          value: membersName
+        },{
+          key:'Created Time',
+          value: projectInfo.createTime
+        }
+      ]
+      this.projectInfoModal = true;
+    },
+    goSingleProject() {
+      var id = this.selectedProjectInfo.projectId;
       let isManager, isMember;
       for (let i = 0; i < this.projectList.length; i++) {
         if (this.projectList[i]["projectId"] === id) {
