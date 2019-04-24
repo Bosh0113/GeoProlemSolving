@@ -36,7 +36,15 @@ img {
           <Icon type="ios-loading" size="100" class="demo-spin-icon-load" color="yellowgreen"></Icon>
           <div>Loading</div>
         </Spin>
-      	<div style="display:flex;height:60px;justify-content:center"></div>
+          <div style="text-align:right;">
+            <Button
+              @click="newProject"
+              type="default"
+              class="btnCreate"
+              style="font-size:15px;height:40px;margin:10px"
+              icon="md-add"
+            >Create New Project</Button>
+          </div>
         <div style="display:flex">
           <Tabs value="All">
             <TabPane label="All" name="All" icon="ios-list">
@@ -70,15 +78,6 @@ img {
               <project-list :projectList = currentProjectList projectType="General"></project-list>
             </TabPane>
           </Tabs>
-          <div style="width:40%;display:flex;justify-content:flex-end;margin-left:2%">
-            <Button
-              @click="newProject"
-              type="default"
-              class="btnCreate"
-              style="font-size:15px;height:40px"
-              icon="md-add"
-            >Create</Button>
-          </div>
         </div>
       </Col>
     </Row>
