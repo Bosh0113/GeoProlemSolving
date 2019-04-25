@@ -137,7 +137,7 @@ img {
           <Table stripe border :columns="columns" :data="projectInfoShow" :show-header="false"></Table>
           <div slot="footer">
             <Button @click="projectInfoModal=false">Cancel</Button>
-            <Button type="success" @click="joinApplyModalShow(this.selectedProjectInfo)" v-show="!selectedProjectInfo.isMember&&!selectedProjectInfo.isManager&&UserState" >Apply</Button>
+            <Button type="success" @click="joinApplyModalShow(selectedProjectInfo)" v-show="!selectedProjectInfo.isMember&&!selectedProjectInfo.isManager&&UserState" >Apply</Button>
             <Button type="primary" @click="goSingleProject()" v-show="UserState&&(selectedProjectInfo.isMember||selectedProjectInfo.isManager)">Enter</Button>
           </div>
         </Modal>
@@ -221,7 +221,7 @@ export default {
     },
     //进入项目详情页面的函数
     projectInfoModalShow(projectInfo) {
-      this.selectedProjectInfo = projectInfo;
+      this.selectedProjectInfo = Object.assign({},projectInfo);
       var category = "";
       if (projectInfo.category != "Human" && projectInfo.category != "GISRS") {
         category = projectInfo.category;
