@@ -120,9 +120,9 @@ export default {
           }
         })
         .catch(err => {});
-      console.log("this is render" + render);
-      console.log("this is value" + value);
-      console.log(this.$refs.md.d_render);
+      // console.log("this is render" + render);
+      // console.log("this is value" + value);
+      // console.log(this.$refs.md.d_render);
     },
     save(){
       console.log(this.markDownValue);

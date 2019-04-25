@@ -1434,9 +1434,6 @@ export default {
         method: "post",
         onUploadProgress: progressEvent => {
           this.uploadProgress = (progressEvent.loaded / progressEvent.total * 100 | 0);
-          // let complete = (progressEvent.loaded / progressEvent.total * 100 | 0) + '%'
-          console.log(progressEvent);
-          console.log(this.uploadProgress);
         },
         data:formData
       })
@@ -1460,25 +1457,18 @@ export default {
       if (that.file.length >= 5) {
         this.$Message.info("最多只能上传5个文件");
       } else {
-        console.table(this.file);
         that.file.push(file);
         that.file.map(element => {
           element["fileSize"] = Math.round((element.size / 1024) * 100) / 100;
         });
-        console.log(that.file);
       }
       return false;
     },
     delFileList(index) {
       let that = this;
       that.file.splice(index, 1);
-      console.log(that.file);
     },
     handleOnProgress3(event, file, fileList) {
-      console.log(event);
-      console.log(file.percentage);
-      console.log(fileList);
-      //this.isUpload3 = true
       if (file.percentage < 100) {
         window.onbeforeunload = function(event) {
           return "文件正在上传中，您确定要离开此页面吗？";
