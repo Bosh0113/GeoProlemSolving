@@ -64,7 +64,6 @@ img {
                         :id="item.projectId"
                     />
                     </div>
-                    <div style="display:flex;align-items:center;height:20px">
                         <strong style="text-align: center">Description</strong>
                         <p style="padding: 0 10px;word-break:break-word;overflow: hidden;
                             white-space: nowrap;
@@ -144,16 +143,16 @@ img {
         <Modal
         v-model="applyJoinModal"
         title="Apply to join the project"
-        ok-text="Apply"
-        cancel-text="Cancel"
-        @on-ok="joinApply('applyValidate')"
-        @on-cancel=""
         >
         <Form ref="applyValidate" :model="applyValidate" :rules="applyRuleValidate" :label-width="80">
             <FormItem label="Reason" prop="reason">
             <Input v-model="applyValidate.reason" type="textarea" :rows="4" placeholder="Enter The Reason For Application ..." />
             </FormItem>
         </Form>
+        <div slot="footer">
+          <Button @click="applyJoinModal=false">Cancel</Button>
+          <Button type="success" @click="joinApply('applyValidate')">Apply</Button>
+        </div>
         </Modal>
     </div>
 </template>
@@ -310,6 +309,7 @@ export default {
     joinApply(name) {
       this.$refs[name].validate(valid => {
         if (valid) {
+          this.applyJoinModal=false;
           var data = this.applyProjectInfo;
           if (
             this.haveApplied == true &&
