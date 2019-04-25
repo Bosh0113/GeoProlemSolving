@@ -456,16 +456,6 @@ export default {
       return false;
     },
     viewData() {
-      // 协同
-      this.send_content = {
-        type: "uploaddata",
-        
-              name: filename,
-              description: "map tool data",
-              pathURL: "/GeoProblemSolving/resource/upload/" + dataName
-      };
-      this.socketApi.sendSock(this.send_content, this.getSocketConnect);
-
       //从url获取GeoJSON数据
       var that = this;
       var xhr = new XMLHttpRequest();
@@ -740,6 +730,11 @@ export default {
             that.resources.push(dataItem);
             break;
           }
+          case "selectdata":{
+            this.dataUrl = socketMsg.pathURL;
+            this.viewData();
+            break;
+          }
         }
       }
     },
@@ -826,6 +821,16 @@ export default {
       this.socketApi.sendSock(this.send_content, this.getSocketConnect);
     },
     getResources() {
+      this.resources = [];
+      let resources = JSON.parse(sessionStorage.getItem("resources"));
+      if(resources.length > 0){
+        for (let i = 0; i < resources.length; i++) {
+              if (resources[i].type == "data") {
+                this.resources.push(resources[i]);
+              }
+            }
+      }
+      else {
       var that = this;
       this.axios
         .get(
@@ -837,7 +842,6 @@ export default {
         .then(res => {
           // 写渲染函数，取到所有资源
           if (res.data !== "None") {
-            that.resources = [];
             for (let i = 0; i < res.data.length; i++) {
               if (res.data[i].type == "data") {
                 that.resources.push(res.data[i]);
@@ -850,9 +854,18 @@ export default {
         .catch(err => {
           console.log(err.data);
         });
+      }
     },
     selecetResource(url) {
       this.dataUrl = url;
+      
+      // 协同
+      this.send_content = {
+        type: "selectdata",
+        pathURL: this.dataUrl
+      };
+      this.socketApi.sendSock(this.send_content, this.getSocketConnect);
+
       this.viewData();
     }
   },

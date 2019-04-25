@@ -29,7 +29,7 @@ header {
   flex: 1 0 auto;
   margin-top:60px;
   /* margin-bottom:20px; */
-  min-height:800px;
+  /* min-height: 800px; */
 }
 footer{
   background-color:#515a6e;
@@ -123,7 +123,7 @@ footer{
         </div>
       </div>
     </header>
-    <section class="content">
+    <section class="content" :style="{minHeight:contentHeight}">
      <router-view @sendNotice="sendMessage" @readNotification="readNotification"></router-view>
     </section>
     <footer>
@@ -144,7 +144,7 @@ export default {
       timer: null,
       //导航栏宽度
       headerWidth: "",
-      // contentHeight:"",
+      contentHeight: window.innerHeight-120+'px',
     };
   },
   mounted() {

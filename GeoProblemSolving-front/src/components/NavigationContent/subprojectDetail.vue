@@ -121,7 +121,7 @@
         <Card>
           <div slot="title" style="height:20px;width:50%" >
             <Breadcrumb>
-              <BreadcrumbItem :to="toSubProjectPage">Project</BreadcrumbItem>
+              <BreadcrumbItem :to="toProjectPage">Project</BreadcrumbItem>
               <BreadcrumbItem >Subproject</BreadcrumbItem>
               <!-- <span>Subproject</span> -->
               <!-- <BreadcrumbItem>
@@ -129,31 +129,38 @@
               <span>{{subProjectInfo.title}}</span></BreadcrumbItem> -->
 
             </Breadcrumb>
-            <span style="float:right;margin-top:-10px;font-size:1rem"><strong>{{subProjectInfo.title}}</strong></span>
+            <span style="float:right;margin-top:-15px;font-size:1.5rem"><strong>{{subProjectInfo.title}}</strong></span>
           </div>
           <div
             slot="extra"
             style="height:20px;display:flex;align-items:center"
             class="operatePanel"
           >
+          
+            <Button
+              type="default"
+              @click="gotoWorkingPanel()"
+              icon="ios-git-network"
+              title="Back to project page"
+            >Work</Button>
             <Button
               type="default"
               @click="conveneWork()"
               icon="md-mail"
-              title="Start to work"
-            >Convene</Button>
-            <Button
+              title="Inform others to work together"
+            >Inform</Button>
+            <!-- <Button
               type="default"
               @click="backProject()"
               icon="md-arrow-back"
               title="Back to project page"
-            >Back</Button>
+            >Back</Button> -->
           </div>
           <Row>
             <Col span="22" offset="1" style="background-color:white;">
             <!-- <span >{{subProjectInfo.title}}</span> -->
               <Tabs type="card" v-model="currentTab" @on-click="currentTabChanged">
-                <TabPane label="Subproject home" icon="ios-home" @on-click="showDetail('Home',0)" name="home">
+                <TabPane label="Subproject home" icon="ios-home" name="home">
                   <div class="workspaceContent">
                     <Col
                       :xs="8"
@@ -269,7 +276,6 @@
                             width="400px"
                             title="Quit Sub-Project"
                             @on-ok="quitSubProject()"
-                            @on-cancel
                           >
                             <h2>Are you sure to quit this subproject?</h2>
                           </Modal>
@@ -280,7 +286,6 @@
                             @on-ok="inviteMembers"
                             ok-text="ok"
                             cancel-text="cancel"
-                            @on-cancel
                           >
                             <div>
                               <p>Members:</p>
@@ -335,11 +340,10 @@
                     </Col>
                   </div>
                 </TabPane>
-                <TabPane label="Task assignment" icon="md-list" @on-click="showDetail('Task',1)" name="task">
+                <TabPane label="Task assignment" icon="md-list" name="task">
                   <Col
                     id="taskPage"
-                    span="22"
-                    offset="1"
+                    span="24"
                     style="margin-top:20px"
                     :style="{minHeight:taskContainerHeight+14+'px'}"
                   >
@@ -562,24 +566,7 @@
                     </div>
                   </Col>
                 </TabPane>
-                <TabPane
-                  label="Working panel"
-                  icon="ios-git-network"
-                  name="working"
-                  @on-click="showDetail('Start working',2)"
-                ></TabPane>
               </Tabs>
-
-              <!-- <Steps :current="order">
-                <Step title="Home" icon="ios-home" @click.native="showDetail(0)" :order="0"></Step>
-                <Step title="Task" icon="md-list" @click.native="showDetail(1)" :order="1"></Step>
-                <Step
-                  title="Start working"
-                  icon="ios-git-network"
-                  @click.native="showDetail(2)"
-                  :order="2"
-                ></Step>
-              </Steps>-->
             </Col>
           </Row>
         </Card>
@@ -790,13 +777,11 @@ export default {
       candidates: [],
       inviteList: [],
       inviteAble: true,
-      order: 0,
+      oldTabPaneState:"home",
       // 后台获取的module下的task列表
       taskList: [],
       selectTaskIndex: 0,
       taskDeleteModal: false,
-      // 后台拿到的Module集合，渲染成一条轴用的
-      moduleList: [],
       // 创建任务的模态框
       createTaskModal: false,
       // 编辑任务的模态框
@@ -844,21 +829,19 @@ export default {
         endTime: [{ required: true, type: "date", trigger: "change" }]
       },
       contentHeight: "",
-      // tab栏当前选中的tab,初始化默认为home
       currentTab:"home",
-      breadTitle:"Subproject home",
-      toSubProjectPage:"",
+      toProjectPage:"",
+      toSubProjectPage: ""
     };
   },
   created() {
     this.init();
-    // alert(sessionStorage.getItem("projectId"));
-    this.toSubProjectPage = "/project/"+ sessionStorage.getItem("projectId");
   },
   mounted() {
     this.contentHeight = window.innerHeight + "px";
     // window.addEventListener("resize", this.initSize);
     this.inquiryTask();
+    this.toProjectPage = "/project/"+ sessionStorage.getItem("projectId");
   },
   // add by mzy for navigation guards
   beforeRouteEnter: (to, from, next) => {
@@ -1017,17 +1000,6 @@ export default {
         })
         .catch(err => {});
     },
-    showDetail(item, index) {
-      this.order = index;
-      if (index == 0) {
-        this.openModuleSocket();
-      } else if (index == 1) {
-        this.closeModuleSocket();
-        this.$router.push(`./workspace`);
-      } else if (index == 2) {
-        this.closeModuleSocket();
-      }
-    },
     closeModuleSocket() {
       if (this.subprojectSocket != null) {
         this.removeTimer();
@@ -1095,39 +1067,39 @@ export default {
     sendMessage(message) {
       this.subprojectSocket.send(JSON.stringify(message));
     },
-    // 返回项目页
-    backProject() {
-      let projectInfo = this.$store.getters.project;
-      if (
-        JSON.stringify(projectInfo) != "{}" &&
-        projectInfo.projectId == this.subProjectInfo.projectId
-      ) {
-        let id = projectInfo.projectId;
-        this.$router.push(`../${id}`);
-      } else {
-        this.axios
-          .get(
-            "/GeoProblemSolving/project/inquiry" +
-              "?key=projectId" +
-              "&value=" +
-              this.subProjectInfo.projectId
-          )
-          .then(res => {
-            if (res.data != "None" && res.data != "Fail") {
-              this.projectInfo = res.data[0];
-              this.$store.commit("setProjectInfo", res.data[0]);
+    // 返回项目页面
+    // backProject() {
+    //   let projectInfo = this.$store.getters.project;
+    //   if (
+    //     JSON.stringify(projectInfo) != "{}" &&
+    //     projectInfo.projectId == this.subProjectInfo.projectId
+    //   ) {
+    //     let id = projectInfo.projectId;
+    //     this.$router.push(`../${id}`);
+    //   } else {
+    //     this.axios
+    //       .get(
+    //         "/GeoProblemSolving/project/inquiry" +
+    //           "?key=projectId" +
+    //           "&value=" +
+    //           this.subProjectInfo.projectId
+    //       )
+    //       .then(res => {
+    //         if (res.data != "None" && res.data != "Fail") {
+    //           this.projectInfo = res.data[0];
+    //           this.$store.commit("setProjectInfo", res.data[0]);
 
-              let id = this.projectInfo.projectId;
-              this.$router.push(`../${id}`);
-            } else {
-              console.log(res.data);
-            }
-          })
-          .catch(err => {
-            console.log(err.data);
-          });
-      }
-    },
+    //           let id = this.projectInfo.projectId;
+    //           this.$router.push(`../${id}`);
+    //         } else {
+    //           console.log(res.data);
+    //         }
+    //       })
+    //       .catch(err => {
+    //         console.log(err.data);
+    //       });
+    //   }
+    // },
     // 召集参与者
     conveneWork() {
       for (let i = 0; i < this.participants.length; i++) {
@@ -1759,14 +1731,18 @@ export default {
         });
     },
     currentTabChanged(name){
-      if(name=="home"){
-        this.breadTitle = "Subproject home"
-      }else if(name == "task"){
-        this.breadTitle = "Task assignment"
-      }else if(name="working"){
-        this.breadTitle = "Working panel"
+      if(this.oldTabPaneState !== name){
+        
+        this.closeModuleSocket();
+
+        if(name == 'task') {
+          this.openModuleSocket();
+        }
       }
-    }
+    },
+    gotoWorkingPanel(){
+      this.$router.push(`./workspace`);
+    },
   }
 };
 </script>

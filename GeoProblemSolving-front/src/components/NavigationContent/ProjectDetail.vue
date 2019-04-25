@@ -61,9 +61,6 @@
   line-height: 20px;
   font-size: 20px;
 }
-.whitespace {
-  height: 20px;
-}
 .createSubProjectPanel {
   display: flex;
 }
@@ -147,11 +144,8 @@
 <template>
   <div class="main">
     <Row>
-
       <Col span="22" offset="1">
-        <div class="whitespace"></div>
-        <div class="whitespace"></div>
-        <div class="detail" style="padding: 0 0 20px 0">
+        <div class="detail">
           <div class="detail_description">
             <Card>
               <p
@@ -278,7 +272,6 @@
             </FormItem>
           </Form>
         </Modal>
-        <div class="whitespace"></div>
         <div style="padding: 20px">
           <Card :bordered="false">
             <p slot="title" style="font-size:25px;height:40px;line-height:40px">Subprojects</p>
@@ -455,7 +448,6 @@
                 ok-text="Confirm"
                 cancel-text="cancel"
                 @on-ok="deleteSubProject()"
-                @on-cancel
                 width="800px"
                 :mask-closable="false"
               >
@@ -464,7 +456,6 @@
             </div>
           </Card>
         </div>
-        <div class="whitespace"></div>
         <div class="resourcePanel" style="padding:20px">
           <Card>
             <p slot="title" style="font-size:25px;height:40px;line-height:40px;">Resources</p>
@@ -850,6 +841,7 @@ export default {
       // 进度条模态框
       progressModalShow: false,
       uploadProgress:0,
+      panel: null,
     };
   },
   created() {
@@ -890,6 +882,12 @@ export default {
         }
       }
     });
+  },
+  beforeRouteLeave(to, from, next) {
+    if(this.panel != null){
+        this.panel.close();
+      }
+    next();
   },
   methods: {
     getProjectDetail() {
@@ -1205,7 +1203,30 @@ export default {
         });
     },
     show(index) {
-      window.open(this.projectResourceList[index].pathURL);
+      
+      let name = this.projectResourceList[index].name;
+      if(!/\.(pdf||zip||doc||docx||ppt||pptx||xls||xlsx)$/.test(name.toLowerCase())){
+        if(this.panel != null){
+          this.panel.close();
+        }
+        let url = "http://172.21.212.7:8012/previewFile?url="+this.projectResourceList[index].pathURL;
+        let toolURL ='<iframe src='+url+' style="width: 100%;height:100%"></iframe>'
+        this.panel = jsPanel.create({
+          headerControls: {
+            smallify:'remove',
+          },
+          theme: "none",
+          headerTitle: "Review",
+          contentSize: "800 600",
+          content: toolURL,
+          disableOnMaximized: true,
+          dragit:{
+            containment:5,
+          },
+          closeOnEscape: true,
+        });
+        $(".jsPanel-content").css("font-size", "0");
+      }
     },
     gotoPersonalPage(id) {
       if (id == this.$store.getters.userId) {
