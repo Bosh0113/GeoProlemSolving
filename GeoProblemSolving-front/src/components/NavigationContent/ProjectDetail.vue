@@ -323,23 +323,7 @@
                       ></Input>
                     </FormItem>
                   </Form>
-                  <!-- <span style="width:20%;text-align:center">Title</span>
-                    <Input
-                      v-model="subProjectTitle"
-                      placeholder="Sub project title"
-                      style="width: 800px;"
-                  />-->
-                  <!-- <br> -->
-                  <!-- <div class="createSubProjectPanelInput">
-                    <span style="width:20%;text-align:center">Description</span>
-                    <Input
-                      v-model="subProjectDescription"
-                      placeholder="Sub project description"
-                      style="width: 800px;"
-                      :rows="4"
-                      type="textarea"
-                    />
-                  </div>-->
+
                 </div>
               </Modal>
             </div>
@@ -756,7 +740,7 @@ export default {
            { required: true, message: 'The project privacy cannot be empty', trigger: 'blur' }
         ],
         introduction:[
-           { required: true, message: 'The project introduction cannot be empty', trigger: 'blur' }
+           { required: true, max: 100 , message: 'The project introduction cannot be empty', trigger: 'blur' }
         ]
       },
       //子项目表单
