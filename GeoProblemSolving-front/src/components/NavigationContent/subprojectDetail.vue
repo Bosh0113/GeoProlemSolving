@@ -119,17 +119,18 @@
     <Row>
       <Col span="22" offset="1">
         <Card>
-          <div slot="title" style="height:20px;width:50%" >
+          <div slot="title" style="height:20px;width:50%">
             <Breadcrumb>
               <BreadcrumbItem :to="toSubProjectPage">Project</BreadcrumbItem>
-              <BreadcrumbItem >Subproject</BreadcrumbItem>
+              <BreadcrumbItem>Subproject</BreadcrumbItem>
               <!-- <span>Subproject</span> -->
               <!-- <BreadcrumbItem>
               <span style="color:#999">>>></span>
-              <span>{{subProjectInfo.title}}</span></BreadcrumbItem> -->
-
+              <span>{{subProjectInfo.title}}</span></BreadcrumbItem>-->
             </Breadcrumb>
-            <span style="float:right;margin-top:-10px;font-size:1rem"><strong>{{subProjectInfo.title}}</strong></span>
+            <span style="float:right;margin-top:-10px;font-size:1rem">
+              <strong>{{subProjectInfo.title}}</strong>
+            </span>
           </div>
           <div
             slot="extra"
@@ -151,9 +152,14 @@
           </div>
           <Row>
             <Col span="22" offset="1" style="background-color:white;">
-            <!-- <span >{{subProjectInfo.title}}</span> -->
-              <Tabs type="card" v-model="currentTab" @on-click="currentTabChanged">
-                <TabPane label="Subproject home" icon="ios-home" @on-click="showDetail('Home',0)" name="home">
+              <!-- <span >{{subProjectInfo.title}}</span> -->
+              <Tabs type="card" v-model="currentTab" @on-click="currentTabChanged(name)">
+                <TabPane
+                  label="Subproject home"
+                  icon="ios-home"
+                  @on-click="showDetail('Home',0)"
+                  name="home"
+                >
                   <div class="workspaceContent">
                     <Col
                       :xs="8"
@@ -303,13 +309,7 @@
                         </div>
                       </div>
                     </Col>
-                    <Col
-                      :xs="15"
-                      :sm="16"
-                      :md="17"
-                      :lg="17"
-                      style="margin-left:20px;"
-                    >
+                    <Col :xs="15" :sm="16" :md="17" :lg="17" style="margin-left:20px;">
                       <div
                         style="background-color:white;margin-left:30px;height:40px;border:1px solid lightgray"
                         :style="{height:descHeight +'px'}"
@@ -320,6 +320,180 @@
                           class="subProjectDesc"
                         >{{subProjectInfo.description}}</div>
                       </div>
+                      <div class="resourcePanel" style="padding:20px 0 0 30px">
+                        <Card>
+                          <p
+                            slot="title"
+                            style="font-size:20px;height:20px;line-height:20px;"
+                          >Resource</p>
+                          <div slot="extra" style="display:flex;align-items:center;height:20px">
+                            <Button
+                              id="upload"
+                              type="default"
+                              @click="uploadShow=true"
+                              class="uploadBtn"
+                              title="upload resource"
+                            >
+                              <Icon type="md-cloud-upload" size="20"/>
+                            </Button>
+                            <Button
+                              class="moreBtn"
+                              type="default"
+                              style="margin-left: 10px"
+                              @click="toResourceList()"
+                              title="more"
+                            >
+                              <Icon type="md-more"/>
+                            </Button>
+                          </div>
+                          <div style="height:200px;overflow-y:scroll">
+                            <div v-show="this.subProjectResourceList==[]">
+                              <span
+                                style="text-align:center"
+                              >There are no any resources in this subproject</span>
+                            </div>
+                            <Table
+                              :columns="projectTableColName"
+                              :data="this.subProjectResourceList"
+                              v-show="this.subProjectResourceList!=[]&&this.subProjectResourceList!='None'"
+                            >
+                              <template slot-scope="{ row }" slot="name">
+                                <strong>{{ row.name }}</strong>
+                              </template>
+
+                              <template slot-scope="{ row, index }" slot="action">
+                                <a
+                                  :href="subProjectResourceList[index].pathURL"
+                                  :download="subProjectResourceList[index].name"
+                                >
+                                  <Icon type="md-download" :size="20"/>
+                                </a>
+                                <a @click="show(index)" style="margin-left: 10px" title="View">
+                                  <Icon type="md-eye" :size="20"/>
+                                </a>
+                              </template>
+                            </Table>
+                          </div>
+                        </Card>
+                        <Modal
+                          width="800"
+                          v-model="uploadShow"
+                          :mask-closable="false"
+                          @on-ok="subProjectfilesUpload('subProjectFileUploadForm')"
+                          ok-text="submit"
+                          @on-cancel
+                          cancel-text="cancel"
+                          title="Upload resource here"
+                        >
+                          <div>
+                            <!-- subProjectFileUploadForm -->
+
+                            <!-- subProjectFileUploadFormRuleValidate -->
+                            <Form
+                              ref="subProjectFileUploadForm"
+                              :model="subProjectFileUploadForm"
+                              :rules="subProjectFileUploadFormRuleValidate"
+                              :label-width="100"
+                            >
+                              <FormItem label="Privacy" prop="privacy">
+                                <RadioGroup
+                                  v-model="subProjectFileUploadForm.privacy"
+                                  style="width:80%"
+                                >
+                                  <Radio label="public"></Radio>
+                                  <Radio label="privacy"></Radio>
+                                </RadioGroup>
+                                <!-- <Input v-model="formValidate.name" placeholder="Enter your name"></Input> -->
+                              </FormItem>
+                              <FormItem label="Type" prop="type">
+                                <RadioGroup v-model="subProjectFileUploadForm.type">
+                                  <Radio label="image"></Radio>
+                                  <Radio label="video"></Radio>
+                                  <Radio label="data"></Radio>
+                                  <Radio label="paper"></Radio>
+                                  <Radio label="document"></Radio>
+                                  <Radio label="model"></Radio>
+                                  <Radio label="others"></Radio>
+                                </RadioGroup>
+                                <!-- <Input v-model="formValidate.mail" placeholder="Enter your e-mail"></Input> -->
+                              </FormItem>
+                              <FormItem label="Description" prop="description">
+                                <Input
+                                  type="textarea"
+                                  :rows="4"
+                                  v-model="subProjectFileUploadForm.description"
+                                />
+                              </FormItem>
+                            </Form>
+                          </div>
+                          <!-- <div style="display:flex;;align-items:center">
+                          <span style="width:20%;text-align:center"><Icon type="md-star" color="red"/>Privacy</span>
+                            <RadioGroup v-model="privacy" style="width:80%">
+                            <Radio label="public"></Radio>
+                            <Radio label="privacy"></Radio>
+                          </RadioGroup>
+                          </div>-->
+                          <!-- <br> -->
+                          <!-- <div style="display:flex;text-align:center;align-items:center">
+                          <span style="width:20%;text-align:center"><Icon type="md-star" color="red"/>Type</span>
+                          <RadioGroup v-model="fileType" style="float:left">
+                            <Radio label="image"></Radio>
+                            <Radio label="video"></Radio>
+                            <Radio label="data"></Radio>
+                            <Radio label="paper"></Radio>
+                            <Radio label="document"></Radio>
+                            <Radio label="model"></Radio>
+                            <Radio label="others"></Radio>
+                          </RadioGroup>
+                          </div>-->
+                          <!-- <br>
+                        <div style="display:flex;text-align:center;align-items:center;justify-content:center">
+                       <span style="width:20%;text-align:center">Description</span>
+                        <Input type="textarea" :rows="4" v-model="fileDescription"/>
+                          </div>-->
+                          <!-- <br> -->
+                          <Upload
+                            :max-size="1024*1024"
+                            multiple
+                            type="drag"
+                            :before-upload="gatherFile"
+                            action="-"
+                          >
+                            <div style="padding: 20px 0">
+                              <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
+                              <p>Click or drag files here to upload</p>
+                            </div>
+                          </Upload>
+                          <div style="padding:0 10px 0 10px">
+                            <ul v-for="(list,index) in file" :key="index">
+                              <li style="display:flex">
+                                filename:
+                                <span style="font-size:10px;width:60%">{{ list.name }}</span>
+                                size:
+                                <span
+                                  style="font-size:10px;width:70%"
+                                >{{Math.round(list.size/1024)}}kb</span>
+                                <Icon
+                                  type="ios-close"
+                                  size="20"
+                                  @click="delFileList(index)"
+                                  style="display:flex;justify-content:flex-end"
+                                ></Icon>
+                              </li>
+                            </ul>
+                          </div>
+                        </Modal>
+                        <Modal
+                          v-model="progressModalShow"
+                          title="Upload Progress"
+                          @on-ok
+                          @on-cancel
+                          ok-text="ok"
+                          cancel-text="close"
+                        >
+                          <Progress :percent="uploadProgress"></Progress>
+                        </Modal>
+                      </div>
                       <div
                         style="display:flex;align-items:center;justify-content:center;height:60px;margin-left:30px"
                       >
@@ -329,13 +503,15 @@
                           v-show="subProjectInfo.managerId == this.$store.getters.userId"
                         >Delete this sub-project ?</Button>
                       </div>
-                      <div style="margin-top:20px;margin-left:30px;height:100px;border:1px solid black">
-
-                      </div>
                     </Col>
                   </div>
                 </TabPane>
-                <TabPane label="Task assignment" icon="md-list" @on-click="showDetail('Task',1)" name="task">
+                <TabPane
+                  label="Task assignment"
+                  icon="md-list"
+                  @on-click="showDetail('Task',1)"
+                  name="task"
+                >
                   <Col
                     id="taskPage"
                     span="22"
@@ -775,6 +951,31 @@ export default {
   },
   data() {
     return {
+      subProjectFileUploadForm: { privacy: "", type: "", description: "" },
+      subProjectFileUploadFormRuleValidate: {
+        privacy: [
+          {
+            required: true,
+            message: "file privacy cannot be empty",
+            trigger: "blur"
+          }
+        ],
+        type: [
+          {
+            required: true,
+            message: "file type cannot be empty",
+            trigger: "blur"
+          }
+        ],
+        description: [
+          {
+            required: true,
+            message: "file description cannot be empty",
+            trigger: "blur"
+          }
+        ]
+      },
+      //
       // information of project
       projectInfo: {},
       // info of subproject
@@ -845,20 +1046,55 @@ export default {
       },
       contentHeight: "",
       // tab栏当前选中的tab,初始化默认为home
-      currentTab:"home",
-      breadTitle:"Subproject home",
-      toSubProjectPage:"",
+      currentTab: "home",
+      breadTitle: "Subproject home",
+      toSubProjectPage: "",
+      // 上传文件
+      uploadShow: false,
+      privacy: "",
+      file: [],
+      fileDescription: "",
+      fileType: "",
+      progressModalShow: false,
+      uploadProgress: 0,
+      // 子项目资源列表
+      subProjectResourceList: [],
+      projectTableColName: [
+        {
+          title: "Name",
+          key: "name"
+        },
+        {
+          title: "Description",
+          key: "description"
+        },
+        {
+          title: "type",
+          key: "type",
+          sortable: true
+        },
+        {
+          title: "uploadTime",
+          key: "uploadTime",
+          sortable: true
+        },
+        {
+          title: "Action",
+          slot: "action",
+          width: 250,
+          align: "center"
+        }
+      ]
     };
   },
   created() {
     this.init();
-    // alert(sessionStorage.getItem("projectId"));
-    this.toSubProjectPage = "/project/"+ sessionStorage.getItem("projectId");
+    this.toSubProjectPage = "/project/" + sessionStorage.getItem("projectId");
   },
   mounted() {
     this.contentHeight = window.innerHeight + "px";
-    // window.addEventListener("resize", this.initSize);
     this.inquiryTask();
+    this.getAllResource();
   },
   // add by mzy for navigation guards
   beforeRouteEnter: (to, from, next) => {
@@ -894,7 +1130,7 @@ export default {
     initSize() {
       //侧边栏的高度随着屏幕的高度自适应
       this.sidebarHeight = window.innerHeight - 227;
-      this.descHeight = (window.innerHeight - 227)/3;
+      this.descHeight = (window.innerHeight - 227) / 3;
       this.taskContainerHeight = this.sidebarHeight + 10;
       //通知栏的属性设置，top表示距离顶部的距离，duration表示持续的时间
       this.$Notice.config({
@@ -1760,14 +1996,122 @@ export default {
           console.log(err.data);
         });
     },
-    currentTabChanged(name){
-      if(name=="home"){
-        this.breadTitle = "Subproject home"
-      }else if(name == "task"){
-        this.breadTitle = "Task assignment"
-      }else if(name="working"){
-        this.breadTitle = "Working panel"
+    currentTabChanged(name) {
+      if (name == "home") {
+        this.breadTitle = "Subproject home";
+      } else if (name == "task") {
+        this.breadTitle = "Task assignment";
+      } else if ((name = "working")) {
+        this.breadTitle = "Working panel";
       }
+    },
+    toResourceList() {
+      this.$router.push({ path: "/resourceList" });
+    },
+    show(index) {
+      window.open(this.subProjectResourceList[index].pathURL);
+    },
+    getAllResource() {
+      // url是请求的网址
+      //查询的形式是key-value格式
+      this.axios
+        .get(
+          "/GeoProblemSolving/resource/inquiry" +
+            "?key=scope.subprojectId" +
+            "&value=" +
+            sessionStorage.getItem("subProjectId")
+        )
+        .then(res => {
+          //写渲染函数，取到所有资源
+          if (res.data !== "None") {
+            this.$set(this, "subProjectResourceList", res.data);
+            console.table(this.subProjectResourceList);
+          } else {
+            this.projectResourceList = [];
+          }
+          //渲染函数，将列表展现出来，下载
+        })
+        .catch(err => {
+          console.log(err.data);
+        });
+    },
+    gatherFile(file) {
+      let that = this;
+      if (that.file.length >= 5) {
+        this.$Message.info("最多只能上传5个文件");
+      } else {
+        console.table(this.file);
+        that.file.push(file);
+        that.file.map(element => {
+          element["fileSize"] = Math.round((element.size / 1024) * 100) / 100;
+        });
+        console.log(that.file);
+      }
+      return false;
+    },
+    subProjectfilesUpload(form) {
+      this.$refs[form].validate(valid => {
+        if (valid) {
+          let that = this;
+          if (that.file.length != 0) {
+            var formData = new FormData();
+            for (var i = 0; i < that.file.length; i++) {
+              formData.append("file", that.file[i]); // 文件对象
+            }
+            let userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
+            formData.append(
+              "description",
+              this.subProjectFileUploadForm.description
+            );
+            formData.append("type", this.subProjectFileUploadForm.type);
+            formData.append("uploaderId", this.$store.getters.userInfo.userId);
+            formData.append("belong", sessionStorage.getItem("subProjectName"));
+            let scopeObject = {
+              projectId: sessionStorage.getItem("projectId"),
+              subprojectId: sessionStorage.getItem("subProjectId"),
+              moduleId: ""
+            };
+            formData.append("scope", JSON.stringify(scopeObject));
+            formData.append("privacy", this.subProjectFileUploadForm.privacy);
+            this.progressModalShow = true;
+          }
+          this.axios({
+            url: "/GeoProblemSolving/resource/upload",
+            method: "post",
+            onUploadProgress: progressEvent => {
+              this.uploadProgress =
+                ((progressEvent.loaded / progressEvent.total) * 100) | 0;
+              // let complete = (progressEvent.loaded / progressEvent.total * 100 | 0) + '%'
+              console.log(progressEvent);
+              console.log(this.uploadProgress);
+            },
+            data: formData
+          })
+            .then(res => {
+              if (res.data != "Size over" && res.data.length > 0) {
+                this.$Notice.open({
+                  title: "Upload notification title",
+                  desc: "File uploaded successfully",
+                  duration: 2
+                });
+                //这里重新获取一次该项目下的全部资源
+                // this.addUploadEvent(this.currentProjectDetail.projectId);
+                this.getAllResource();
+                this.subProjectFileUploadForm.description = "";
+                this.subProjectFileUploadForm.privacy = "";
+                this.subProjectFileUploadForm.type = "";
+                this.file = [];
+              }
+            })
+            .catch(err => {});
+        } else {
+        }
+      });
+    },
+    delFileList(index) {
+      let that = this;
+      that.file.splice(index, 1);
+      console.log(that.file);
     }
   }
 };
