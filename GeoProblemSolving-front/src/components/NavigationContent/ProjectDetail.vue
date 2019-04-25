@@ -343,7 +343,7 @@
                         >
                           <div style="display:flex">
                             <span
-                              v-show="subProject['isManager'] == true"
+                              v-show="subProject.isManager == true"
                               @click.stop="handOverSubProjectShow(index)"
                               title="Exchange manager"
                             >
@@ -1014,10 +1014,11 @@ export default {
         .post("/GeoProblemSolving/subProject/create", SubProject)
         .then(res => {
           if (res.data != "Fail") {
-            this.$Message.info("create success");
+            this.$Message.info("Created Success");
             this.subProjectTitle = "";
             this.subProjectDescription = "";
-            this.getAllSubProject();
+            this.subProjectList.push(res.data);
+            this.identity(this.subProjectList);
           } else {
             this.$Message.info("fail");
           }
@@ -1080,7 +1081,24 @@ export default {
             this.newManagerId
         )
         .then(res => {
-          this.getAllSubProject();
+          if (res.data != "Fail") {
+            var newSubProject = res.data;
+            var length = this.subProjectList.length;
+            var subProjectInfoList = this.subProjectList;
+            for (var i = 0; i < length; i++) {
+              if (
+                subProjectInfoList[i].subProjectId == newSubProject.subProjectId
+              ) {
+                subProjectInfoList.splice(i,1,res.data);
+                this.identity(subProjectInfoList);
+                this.$Message.success("Handover management authority success!");
+                break;
+              }
+            }
+            //此处缺少权限移交后的通知
+          } else {
+            this.$Message.error("Handover management authority failed.");
+          }
         })
         .catch(err => {
           console.log(err.data);
@@ -1104,7 +1122,17 @@ export default {
       this.axios
         .post("/GeoProblemSolving/subProject/update", obj)
         .then(res => {
-          this.getAllSubProject();
+          if(res.data!="Fail"){
+            var newSubProject = res.data;
+            for(var i=0;i<this.subProjectList.length;i++){
+              if(this.subProjectList[i].subProjectId==newSubProject.subProjectId){
+                this.subProjectList.splice(i,1,res.data);
+                break;
+              }
+            }
+          }else{
+            this.$Message.error("Update sub-project failed.");
+          }
         })
         .catch(err => {
           console.log(err.data);
@@ -1115,14 +1143,27 @@ export default {
       this.deleteSubProjectModal = true;
     },
     deleteSubProject() {
+      var deletedSubProjectId = this.subProjectList[this.editSubProjectindex]
+        .subProjectId;
       this.axios
         .get(
           "/GeoProblemSolving/subProject/delete?" +
             "subProjectId=" +
-            this.subProjectList[this.editSubProjectindex].subProjectId
+            deletedSubProjectId
         )
         .then(res => {
-          this.getAllSubProject();
+          if (res.data == "Success") {
+            var length = this.subProjectList.length;
+            for (var i = 0; i < length; i++) {
+              if (this.subProjectList[i].subProjectId == deletedSubProjectId) {
+                this.subProjectList.splice(i, 1);
+                this.$Message.success("Delete sub-project success!");
+                break;
+              }
+            }
+          } else {
+            this.$Message.error("Delete sub-project failed.");
+          }
         })
         .catch(err => {
           console.log(err.data);
@@ -1296,16 +1337,6 @@ export default {
         .catch(err => {
           console.log(err.data);
         });
-    },
-    getResourceList() {
-      this.axios
-        .get(url, {
-          params: {
-            id: paramId
-          }
-        })
-        .then(function(response) {})
-        .catch(function(error) {});
     },
     removeProjectModalShow() {
       this.removeProjectModal = true;

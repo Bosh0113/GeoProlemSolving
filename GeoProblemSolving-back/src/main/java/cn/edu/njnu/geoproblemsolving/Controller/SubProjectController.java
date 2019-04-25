@@ -17,7 +17,7 @@ public class SubProjectController {
     private MongoTemplate mongoTemplate;
 
     @RequestMapping(value = "/create", produces = {"application/json;charset=UTF-8"},method = RequestMethod.POST)
-    public String createSubProject(@RequestBody SubProjectEntity subProject){
+    public Object createSubProject(@RequestBody SubProjectEntity subProject){
         SubProjectDaoImpl subProjectDao=new SubProjectDaoImpl(mongoTemplate);
         return subProjectDao.createSubProject(subProject);
     }
@@ -35,7 +35,7 @@ public class SubProjectController {
     }
 
     @RequestMapping(value = "/update", produces = {"application/json;charset=UTF-8"}, method = RequestMethod.POST)
-    public String updateSubProject(HttpServletRequest request){
+    public Object updateSubProject(HttpServletRequest request){
         SubProjectDaoImpl subProjectDao=new SubProjectDaoImpl(mongoTemplate);
         return subProjectDao.updateSubProject(request);
     }
