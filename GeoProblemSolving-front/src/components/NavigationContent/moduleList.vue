@@ -361,7 +361,7 @@
                         <p style="text-indent:2em;overflow:hidden;break-word:word-break">{{this.currentModuleNoticeList[this.currentModuleNoticeList.length-1].description}}</p>
                       </div>
                       <div v-if="this.currentModuleNoticeList.length==0">
-                        <p style="text-indent:2em;overflow:hidden;break-word:word-break">Sorry,there are no notice recently</p>
+                        <p style="text-indent:2em;overflow:hidden;break-word:word-break">There is no notice recently</p>
                       </div>
                     </div>
                   </Card>
@@ -1157,7 +1157,8 @@ export default {
       // 控制点击notice后模态框显示的modal
       noticeDetailShowModal:false,
       // 当前选中通知条目的详情
-      currentNoticeDetail:[]
+      currentNoticeDetail:[],
+      panelList:[]
     };
   },
   created() {
@@ -1186,6 +1187,7 @@ export default {
   beforeRouteLeave(to, from, next) {
     this.removeTimer();
     this.closeModuleSocket();
+    this.closePanel();
     next();
   },
   beforeDestroy: function() {
@@ -1359,10 +1361,9 @@ export default {
         this.subprojectSocket = null;
       }
       let subProjectId = this.subProjectInfo.subProjectId;
-      // var subprojectSocketURL =
-        // "ws://localhost:8081/GeoProblemSolving/Module/" + subProjectId;
+      var subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + subProjectId;
       // var subprojectSocketURL = "ws://202.195.237.252:8082/GeoProblemSolving/Module/" + subProjectId;
-      var subprojectSocketURL = "ws://172.21.212.7:8082/GeoProblemSolving/Module/" + subProjectId;
+      // var subprojectSocketURL = "ws://172.21.212.7:8082/GeoProblemSolving/Module/" + subProjectId;
       this.subprojectSocket = new WebSocket(subprojectSocketURL);
       this.subprojectSocket.onopen = this.onOpen;
       this.subprojectSocket.onmessage = this.onMessage;
@@ -2192,7 +2193,7 @@ export default {
         toolName = "Pdf viewer";
       }
 
-      var panel = jsPanel.create({
+      let panel = jsPanel.create({
         theme: "primary",
         headerTitle: toolName,
         contentSize: "1000 600",
@@ -2204,6 +2205,8 @@ export default {
       });
       panel.resizeit("disable");
       $(".jsPanel-content").css("font-size", "0");
+      this.panelList.push(panel);
+
       // 生成records, 同步
       let record = {
         who: this.$store.getters.userName,
@@ -2216,6 +2219,11 @@ export default {
       };
       this.subprojectSocket.send(JSON.stringify(record));
       // this.allRecords.push(record);
+    },
+    closePanel(){
+      for(let i = 0;i<this.panelList.length;i++){
+        this.panelList[i].close();
+      }
     },
     createNotice(){
       let noticeForm ={};

@@ -166,7 +166,7 @@ export default {
             };
             if (that.isPaper) {
               that.paperList.push(pdfItem);
-              activeItem="1-"+(that.paperList.length-1);
+              that.activeItem="1-"+(that.paperList.length-1);
             } else {
               that.documentList.push(pdfItem);
               that.activeItem="2-"+(that.documentList.length-1);

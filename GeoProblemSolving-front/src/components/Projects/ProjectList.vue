@@ -52,11 +52,11 @@ img {
           <Tabs v-model="currentTab" @click.native="chooseCurrentType(currentTab)">
             <TabPane label="All" name="All" icon="ios-list"></TabPane>
             <TabPane label="Terrestrial" name="Terrestrial" icon="md-globe"></TabPane>
-            <TabPane label="Coastal" name="Coastal" icon="ios-boat"></TabPane>
-            <TabPane label="Marine" name="Marine" icon="ios-water"></TabPane>
+            <TabPane label="Coast" name="Coastal" icon="ios-boat"></TabPane>
+            <TabPane label="Ocean" name="Marine" icon="ios-water"></TabPane>
             <TabPane label="Climate" name="Climate" icon="ios-partly-sunny"></TabPane>
-            <TabPane label="Ecological" name="Ecological" icon="ios-leaf"></TabPane>
-            <TabPane label="Geological" name="Geological" icon="ios-analytics"></TabPane>
+            <TabPane label="Ecology" name="Ecological" icon="ios-leaf"></TabPane>
+            <TabPane label="Geology" name="Geological" icon="ios-analytics"></TabPane>
             <TabPane label="Human-Activity" name="Human" icon="ios-people"></TabPane>
             <TabPane label="GIS & RS" name="GISRS" icon="ios-globe"></TabPane>
             <TabPane label="General" name="General" icon="ios-grid"></TabPane>
@@ -144,7 +144,7 @@ img {
                       <img :src="item.picture" v-if="item.picture!=''&&item.picture!='undefined'">
                       <avatar
                         :username="item.title"
-                        :size="150"
+                        :size="200"
                         :title="item.title"
                         :rounded="false"
                         v-else

@@ -137,7 +137,7 @@
   height: 40px;
   line-height: 40px;
   font-size: 20px;
-  max-width: 200px;
+  max-width: 70px;
   display: inline-block;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -283,7 +283,7 @@
           <Card :bordered="false">
             <p slot="title" style="font-size:25px;height:40px;line-height:40px">Subprojects</p>
             <div slot="extra" style="height:40px">
-              <Poptip trigger="hover" content="Invite other members" placement="right">
+              <Poptip trigger="hover" content="Create a new subproject" placement="right">
                 <Button
                   class="subProjectBtn"
                   @click="subProjectModal = true"
@@ -472,7 +472,7 @@
         <div class="whitespace"></div>
         <div class="resourcePanel" style="padding:20px">
           <Card>
-            <p slot="title" style="font-size:25px;height:40px;line-height:40px;">Resource</p>
+            <p slot="title" style="font-size:25px;height:40px;line-height:40px;">Resources</p>
             <div slot="extra" style="display:flex;align-items:center;height:40px" class="popCenter">
               <Button
                 id="upload"
@@ -809,9 +809,6 @@ export default {
       value2: "",
       data2: [],
       file: [],
-      // 关于进度条
-      xhr: new XMLHttpRequest(),
-      showProgress: false,
     };
   },
   created() {

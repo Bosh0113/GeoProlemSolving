@@ -411,8 +411,6 @@ export default {
       thisUserName: this.$store.getters.userName,
       thisUserId: this.$store.getters.userId,
       panelHeight:'',
-
-
       messageListPanelHeight:'',
       seletRoom:"module"
     };
