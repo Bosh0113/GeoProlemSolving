@@ -38,6 +38,10 @@ const routes = [{
 { path: '/pdfview', name: 'pdfViewer', component: resolve=>(require(["@/components/utils/pdfViewer"],resolve)) },
 { path: '/join/:id/:email', name: 'joinProject', component: resolve=>(require(["@/components/createNew/joinNewProject"],resolve)) },
 { path: '/resetPassword/:email', name: 'resetPassword', component: resolve=>(require(["@/components/UsersState/ResetPwd"],resolve)) },
+// { path: '/upload', name: 'upload', component: resolve=>(require(["@/components/NavigationContent/testUpload"],resolve)) },
+{ path: '/toolStyle', name: 'tool', component: resolve=>(require(["@/components/utils/singleUtils/toolStyle"],resolve)) },
+{ path: '/markDownTool', name: 'markDownTool', component: resolve=>(require(["@/components/utils/singleUtils/markDownEditor"],resolve)) },
+{ path: '/tinymce', name: 'tinymce', component: resolve=>(require(["@/components/utils/singleUtils/tinymce"],resolve)) },
 
 ]
 export default new Router({

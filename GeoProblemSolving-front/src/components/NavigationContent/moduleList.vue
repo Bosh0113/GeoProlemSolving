@@ -674,6 +674,25 @@
                           color="gray"
                         />
                       </div>
+                      <div class="singl_tool_style">
+                        <Icon
+                          type="md-clipboard"
+                          size="60"
+                          @click.native="toolPanel('Doc Edit')"
+                          title="doc editor"
+                          color="gray"
+                        />
+                      </div>
+                      <div class="singl_tool_style">
+
+                        <Icon
+                          type="logo-youtube"
+                          size="60"
+                          @click.native="toolPanel('video Tool')"
+                          title="video Tool"
+                          color="gray"
+                        />
+                      </div>
                     </div>
                   </TabPane>
                   <TabPane label="Special tools" name="Special">
@@ -2090,7 +2109,8 @@ export default {
 
       if (type == "map") {
         toolURL =
-          '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/map" style="width: 100%;height:100%"></iframe>';
+        // http://localhost:8080/tinymce
+          '<iframe src="http://localhost:8080/map" style="width: 100%;height:100%"></iframe>';
         toolName = "Map";
 
       } else if (type == "draw") {
@@ -2191,6 +2211,15 @@ export default {
         toolURL =
           '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/pdfview" style="width: 100%;height:100%"></iframe>';
         toolName = "Pdf viewer";
+      }else if(type == "Doc Edit"){
+        toolURL =
+          '<iframe src="http://localhost:8080/tinymce" style="width: 100%;height:100%"></iframe>';
+        toolName = "doc editor";
+      }
+      else if(type == "video Tool"){
+        toolURL =
+          '<iframe src="/GeoProblemSolving/Collaborative/vedioChat/WebRtcTest.html" style="width: 100%;height:100%"></iframe>';
+        toolName = "video Tool";
       }
 
       let panel = jsPanel.create({
@@ -2199,11 +2228,15 @@ export default {
         contentSize: "1000 600",
         content: toolURL,
         disableOnMaximized: true,
+        resizeit: {
+          minWidth:1200,
+          minHeight:900,
+        },
         callback: function() {
           // this.content.style.padding = "20px";
         }
       });
-      panel.resizeit("disable");
+      // panel.resizeit("disable");
       $(".jsPanel-content").css("font-size", "0");
       this.panelList.push(panel);
 

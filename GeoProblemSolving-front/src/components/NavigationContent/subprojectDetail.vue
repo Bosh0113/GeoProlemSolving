@@ -115,17 +115,25 @@
 }
 </style>
 <template>
-  <div style="background-color:#dcdee2" :style="{height:contentHeight}">
+  <div style="background-color:#dcdee2">
     <Row>
       <Col span="22" offset="1">
         <Card>
-          <p
-            slot="title"
-            style="height:30px;line-height:30px;font-size:20px;display: inline-block;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;max-width: 50%;"
-          >{{subProjectInfo.title}}</p>
+          <div slot="title" style="height:20px;width:50%" >
+            <Breadcrumb>
+              <BreadcrumbItem :to="toSubProjectPage">Project</BreadcrumbItem>
+              <BreadcrumbItem >Subproject</BreadcrumbItem>
+              <!-- <span>Subproject</span> -->
+              <!-- <BreadcrumbItem>
+              <span style="color:#999">>>></span>
+              <span>{{subProjectInfo.title}}</span></BreadcrumbItem> -->
+
+            </Breadcrumb>
+            <span style="float:right;margin-top:-10px;font-size:1rem"><strong>{{subProjectInfo.title}}</strong></span>
+          </div>
           <div
             slot="extra"
-            style="height:30px;display:flex;align-items:center"
+            style="height:20px;display:flex;align-items:center"
             class="operatePanel"
           >
             <Button
@@ -142,8 +150,427 @@
             >Back</Button>
           </div>
           <Row>
-            <Col span="22" offset="1" style="margin-top:10px;background-color:white;">
-              <Steps :current="order">
+            <Col span="22" offset="1" style="background-color:white;">
+            <!-- <span >{{subProjectInfo.title}}</span> -->
+              <Tabs type="card" v-model="currentTab" @on-click="currentTabChanged">
+                <TabPane label="Subproject home" icon="ios-home" @on-click="showDetail('Home',0)" name="home">
+                  <div class="workspaceContent">
+                    <Col
+                      :xs="8"
+                      :sm="7"
+                      :md="7"
+                      :lg="5"
+                      v-bind="this.participants"
+                      :style="{height:sidebarHeight+14+'px'}"
+                    >
+                      <div
+                        class="member-panel"
+                        :style="{height:sidebarHeight-6+'px'}"
+                        style="background-color:white;border:1px solid lightgray"
+                      >
+                        <div class="title">Participants</div>
+                        <div :style="{height:sidebarHeight-100+'px'}">
+                          <div
+                            class="member-desc"
+                            v-for="(member,index) in this.participants"
+                            :key="member.index"
+                          >
+                            <template v-if="index==0">
+                              <Badge text="♔" type="warning" class="userAvatar">
+                                <div
+                                  class="member-image"
+                                  @click="gotoPersonalSpace(member.userId)"
+                                  style="cursor:pointer"
+                                >
+                                  <img
+                                    v-if="member.avatar != '' && member.avatar!='undefined'"
+                                    :src="member.avatar"
+                                    style="width:auto;height:100%"
+                                  >
+                                  <avatar
+                                    :username="member.userName"
+                                    :size="40"
+                                    style="margin-top:10px"
+                                    :title="member.userName"
+                                    v-else
+                                  ></avatar>
+                                </div>
+                              </Badge>
+                              <div class="memebr-work">
+                                <div class="userName">
+                                  <span style="padding:0 5px;float:right">{{member.userName}}</span>
+                                </div>
+                                <div class="organization">
+                                  <span style="padding:0 5px">{{member.organization}}</span>
+                                </div>
+                              </div>
+                            </template>
+                            <template v-else style="margin-top:5px">
+                              <div
+                                class="member-image"
+                                @click="gotoPersonalSpace(member.userId)"
+                                style="cursor:pointer"
+                              >
+                                <img
+                                  v-if="member.avatar != ''"
+                                  :src="member.avatar"
+                                  style="width:auto;height:100%"
+                                >
+                                <avatar
+                                  :username="member.userName"
+                                  :size="40"
+                                  style="margin-top:10px"
+                                  :title="member.userName"
+                                  v-else
+                                ></avatar>
+                              </div>
+                              <div class="memebr-work">
+                                <div class="userName">
+                                  <span style="padding:0 5px;float:right">{{member.userName}}</span>
+                                </div>
+                                <div class="organization">
+                                  <span style="padding:0 5px">{{member.organization}}</span>
+                                </div>
+                              </div>
+                              <!-- v-show="this.$store.getters.userId" -->
+                              <!-- v-show="this.subProjectInfo.managerId == this.$store.getters.userId" -->
+                            </template>
+                            <div style="line-height:60px" type="default">
+                              <span
+                                style="cursor:pointer"
+                                title="quit"
+                                v-show="giveDeleteProperty(index)"
+                                @click="removeMember(member.userId,member.userName)"
+                              >
+                                <Icon type="md-log-out" :size="20"/>
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <div
+                          class="member-invite"
+                          style="display:flex;justify-content:center;height:60px;align-items:center"
+                        >
+                          <Button
+                            type="success"
+                            style="text-align:center;width:100px"
+                            @click="inviteMembersModalShow()"
+                            :disabled="inviteAble"
+                            v-if="this.subProjectInfo.managerId == this.$store.getters.userId"
+                          >Invite</Button>
+                          <Button
+                            type="warning"
+                            style="text-align:center;width:100px"
+                            @click="quitModal=true"
+                            v-else-if="this.subProjectInfo.isMember"
+                          >Quit</Button>
+                          <Modal
+                            v-model="quitModal"
+                            width="400px"
+                            title="Quit Sub-Project"
+                            @on-ok="quitSubProject()"
+                            @on-cancel
+                          >
+                            <h2>Are you sure to quit this subproject?</h2>
+                          </Modal>
+                          <Modal
+                            v-model="inviteModal"
+                            width="400px"
+                            title="Invite group members join the sub-project"
+                            @on-ok="inviteMembers"
+                            ok-text="ok"
+                            cancel-text="cancel"
+                            @on-cancel
+                          >
+                            <div>
+                              <p>Members:</p>
+                              <Tag
+                                v-for="participant in this.participants"
+                                :key="participant.index"
+                              >{{participant.userName}}</Tag>
+                              <p>Candidates:</p>
+                              <CheckboxGroup v-model="inviteList">
+                                <Checkbox
+                                  v-for="candidate in candidates"
+                                  :key="candidate.index"
+                                  :label="candidate.userId"
+                                >
+                                  <span>{{candidate.userName}}</span>
+                                </Checkbox>
+                              </CheckboxGroup>
+                            </div>
+                          </Modal>
+                        </div>
+                      </div>
+                    </Col>
+                    <Col
+                      :xs="15"
+                      :sm="16"
+                      :md="17"
+                      :lg="17"
+                      style="margin-left:20px;"
+                    >
+                      <div
+                        style="background-color:white;margin-left:30px;height:40px;border:1px solid lightgray"
+                        :style="{height:descHeight +'px'}"
+                      >
+                        <div class="title">Description</div>
+                        <div
+                          :style="{height:descHeight +'px'}"
+                          class="subProjectDesc"
+                        >{{subProjectInfo.description}}</div>
+                      </div>
+                      <div
+                        style="display:flex;align-items:center;justify-content:center;height:60px;margin-left:30px"
+                      >
+                        <Button
+                          type="error"
+                          style="margin:auto"
+                          v-show="subProjectInfo.managerId == this.$store.getters.userId"
+                        >Delete this sub-project ?</Button>
+                      </div>
+                      <div style="margin-top:20px;margin-left:30px;height:100px;border:1px solid black">
+
+                      </div>
+                    </Col>
+                  </div>
+                </TabPane>
+                <TabPane label="Task assignment" icon="md-list" @on-click="showDetail('Task',1)" name="task">
+                  <Col
+                    id="taskPage"
+                    span="22"
+                    offset="1"
+                    style="margin-top:20px"
+                    :style="{minHeight:taskContainerHeight+14+'px'}"
+                  >
+                    <div id="taskContainer" :style="{minHeight:taskContainerHeight+'px'}">
+                      <Row type="flex" justify="space-around">
+                        <Col span="7">
+                          <Card :padding="0" :border="false">
+                            <h3 slot="title">Todo</h3>
+                            <Button
+                              slot="extra"
+                              type="default"
+                              class="createTaskBtn"
+                              style="margin-top:-10px"
+                              @click="createTaskModalShow()"
+                              v-show="this.subProjectInfo.managerId == this.$store.getters.userId||this.subProjectInfo.isMember"
+                            >Add</Button>
+                            <draggable
+                              class="taskList"
+                              element="ul"
+                              :options="{group:'task'}"
+                              v-model="taskTodo"
+                              @start="setMoveCount()"
+                              @update="updateMoveTask(taskTodo,'todo')"
+                              @add="addMoveTask(taskTodo,'todo')"
+                              @remove="removeMoveTask(taskTodo,'todo')"
+                            >
+                              <Card
+                                v-for="(item,index) in taskTodo"
+                                :key="index"
+                                :padding="3"
+                                style="margin:5px"
+                              >
+                                <div>
+                                  <span style="float:left;padding:0 2.5px">
+                                    <Icon type="ios-list" color="gray" :size="20"/>
+                                  </span>
+                                  <span style="padding:5px">
+                                    <strong
+                                      style="color:#57a3f3"
+                                      class="taskName"
+                                      :title="item.taskName"
+                                    >{{item.taskName}}</strong>
+                                  </span>
+                                  <div style="float:right">
+                                    <Rate
+                                      v-model="item.importance"
+                                      :count="1"
+                                      clearable
+                                      title="Importance"
+                                      @on-change="changeImportance(item)"
+                                    />
+                                    <span title="Edit">
+                                      <Icon
+                                        type="ios-create"
+                                        color="gray"
+                                        :size="20"
+                                        style="cursor:pointer"
+                                        @click="editOneTask(index, taskTodo)"
+                                      />
+                                    </span>
+                                    <span
+                                      style="margin-left:5px;margin-right:3px;cursor: pointer;color:gray;"
+                                      title="Delete"
+                                      @click="taskRemoveAssure(index,taskTodo)"
+                                    >
+                                      <Icon type="ios-trash" :size="20" color="gray"/>
+                                    </span>
+                                  </div>
+                                  <p
+                                    style="word-break:break-word;padding:5px;cursor:pointer"
+                                    @click="showTask(index, taskTodo)"
+                                  >{{item.description}}</p>
+                                  <div style="display:flex;justify-content:flex-end">
+                                    <Tag color="default" style="cursor:default">{{item.creatorName}}</Tag>
+                                  </div>
+                                </div>
+                              </Card>
+                            </draggable>
+                          </Card>
+                        </Col>
+                        <Col span="7">
+                          <Card :padding="0" :border="false">
+                            <h3 slot="title">Doing</h3>
+                            <draggable
+                              class="taskList"
+                              element="ul"
+                              :options="{group:'task'}"
+                              v-model="taskDoing"
+                              @start="setMoveCount()"
+                              @update="updateMoveTask(taskDoing,'doing')"
+                              @add="addMoveTask(taskDoing,'doing')"
+                              @remove="removeMoveTask(taskDoing,'doing')"
+                            >
+                              <Card
+                                v-for="(item,index)  in taskDoing"
+                                :key="index"
+                                :padding="3"
+                                style="margin:5px"
+                              >
+                                <div>
+                                  <span style="float:left;padding:0 2.5px">
+                                    <Icon
+                                      type="ios-information-circle-outline"
+                                      color="gray"
+                                      :size="20"
+                                    />
+                                  </span>
+                                  <span style="padding:5px">
+                                    <strong
+                                      style="color:#57a3f3"
+                                      class="taskName"
+                                      :title="item.taskName"
+                                    >{{item.taskName}}</strong>
+                                  </span>
+                                  <div style="float:right">
+                                    <Rate
+                                      v-model="item.importance"
+                                      :count="1"
+                                      clearable
+                                      title="Importance"
+                                      @on-change="changeImportance(item)"
+                                    />
+                                    <span>
+                                      <Icon
+                                        type="ios-create"
+                                        color="gray"
+                                        :size="20"
+                                        style="cursor:pointer"
+                                        @click="editOneTask(index,taskDoing)"
+                                      />
+                                    </span>
+                                    <span
+                                      style="margin-left:5px;margin-right:3px;cursor: pointer;color:gray;"
+                                      title="Delete"
+                                      @click="taskRemoveAssure(index,taskDoing)"
+                                    >
+                                      <Icon type="ios-trash" :size="20" color="gray"/>
+                                    </span>
+                                  </div>
+                                </div>
+                                <p
+                                  style="word-break:break-word;padding:5px;cursor:pointer"
+                                  @click="showTask(index,taskDoing)"
+                                >{{item.description}}</p>
+                                <div style="display:flex;justify-content:flex-end">
+                                  <Tag color="default" style="cursor:default">{{item.managerName}}</Tag>
+                                </div>
+                              </Card>
+                            </draggable>
+                          </Card>
+                        </Col>
+                        <Col span="7">
+                          <Card :padding="0" :border="false">
+                            <h3 slot="title">Done</h3>
+                            <draggable
+                              class="taskList"
+                              element="ul"
+                              :options="{group:'task'}"
+                              v-model="taskDone"
+                              @start="setMoveCount()"
+                              @update="updateMoveTask(taskDone,'done')"
+                              @add="addMoveTask(taskDone,'done')"
+                              @remove="removeMoveTask(taskDone,'done')"
+                            >
+                              <Card
+                                v-for="(item,index) in taskDone"
+                                :key="index"
+                                :padding="3"
+                                style="margin:5px"
+                              >
+                                <div>
+                                  <span style="float:left;padding:0 2.5px">
+                                    <Icon type="md-checkmark-circle-outline"/>
+                                  </span>
+                                  <span style="padding:5px">
+                                    <strong
+                                      style="color:#57a3f3"
+                                      class="taskName"
+                                      :title="item.taskName"
+                                    >{{item.taskName}}</strong>
+                                  </span>
+                                  <div style="float:right">
+                                    <Rate
+                                      v-model="item.importance"
+                                      :count="1"
+                                      clearable
+                                      title="Importance"
+                                      @on-change="changeImportance(item)"
+                                    />
+                                    <span>
+                                      <Icon
+                                        type="ios-create"
+                                        color="gray"
+                                        :size="20"
+                                        style="cursor:pointer"
+                                        @click="editOneTask(index,taskDone)"
+                                      />
+                                    </span>
+                                    <span
+                                      style="margin-left:5px;margin-right:3px;cursor: pointer;color:gray;"
+                                      title="Delete"
+                                      @click="taskRemoveAssure(index,taskDone)"
+                                    >
+                                      <Icon type="ios-trash" :size="20" color="gray"/>
+                                    </span>
+                                  </div>
+                                  <p
+                                    style="word-break:break-word;padding:5px;cursor:pointer"
+                                    @click="showTask(index,taskDone)"
+                                  >{{item.description}}</p>
+                                  <div style="display:flex;justify-content:flex-end">
+                                    <Tag color="default" style="cursor:default">{{item.managerName}}</Tag>
+                                  </div>
+                                </div>
+                              </Card>
+                            </draggable>
+                          </Card>
+                        </Col>
+                      </Row>
+                    </div>
+                  </Col>
+                </TabPane>
+                <TabPane
+                  label="Working panel"
+                  icon="ios-git-network"
+                  name="working"
+                  @on-click="showDetail('Start working',2)"
+                ></TabPane>
+              </Tabs>
+
+              <!-- <Steps :current="order">
                 <Step title="Home" icon="ios-home" @click.native="showDetail(0)" :order="0"></Step>
                 <Step title="Task" icon="md-list" @click.native="showDetail(1)" :order="1"></Step>
                 <Step
@@ -152,365 +579,13 @@
                   @click.native="showDetail(2)"
                   :order="2"
                 ></Step>
-              </Steps>
+              </Steps>-->
             </Col>
           </Row>
         </Card>
       </Col>
-      <div v-if="order == 0" class="workspaceContent">
-        <Col
-          :xs="8"
-          :sm="7"
-          :md="7"
-          :lg="5"
-          v-bind="this.participants"
-          offset="1"
-          style="margin-top:20px"
-          :style="{height:sidebarHeight+14+'px'}"
-        >
-          <div
-            class="member-panel"
-            :style="{height:sidebarHeight-6+'px'}"
-            style="background-color:white"
-          >
-            <div class="title">Participants</div>
-            <div :style="{height:sidebarHeight-100+'px'}">
-              <div
-                class="member-desc"
-                v-for="(member,index) in this.participants"
-                :key="member.index"
-              >
-                <template v-if="index==0">
-                  <Badge text="♔" type="warning" class="userAvatar">
-                    <div
-                      class="member-image"
-                      @click="gotoPersonalSpace(member.userId)"
-                      style="cursor:pointer"
-                    >
-                      <img
-                        v-if="member.avatar != '' && member.avatar!='undefined'"
-                        :src="member.avatar"
-                        style="width:auto;height:100%"
-                      >
-                      <avatar
-                        :username="member.userName"
-                        :size="40"
-                        style="margin-top:10px"
-                        :title="member.userName"
-                        v-else
-                      ></avatar>
-                    </div>
-                  </Badge>
-                  <div class="memebr-work">
-                    <div class="userName">
-                      <span style="padding:0 5px;float:right">{{member.userName}}</span>
-                    </div>
-                    <div class="organization">
-                      <span style="padding:0 5px">{{member.organization}}</span>
-                    </div>
-                  </div>
-                </template>
-                <template v-else style="margin-top:5px">
-                  <div
-                    class="member-image"
-                    @click="gotoPersonalSpace(member.userId)"
-                    style="cursor:pointer"
-                  >
-                    <img
-                      v-if="member.avatar != ''"
-                      :src="member.avatar"
-                      style="width:auto;height:100%"
-                    >
-                    <avatar
-                      :username="member.userName"
-                      :size="40"
-                      style="margin-top:10px"
-                      :title="member.userName"
-                      v-else
-                    ></avatar>
-                  </div>
-                  <div class="memebr-work">
-                    <div class="userName">
-                      <span style="padding:0 5px;float:right">{{member.userName}}</span>
-                    </div>
-                    <div class="organization">
-                      <span style="padding:0 5px">{{member.organization}}</span>
-                    </div>
-                  </div>
-                  <!-- v-show="this.$store.getters.userId" -->
-                  <!-- v-show="this.subProjectInfo.managerId == this.$store.getters.userId" -->
-                </template>
-                <div style="line-height:60px" type="default">
-                  <span
-                    style="cursor:pointer"
-                    title="quit"
-                    v-show="giveDeleteProperty(index)"
-                    @click="removeMember(member.userId,member.userName)">
-                    <Icon type="md-log-out" :size="20"/>
-                  </span>
-                </div>
-              </div>
-            </div>
-            <div
-              class="member-invite"
-              style="display:flex;justify-content:center;height:60px;align-items:center"
-            >
-              <Button
-                type="success"
-                style="text-align:center;width:100px"
-                @click="inviteMembersModalShow()"
-                :disabled="inviteAble"
-                v-if="this.subProjectInfo.managerId == this.$store.getters.userId"
-              >Invite</Button>
-              <Button
-                type="warning"
-                style="text-align:center;width:100px"
-                @click="quitModal=true"
-                v-else-if="this.subProjectInfo.isMember"
-              >Quit</Button>
-              <Modal
-                v-model="quitModal"
-                width="400px"
-                title="Quit Sub-Project"
-                @on-ok="quitSubProject()"
-                @on-cancel=""
-              >
-                <h2>Are you sure to quit this subproject?</h2>
-              </Modal>
-              <Modal
-                v-model="inviteModal"
-                width="400px"
-                title="Invite group members join the sub-project"
-                @on-ok="inviteMembers"
-                ok-text="ok"
-                cancel-text="cancel"
-                @on-cancel=""
-              >
-                <div>
-                  <p>Members:</p>
-                  <Tag
-                    v-for="participant in this.participants"
-                    :key="participant.index"
-                  >{{participant.userName}}</Tag>
-                  <p>Candidates:</p>
-                  <CheckboxGroup v-model="inviteList">
-                    <Checkbox
-                      v-for="candidate in candidates"
-                      :key="candidate.index"
-                      :label="candidate.userId"
-                    >
-                      <span>{{candidate.userName}}</span>
-                    </Checkbox>
-                  </CheckboxGroup>
-                </div>
-              </Modal>
-            </div>
-          </div>
-        </Col>
-        <Col :xs="15" :sm="16" :md="17" :lg="17" style="margin-top:20px">
-          <div style="background-color:white;padding:20px;margin-left:30px">
-            <h2 style="margin-bottom:5px">Description</h2>
-            <hr style="margin-bottom:10px">
-            <div
-              :style="{height:sidebarHeight-140+'px'}"
-              class="subProjectDesc"
-            >{{subProjectInfo.description}}</div>
-          </div>
-          <div
-            style="display:flex;align-items:center;justify-content:center;height:60px;margin-left:30px"
-          >
-            <Button
-              type="error"
-              style="margin:auto"
-              v-show="subProjectInfo.managerId == this.$store.getters.userId"
-            >Delete this sub-project ?</Button>
-          </div>
-        </Col>
-      </div>
-      <template v-else-if="order == 1">
-        <Col
-          id="taskPage"
-          span="22"
-          offset="1"
-          style="margin-top:20px"
-          :style="{minHeight:taskContainerHeight+14+'px'}"
-        >
-          <div
-            id="taskContainer"
-            :style="{minHeight:taskContainerHeight+'px'}"
-          >
-            <Row type="flex" justify="space-around">
-              <Col span="7">
-                <Card :padding="0" :border="false">
-                  <h3 slot="title">Todo</h3>
-                  <Button
-                    slot="extra"
-                    type="default"
-                    class="createTaskBtn"
-                    style="margin-top:-10px"
-                    @click="createTaskModalShow()"
-                    v-show="this.subProjectInfo.managerId == this.$store.getters.userId||this.subProjectInfo.isMember"
-                  >Add</Button>
-                  <draggable
-                    class="taskList"
-                    element="ul"
-                    :options="{group:'task'}"
-                    v-model="taskTodo"
-                    @start="setMoveCount()"
-                    @update="updateMoveTask(taskTodo,'todo')"
-                    @add="addMoveTask(taskTodo,'todo')"
-                    @remove="removeMoveTask(taskTodo,'todo')"
-                  >
-                    <Card v-for="(item,index) in taskTodo" :key="index" :padding="3" style="margin:5px">
-                      <div>
-                        <span style="float:left;padding:0 2.5px">
-                          <Icon type="ios-list" color="gray" :size="20"/>
-                        </span>
-                        <span style="padding:5px">
-                          <strong style="color:#57a3f3" class="taskName" :title="item.taskName">{{item.taskName}}</strong>
-                        </span>
-                        <div style="float:right">
-                          <Rate v-model="item.importance" :count="1" clearable title="Importance" @on-change="changeImportance(item)"/>
-                          <span title="Edit">
-                            <Icon
-                              type="ios-create"
-                              color="gray"
-                              :size="20"
-                              style="cursor:pointer"
-                              @click="editOneTask(index, taskTodo)"
-                            />
-                          </span>
-                          <span
-                            style="margin-left:5px;margin-right:3px;cursor: pointer;color:gray;"
-                            title="Delete"
-                            @click="taskRemoveAssure(index,taskTodo)"
-                          >
-                            <Icon type="ios-trash" :size="20" color="gray"/>
-                          </span>
-                        </div>
-                        <p
-                          style="word-break:break-word;padding:5px;cursor:pointer"
-                          @click="showTask(index, taskTodo)"
-                        >{{item.description}}</p>
-                        <div style="display:flex;justify-content:flex-end">
-                          <Tag color="default" style="cursor:default">{{item.creatorName}}</Tag>
-                        </div>
-                      </div>
-                    </Card>
-                  </draggable>
-                </Card>
-              </Col>
-              <Col span="7">
-                <Card :padding="0" :border="false">
-                  <h3 slot="title">Doing</h3>
-                  <draggable
-                    class="taskList"
-                    element="ul"
-                    :options="{group:'task'}"
-                    v-model="taskDoing"
-                    @start="setMoveCount()"
-                    @update="updateMoveTask(taskDoing,'doing')"
-                    @add="addMoveTask(taskDoing,'doing')"
-                    @remove="removeMoveTask(taskDoing,'doing')"
-                  >
-                    <Card v-for="(item,index)  in taskDoing" :key="index" :padding="3" style="margin:5px">
-                      <div>
-                        <span style="float:left;padding:0 2.5px">
-                          <Icon type="ios-information-circle-outline" color="gray" :size="20"/>
-                        </span>
-                        <span style="padding:5px">
-                          <strong style="color:#57a3f3" class="taskName" :title="item.taskName">{{item.taskName}}</strong>
-                        </span>
-                        <div style="float:right">
-                          <Rate v-model="item.importance" :count="1" clearable title="Importance" @on-change="changeImportance(item)"/>
-                          <span>
-                            <Icon
-                              type="ios-create"
-                              color="gray"
-                              :size="20"
-                              style="cursor:pointer"
-                              @click="editOneTask(index,taskDoing)"
-                            />
-                          </span>
-                          <span
-                            style="margin-left:5px;margin-right:3px;cursor: pointer;color:gray;"
-                            title="Delete"
-                            @click="taskRemoveAssure(index,taskDoing)"
-                          >
-                            <Icon type="ios-trash" :size="20" color="gray"/>
-                          </span>
-                        </div>
-                      </div>
-                      <p
-                        style="word-break:break-word;padding:5px;cursor:pointer"
-                        @click="showTask(index,taskDoing)"
-                      >{{item.description}}</p>
-                      <div style="display:flex;justify-content:flex-end">
-                          <Tag color="default" style="cursor:default">{{item.managerName}}</Tag>
-                      </div>
-                    </Card>
-                  </draggable>
-                </Card>
-              </Col>
-              <Col span="7">
-                <Card :padding="0" :border="false">
-                  <h3 slot="title">Done</h3>
-                  <draggable
-                    class="taskList"
-                    element="ul"
-                    :options="{group:'task'}"
-                    v-model="taskDone"
-                    @start="setMoveCount()"
-                    @update="updateMoveTask(taskDone,'done')"
-                    @add="addMoveTask(taskDone,'done')"
-                    @remove="removeMoveTask(taskDone,'done')"
-                  >
-                    <Card v-for="(item,index) in taskDone" :key="index" :padding="3" style="margin:5px">
-                      <div>
-                        <span style="float:left;padding:0 2.5px">
-                          <Icon type="md-checkmark-circle-outline"/>
-                        </span>
-                        <span style="padding:5px">
-                          <strong
-                            style="color:#57a3f3"
-                            class="taskName"
-                            :title="item.taskName"
-                          >{{item.taskName}}</strong>
-                        </span>
-                        <div style="float:right">
-                          <Rate v-model="item.importance" :count="1" clearable title="Importance" @on-change="changeImportance(item)"/>
-                          <span>
-                            <Icon
-                              type="ios-create"
-                              color="gray"
-                              :size="20"
-                              style="cursor:pointer"
-                              @click="editOneTask(index,taskDone)"
-                            />
-                          </span>
-                          <span
-                            style="margin-left:5px;margin-right:3px;cursor: pointer;color:gray;"
-                            title="Delete"
-                            @click="taskRemoveAssure(index,taskDone)"
-                          >
-                            <Icon type="ios-trash" :size="20" color="gray"/>
-                          </span>
-                        </div>
-                        <p
-                          style="word-break:break-word;padding:5px;cursor:pointer"
-                          @click="showTask(index,taskDone)"
-                        >{{item.description}}</p>
-                        <div style="display:flex;justify-content:flex-end">
-                          <Tag color="default" style="cursor:default">{{item.managerName}}</Tag>
-                        </div>
-                      </div>
-                    </Card>
-                  </draggable>
-                </Card>
-              </Col>
-            </Row>
-          </div>
-        </Col>
+
+      <template>
         <BackTop></BackTop>
       </template>
     </Row>
@@ -522,11 +597,7 @@
     >
       <p>Do yout want to delete this task?</p>
     </Modal>
-    <Modal
-      v-model="createTaskModal"
-      title="Create Task"
-      width="800px"
-    >
+    <Modal v-model="createTaskModal" title="Create Task" width="800px">
       <Form
         ref="formValidate"
         :model="formValidate"
@@ -568,7 +639,7 @@
             style="width: 560px"
           ></DatePicker>
         </FormItem>
-        <FormItem label="" prop="importance">
+        <FormItem label prop="importance">
           <Checkbox v-model="formValidate.importanceCheck">Important Task</Checkbox>
         </FormItem>
       </Form>
@@ -627,7 +698,7 @@
             style="width: 560px"
           ></DatePicker>
         </FormItem>
-        <FormItem label="" prop="importance">
+        <FormItem label prop="importance">
           <Checkbox v-model="formValidate.importanceCheck">Important Task</Checkbox>
         </FormItem>
       </Form>
@@ -713,6 +784,7 @@ export default {
       inviteModal: false,
       quitModal: false,
       sidebarHeight: 800,
+      descHeight: 250,
       taskContainerHeight: 800,
       participants: [],
       candidates: [],
@@ -771,15 +843,21 @@ export default {
         startTime: [{ required: true, type: "date", trigger: "change" }],
         endTime: [{ required: true, type: "date", trigger: "change" }]
       },
-      contentHeight:"",
+      contentHeight: "",
+      // tab栏当前选中的tab,初始化默认为home
+      currentTab:"home",
+      breadTitle:"Subproject home",
+      toSubProjectPage:"",
     };
   },
   created() {
     this.init();
+    // alert(sessionStorage.getItem("projectId"));
+    this.toSubProjectPage = "/project/"+ sessionStorage.getItem("projectId");
   },
   mounted() {
-    this.contentHeight = window.innerHeight + 'px';
-    window.addEventListener("resize", this.initSize);
+    this.contentHeight = window.innerHeight + "px";
+    // window.addEventListener("resize", this.initSize);
     this.inquiryTask();
   },
   // add by mzy for navigation guards
@@ -792,7 +870,7 @@ export default {
         var members = vm.subProjectInfo.members;
         var isMember = false;
         for (var i = 0; i < members.length; i++) {
-          if ((members[i].userId == userId)) {
+          if (members[i].userId == userId) {
             isMember = true;
             break;
           }
@@ -816,6 +894,7 @@ export default {
     initSize() {
       //侧边栏的高度随着屏幕的高度自适应
       this.sidebarHeight = window.innerHeight - 227;
+      this.descHeight = (window.innerHeight - 227)/3;
       this.taskContainerHeight = this.sidebarHeight + 10;
       //通知栏的属性设置，top表示距离顶部的距离，duration表示持续的时间
       this.$Notice.config({
@@ -837,7 +916,7 @@ export default {
         var members = subProjectInfo.members;
         subProjectInfo.isMember = false;
         for (var i = 0; i < members.length; i++) {
-          if ((members[i].userId == userId)) {
+          if (members[i].userId == userId) {
             subProjectInfo.isMember = true;
             break;
           }
@@ -938,14 +1017,14 @@ export default {
         })
         .catch(err => {});
     },
-    showDetail(item) {
-      this.order = item;
-      if (item == 1) {
+    showDetail(item, index) {
+      this.order = index;
+      if (index == 0) {
         this.openModuleSocket();
-      } else if (item == 2) {
+      } else if (index == 1) {
         this.closeModuleSocket();
         this.$router.push(`./workspace`);
-      } else if (item == 0) {
+      } else if (index == 2) {
         this.closeModuleSocket();
       }
     },
@@ -1678,6 +1757,15 @@ export default {
         .catch(err => {
           console.log(err.data);
         });
+    },
+    currentTabChanged(name){
+      if(name=="home"){
+        this.breadTitle = "Subproject home"
+      }else if(name == "task"){
+        this.breadTitle = "Task assignment"
+      }else if(name="working"){
+        this.breadTitle = "Working panel"
+      }
     }
   }
 };

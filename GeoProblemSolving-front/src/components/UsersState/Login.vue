@@ -85,8 +85,10 @@
                       placeholder="please input your password"
                       style="width: 90%"
                       v-model="formInline.password"
+                      @keyup.enter.native="login('formInline')"
                       type="password"
                     />
+
                   </FormItem>
                   <div style="display:flex;text-align:center;justify-content:center">
                     <Checkbox v-model="checked">Automatic login within one week</Checkbox>
@@ -120,6 +122,15 @@
                   </FormItem>
                   <div style="display:flex;text-align:center;justify-content:center">
                     <span>If you don't hava an account,click <a @click="goRegister">Here</a> to register.</span>
+                  </div>
+                  <div>
+                    <!-- <div style="display:flex;text-align:center;justify-content:center">
+                      <Spin fix v-if="loadingStatus==true">
+                        <Icon type="ios-loading" size=18 class="demo-spin-icon-load"></Icon>
+                        <div>Loading</div>
+                      </Spin>
+                      <Icon type="md-checkmark-circle" v-if="loginStatus==true"/>
+                    </div> -->
                   </div>
                 </Form>
               </div>
@@ -180,6 +191,8 @@ export default {
       changePwdEmailStyle:"This email is used for help you reset your password,you can click this url ",
       urlAddress:"http://172.21.212.7:8082/GeoProblemSolving/resetPassword/",
       resetModalSHow:false,
+      // loginStatus:false,
+      // loadingStatus:false,
     };
   },
   mounted() {
@@ -193,6 +206,8 @@ export default {
   },
   methods: {
     login(name) {
+      // 设置一个缓冲动画
+      // this.loadingStatus = true;
       this.$refs[name].validate(valid => {
         if (valid) {
           if (this.checked == true) {
@@ -227,10 +242,12 @@ export default {
                 this.$Message.error("Invalid account or password.");
               }
                else {
-                 this.$Message.info("Login Success");
+                //  this.loadingStatus = false;
+                //  this.loginStatus = true;
+                //  this.$Message.info("Login Success");
                 // this.$Message.success("Success!");
                 this.$store.commit("userLogin", res.data);
-                setTimeout(this.goBack,500);
+                setTimeout(this.goBack,100);
                 // 这里逻辑有问题，需要修改
                 // this.$router.push({ path: "/login" });
                 // this.$router.go(-1);

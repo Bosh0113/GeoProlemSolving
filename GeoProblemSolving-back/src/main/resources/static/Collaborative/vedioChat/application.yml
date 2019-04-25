@@ -1,0 +1,56 @@
+http:
+  port: 8084
+
+server:
+  port: 8083
+  protocol: HTTP / 1.1
+  #证书的路径.
+  ssl:
+    #证书的路径.
+    key-store: classpath:keystore.p12
+    #证书密码
+    key-store-password: 123456
+    #秘钥库类型
+    keyStoreType: PKCS12
+    #证书别名
+    keyAlias: tomcat
+
+
+##thymeleaf页面模板配置
+spring:
+  mvc:
+    view:
+      prefix: /
+      suffix: .html
+  datasource:
+    url: jdbc:mysql://localhost:3306/web_chat?serverTimezone=GMT%2B8
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    database: mysql
+    generate-ddl: true
+    show-sql: true
+  servlet:
+    multipart:
+      max-request-size: 50MB
+      max-file-size: 50MB
+  jackson:
+    time-zone: GMT+8
+
+#  -----热部署相关----
+  #devtools热部署生效
+  devtools:
+    restart:
+      enabled: true
+      additional-paths: src/main/java
+  thymeleaf:
+    cache: false
+#  ----热部署相关----
+
+#mybatis配置
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+  type-aliases-package: com.ogms.webchat.entity

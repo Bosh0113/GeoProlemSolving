@@ -1,12 +1,7 @@
-<style>
-  /* .ivu-card-head{
-    height:55px !important;
-    padding:10px !important;
-    display:flex;
-    align-items:center
-  } */
-</style>
 <style scoped>
+.top,.bottom{
+        text-align: center;
+    }
 img {
   width: 100%;
   height:auto;
@@ -40,15 +35,14 @@ img {
 <template>
   <!-- tab栏分页 -->
   <!-- 外层div -->
-
-    <Row>
+    <Row style="margin-bottom:100px">
       <Col span="22" offset="1">
         <Spin fix v-show="getFinish">
           <Icon type="ios-loading" size="100" class="demo-spin-icon-load" color="yellowgreen"></Icon>
           <div>Loading</div>
         </Spin>
-        <div style="display:flex;height:60px;justify-content:center"></div>
-        <div class="Tabpane" style="display:flex">
+        <!-- <div style="display:flex;height:60px;justify-content:center"></div> -->
+        <div class="Tabpane" style="display:flex;margin-top:10px">
           <Tabs v-model="currentTab" @click.native="chooseCurrentType(currentTab)">
             <TabPane label="All" name="All" icon="ios-list"></TabPane>
             <TabPane label="Terrestrial" name="Terrestrial" icon="md-globe"></TabPane>
@@ -72,7 +66,7 @@ img {
           </div>
         </div>
       </Col>
-      <div class="ProjectList">
+      <div class="ProjectList" >
         <div v-show="!getFinish">
           <div v-if="currentProjectList.length < 1">
             <Col span="22" offset="1">
@@ -104,11 +98,11 @@ img {
             <Col
               :xs="{ span: 21, offset: 1 }"
               :md="{ span: 11, offset: 1 }"
-              :lg="{ span: 5,  offset: 1 }"
+              :lg="{ span: 5 }"
               v-if="item.privacy=='Public'"
             >
               <div @click="goSingleProject(item.projectId)" style="cursor:pointer">
-                <Card style="height:auto;margin:20px 0 20px 0">
+                <Card style="height:auto;margin:20px -15px">
                   <span slot="title" class="projectTitle">{{item.title}}</span>
                   <div
                     class="operate"
@@ -133,12 +127,15 @@ img {
                       />
                     </div>
                     <div style="display:flex;align-items:center;height:20px">
-                      <strong style="text-align: center"><Poptip trigger="hover" :content="item.description" placement="bottom-right" width="250" word-wrap  >Description</Poptip></strong>
+                         <strong style="text-align: center">Description</strong>
+                        <!-- <Poptip trigger="hover" :content="item.description" placement="bottom-right" width="250" word-wrap> -->
                         <p style="padding: 0 10px;word-break:break-word;overflow: hidden;
                             white-space: nowrap;
                             text-overflow: ellipsis;
-                            max-width: 400px;">
+                            max-width: 400px;"
+                            :title="item.description">
                       {{item.description}}</p>
+                      <!-- </Poptip> -->
                     </div>
                     <div style="height:200px;display:flex;justify-content:center;margin-top:10px">
                       <img :src="item.picture" v-if="item.picture!=''&&item.picture!='undefined'">

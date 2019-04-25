@@ -12,6 +12,8 @@ public interface IResourceDao {
 
     Object readResource(String key,String value);
 
+    Object readPublicResource();
+
     String deleteResource(String key,String value);
 
     void getZipResource(HttpServletRequest request, HttpServletResponse response, String key, String value);

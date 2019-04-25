@@ -18,6 +18,11 @@ public class ResourceEntity {
     private String uploaderName;
     private String uploadTime;
     private String organization;
+    private String privacy;     //public/private
+
+    public void setPrivacy(String privacy) {
+        this.privacy = privacy;
+    }
 
     public void setOrganization(String organization) {
         this.organization = organization;
@@ -113,5 +118,9 @@ public class ResourceEntity {
 
     public String getOrganization() {
         return organization;
+    }
+
+    public String getPrivacy() {
+        return privacy;
     }
 }

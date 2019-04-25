@@ -1,5 +1,11 @@
 <template>
-  <div class="layout">
+<div>
+  <Row>
+    <Col span="2">
+      <toolstyle></toolstyle>
+    </Col>
+    <Col span="21" offset="1">
+      <div class="layout" style="margin-left:60px">
     <div class="header">
       <div class="logo">
         <span>Drawing</span>
@@ -76,14 +82,18 @@
       </div>
     </div>
   </div>
+    </Col>
+  </RoW>
+</div>
 </template>
-
 <script>
+import toolstyle from "./../toolStyle"
 import { Photoshop } from "vue-color";
 import { canvas } from "leaflet";
 // import MuseUI from "./../../../utils/MuseUI";
 export default {
-  name: "draw",
+  // name: "draw",
+  components:{toolstyle},
   data() {
     return {
       //关于复制
@@ -428,7 +438,7 @@ export default {
       let image = new Image(); //创建一个image对象
       if (graphType != "rubber") {
         image.src = this.canvas_bak.toDataURL(); //方法返回一个包含图片展示的data URI.参数是type与encoderOptions，分别表示图片格式与图片质量，0到1之间
-         
+
         // 相当于给浏览器缓存了一张图片
         // iamge onload事件在图片加载完后立即执行
         image.onload = () => {
@@ -685,7 +695,7 @@ export default {
         height: window.screen.availHeight * 0.75
       };
     });
-    
+
   }
 };
 </script>

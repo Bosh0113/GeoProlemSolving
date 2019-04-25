@@ -142,6 +142,7 @@ public class ResourceDaoImpl implements IResourceDao {
                         resourceEntity.setName(fileNames);
                         resourceEntity.setDescription(request.getParameter("description"));
                         resourceEntity.setBelong(request.getParameter("belong"));
+                        resourceEntity.setPrivacy(request.getParameter("privacy"));
                         resourceEntity.setType(request.getParameter("type"));
                         resourceEntity.setFileSize(fileSize);
                         resourceEntity.setPathURL(pathURL);
@@ -203,6 +204,16 @@ public class ResourceDaoImpl implements IResourceDao {
                 return "None";
             }
         } catch (Exception e) {
+            return "Fail";
+        }
+    }
+
+    @Override
+    public Object readPublicResource(){
+        try {
+            Query query = Query.query(Criteria.where("privacy").is("public"));
+            return mongoTemplate.find(query,ResourceEntity.class);
+        }catch (Exception e){
             return "Fail";
         }
     }
