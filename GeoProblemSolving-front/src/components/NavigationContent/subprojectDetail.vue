@@ -119,13 +119,21 @@
     <Row>
       <Col span="22" offset="1">
         <Card>
-          <p
-            slot="title"
-            style="height:30px;line-height:30px;font-size:20px;display: inline-block;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;max-width: 50%;"
-          >{{subProjectInfo.title}}</p>
+          <div slot="title" style="height:20px;width:50%" >
+            <Breadcrumb>
+              <BreadcrumbItem :to="toSubProjectPage">Project</BreadcrumbItem>
+              <BreadcrumbItem >Subproject</BreadcrumbItem>
+              <!-- <span>Subproject</span> -->
+              <!-- <BreadcrumbItem>
+              <span style="color:#999">>>></span>
+              <span>{{subProjectInfo.title}}</span></BreadcrumbItem> -->
+
+            </Breadcrumb>
+            <span style="float:right;margin-top:-10px;font-size:1rem"><strong>{{subProjectInfo.title}}</strong></span>
+          </div>
           <div
             slot="extra"
-            style="height:30px;display:flex;align-items:center"
+            style="height:20px;display:flex;align-items:center"
             class="operatePanel"
           >
             <Button
@@ -142,9 +150,10 @@
             >Back</Button>
           </div>
           <Row>
-            <Col span="22" offset="1" style="margin-top:10px;background-color:white;">
-              <Tabs value="Home">
-                <TabPane label="Home" icon="ios-home" @click.native="showDetail('Home',0)">
+            <Col span="22" offset="1" style="background-color:white;">
+            <!-- <span >{{subProjectInfo.title}}</span> -->
+              <Tabs type="card" v-model="currentTab" @on-click="currentTabChanged">
+                <TabPane label="Subproject home" icon="ios-home" @on-click="showDetail('Home',0)" name="home">
                   <div class="workspaceContent">
                     <Col
                       :xs="8"
@@ -152,7 +161,6 @@
                       :md="7"
                       :lg="5"
                       v-bind="this.participants"
-                      style="margin-top:20px"
                       :style="{height:sidebarHeight+14+'px'}"
                     >
                       <div
@@ -300,15 +308,15 @@
                       :sm="16"
                       :md="17"
                       :lg="17"
-                      style="margin-top:20px;margin-left:20px;"
+                      style="margin-left:20px;"
                     >
                       <div
                         style="background-color:white;margin-left:30px;height:40px;border:1px solid lightgray"
-                        :style="{height:sidebarHeight-6+'px'}"
+                        :style="{height:descHeight +'px'}"
                       >
                         <div class="title">Description</div>
                         <div
-                          :style="{height:sidebarHeight-140+'px'}"
+                          :style="{height:descHeight +'px'}"
                           class="subProjectDesc"
                         >{{subProjectInfo.description}}</div>
                       </div>
@@ -321,10 +329,13 @@
                           v-show="subProjectInfo.managerId == this.$store.getters.userId"
                         >Delete this sub-project ?</Button>
                       </div>
+                      <div style="margin-top:20px;margin-left:30px;height:100px;border:1px solid black">
+
+                      </div>
                     </Col>
                   </div>
                 </TabPane>
-                <TabPane label="Task" icon="md-list" @click.native="showDetail('Task',1)">
+                <TabPane label="Task assignment" icon="md-list" @on-click="showDetail('Task',1)" name="task">
                   <Col
                     id="taskPage"
                     span="22"
@@ -552,9 +563,10 @@
                   </Col>
                 </TabPane>
                 <TabPane
-                  label="Start working"
+                  label="Working panel"
                   icon="ios-git-network"
-                  @click.native="showDetail('Start working',2)"
+                  name="working"
+                  @on-click="showDetail('Start working',2)"
                 ></TabPane>
               </Tabs>
 
@@ -772,6 +784,7 @@ export default {
       inviteModal: false,
       quitModal: false,
       sidebarHeight: 800,
+      descHeight: 250,
       taskContainerHeight: 800,
       participants: [],
       candidates: [],
@@ -830,11 +843,17 @@ export default {
         startTime: [{ required: true, type: "date", trigger: "change" }],
         endTime: [{ required: true, type: "date", trigger: "change" }]
       },
-      contentHeight: ""
+      contentHeight: "",
+      // tab栏当前选中的tab,初始化默认为home
+      currentTab:"home",
+      breadTitle:"Subproject home",
+      toSubProjectPage:"",
     };
   },
   created() {
     this.init();
+    // alert(sessionStorage.getItem("projectId"));
+    this.toSubProjectPage = "/project/"+ sessionStorage.getItem("projectId");
   },
   mounted() {
     this.contentHeight = window.innerHeight + "px";
@@ -875,6 +894,7 @@ export default {
     initSize() {
       //侧边栏的高度随着屏幕的高度自适应
       this.sidebarHeight = window.innerHeight - 227;
+      this.descHeight = (window.innerHeight - 227)/3;
       this.taskContainerHeight = this.sidebarHeight + 10;
       //通知栏的属性设置，top表示距离顶部的距离，duration表示持续的时间
       this.$Notice.config({
@@ -1739,6 +1759,15 @@ export default {
         .catch(err => {
           console.log(err.data);
         });
+    },
+    currentTabChanged(name){
+      if(name=="home"){
+        this.breadTitle = "Subproject home"
+      }else if(name == "task"){
+        this.breadTitle = "Task assignment"
+      }else if(name="working"){
+        this.breadTitle = "Working panel"
+      }
     }
   }
 };

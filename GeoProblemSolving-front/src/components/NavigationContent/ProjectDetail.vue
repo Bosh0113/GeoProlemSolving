@@ -147,7 +147,7 @@
 <template>
   <div class="main">
     <Row>
-      <!-- <Col span="3" style="background-color:lightblue" :style="{height:sidebarHeight}">111</Col> -->
+
       <Col span="22" offset="1">
         <div class="whitespace"></div>
         <div class="whitespace"></div>
@@ -524,17 +524,17 @@
           ok-text="Confirm"
           cancel-text="cancel"
         >
-          <div style="display:flex;text-align:center;align-items:center">
-            <span style="width:20%">privacy</span>
-            <RadioGroup v-model="privacy" style="width:40%">
+          <div style="display:flex;;align-items:center">
+            <span style="width:20%;text-align:center">Privacy</span>
+              <RadioGroup v-model="privacy" style="width:80%">
               <Radio label="public"></Radio>
               <Radio label="privacy"></Radio>
             </RadioGroup>
           </div>
-          <div style="display:flex;text-align:center;align-items:center;justify-content:center">
+          <div style="display:flex;text-align:center;align-items:center">
             <!-- 这里定义上传的几种资源类型供用户选择 -->
-            <span style="width:20%">Type</span>
-            <RadioGroup v-model="fileType" style="width:80%">
+            <span style="width:20%;text-align:center">Type</span>
+            <RadioGroup v-model="fileType" style="float:left">
               <Radio label="image"></Radio>
               <Radio label="video"></Radio>
               <Radio label="data"></Radio>
@@ -543,12 +543,11 @@
               <Radio label="model"></Radio>
               <Radio label="others"></Radio>
             </RadioGroup>
-            <!-- 结束 -->
           </div>
           <br>
           <div style="display:flex;text-align:center;align-items:center;justify-content:center">
-            <span style="width:20%">Description</span>
-            <Input type="textarea" :rows="2" v-model="fileDescription"/>
+            Description:<br>
+            <Input type="textarea" :rows="4" v-model="fileDescription"/>
           </div>
           <br>
           <Upload
