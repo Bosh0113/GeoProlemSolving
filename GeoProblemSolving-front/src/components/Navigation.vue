@@ -29,7 +29,7 @@ header {
   flex: 1 0 auto;
   margin-top:60px;
   /* margin-bottom:20px; */
-  min-height:800px;
+  /* min-height:800px; */
 }
 footer{
   background-color:#515a6e;
@@ -123,7 +123,7 @@ footer{
         </div>
       </div>
     </header>
-    <section class="content">
+    <section class="content" :style="{minHeight:contentHeight}">
      <router-view @sendNotice="sendMessage" @readNotification="readNotification"></router-view>
     </section>
     <footer>
@@ -144,11 +144,11 @@ export default {
       timer: null,
       //导航栏宽度
       headerWidth: "",
-      // contentHeight:"",
+      contentHeight:"",
     };
   },
   mounted() {
-    // this.contentHeight = window.innerHeight-120+'px';
+    this.contentHeight = window.innerHeight-120+'px';
     if (this.$store.getters.userState) {
       this.setTimer();
       this.initWebSocket();
@@ -181,7 +181,7 @@ export default {
       } else if (name == "projects") {
         this.$router.replace({ name: "Projects" });
       } else if (name == "resources") {
-        this.$router.replace({ name: "resourceList" });
+        this.$router.replace({ name: "PublicResource" });
       } else if (name == "community") {
         this.$router.replace({ name: "Community" });
       } else if (name == "help") {
