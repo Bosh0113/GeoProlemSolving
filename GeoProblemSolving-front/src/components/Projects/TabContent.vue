@@ -29,7 +29,7 @@ img {
 </style>
 <template>
     <div>
-        <div class="TabContent" v-if="projectList.length>0">
+        <div class="TabContent">
             <div class="projectCard"
             v-for="(item,index) in projectList"
             :key="item.index"
@@ -64,6 +64,7 @@ img {
                         :id="item.projectId"
                     />
                     </div>
+                    <div style="display:flex;align-items:center;height:20px">
                         <strong style="text-align: center">Description</strong>
                         <p style="padding: 0 10px;word-break:break-word;overflow: hidden;
                             white-space: nowrap;
@@ -105,7 +106,7 @@ img {
                           {{item.tag}}
                         </strong>
                     </div>
-                </Card>
+                    </Card>
                 </div>
             </Col>
             </div>
@@ -137,7 +138,7 @@ img {
           <div slot="footer">
             <Button @click="projectInfoModal=false">Cancel</Button>
             <Button type="success" @click="joinApplyModalShow(this.selectedProjectInfo)" v-show="!selectedProjectInfo.isMember&&!selectedProjectInfo.isManager&&UserState" >Apply</Button>
-            <Button type="primary" @click="goSingleProject()" v-show="UserState&&(selectedProjectInfo.isMember||selectedProjectInfo.isManager)">Goto</Button>
+            <Button type="primary" @click="goSingleProject()" v-show="UserState&&(selectedProjectInfo.isMember||selectedProjectInfo.isManager)">Enter</Button>
           </div>
         </Modal>
         <Modal
@@ -309,7 +310,7 @@ export default {
     joinApply(name) {
       this.$refs[name].validate(valid => {
         if (valid) {
-          this.applyJoinModal=false;
+          this.applyJoinModal = false;
           var data = this.applyProjectInfo;
           if (
             this.haveApplied == true &&
@@ -388,4 +389,3 @@ export default {
   }
 };
 </script>
-
