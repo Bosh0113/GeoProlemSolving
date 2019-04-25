@@ -15,6 +15,9 @@ import store from './store/store.js'
 import * as socketApi from './api/socket'
 // import VCharts from 'v-charts';
 
+//set globe CSS
+import './assets/css/style.css'
+
 axios.defaults.withCredentials=true;
 Vue.prototype.socketApi = socketApi
 Vue.config.productionTip = false

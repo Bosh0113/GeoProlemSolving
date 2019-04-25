@@ -61,12 +61,6 @@ h1 {
   padding: 2.5%;
   /* height:140px; */
 }
-img {
-  width: auto;
-  height: auto;
-  max-width: 100%;
-  max-height: 100%;
-}
 .card_content {
   width: 50%;
   height: auto;
@@ -88,49 +82,109 @@ img {
 .image {
   background-image: "./../../assets/images/1.jpg";
 }
-.feature{
-  height:480px;
-  display:flex;;
-  margin-bottom:40px;
-}
-.textContent{
-  flex:1;
-  /* background-color: lightblue; */
-  height:100%;
-  display:flex;
-  align-items:center;
-  justify-content:center
-}
-.imgContent{
-  flex:2;
-  height:100%;
-  /* background-color: lightgray; */
+
+.title-text {
+  color: white;
+  font-size: 3rem;
+  text-align: left;
+  padding: 0 2.5rem;
+  position: relative;
 }
 
+.title-des {
+  color: #fff;
+  font-size: 1rem;
+  display: inline-block;
+  padding: 0.5rem 2.5rem;
+  text-align: left;
+}
+
+.imgContent {
+  max-width: 550px;
+  max-height: 550px;
+  overflow: hidden;
+  /* background-color: lightgray; */
+}
+.imgContent img {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: 6px;
+}
+.section {
+  padding: 4rem 2rem;
+}
+
+.feature {
+  text-align: left;
+  display: flex;
+  align-items: center;
+  vertical-align: middle;
+}
+
+.feature.first {
+  background: linear-gradient(135deg, #0079bf, #5067c5);
+  padding: 4rem 0;
+  margin-bottom: 2rem;
+}
+
+.feature .textContent {
+  padding: 0 4rem;
+}
+
+.feature .textContent h3 {
+  font-size: 2.1875rem;
+}
+
+.feature .textContent p {
+  font-size: 1rem;
+  padding: 20px 0;
+}
+
+.vertical-center {
+  display: flex;
+  align-items: center;
+  vertical-align: middle;
+}
+.register-btn {
+  display: inline-block;
+  padding: 1rem 2.5rem;
+}
+.register-btn .ivu-btn{
+  font-size: 1rem;
+}
 </style>
 <template>
   <div class="home">
-    <Row>
-      <div style="height:500px;background: linear-gradient(135deg, #0079BF, #5067C5);">
+    <Row class="feature first section">
 
-        <div style="display:flex;align-items:center;height:100%">
-          <Col span="10" offset="2">
-          <h3 style="color:white;font-size: 3rem;text-align:center">
-            A Platform for Solving Complex Geographic Problems
-          </h3>
-           </Col>
-        </div>
-        <Col span="10">
+      <Col
+        span="10"
+        offset="2"
+      >
+      <div>
+        <h3 class="title-text">
+          A Platform for Solving Complex Geographic Problems
+        </h3>
+        <span class="title-des">This is a collaborative platform for solving complex problems, gathering people's efforts to promote the progress of scientific research.</span>
+        <span class="register-btn"><Button type="success">Register for free！</Button></span>
+      </div>
+      </Col>
+      <Col span="10">
+      <div class="imgContent">
+        <img src="./../../assets/images/first.png" />
+      </div>
+      </Col>
 
-        </Col>
-        <!-- <div style="width:40%;display:flex;justify-content:center;align-items:center">
+      <!-- <div style="width:40%;display:flex;justify-content:center;align-items:center">
           <div style="padding:100px;">
             <h1 style="color:white;font-size: 3rem;">
             A platform for solving complex geographic problems
             </h1>
           </div>
           </div> -->
-      </div>
+
     </Row>
     <!-- <Row>
       <Col span = "20" offset ="2" style="margin-top:60px">
@@ -158,111 +212,137 @@ img {
     </Carousel>
       </Col>
     </Row> -->
-    <Row>
-      <div class="feature_part">
-        <Col span="20" offset="2">
-        <div class="feature">
-           <div class="imgContent">
-             <img src="./../../assets/images/projects.png"/>
-          </div>
-          <div class="textContent">
-            <div>
-              <h3 style="font-size: 2.1875rem;text-align:center">{{this.createProjectsTitle}}</h3>
-              <p style="font-size: 1rem;padding:20px 60px 20px 60px;text-align:center">Choose proper area to create projects so as to solve complex  geographical problems.</p>
-            </div>
-            </div>
-        </div>
-        <div class="feature">
-          <div class="textContent">
-            <div>
-              <h3 style="font-size: 2.1875rem;text-align:center">{{this.manageProjectsTitle}}</h3>
-              <p style="font-size: 1rem;padding:20px 60px 20px 60px;text-align:center">Freely create to-do items, doing items and done items, update project progress freely.</p>
-            </div>
-            </div>
-          <div class="imgContent">
-            <img src="./../../assets/images/task.png"/>
-          </div>
-        </div>
-        <div class="feature">
-          <div class="imgContent">
-            <img src="./../../assets/images/tools.png"/>
-          </div>
-          <div class="textContent">
-            <div>
-              <h3 style="font-size: 2.1875rem;text-align:center">{{this.toolsTitle}}</h3>
-              <p style="font-size: 1rem;padding:20px 60px 20px 60px;text-align:center">Variable tools help you process data or design geographical concepts in different scene.</p>
-            </div>
-            </div>
 
-        </div>
-        <div class="feature">
-           <div class="Carsoule"></div>
+    <Row class="feature section">
 
+      <Col
+        span="10"
+        offset="2"
+      >
+      <div class="imgContent">
+        <img src="./../../assets/images/projects1.png" />
+      </div>
+      </Col>
+      <Col span="10">
+      <div class="textContent">
+        <div>
+          <h3>{{this.createProjectsTitle}}</h3>
+          <p>Choose proper area to create projects so as to solve complex geographical problems.</p>
         </div>
+      </div>
+      </Col>
 
+    </Row>
+
+    <Row class="feature section">
+      <Col
+        span="10"
+        offset="2"
+      >
+      <div class="textContent">
+        <div>
+          <h3>{{this.manageProjectsTitle}}</h3>
+          <p>Freely create to-do items, doing items and done items, update project progress freely.</p>
+        </div>
+      </div>
+      </Col>
+      <Col span="10">
+      <div class="imgContent">
+        <img src="./../../assets/images/task1.png" />
+      </div>
+      </Col>
+    </Row>
+
+    <Row class="feature section">
+      <Col
+        span="10"
+        offset="2"
+      >
+      <div class="imgContent">
+        <img src="./../../assets/images/tools1.png" />
+      </div>
+      </Col>
+      <Col span="10">
+      <div class="textContent ">
+        <h3>{{this.toolsTitle}}</h3>
+        <p>Variable tools help you process data or design geographical concepts in different scene.</p>
+      </div>
+      </Col>
+    </Row>
+
+    <Row class="feature section">
+      <div class="Carsoule"></div>
+    </Row>
+
+    <Row class="section">
+      <div class="function_part">
+        <Col
+          span="20"
+          offset="2"
+        >
+        <div style="margin-top:20px">
+          <div class="feature_title">Function Modules</div>
+          <Row>
+            <Col
+              :lg="{ span: 7, offset: 1 }"
+              :md="{ span: 11, offset: 1}"
+              :sm="{ span: 22, offset: 1}"
+              :xs="{ span: 22, offset: 1}"
+              v-for="module in module_lists"
+              :key="module.index"
+            >
+            <div class="function_card">
+              <div class="card_title">{{module.name}}</div>
+              <div class="card_body">
+                <div class="card_image">
+                  <img :src="module.src">
+                  <!-- <img src="./../../assets/module/prepare.png"> -->
+                </div>
+                <div class="card_content">
+                  <p>The preparation module includes collecting resources, sharing resources, and determining research objects.</p>
+                </div>
+              </div>
+            </div>
+            </Col>
+          </Row>
+        </div>
         </Col>
       </div>
 
     </Row>
-    <Row>
-        <div class="function_part">
-          <Col span = "20" offset = "2">
-          <div style="margin-top:20px">
-             <div class="feature_title">Function Modules</div>
-             <Row>
-               <Col
-                :lg="{ span: 7, offset: 1 }"
-                :md="{ span: 11, offset: 1}"
-                :sm="{ span: 22, offset: 1}"
-                :xs="{ span: 22, offset: 1}"
-                v-for="module in module_lists" :key="module.index">
-                <div class="function_card">
-                <div class="card_title">{{module.name}}</div>
-                <div class="card_body">
-                  <div class="card_image">
-                    <img :src="module.src">
-                    <!-- <img src="./../../assets/module/prepare.png"> -->
-                  </div>
-                  <div class="card_content">
-                    <p>The preparation module includes collecting resources, sharing resources, and determining research objects.</p>
-                  </div>
-                </div>
+    <!-- <Row style="margin-top:20px">
+      <Col
+        span="20"
+        offset="2"
+      >
+      <div class="function_part">
+        <div class="function_title">Example lists</div>
+        <Row>
+          <Col
+            :lg="{ span: 7, offset: 1 }"
+            :md="{ span: 11, offset: 1}"
+            :sm="{ span: 22, offset: 1}"
+            :xs="{ span: 22, offset: 1}"
+            v-for="list in example_show_lists"
+            :key="list.index"
+          >
+          <div class="function_card">
+            <div class="card_title">{{list.name}}</div>
+            <div class="card_body">
+              <div class="card_image">
+                <img :src="list.src">
+                
               </div>
-               </Col>
-            </Row>
+              <div class="card_content">
+                <p>The preparation module includes collecting resources, sharing resources, and determining research objects.</p>
+              </div>
+            </div>
           </div>
           </Col>
-        </div>
-
-    </Row>
-    <Row style="margin-top:20px">
-      <Col span="20" offset="2">
-        <div class="function_part">
-          <div class="function_title">Example lists</div>
-          <Row>
-            <Col
-               :lg="{ span: 7, offset: 1 }"
-               :md="{ span: 11, offset: 1}"
-               :sm="{ span: 22, offset: 1}"
-               :xs="{ span: 22, offset: 1}"
-                v-for="list in example_show_lists" :key="list.index">
-              <div class="function_card">
-                <div class="card_title">{{list.name}}</div>
-                <div class="card_body">
-                  <div class="card_image">
-                    <img :src="list.src">
-                    <!-- <img src="./../../assets/module/prepare.png"> -->
-                  </div>
-                  <div class="card_content">
-                    <p>The preparation module includes collecting resources, sharing resources, and determining research objects.</p>
-                  </div>
-                </div>
-              </div>
-            </Col>
-          </Row>
-        </div>
+        </Row>
+      </div>
       </Col>
-    </Row>
+    </Row> -->
 
   </div>
 </template>
@@ -273,9 +353,9 @@ export default {
   data() {
     return {
       // msg: "Welcome to Home",
-      manageProjectsTitle:"Manage projects easily",
-      createProjectsTitle:"Create projects in different areas",
-      toolsTitle:"Multi-purpose tools",
+      manageProjectsTitle: "Manage projects easily",
+      createProjectsTitle: "Create projects in different areas",
+      toolsTitle: "Multi-purpose tools",
       imagelist: 0,
       image_index: 0,
       example_show_lists: [
