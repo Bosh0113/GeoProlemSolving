@@ -3,7 +3,7 @@
   display: flex;
 }
 .sidebarTree {
-  min-width: 150px;
+  min-width: 250px;
   margin-top: 20px;
   border: 1px solid lightgray;
   z-index: 0;
@@ -27,7 +27,8 @@
 
 <template>
   <Row>
-    <Col span="22" offset="1">
+    <Col span="23" offset="1">
+      <h2 style="margin-top: 20px;">Here are public resources shared by users. We will NEVER make your resources public until you share it.</h2>
       <div class="main" :style="{height:contentHeight}">
         <div class="sidebarTree">
           <Menu
@@ -36,27 +37,27 @@
             width="auto"
             @on-select="onMenuSelect"
           >
-            <MenuGroup title="File Type">
+            <MenuGroup title="File type">
               <MenuItem name="all">
                 <Icon type="ios-list-box-outline"/>All
               </MenuItem>
               <MenuItem name="image">
-                <Icon type="md-image"/>Image
+                <Icon type="md-image"/>Images
               </MenuItem>
               <MenuItem name="video">
-                <Icon type="md-videocam"/>Video
+                <Icon type="md-videocam"/>Videos
               </MenuItem>
               <MenuItem name="data">
                 <Icon type="md-analytics"/>Data
               </MenuItem>
               <MenuItem name="paper">
-                <Icon type="md-paper"/>Paper
+                <Icon type="md-paper"/>Papers
               </MenuItem>
               <MenuItem name="document">
-                <Icon type="md-document"/>Document
+                <Icon type="md-document"/>Documents
               </MenuItem>
               <MenuItem name="model">
-                <Icon type="logo-dropbox"/>Model
+                <Icon type="logo-dropbox"/>Models
               </MenuItem>
               <MenuItem name="others">
                 <Icon type="logo-xbox"/>Others
@@ -68,23 +69,34 @@
           <div style="height:20px"></div>
           <div class="resourcePanel">
             <Row>
+              <template v-if="$store.getters.userState">
               <Col span="22" offset="1">
                 <Table :columns="resourceColumn" :data="showList" border>
-                  <template v-if="$store.getters.userState" slot-scope="{ row, index }" slot="action" v-show="showList.length>0">
+                  <template slot-scope="{ row, index }" slot="action" v-show="showList.length>0">
                      <a :href="showList[index].pathURL" :download="showList[index].name" title="Download"><Icon type="md-download" :size="20" color="yellowgreen"/></a>
                      <a @click="show(index)" style="margin-left: 10px" title="Preview"><Icon type="md-eye" :size="20" color="orange"/></a>
                   </template>
-                  <template v-if="!$store.getters.userState" slot-scope="{ row, index }" slot="action" v-show="showList.length>0">
+                </Table>
+              </Col>
+              </template>
+              <template v-else>
+              <Col span="22" offset="1">
+                <Table :columns="resourceColumn" :data="showList" border>
+                  <template slot-scope="{ row, index }" slot="action" v-show="showList.length>0">
                      <a title="Please download after login"><Icon type="md-download" :size="20" color="gray"/></a>
                      <a style="margin-left: 10px" title="Please preview after login"><Icon type="md-eye" :size="20" color="gray"/></a>
                   </template>
                 </Table>
-                <Page :total="dataCount" :page-size="pageSize" show-total @on-change="changepage" show-elevator style="position: absolute;top:550px"/>
+                
               </Col>
+              </template>
             </Row>
-            <div style="height:20px"></div>
+            <div style="display:flex;justify-content:center">
+              <Page :total="dataCount" :page-size="pageSize" show-total @on-change="changepage" show-elevator style="position: absolute;top:600px"/>
+            </div>
           </div>
         </div>
+        
       </div>
     </Col>
     <Modal
@@ -137,6 +149,19 @@ export default {
           key: "name",
           minWidth:10,
           tooltip: true,
+          sortable: true,
+        },
+        {
+          title: "Type",
+          key: "type",
+          width: 100,
+          sortable: true,
+        },
+        {
+          title: "Size",
+          key: "fileSize",
+          width: 100,
+          sortable: true,
         },
         {
           title: "Description",
@@ -144,40 +169,17 @@ export default {
           minWidth:30,
           tooltip: true
         },
-        {
-          title: "Belong",
-          key: "belong",
-          minWidth: 30,
-          tooltip: true
-        },
-        {
-          title: "Type",
-          key: "type",
-          minWidth: 10,
-          tooltip: true,
-          align:'center'
-        },
-        {
-          title: "Uploader",
-          key: "uploaderName",
-          minWidth:20,
-          tooltip: true,
-          align:'center'
-        },
-        {
-          title: "Time",
+        {          
+          title: "Upload time",
           key: "uploadTime",
-          sortable: true,
-          minWidth: 20,
-          tooltip: true,
-          align:'center'
+          width: 160,
+          sortable: true
         },
         {
           title: "Action",
           slot: "action",
-          minWidth: 10,
-          tooltip: true,
-          align:'center'
+          width: 120,
+          align:"center"
         }
       ],
       allResourceList:[],
@@ -206,7 +208,7 @@ export default {
   },
   methods: {
     initLayout() {
-      this.contentHeight = window.innerHeight - 120 + "px";
+      this.contentHeight = window.innerHeight - 180 + "px";
     },
     readResource(){
       this.allResourceList = [];
@@ -216,7 +218,7 @@ export default {
           var tempResourceList = res.data;
           tempResourceList.forEach(function(list) {
             var time = list.uploadTime;
-            list.uploadTime = time.substring(0,10);
+            list.uploadTime = time;
           });
           this.dataCount = tempResourceList.length;
           this.$set(this, "allResourceList", tempResourceList);

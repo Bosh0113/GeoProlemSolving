@@ -317,7 +317,6 @@
                       ></Input>
                     </FormItem>
                   </Form>
-
                 </div>
               </Modal>
             </div>
@@ -330,7 +329,7 @@
                       style="cursor:pointer"
                     >
                       <Card class="subProjectStyle">
-                        <div style="width:70%" class="subProjectTitle" slot="title">
+                        <div style="width:70%" class="subProjectTitle" slot="title" :title="subProject.title">
                           <span>{{subProject["title"]}}</span>
                         </div>
                         <div
@@ -517,9 +516,9 @@
                   >
                     <Icon type="md-download" :size="20"/>
                   </a>
-                  <a @click="show(index)" style="margin-left: 10px" title="Preview">
-                    <Icon type="md-eye" :size="20"/>
-                  </a>
+                  <span @click="show(index)" style="margin-left:10px"title="Preview">
+                    <Icon type="md-eye" :size="20" color="#2d8cf0" style="cursor:pointer"/>
+                  </span>
                 </template>
               </Table>
             </div>
@@ -528,7 +527,7 @@
         <!-- 上传文件按钮的模态框 -->
         <Modal
           v-model="uploadFileModal"
-          title="upload file"
+          title="Upload file"
           width="800px"
           :mask-closable="false"
           @on-ok="filesUpload('fileUploadForm')"
@@ -579,17 +578,18 @@
           <div style="padding:0 10px 0 10px">
             <ul v-for="(list,index) in file" :key="index">
               <li style="display:flex">
-                filename:
-                <span style="font-size:10px;width:60%">{{ list.name }}</span>
-                size:
+                File name:
+                <span style="font-size:10px;margin: 0 5px 0 5px">{{ list.name }}</span>
+                (Size:
                 <span
-                  style="font-size:10px;width:70%"
-                >{{Math.round(list.size/1024)}}kb</span>
+                  style="font-size:10px;margin-right:10px"
+                >{{Math.round(list.size/1024)}}kb)</span>
                 <Icon
                   type="ios-close"
                   size="20"
                   @click="delFileList(index)"
-                  style="display:flex;justify-content:flex-end"
+                  style="display:flex;justify-content:flex-end;cursor:pointer"
+                  title="Cancel"
                 ></Icon>
               </li>
             </ul>
@@ -921,26 +921,38 @@ export default {
       projectTableColName: [
         {
           title: "Name",
-          key: "name"
-        },
-        {
-          title: "Description",
-          key: "description"
-        },
-        {
-          title: "type",
-          key: "type",
+          key: "name",
+          tooltip:true,
           sortable: true
         },
         {
-          title: "uploadTime",
+          title: "Type",
+          key: "type",
+          width: 100,
+          sortable: true
+        },
+        {
+          title: "Size",
+          key: "fileSize",
+          width: 100,
+          sortable: true
+        },
+        {
+          title: "Description",
+          key: "description",
+          tooltip:true,
+          sortable: true
+        },
+        {
+          title: "Upload time",
           key: "uploadTime",
+          width: 160,
           sortable: true
         },
         {
           title: "Action",
           slot: "action",
-          width: 250,
+          width: 120,
           align: "center"
         }
       ],

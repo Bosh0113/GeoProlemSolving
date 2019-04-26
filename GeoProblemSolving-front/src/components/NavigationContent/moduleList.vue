@@ -407,7 +407,7 @@
           </template>
           <template>
             <Col :xs="15" :sm="16" :md="17" :lg="17">
-              <Col span="12">
+              <Col span="11">
                 <div
                   style="border:1px solid lightgray;background-color:white;margin-left:30px"
                 >
@@ -459,7 +459,7 @@
                   </Card>
                 </div>
               </Col>
-              <Col span="12">
+              <Col span="13">
                 <div
                   style="background-color:white;margin-left:30px"
                   class="resourcePanel"
@@ -1142,17 +1142,21 @@ export default {
       tableColName: [
         {
           title: "Name",
-          key: "name"
+          key: "name",
+          sortable: true,
+          tooltip:true,
         },
         {
-          title: "type",
+          title: "Type",
           key: "type",
-          sortable: true
+          sortable: true,
+          width: 90
         },
         {
           title: "Action",
           slot: "action",
-          align: "center"
+          align: "center",
+          width: 120
         }
       ],
       fileDescription: "",

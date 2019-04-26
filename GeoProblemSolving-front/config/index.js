@@ -12,8 +12,7 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/GeoProblemSolving': {
-        // target: 'http://localhost:8081',
-        target: 'http://172.21.212.7:8082',
+        target: 'http://localhost:8081',
         changeOrigin: true,
         pathRewrite: {
           '^/GeoProblemSolving': '/GeoProblemSolving'

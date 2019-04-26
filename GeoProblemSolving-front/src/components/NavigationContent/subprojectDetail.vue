@@ -355,12 +355,13 @@
                                 <a
                                   :href="subProjectResourceList[index].pathURL"
                                   :download="subProjectResourceList[index].name"
+                                  title="Download"
                                 >
                                   <Icon type="md-download" :size="20"/>
                                 </a>
-                                <a @click="show(index)" style="margin-left: 10px" title="Preview">
-                                  <Icon type="md-eye" :size="20"/>
-                                </a>
+                                <span @click="show(index)" style="margin-left: 10px" title="Preview">
+                                  <Icon type="md-eye" :size="20" style="cursor:pointer" color="#2d8cf0"/>
+                                </span>
                               </template>
                             </Table>
                           </div>
@@ -996,26 +997,38 @@ export default {
       projectTableColName: [
         {
           title: "Name",
-          key: "name"
-        },
-        {
-          title: "Description",
-          key: "description"
-        },
-        {
-          title: "type",
-          key: "type",
+          key: "name",
+          tooltip:true,
           sortable: true
         },
         {
-          title: "uploadTime",
+          title: "Type",
+          key: "type",
+          width: 90,
+          sortable: true
+        },
+        {
+          title: "Size",
+          key: "fileSize",
+          width: 100,
+          sortable: true
+        },
+        {
+          title: "Description",
+          key: "description",
+          tooltip:true,
+          sortable: true
+        },
+        {
+          title: "Upload time",
           key: "uploadTime",
+          width: 150,
           sortable: true
         },
         {
           title: "Action",
           slot: "action",
-          width: 250,
+          width: 120,
           align: "center"
         }
       ],
