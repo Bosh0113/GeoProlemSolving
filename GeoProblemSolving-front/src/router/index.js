@@ -31,20 +31,26 @@ const routes = [{
 { path: '/draw', name: 'drawUtil', component: resolve=>(require(["@/components/utils/drawBoard"],resolve)) },
 { path: '/map', name: 'mapTool', component: resolve=>(require(["@/components/utils/mapTool"],resolve)) },
 { path: '/charts', name: 'dataCharts', component: resolve=>(require(["@/components/utils/charts"],resolve)) },
-{ path: '/nc/draw', name: 'drawUtilNC', component: resolve=>(require(["@/components/utils/singleUtils/drawBoard"],resolve)) },
-{ path: '/nc/map', name: 'mapToolNC', component: resolve=>(require(["@/components/utils/singleUtils/mapTool"],resolve)) },
-{ path: '/nc/charts', name: 'dataChartsNC', component: resolve=>(require(["@/components/utils/singleUtils/charts"],resolve)) },
+{ path: '/nc/draw', name: 'drawUtilNC', component: resolve=>(require(["@/components/utils/singleUtils/ncDrawBoard"],resolve)) },
+{ path: '/nc/map', name: 'mapToolNC', component: resolve=>(require(["@/components/utils/singleUtils/ncMapTool"],resolve)) },
+{ path: '/nc/charts', name: 'dataChartsNC', component: resolve=>(require(["@/components/utils/singleUtils/ncCharts"],resolve)) },
 { path: '/video', name: 'videoViewer', component: resolve=>(require(["@/components/utils/videoViewer"],resolve)) },
-{ path: '/pdfview', name: 'pdfViewer', component: resolve=>(require(["@/components/utils/pdfViewer"],resolve)) },
+{ path: '/review', name: 'pdfViewer', component: resolve=>(require(["@/components/utils/fileReview"],resolve)) },
 { path: '/join/:id/:email', name: 'joinProject', component: resolve=>(require(["@/components/createNew/joinNewProject"],resolve)) },
 { path: '/resetPassword/:email', name: 'resetPassword', component: resolve=>(require(["@/components/UsersState/ResetPwd"],resolve)) },
 // { path: '/upload', name: 'upload', component: resolve=>(require(["@/components/NavigationContent/testUpload"],resolve)) },
 { path: '/toolStyle', name: 'tool', component: resolve=>(require(["@/components/utils/singleUtils/toolStyle"],resolve)) },
-// { path: '/markDownTool', name: 'markDownTool', component: resolve=>(require(["@/components/utils/singleUtils/markDownEditor"],resolve)) },
 { path: '/tinymce', name: 'tinymce', component: resolve=>(require(["@/components/utils/singleUtils/tinymce"],resolve)) },
 
 ]
 export default new Router({
   routes,
   mode: 'history',
+  scrollBehavior (to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition
+    } else {
+      return { x: 0, y: 0 }
+    }
+  }
 })

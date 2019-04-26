@@ -121,45 +121,45 @@
         <Card>
           <div slot="title" style="height:20px;width:50%">
             <Breadcrumb>
-              <BreadcrumbItem :to="toSubProjectPage">Project</BreadcrumbItem>
-              <BreadcrumbItem>Subproject</BreadcrumbItem>
+              <BreadcrumbItem :to="toProjectPage">Project</BreadcrumbItem>
+              <BreadcrumbItem >Subproject</BreadcrumbItem>
               <!-- <span>Subproject</span> -->
               <!-- <BreadcrumbItem>
               <span style="color:#999">>>></span>
               <span>{{subProjectInfo.title}}</span></BreadcrumbItem>-->
             </Breadcrumb>
-            <span style="float:right;margin-top:-10px;font-size:1rem">
-              <strong>{{subProjectInfo.title}}</strong>
-            </span>
+            <span style="float:right;margin-top:-15px;font-size:1.5rem"><strong>{{subProjectInfo.title}}</strong></span>
           </div>
           <div
             slot="extra"
             style="height:20px;display:flex;align-items:center"
             class="operatePanel"
           >
+          
+            <Button
+              type="default"
+              @click="gotoWorkingPanel()"
+              icon="ios-git-network"
+              title="Back to project page"
+            >Work</Button>
             <Button
               type="default"
               @click="conveneWork()"
               icon="md-mail"
-              title="Start to work"
-            >Convene</Button>
-            <Button
+              title="Inform others to work together"
+            >Inform</Button>
+            <!-- <Button
               type="default"
               @click="backProject()"
               icon="md-arrow-back"
               title="Back to project page"
-            >Back</Button>
+            >Back</Button> -->
           </div>
           <Row>
             <Col span="22" offset="1" style="background-color:white;">
-              <!-- <span >{{subProjectInfo.title}}</span> -->
+            <!-- <span >{{subProjectInfo.title}}</span> -->
               <Tabs type="card" v-model="currentTab" @on-click="currentTabChanged(name)">
-                <TabPane
-                  label="Subproject home"
-                  icon="ios-home"
-                  @on-click="showDetail('Home',0)"
-                  name="home"
-                >
+                <TabPane label="Subproject home" icon="ios-home" name="home">
                   <div class="workspaceContent">
                     <Col
                       :xs="8"
@@ -269,7 +269,6 @@
                             width="400px"
                             title="Quit Sub-Project"
                             @on-ok="quitSubProject()"
-                            @on-cancel
                           >
                             <h2>Are you sure to quit this subproject?</h2>
                           </Modal>
@@ -280,7 +279,6 @@
                             @on-ok="inviteMembers"
                             ok-text="ok"
                             cancel-text="cancel"
-                            @on-cancel
                           >
                             <div>
                               <p>Members:</p>
@@ -317,7 +315,7 @@
                           <div
                             slot="title"
                             style="font-size:18px;height:20px;line-height:20px;"
-                          ><strong>Resource</strong></div>
+                          ><strong>Resources</strong></div>
                           <div slot="extra" style="display:flex;align-items:center;height:20px">
                             <Button
                               id="upload"
@@ -338,7 +336,7 @@
                               <Icon type="md-more"/>
                             </Button>
                           </div>
-                          <div style="height:200px;overflow-y:scroll">
+                          <div style="height:250px;overflow-y:scroll">
                             <div v-show="this.subProjectResourceList==[]">
                               <span
                                 style="text-align:center"
@@ -378,9 +376,6 @@
                           title="Upload resource here"
                         >
                           <div>
-                            <!-- subProjectFileUploadForm -->
-
-                            <!-- subProjectFileUploadFormRuleValidate -->
                             <Form
                               ref="subProjectFileUploadForm"
                               :model="subProjectFileUploadForm"
@@ -395,7 +390,6 @@
                                   <Radio label="public"></Radio>
                                   <Radio label="privacy"></Radio>
                                 </RadioGroup>
-                                <!-- <Input v-model="formValidate.name" placeholder="Enter your name"></Input> -->
                               </FormItem>
                               <FormItem label="Type" prop="type">
                                 <RadioGroup v-model="subProjectFileUploadForm.type">
@@ -407,7 +401,6 @@
                                   <Radio label="model"></Radio>
                                   <Radio label="others"></Radio>
                                 </RadioGroup>
-                                <!-- <Input v-model="formValidate.mail" placeholder="Enter your e-mail"></Input> -->
                               </FormItem>
                               <FormItem label="Description" prop="description">
                                 <Input
@@ -417,33 +410,7 @@
                                 />
                               </FormItem>
                             </Form>
-                          </div>
-                          <!-- <div style="display:flex;;align-items:center">
-                          <span style="width:20%;text-align:center"><Icon type="md-star" color="red"/>Privacy</span>
-                            <RadioGroup v-model="privacy" style="width:80%">
-                            <Radio label="public"></Radio>
-                            <Radio label="privacy"></Radio>
-                          </RadioGroup>
-                          </div>-->
-                          <!-- <br> -->
-                          <!-- <div style="display:flex;text-align:center;align-items:center">
-                          <span style="width:20%;text-align:center"><Icon type="md-star" color="red"/>Type</span>
-                          <RadioGroup v-model="fileType" style="float:left">
-                            <Radio label="image"></Radio>
-                            <Radio label="video"></Radio>
-                            <Radio label="data"></Radio>
-                            <Radio label="paper"></Radio>
-                            <Radio label="document"></Radio>
-                            <Radio label="model"></Radio>
-                            <Radio label="others"></Radio>
-                          </RadioGroup>
-                          </div>-->
-                          <!-- <br>
-                        <div style="display:flex;text-align:center;align-items:center;justify-content:center">
-                       <span style="width:20%;text-align:center">Description</span>
-                        <Input type="textarea" :rows="4" v-model="fileDescription"/>
-                          </div>-->
-                          <!-- <br> -->
+                          </div>                          
                           <Upload
                             :max-size="1024*1024"
                             multiple
@@ -498,16 +465,10 @@
                     </Col>
                   </div>
                 </TabPane>
-                <TabPane
-                  label="Task assignment"
-                  icon="md-list"
-                  @on-click="showDetail('Task',1)"
-                  name="task"
-                >
+                <TabPane label="Task assignment" icon="md-list" name="task">
                   <Col
                     id="taskPage"
-                    span="22"
-                    offset="1"
+                    span="24"
                     style="margin-top:20px"
                     :style="{minHeight:taskContainerHeight+14+'px'}"
                   >
@@ -730,24 +691,7 @@
                     </div>
                   </Col>
                 </TabPane>
-                <TabPane
-                  label="Working panel"
-                  icon="ios-git-network"
-                  name="working"
-                  @on-click="showDetail('Start working',2)"
-                ></TabPane>
               </Tabs>
-
-              <!-- <Steps :current="order">
-                <Step title="Home" icon="ios-home" @click.native="showDetail(0)" :order="0"></Step>
-                <Step title="Task" icon="md-list" @click.native="showDetail(1)" :order="1"></Step>
-                <Step
-                  title="Start working"
-                  icon="ios-git-network"
-                  @click.native="showDetail(2)"
-                  :order="2"
-                ></Step>
-              </Steps>-->
             </Col>
           </Row>
         </Card>
@@ -983,13 +927,11 @@ export default {
       candidates: [],
       inviteList: [],
       inviteAble: true,
-      order: 0,
+      oldTabPaneState:"home",
       // 后台获取的module下的task列表
       taskList: [],
       selectTaskIndex: 0,
       taskDeleteModal: false,
-      // 后台拿到的Module集合，渲染成一条轴用的
-      moduleList: [],
       // 创建任务的模态框
       createTaskModal: false,
       // 编辑任务的模态框
@@ -1039,7 +981,7 @@ export default {
       contentHeight: "",
       // tab栏当前选中的tab,初始化默认为home
       currentTab: "home",
-      breadTitle: "Subproject home",
+      toProjectPage: "",
       toSubProjectPage: "",
       // 上传文件
       uploadShow: false,
@@ -1076,15 +1018,16 @@ export default {
           width: 250,
           align: "center"
         }
-      ]
+      ],
+      panel:null
     };
   },
   created() {
     this.init();
-    this.toSubProjectPage = "/project/" + sessionStorage.getItem("projectId");
   },
   mounted() {
     this.contentHeight = window.innerHeight + "px";
+    this.toProjectPage = "/project/"+ sessionStorage.getItem("projectId");
     this.inquiryTask();
     this.getAllResource();
   },
@@ -1113,6 +1056,9 @@ export default {
   },
   beforeRouteLeave(to, from, next) {
     this.removeTimer();
+    if (this.panel != null) {
+      this.panel.close();
+    }
     next();
   },
   beforeDestroy: function() {
@@ -1245,17 +1191,6 @@ export default {
         })
         .catch(err => {});
     },
-    showDetail(item, index) {
-      this.order = index;
-      if (index == 0) {
-        this.openModuleSocket();
-      } else if (index == 1) {
-        this.closeModuleSocket();
-        this.$router.push(`./workspace`);
-      } else if (index == 2) {
-        this.closeModuleSocket();
-      }
-    },
     closeModuleSocket() {
       if (this.subprojectSocket != null) {
         this.removeTimer();
@@ -1267,11 +1202,9 @@ export default {
         this.subprojectSocket = null;
       }
       let roomId = this.subProjectInfo.subProjectId + "task";
-      // var subprojectSocketURL =
-      // "ws://localhost:8081/GeoProblemSolving/Module/" + roomId;
+      var subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + roomId;
       // var subprojectSocketURL = "ws://202.195.237.252:8082/GeoProblemSolving/Module/" + roomId;
-      var subprojectSocketURL =
-        "ws://172.21.212.7:8082/GeoProblemSolving/Module/" + roomId;
+      // var subprojectSocketURL = "ws://172.21.212.7:8082/GeoProblemSolving/Module/" + roomId;
       this.subprojectSocket = new WebSocket(subprojectSocketURL);
       this.subprojectSocket.onopen = this.onOpen;
       this.subprojectSocket.onmessage = this.onMessage;
@@ -1325,39 +1258,39 @@ export default {
     sendMessage(message) {
       this.subprojectSocket.send(JSON.stringify(message));
     },
-    // 返回项目页
-    backProject() {
-      let projectInfo = this.$store.getters.project;
-      if (
-        JSON.stringify(projectInfo) != "{}" &&
-        projectInfo.projectId == this.subProjectInfo.projectId
-      ) {
-        let id = projectInfo.projectId;
-        this.$router.push(`../${id}`);
-      } else {
-        this.axios
-          .get(
-            "/GeoProblemSolving/project/inquiry" +
-              "?key=projectId" +
-              "&value=" +
-              this.subProjectInfo.projectId
-          )
-          .then(res => {
-            if (res.data != "None" && res.data != "Fail") {
-              this.projectInfo = res.data[0];
-              this.$store.commit("setProjectInfo", res.data[0]);
+    // 返回项目页面
+    // backProject() {
+    //   let projectInfo = this.$store.getters.project;
+    //   if (
+    //     JSON.stringify(projectInfo) != "{}" &&
+    //     projectInfo.projectId == this.subProjectInfo.projectId
+    //   ) {
+    //     let id = projectInfo.projectId;
+    //     this.$router.push(`../${id}`);
+    //   } else {
+    //     this.axios
+    //       .get(
+    //         "/GeoProblemSolving/project/inquiry" +
+    //           "?key=projectId" +
+    //           "&value=" +
+    //           this.subProjectInfo.projectId
+    //       )
+    //       .then(res => {
+    //         if (res.data != "None" && res.data != "Fail") {
+    //           this.projectInfo = res.data[0];
+    //           this.$store.commit("setProjectInfo", res.data[0]);
 
-              let id = this.projectInfo.projectId;
-              this.$router.push(`../${id}`);
-            } else {
-              console.log(res.data);
-            }
-          })
-          .catch(err => {
-            console.log(err.data);
-          });
-      }
-    },
+    //           let id = this.projectInfo.projectId;
+    //           this.$router.push(`../${id}`);
+    //         } else {
+    //           console.log(res.data);
+    //         }
+    //       })
+    //       .catch(err => {
+    //         console.log(err.data);
+    //       });
+    //   }
+    // },
     // 召集参与者
     conveneWork() {
       for (let i = 0; i < this.participants.length; i++) {
@@ -1989,19 +1922,47 @@ export default {
         });
     },
     currentTabChanged(name) {
-      if (name == "home") {
-        this.breadTitle = "Subproject home";
-      } else if (name == "task") {
-        this.breadTitle = "Task assignment";
-      } else if ((name = "working")) {
-        this.breadTitle = "Working panel";
+      if(this.oldTabPaneState !== name){
+        
+        this.closeModuleSocket();
+
+        if(name == 'task') {
+          this.openModuleSocket();
+        }
       }
     },
     toResourceList() {
       this.$router.push({ path: "/resourceList" });
     },
     show(index) {
-      window.open(this.subProjectResourceList[index].pathURL);
+      let name = this.subProjectResourceList[index].name;
+      
+        if (this.panel != null) {
+          this.panel.close();
+        }
+        let url =
+          "http://172.21.212.7:8012/previewFile?url=http://172.21.212.7:8082" +
+          this.subProjectResourceList[index].pathURL;
+        let toolURL =
+          "<iframe src=" + url + ' style="width: 100%;height:100%"></iframe>';
+        this.panel = jsPanel.create({
+          headerControls: {
+            smallify: "remove"
+          },
+          theme: "none",
+          headerTitle: "Review",
+          contentSize: "800 600",
+          content: toolURL,
+          disableOnMaximized: true,
+          dragit: {
+            containment: 5
+          },
+          closeOnEscape: true
+        });
+        $(".jsPanel-content").css("font-size", "0");
+    },
+    gotoWorkingPanel(){
+      this.$router.push(`./workspace`);
     },
     getAllResource() {
       // url是请求的网址
@@ -2017,7 +1978,6 @@ export default {
           //写渲染函数，取到所有资源
           if (res.data !== "None") {
             this.$set(this, "subProjectResourceList", res.data);
-            console.table(this.subProjectResourceList);
           } else {
             this.projectResourceList = [];
           }
@@ -2032,12 +1992,10 @@ export default {
       if (that.file.length >= 5) {
         this.$Message.info("最多只能上传5个文件");
       } else {
-        console.table(this.file);
         that.file.push(file);
         that.file.map(element => {
           element["fileSize"] = Math.round((element.size / 1024) * 100) / 100;
         });
-        console.log(that.file);
       }
       return false;
     },
@@ -2073,9 +2031,6 @@ export default {
             onUploadProgress: progressEvent => {
               this.uploadProgress =
                 ((progressEvent.loaded / progressEvent.total) * 100) | 0;
-              // let complete = (progressEvent.loaded / progressEvent.total * 100 | 0) + '%'
-              console.log(progressEvent);
-              console.log(this.uploadProgress);
             },
             data: formData
           })
@@ -2103,7 +2058,6 @@ export default {
     delFileList(index) {
       let that = this;
       that.file.splice(index, 1);
-      console.log(that.file);
     }
   }
 };

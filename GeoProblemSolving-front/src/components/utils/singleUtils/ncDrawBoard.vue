@@ -628,7 +628,6 @@ export default {
       var width = context.canvas.width;
       var height = context.canvas.height;
       this.copyimgdata = context.getImageData(0, 0, width, height);
-      console.log(this.copyimgdata);
     },
     canvas_paste() {
       var context = document.getElementById("canvas_bak").getContext("2d");

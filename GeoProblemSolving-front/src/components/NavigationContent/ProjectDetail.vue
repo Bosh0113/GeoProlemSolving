@@ -61,9 +61,6 @@
   line-height: 20px;
   font-size: 20px;
 }
-.whitespace {
-  height: 20px;
-}
 .createSubProjectPanel {
   display: flex;
 }
@@ -136,7 +133,7 @@
   height: 40px;
   line-height: 40px;
   font-size: 20px;
-  max-width: 200px;
+  max-width: 70px;
   display: inline-block;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -148,9 +145,7 @@
   <div class="main">
     <Row>
       <Col span="22" offset="1">
-        <div class="whitespace"></div>
-        <div class="whitespace"></div>
-        <div class="detail" style="padding: 0 0 20px 0">
+        <div class="detail">
           <div class="detail_description">
             <Card>
               <p
@@ -277,12 +272,11 @@
             </FormItem>
           </Form>
         </Modal>
-        <div class="whitespace"></div>
         <div style="padding: 20px">
           <Card :bordered="false">
             <p slot="title" style="font-size:25px;height:40px;line-height:40px">Subprojects</p>
             <div slot="extra" style="height:40px">
-              <Poptip trigger="hover" content="Invite other members" placement="right">
+              <Poptip trigger="hover" content="Create a new subproject" placement="right">
                 <Button
                   class="subProjectBtn"
                   @click="subProjectModal = true"
@@ -345,7 +339,7 @@
                         >
                           <div style="display:flex">
                             <span
-                              v-show="subProject['isManager'] == true"
+                              v-show="subProject.isManager == true"
                               @click.stop="handOverSubProjectShow(index)"
                               title="Exchange manager"
                             >
@@ -474,7 +468,6 @@
                 ok-text="Confirm"
                 cancel-text="cancel"
                 @on-ok="deleteSubProject()"
-                @on-cancel
                 width="800px"
                 :mask-closable="false"
               >
@@ -483,10 +476,9 @@
             </div>
           </Card>
         </div>
-        <div class="whitespace"></div>
         <div class="resourcePanel" style="padding:20px">
           <Card>
-            <p slot="title" style="font-size:25px;height:40px;line-height:40px;">Resource</p>
+            <p slot="title" style="font-size:25px;height:40px;line-height:40px;">Resources</p>
             <div slot="extra" style="display:flex;align-items:center;height:40px" class="popCenter">
               <Button
                 id="upload"
@@ -540,7 +532,7 @@
           :mask-closable="false"
           @on-ok="filesUpload('fileUploadForm')"
           @on-cancel
-          ok-text="Confirm"
+          ok-text="Submit"
           cancel-text="cancel"
         >
           <div>
@@ -971,8 +963,7 @@ export default {
       // 进度条模态框
       progressModalShow: false,
       uploadProgress: 0,
-      // 上传文件表单的提示信息
-      nullInputHint: false
+      panel: null
     };
   },
   created() {
@@ -1013,6 +1004,12 @@ export default {
         }
       }
     });
+  },
+  beforeRouteLeave(to, from, next) {
+    if (this.panel != null) {
+      this.panel.close();
+    }
+    next();
   },
   methods: {
     getProjectDetail() {
@@ -1130,9 +1127,7 @@ export default {
       this.$refs[form].validate(valid => {
         if (valid) {
           let SubProject = {};
-          SubProject[
-            "description"
-          ] = this.createSubProjectForm.subProjectDescription;
+          SubProject["description"] = this.createSubProjectForm.subProjectDescription;
           SubProject["title"] = this.createSubProjectForm.subProjectTitle;
           SubProject["projectId"] = this.currentProjectDetail.projectId;
           SubProject["managerId"] = this.$store.getters.userId;
@@ -1140,10 +1135,11 @@ export default {
             .post("/GeoProblemSolving/subProject/create", SubProject)
             .then(res => {
               if (res.data != "Fail") {
-                this.$Message.info("create success");
+                this.$Message.info("Create success");
                 this.createSubProjectForm.subProjectTitle = "";
                 this.createSubProjectForm.subProjectDescription = "";
-                this.getAllSubProject();
+                this.subProjectList.push(res.data);
+                this.identity(this.subProjectList);
               } else {
                 this.$Message.info("fail");
               }
@@ -1210,7 +1206,24 @@ export default {
             this.newManagerId
         )
         .then(res => {
-          this.getAllSubProject();
+          if (res.data != "Fail") {
+            var newSubProject = res.data;
+            var length = this.subProjectList.length;
+            var subProjectInfoList = this.subProjectList;
+            for (var i = 0; i < length; i++) {
+              if (
+                subProjectInfoList[i].subProjectId == newSubProject.subProjectId
+              ) {
+                subProjectInfoList.splice(i,1,res.data);
+                this.identity(subProjectInfoList);
+                this.$Message.success("Handover management authority success!");
+                break;
+              }
+            }
+            //此处缺少权限移交后的通知
+          } else {
+            this.$Message.error("Handover management authority failed.");
+          }
         })
         .catch(err => {
           console.log(err.data);
@@ -1243,7 +1256,17 @@ export default {
           this.axios
             .post("/GeoProblemSolving/subProject/update", obj)
             .then(res => {
-              this.getAllSubProject();
+          if(res.data!="Fail"){
+            var newSubProject = res.data;
+            for(var i=0;i<this.subProjectList.length;i++){
+              if(this.subProjectList[i].subProjectId==newSubProject.subProjectId){
+                this.subProjectList.splice(i,1,res.data);
+                break;
+              }
+            }
+          }else{
+            this.$Message.error("Update sub-project failed.");
+          };
             })
             .catch(err => {
               console.log(err.data);
@@ -1258,14 +1281,27 @@ export default {
       this.deleteSubProjectModal = true;
     },
     deleteSubProject() {
+      var deletedSubProjectId = this.subProjectList[this.editSubProjectindex]
+        .subProjectId;
       this.axios
         .get(
           "/GeoProblemSolving/subProject/delete?" +
             "subProjectId=" +
-            this.subProjectList[this.editSubProjectindex].subProjectId
+            deletedSubProjectId
         )
         .then(res => {
-          this.getAllSubProject();
+          if (res.data == "Success") {
+            var length = this.subProjectList.length;
+            for (var i = 0; i < length; i++) {
+              if (this.subProjectList[i].subProjectId == deletedSubProjectId) {
+                this.subProjectList.splice(i, 1);
+                this.$Message.success("Delete sub-project success!");
+                break;
+              }
+            }
+          } else {
+            this.$Message.error("Delete sub-project failed.");
+          }
         })
         .catch(err => {
           console.log(err.data);
@@ -1349,7 +1385,30 @@ export default {
         });
     },
     show(index) {
-      window.open(this.projectResourceList[index].pathURL);
+      let name = this.projectResourceList[index].name;
+        if (this.panel != null) {
+          this.panel.close();
+        }
+        let url =
+          "http://172.21.212.7:8012/previewFile?url=http://172.21.212.7:8082" +
+          this.projectResourceList[index].pathURL;
+        let toolURL =
+          "<iframe src=" + url + ' style="width: 100%;height:100%"></iframe>';
+        this.panel = jsPanel.create({
+          headerControls: {
+            smallify: "remove"
+          },
+          theme: "none",
+          headerTitle: "Review",
+          contentSize: "800 600",
+          content: toolURL,
+          disableOnMaximized: true,
+          dragit: {
+            containment: 5
+          },
+          closeOnEscape: true
+        });
+        $(".jsPanel-content").css("font-size", "0");
     },
     gotoPersonalPage(id) {
       if (id == this.$store.getters.userId) {
@@ -1361,7 +1420,6 @@ export default {
     editModalShow(id) {
       this.editProjectModal = true;
       let editProjectInfo = this.currentProjectDetail;
-      console.log(editProjectInfo);
       this.projectEditForm.title = editProjectInfo.title;
       this.projectEditForm.introduction = editProjectInfo.introduction;
       this.projectEditForm.description = editProjectInfo.description;
@@ -1444,16 +1502,6 @@ export default {
         .catch(err => {
           console.log(err.data);
         });
-    },
-    getResourceList() {
-      this.axios
-        .get(url, {
-          params: {
-            id: paramId
-          }
-        })
-        .then(function(response) {})
-        .catch(function(error) {});
     },
     removeProjectModalShow() {
       this.removeProjectModal = true;
@@ -1554,9 +1602,6 @@ export default {
             onUploadProgress: progressEvent => {
               this.uploadProgress =
                 ((progressEvent.loaded / progressEvent.total) * 100) | 0;
-              // let complete = (progressEvent.loaded / progressEvent.total * 100 | 0) + '%'
-              console.log(progressEvent);
-              console.log(this.uploadProgress);
             },
             data: formData
           })
@@ -1588,19 +1633,16 @@ export default {
       if (that.file.length >= 5) {
         this.$Message.info("最多只能上传5个文件");
       } else {
-        console.table(this.file);
         that.file.push(file);
         that.file.map(element => {
           element["fileSize"] = Math.round((element.size / 1024) * 100) / 100;
         });
-        console.log(that.file);
       }
       return false;
     },
     delFileList(index) {
       let that = this;
       that.file.splice(index, 1);
-      console.log(that.file);
     }
   }
 };
