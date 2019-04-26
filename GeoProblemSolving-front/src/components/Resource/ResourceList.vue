@@ -26,7 +26,8 @@
 <template>
   <Row>
     <Col span="22" offset="1">
-      <div class="main" :style={height:contentHeight}>
+    <h2 style="margin-top: 20px;">Resource center</h2>
+      <div class="main" :style="{height:contentHeight-60 + 'px'}">
         <div class="sidebarTree">
           <Menu
             :theme="sidebarTheme"
@@ -36,26 +37,24 @@
             :style="{height:sidebarTreeHeight}"
             @on-select="onMenuSelect"
           >
-            <MenuGroup title="Resource Collection">
+            <MenuGroup title="Resource type">
               <MenuItem name="image">
-                <Icon type="md-image"/>Image
+                <Icon type="md-image"/>Images
               </MenuItem>
               <MenuItem name="video">
-                <Icon type="md-videocam"/>Video
+                <Icon type="md-videocam"/>Videos
               </MenuItem>
               <MenuItem name="data">
                 <Icon type="md-analytics"/>Data
               </MenuItem>
-              <!-- <Icon type="md-paper" /> -->
               <MenuItem name="paper">
-                <Icon type="md-paper"/>Paper
+                <Icon type="md-paper"/>Papers
               </MenuItem>
               <MenuItem name="document">
-                <Icon type="md-document"/>Document
+                <Icon type="md-document"/>Documents
               </MenuItem>
-              <!-- <Icon type="logo-dropbox" /> -->
               <MenuItem name="model">
-                <Icon type="logo-dropbox"/>Model
+                <Icon type="logo-dropbox"/>Models
               </MenuItem>
               <MenuItem name="others">
                 <Icon type="logo-xbox"/>Others
@@ -68,40 +67,26 @@
           <div class="resourcePanel">
             <Row>
               <Col span="22" offset="1">
-                <Table :columns="resourceColumn" :data="specifiedResourceList">
+                <Table :columns="resourceColumn" :data="showList">
                   <template slot-scope="{ row }" slot="name">
                     <strong>{{ row.name }}</strong>
                   </template>
                   <template slot-scope="{ row, index }" slot="action">
-                     <a :href="specifiedResourceList[index].pathURL" :download="specifiedResourceList[index].name"><Icon type="md-download" :size="20" color="yellowgreen"/></a>
-                     <a @click="download(index)" style="margin-left: 10px" title="View"><Icon type="md-eye" :size="20" color="orange"/></a>
-                     <a @click="deleteResource(index)" :disabled="judgeDelete(index)" style="margin-left: 10px"><Icon type="md-close" :size="20" color="red"/></a>
-                    <!-- <Button
-                      type="success"
-                      size="small"
-                      style="margin-right: 5px"
-                      @click="download(index)"
-                    >
-                      <Icon type="md-download"/>
-                    </Button>
-                    <Button
-                      type="error"
-                      size="small"
-                      @click="deleteResource(index)"
-                      :disabled="judgeDelete(index)"
-                    >
-                      <Icon type="md-close"/>
-                    </Button> -->
+                     <a :href="specifiedResourceList[index].pathURL" :download="specifiedResourceList[index].name" title="Download"><Icon type="md-download" :size="20" color="yellowgreen"/></a>
+                     <span @click="show(index)" style="margin-left: 10px" title="Preview"><Icon type="md-eye" :size="20" color="orange"/></span>
+                     <span @click="deleteResource(index)" :disabled="judgeDelete(index)" style="margin-left: 10px"><Icon type="md-close" :size="20" color="red"/></span>
                   </template>
                 </Table>
-                <div style="display:flex;margin-top:20px;justify-content:center">
+                <div style="display:flex;margin-top:20px;justify-content:right">
                   <Button type="primary" title="upload resource" @click="fileUploadModalShow()">
                     <Icon type="ios-cloud-upload-outline" :size="20"/>
                   </Button>
                 </div>
               </Col>
             </Row>
-            <div style="height:20px"></div>
+            <div style="display:flex;justify-content:center">
+              <Page :total="dataCount" :page-size="pageSize" show-total @on-change="changepage" show-elevator style="position: absolute;top:600px"/>
+            </div>
           </div>
         </div>
       </div>
@@ -150,46 +135,46 @@ export default {
       sidebarTheme: "light",
       resourceColumn: [
         {
-          type: "selection",
-          width: 60,
-          align: "center",
-          sortable: true
+          type:"index",
+          maxWidth:50,
+          align:"center"
         },
         {
           title: "Name",
           key: "name",
-          sortable: true
-        },
-        {
-          title: "Description",
-          key: "description",
-          sortable: true
-        },
-        {
-          title: "Belong",
-          key: "belong",
-          width:100,
+          minWidth:10,
+          tooltip: true,
+          sortable: true,
         },
         {
           title: "Type",
           key: "type",
+          width: 100,
           sortable: true,
-          width:100,
         },
         {
-          title: "Uploader",
-          key: "uploader"
+          title: "Size",
+          key: "fileSize",
+          width: 100,
+          sortable: true,
         },
         {
-          title: "Time",
+          title: "Description",
+          key: "description",
+          minWidth:30,
+          tooltip: true
+        },
+        {          
+          title: "Upload time",
           key: "uploadTime",
-          sortable: true,
-          width:150
+          width: 160,
+          sortable: true
         },
         {
           title: "Action",
           slot: "action",
-          width:220,
+          width: 150,
+          align:"center"
         }
       ],
       uploaderArray: [],
@@ -199,17 +184,30 @@ export default {
       file: "",
       fileDescription: "",
       fileType: "",
-      contentHeight:""
+      contentHeight:"",
+      panel:null,
+      // 分页
+      allResourceList:[],
+      allSelectedList:[],
+      showList: [],
+      dataCount:0,
+      pageSize:10,
     };
   },
   mounted() {
     this.initLayout();
     this.onMenuSelect("image");
   },
+  beforeRouteLeave(to, from, next) {
+    if (this.panel != null) {
+      this.panel.close();
+    }
+    next();
+  },
   methods: {
     initLayout() {
-      this.sidebarTreeHeight = window.innerHeight - 180 + "px";
-      this.contentHeight = window.innerHeight-120 + 'px';
+      this.sidebarTreeHeight = window.innerHeight - 200 + "px";
+      this.contentHeight = window.innerHeight-120;
     },
     onMenuSelect(name) {
       this.uploaderArray = [];
@@ -218,9 +216,6 @@ export default {
         .get(
           "/GeoProblemSolving/resource/inquiry" + "?key=type" + "&value=" + name
         )
-        // .get(
-        //   "/GeoProblemSolving/resource/allPublic"
-        // )
         .then(res => {
           if (res.data != "None") {
             let specifiedResourceListPre = res.data;
@@ -228,9 +223,25 @@ export default {
               list["uploader"] =
                 list.uploaderName;
             });
+            this.dataCount = specifiedResourceListPre.length;
             this.$set(this, "specifiedResourceList", specifiedResourceListPre);
+            this.sliceList();
           }
         });
+    },
+    sliceList(){
+      var tempResourceList = this.specifiedResourceList;
+      if(this.dataCount < this.pageSize){
+        this.$set(this, "showList", tempResourceList);
+      }
+      else{
+        this.$set(this, "showList", tempResourceList.slice(0,this.pageSize));
+      }
+    },
+    changepage(index){
+      var _start = (index - 1) * this.pageSize;
+      var _end = index * this.pageSize;
+      this.showList = this.specifiedResourceList.slice(_start,_end);
     },
     handleSelectAll(status) {
       this.$refs.selection.selectAll(status);
@@ -292,8 +303,31 @@ export default {
         return true;
       }
     },
-    download(index) {
-      window.open(this.specifiedResourceList[index].pathURL);
+    show(index) {
+      let name = this.specifiedResourceList[index].name;
+        if (this.panel != null) {
+          this.panel.close();
+        }
+        let url =
+          "http://172.21.212.7:8012/previewFile?url=http://172.21.212.7:8082" +
+          this.specifiedResourceList[index].pathURL;
+        let toolURL =
+          "<iframe src=" + url + ' style="width: 100%;height:100%"></iframe>';
+        this.panel = jsPanel.create({
+          headerControls: {
+            smallify: "remove"
+          },
+          theme: "none",
+          headerTitle: "Preview",
+          contentSize: "800 600",
+          content: toolURL,
+          disableOnMaximized: true,
+          dragit: {
+            containment: 5
+          },
+          closeOnEscape: true
+        });
+        $(".jsPanel-content").css("font-size", "0");
     },
     deleteResource(index) {
       if (this.specifiedResourceList[index].resourceId != "") {

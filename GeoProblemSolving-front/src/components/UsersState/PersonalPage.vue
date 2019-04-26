@@ -465,21 +465,31 @@ export default {
         {
           title: "Name",
           key: "name",
+          tooltip: true,
           sortable: true
         },
         {
           title: "Type",
-          key: "type"
+          key: "type",
+          sortable: true,
+          width:90
+        },
+        {
+          title: "Description",
+          key: "description",
+          tooltip:true,
+          sortable: true
         },
         {
           title: "Time",
           key: "uploadTime",
+          width: 160 ,
           sortable: true
         },
         {
           title: "Action",
           slot: "action",
-          width: 200,
+          width: 150,
           align: "center"
         }
       ],

@@ -397,7 +397,7 @@
                       style="cursor:pointer"
                     >
                       <Card class="subProjectStyle">
-                        <div class="subProjectTitle" slot="title">
+                        <div style="width:70%" class="subProjectTitle" slot="title" :title="subProject.title">
                           <span>{{subProject["title"]}}</span>
                         </div>
                         <div slot="extra" class="subProjectTitleOperatePanel">
@@ -548,12 +548,13 @@
                   <a
                     :href="projectResourceList[index].pathURL"
                     :download="projectResourceList[index].name"
+                    title="Download"
                   >
                     <Icon type="md-download" :size="20"/>
                   </a>
-                  <a @click="show(index)" style="margin-left: 10px" title="View">
-                    <Icon type="md-eye" :size="20"/>
-                  </a>
+                  <span @click="show(index)" style="margin-left:10px"title="Preview">
+                    <Icon type="md-eye" :size="20" color="#2d8cf0" style="cursor:pointer"/>
+                  </span>
                 </template>
               </Table>
             </div>
@@ -562,7 +563,7 @@
         <!-- 上传文件按钮的模态框 -->
         <Modal
           v-model="uploadFileModal"
-          title="upload file"
+          title="Upload file"
           width="800px"
           :mask-closable="false"
           @on-ok="filesUpload('fileUploadForm')"
@@ -613,17 +614,19 @@
           <div style="padding:0 10px 0 10px">
             <ul v-for="(list,index) in file" :key="index">
               <li style="display:flex">
-                filename:
-                <span style="font-size:10px;width:60%">{{ list.name }}</span>
-                size:
-                <span
-                  style="font-size:10px;width:30%;margin-left:20px"
-                >{{Math.round(list.size/Math.pow(1024,2))}}MB</span>
+                File name:
+                <span style="font-size:10px;margin: 0 5px 0 5px" :title="list.name">{{ list.name }}</span>
+                (Size:
+                <span v-if="list.size<(1024*1024)" style="font-size:10px;margin-right:10px"
+                >{{(list.size/1024).toFixed(2)}}KB)</span>
+                <span v-else style="font-size:10px;margin-right:10px"
+                >{{(list.size/1024/1024).toFixed(2)}}MB)</span>
                 <Icon
                   type="ios-close"
                   size="20"
                   @click="delFileList(index)"
-                  style="display:flex;justify-content:flex-end"
+                  style="display:flex;justify-content:flex-end;cursor:pointer"
+                  title="Cancel"
                 ></Icon>
               </li>
             </ul>
@@ -960,26 +963,38 @@ export default {
       projectTableColName: [
         {
           title: "Name",
-          key: "name"
-        },
-        {
-          title: "Description",
-          key: "description"
-        },
-        {
-          title: "type",
-          key: "type",
+          key: "name",
+          tooltip:true,
           sortable: true
         },
         {
-          title: "uploadTime",
+          title: "Type",
+          key: "type",
+          width: 100,
+          sortable: true
+        },
+        {
+          title: "Size",
+          key: "fileSize",
+          width: 100,
+          sortable: true
+        },
+        {
+          title: "Description",
+          key: "description",
+          tooltip:true,
+          sortable: true
+        },
+        {
+          title: "Upload time",
           key: "uploadTime",
+          width: 160,
           sortable: true
         },
         {
           title: "Action",
           slot: "action",
-          width: 250,
+          width: 120,
           align: "center"
         }
       ],
@@ -1419,29 +1434,29 @@ export default {
     },
     show(index) {
       let name = this.projectResourceList[index].name;
-      if (this.panel != null) {
-        this.panel.close();
-      }
-      let url =
-        "http://172.21.212.7:8012/previewFile?url=http://172.21.212.7:8082" +
-        this.projectResourceList[index].pathURL;
-      let toolURL =
-        "<iframe src=" + url + ' style="width: 100%;height:100%"></iframe>';
-      this.panel = jsPanel.create({
-        headerControls: {
-          smallify: "remove"
-        },
-        theme: "none",
-        headerTitle: "Review",
-        contentSize: "800 600",
-        content: toolURL,
-        disableOnMaximized: true,
-        dragit: {
-          containment: 5
-        },
-        closeOnEscape: true
-      });
-      $(".jsPanel-content").css("font-size", "0");
+        if (this.panel != null) {
+          this.panel.close();
+        }
+        let url =
+          "http://172.21.212.7:8012/previewFile?url=http://172.21.212.7:8082" +
+          this.projectResourceList[index].pathURL;
+        let toolURL =
+          "<iframe src=" + url + ' style="width: 100%;height:100%"></iframe>';
+        this.panel = jsPanel.create({
+          headerControls: {
+            smallify: "remove"
+          },
+          theme: "none",
+          headerTitle: "Preview",
+          contentSize: "800 600",
+          content: toolURL,
+          disableOnMaximized: true,
+          dragit: {
+            containment: 5
+          },
+          closeOnEscape: true
+        });
+        $(".jsPanel-content").css("font-size", "0");
     },
     gotoPersonalPage(id) {
       if (id == this.$store.getters.userId) {
