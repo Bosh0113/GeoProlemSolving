@@ -14,6 +14,7 @@ public class SubProjectEntity {
     private String managerName;
     private JSONArray members;
     private String createTime;
+    private String fileStruct;
 
     public String getManagerName() {
         return managerName;
@@ -77,5 +78,13 @@ public class SubProjectEntity {
 
     public void setSubProjectId(String subProjectId) {
         this.subProjectId = subProjectId;
+    }
+
+    public String getFileStruct() {
+        return fileStruct;
+    }
+
+    public void setFileStruct(String fileStruct) {
+        this.fileStruct = fileStruct;
     }
 }

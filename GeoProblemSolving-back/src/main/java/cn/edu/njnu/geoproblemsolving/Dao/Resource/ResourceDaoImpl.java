@@ -2,6 +2,7 @@ package cn.edu.njnu.geoproblemsolving.Dao.Resource;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Method.EncodeUtil;
 import cn.edu.njnu.geoproblemsolving.Entity.ResourceEntity;
+import cn.edu.njnu.geoproblemsolving.Entity.ResourceUploadInfo;
 import cn.edu.njnu.geoproblemsolving.Entity.UserEntity;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -117,6 +118,7 @@ public class ResourceDaoImpl implements IResourceDao {
                         }
 
                         String resourceId = UUID.randomUUID().toString();
+                        uploadInfo.setResourceId(resourceId);
                         String fileSize;
                         DecimalFormat df = new DecimalFormat("##0.00");
                         if (part.getSize() > 1024 * 1024) {
@@ -295,24 +297,5 @@ public class ResourceDaoImpl implements IResourceDao {
         }catch (Exception e){
             return "Fail";
         }
-    }
-}class ResourceUploadInfo {
-    private String FileName;
-    private ArrayList<String> ZipFiles;
-
-    public void setFileName(String uploaderId) {
-        this.FileName = uploaderId;
-    }
-
-    public String getFileName() {
-        return FileName;
-    }
-
-    public void setZipFiles(ArrayList<String> ZipFiles) {
-        this.ZipFiles = ZipFiles;
-    }
-
-    public ArrayList<String> getZipFiles() {
-        return ZipFiles;
     }
 }

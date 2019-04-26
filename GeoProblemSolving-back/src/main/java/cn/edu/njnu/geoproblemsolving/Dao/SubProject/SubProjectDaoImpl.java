@@ -1,10 +1,14 @@
 package cn.edu.njnu.geoproblemsolving.Dao.SubProject;
 
+import cn.edu.njnu.geoproblemsolving.Commen.FileStructConst;
 import cn.edu.njnu.geoproblemsolving.Dao.Method.EncodeUtil;
+import cn.edu.njnu.geoproblemsolving.Entity.ProjectEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.SubProjectEntity;
 import cn.edu.njnu.geoproblemsolving.Dao.Method.CommonMethod;
 import cn.edu.njnu.geoproblemsolving.Entity.UserEntity;
+import cn.edu.njnu.geoproblemsolving.utils.EditJsonUtil;
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -14,6 +18,7 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -37,6 +42,12 @@ public class SubProjectDaoImpl implements ISubProjectDao {
             subProject.setSubProjectId(subProjectId);
             subProject.setMembers(new JSONArray());
             subProject.setCreateTime(dateFormat.format(data));
+            JSONObject fileStructJson = new JSONObject();
+            fileStructJson.put("folders",new JSONArray());
+            fileStructJson.put("files",new JSONArray());
+            fileStructJson.put("uid",subProjectId);
+            String fileStruct = fileStructJson.toJSONString();
+            subProject.setFileStruct(fileStruct);
 
             // decode projectId
             String pid = subProject.getProjectId();
@@ -188,5 +199,97 @@ public class SubProjectDaoImpl implements ISubProjectDao {
         } catch (Exception e) {
             return "Fail";
         }
+    }
+
+
+    @Override
+    public String updateFileStruct(String subProjectId, String fileStruct) {
+        try {
+            Query query = new Query(Criteria.where("subProjectId").is(subProjectId));
+            Update update = Update.update("fileStruct", fileStruct);
+            mongoTemplate.updateFirst(query,update,SubProjectEntity.class);
+            return fileStruct;
+        }catch (Exception e){
+            return "Fail";
+        }
+    }
+
+    @Override
+    public String getFileStruct(String subProjectId) {
+        String fileStruct="";
+        Query query = new Query(Criteria.where("subProjectId").is(subProjectId));
+        SubProjectEntity entity = mongoTemplate.findOne(query, SubProjectEntity.class);
+        if(entity!=null && entity.getFileStruct()!=null){
+            fileStruct = entity.getFileStruct();
+        }
+        if(fileStruct.isEmpty()){
+            return "Fail";
+        }
+        return fileStruct;
+    }
+
+    @Override
+    public String createFolder(String subProjectId, String parentId, String name) {
+        try {
+            // decode
+            if (subProjectId.length() > 36) {
+                String pId = new String(EncodeUtil.decode(subProjectId));
+                subProjectId = pId.substring(0, pId.length() - 2);
+            }
+            String id = UUID.randomUUID().toString();
+            String fileStruct = getFileStruct(subProjectId);
+            String newFileStruct = EditJsonUtil.updateFileStruct(fileStruct, subProjectId, parentId, id, name, FileStructConst.CREATE_FOLDER);
+            if("Fail".equals(newFileStruct)){
+                return "Fail";
+            }
+            return newFileStruct;
+        }catch (Exception e){
+            return "Fail";
+        }
+    }
+
+    @Override
+    public String deleteFolder(String subProjectId, String parentId, String id) {
+        // decode
+        if (subProjectId.length() > 36) {
+            String pId = new String(EncodeUtil.decode(subProjectId));
+            subProjectId = pId.substring(0, pId.length() - 2);
+        }
+        String fileStruct = getFileStruct(subProjectId);
+        String newFileStruct = EditJsonUtil.updateFileStruct(fileStruct, subProjectId, parentId, id, "", FileStructConst.DELETE_FOLDER);
+        if("Fail".equals(newFileStruct)){
+            return "Fail";
+        }
+        return newFileStruct;
+    }
+
+    @Override
+    public String renameFolder(String subProjectId, String parentId, String id, String name) {
+        // decode
+        if (subProjectId.length() > 36) {
+            String pId = new String(EncodeUtil.decode(subProjectId));
+            subProjectId = pId.substring(0, pId.length() - 2);
+        }
+        String fileStruct = getFileStruct(subProjectId);
+        String newFileStruct = EditJsonUtil.updateFileStruct(fileStruct, subProjectId, parentId, id, name, FileStructConst.RENAME_FOLDER);
+        if("Fail".equals(newFileStruct)){
+            return "Fail";
+        }
+        return newFileStruct;
+    }
+
+    @Override
+    public String deleteFile(String subProjectId, String parentId, String id) {
+        // decode
+        if (subProjectId.length() > 36) {
+            String pId = new String(EncodeUtil.decode(subProjectId));
+            subProjectId = pId.substring(0, pId.length() - 2);
+        }
+        String fileStruct = getFileStruct(subProjectId);
+        String newFileStruct = EditJsonUtil.updateFileStruct(fileStruct, subProjectId, parentId, id, "", FileStructConst.DELETE_FILE);
+        if("Fail".equals(newFileStruct)){
+            return "Fail";
+        }
+        return newFileStruct;
     }
 }

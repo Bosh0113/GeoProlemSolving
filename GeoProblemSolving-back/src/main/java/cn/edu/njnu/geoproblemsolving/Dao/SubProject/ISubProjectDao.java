@@ -12,4 +12,14 @@ public interface ISubProjectDao {
     Object joinSubProject(String subProjectId,String userId);
     String quitSubProject(String subProjectId,String userId);
     Object changeManager(String subProjectId,String userId);
+    String updateFileStruct(String subProjectId,String fileStruct);
+    String getFileStruct(String subProjectId);
+
+    String createFolder(String projectId, String parentId, String name);
+
+    String deleteFolder(String projectId, String parentId, String id);
+
+    String renameFolder(String projectId,String parentId,String id,String name);
+
+    String deleteFile(String projectId,String parentId,String id);
 }

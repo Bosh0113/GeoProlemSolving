@@ -57,4 +57,56 @@ public class SubProjectController {
         SubProjectDaoImpl subProjectDao=new SubProjectDaoImpl(mongoTemplate);
         return subProjectDao.changeManager(subProjectId,userId);
     }
+
+    @RequestMapping(value = "/updateFileStrcut", method = RequestMethod.POST)
+    public String updateFileStruct(@RequestParam("subProjectId") String subProjectId,@RequestParam("fileStruct") String fileStruct){
+        SubProjectDaoImpl subProjectDao = new SubProjectDaoImpl(mongoTemplate);
+        return subProjectDao.updateFileStruct(subProjectId,fileStruct);
+    }
+
+    @RequestMapping(value = "/getFileStrcut", method = RequestMethod.GET)
+    public String getFileStruct(@RequestParam("subProjectId") String subProjectId){
+        SubProjectDaoImpl subProjectDao = new SubProjectDaoImpl(mongoTemplate);
+        return subProjectDao.getFileStruct(subProjectId);
+    }
+
+
+
+    @RequestMapping(value = "/createFolder", method = RequestMethod.POST)
+    public String createFolder(@RequestParam("subProjectId") String subProjectId,@RequestParam("parentId") String parentId,@RequestParam("folderName") String folderName){
+        SubProjectDaoImpl subProjectDao = new SubProjectDaoImpl(mongoTemplate);
+        String struct = subProjectDao.createFolder(subProjectId, parentId, folderName);
+        if("Fail".equals(struct)){
+            return "Fail";
+        }
+        return subProjectDao.updateFileStruct(subProjectId,struct);
+    }
+
+    @RequestMapping(value = "/deleteFolder", method = RequestMethod.POST)
+    public String deleteFolder(@RequestParam("subProjectId") String subProjectId,@RequestParam("parentId") String parentId,@RequestParam("folderUid") String folderUid){
+        SubProjectDaoImpl subProjectDao = new SubProjectDaoImpl(mongoTemplate);
+        String struct = subProjectDao.deleteFolder(subProjectId, parentId, folderUid);
+        if("Fail".equals(struct)){
+            return "Fail";
+        }
+        return subProjectDao.updateFileStruct(subProjectId,struct);
+    }
+    @RequestMapping(value = "/renameFolder", method = RequestMethod.POST)
+    public String renameFolder(@RequestParam("subProjectId") String subProjectId,@RequestParam("parentId") String parentId,@RequestParam("folderName") String folderName,@RequestParam("folderUid") String folderUid){
+        SubProjectDaoImpl subProjectDao = new SubProjectDaoImpl(mongoTemplate);
+        String struct = subProjectDao.renameFolder(subProjectId, parentId,folderUid, folderName);
+        if("Fail".equals(struct)){
+            return "Fail";
+        }
+        return subProjectDao.updateFileStruct(subProjectId,struct);
+    }
+    @RequestMapping(value = "/deleteFile", method = RequestMethod.POST)
+    public String deleteFile(@RequestParam("subProjectId") String subProjectId,@RequestParam("parentId") String parentId,@RequestParam("fileUid") String fileUid){
+        SubProjectDaoImpl subProjectDao = new SubProjectDaoImpl(mongoTemplate);
+        String struct = subProjectDao.deleteFile(subProjectId, parentId, fileUid);
+        if("Fail".equals(struct)){
+            return "Fail";
+        }
+        return subProjectDao.updateFileStruct(subProjectId,struct);
+    }
 }

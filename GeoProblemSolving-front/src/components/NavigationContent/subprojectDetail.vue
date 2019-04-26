@@ -1202,9 +1202,9 @@ export default {
         this.subprojectSocket = null;
       }
       let roomId = this.subProjectInfo.subProjectId + "task";
-      var subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + roomId;
+      // var subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + roomId;
       // var subprojectSocketURL = "ws://202.195.237.252:8082/GeoProblemSolving/Module/" + roomId;
-      // var subprojectSocketURL = "ws://172.21.212.7:8082/GeoProblemSolving/Module/" + roomId;
+      var subprojectSocketURL = "ws://172.21.212.7:8082/GeoProblemSolving/Module/" + roomId;
       this.subprojectSocket = new WebSocket(subprojectSocketURL);
       this.subprojectSocket.onopen = this.onOpen;
       this.subprojectSocket.onmessage = this.onMessage;
@@ -1256,7 +1256,9 @@ export default {
       clearInterval(this.timer);
     },
     sendMessage(message) {
-      this.subprojectSocket.send(JSON.stringify(message));
+      if(this.subprojectSocket!=null){
+        this.subprojectSocket.send(JSON.stringify(message));
+      }
     },
     // 返回项目页面
     // backProject() {
@@ -1529,9 +1531,9 @@ export default {
                 this.socketMsg.type = "tasks";
                 this.socketMsg.content = "created a new task.";
                 this.socketMsg.time = new Date().toLocaleString();
-                this.sendMessage(this.socketMsg);
                 this.addNewTask(res.data);
                 this.createTaskModal = false;
+                this.sendMessage(this.socketMsg);
               }
             })
             .catch(err => {});
@@ -1670,8 +1672,8 @@ export default {
                 this.socketMsg.type = "tasks";
                 this.socketMsg.content = "edited a new task.";
                 this.socketMsg.time = new Date().toLocaleString();
-                this.sendMessage(this.socketMsg);
                 this.editTaskModal = false;
+                this.sendMessage(this.socketMsg);
               } else {
                 this.$Message.error("Fail!");
               }
