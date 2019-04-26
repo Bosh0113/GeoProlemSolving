@@ -7,7 +7,7 @@
   z-index: 1;
   margin-top: 5px;
   margin-left: 2.5%;
-  /* margin-left: 5%; */
+  cursor:pointer
 }
 .header span {
   font-size: 15px;
@@ -51,11 +51,30 @@ footer{
   font-size:1.2em;
   font-weight:bold;
 }
+.menuItem:first-child{
+  margin-left:25%
+}
+.userImg{
+  width:40px;
+  height:40px;
+  vertical-align:middle;
+}
+.footerTop{
+  text-align:center;
+  color:white;
+  font-weight:bold;
+  margin-top:10px
+}
+.footerBottom{
+  text-align:center;
+  color:white;
+  font-size:.8em
+}
 </style>
 <template>
   <div class="container">
     <header>
-      <img src="@/assets/images/OGMS.png" id="logo" class="pic" @click="goHome" style="cursor:pointer">
+      <img src="@/assets/images/OGMS.png" id="logo" @click="goHome">
       <div class="navPart">
         <Menu
           mode="horizontal"
@@ -65,7 +84,7 @@ footer{
           style="z-index:0"
           width="auto"
         >
-          <MenuItem name="home" class="menuItem" style="margin-left:30%">
+          <MenuItem name="home" class="menuItem">
             <span>Home</span>
           </MenuItem>
           <MenuItem name="projects" class="menuItem">
@@ -82,7 +101,7 @@ footer{
           </MenuItem>
         </Menu>
         <div class="userState">
-            <Menu mode="horizontal" theme="dark" @on-select="unlogin" style="z-index:0" v-show="!userState"  class="menuItem">
+            <Menu mode="horizontal" theme="dark" @on-select="unlogin" v-show="!userState"  class="menuItem">
               <MenuItem name="login">
                 <span>Login</span>
               </MenuItem>
@@ -90,9 +109,9 @@ footer{
                  <span>Sign up</span>
               </MenuItem>
             </Menu>
-            <Menu mode="horizontal" theme="dark" @on-select="logged" style="z-index:0"  v-show="userState"  class="menuItem">
+            <Menu mode="horizontal" theme="dark" @on-select="logged"  v-show="userState"  class="menuItem">
               <MenuItem name="notification">
-                <Badge :count="unreadNoticeCount" id="noticeBadge">
+                <Badge :count="unreadNoticeCount">
                   <Icon type="ios-notifications-outline" size="25"></Icon>
                 </Badge>
               </MenuItem>
@@ -102,12 +121,11 @@ footer{
                     v-bind:src="avatar"
                     v-if="avatar!=''&&avatar!='undefined'"
                     :title="userName"
-                    style="width:40px;height:40px;vertical-align:middle;"
+                    class="userImg"
                   >
                   <avatar
                     :username="userName"
                     :size="40"
-                    style="margin-top:10px"
                     :title="userName"
                     v-else
                   ></avatar>
@@ -125,8 +143,8 @@ footer{
      <router-view @sendNotice="sendMessage" @readNotification="readNotification"></router-view>
     </section>
     <footer>
-      <h2 style="text-align:center;color:white;font-weight:bold;margin-top:10px"><i>Open Geographic Modeling and Simulation</i></h2>
-      <p style="text-align:center;color:white;font-size:.8em">copyright@2013-2019 OpenGMS.all rights reserved</p>
+      <h2 class="footerTop"><i>Open Geographic Modeling and Simulation</i></h2>
+      <p class="footerBottom">copyright@2013-2019 OpenGMS.all rights reserved</p>
     </footer>
   </div>
 </template>
@@ -239,8 +257,6 @@ export default {
         this.noticeSocket = null;
       }
       var noticeSocketURL = "ws://localhost:8081/GeoProblemSolving/NoticeSocket";
-      // var noticeSocketURL = "ws://202.195.237.252:8082/GeoProblemSolving/NoticeSocket";
-      // var noticeSocketURL = "ws://172.21.212.7:8082/GeoProblemSolving/NoticeSocket";
       this.noticeSocket = new WebSocket(noticeSocketURL);
       this.noticeSocket.onopen = this.onOpen;
       this.noticeSocket.onmessage = this.onMessage;
@@ -248,7 +264,7 @@ export default {
       this.noticeSocket.onerror = this.onError;
     },
     onOpen() {
-      console.log("NoticeSocket连接成功！");
+      // console.log("NoticeSocket连接成功！");
     },
     onMessage(e) {
       if (e.data == "Notice") {
@@ -261,11 +277,11 @@ export default {
     },
     onClose(e) {
       this.removeTimer();
-      console.log("NoticeSocket连接断开！");
+      // console.log("NoticeSocket连接断开！");
     },
     onError(e) {
       this.removeTimer();
-      console.log("NoticeSocket连接错误！");
+      // console.log("NoticeSocket连接错误！");
     },
     sendMessage(recipientId) {
       this.noticeSocket.send(recipientId);
