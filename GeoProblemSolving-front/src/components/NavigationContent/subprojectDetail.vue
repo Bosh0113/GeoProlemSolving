@@ -358,7 +358,7 @@
                                 >
                                   <Icon type="md-download" :size="20"/>
                                 </a>
-                                <a @click="show(index)" style="margin-left: 10px" title="View">
+                                <a @click="show(index)" style="margin-left: 10px" title="Preview">
                                   <Icon type="md-eye" :size="20"/>
                                 </a>
                               </template>
@@ -1950,7 +1950,7 @@ export default {
             smallify: "remove"
           },
           theme: "none",
-          headerTitle: "Review",
+          headerTitle: "Preview",
           contentSize: "800 600",
           content: toolURL,
           disableOnMaximized: true,

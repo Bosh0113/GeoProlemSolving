@@ -508,7 +508,7 @@
                             style="margin-right: 5px"
                             :href="resourceList[index].pathURL"
                             @click="show(index)"
-                            title="download"
+                            title="Download"
                           >
                             <Icon type="md-download"/>
                           </Button>
@@ -516,8 +516,8 @@
                             type="warning"
                             size="small"
                             style="margin-right: 5px"
-                            title="View"
-                            @click="reviewRes(index)"
+                            title="Preview"
+                            @click="previewRes(index)"
                           >
                             <Icon type="md-eye"/>
                           </Button>
@@ -856,7 +856,7 @@
                             style="margin-right: 5px"
                             :href="resourceList[index].pathURL"
                             @click="show(index)"
-                            title="download"
+                            title="Download"
                           >
                             <Icon type="md-download"/>
                           </Button>
@@ -864,8 +864,8 @@
                             type="warning"
                             size="small"
                             style="margin-right: 5px"
-                            title="View"
-                            @click="reviewRes(index)"
+                            title="Preview"
+                            @click="previewRes(index)"
                           >
                             <Icon type="md-eye"/>
                           </Button>
@@ -2328,7 +2328,7 @@ export default {
       this.editFormItem.description = this.currentNoticeDetail.description;
       // this.currentModuleNoticeList[index];显示在模态框里面的内容
     },    
-    reviewRes(index) {
+    previewRes(index) {
       let name = this.resourceList[index].name;
         if(this.panel != null){
           this.panel.close();
@@ -2340,7 +2340,7 @@ export default {
             smallify:'remove',
           },
           theme: "none",
-          headerTitle: "Review",
+          headerTitle: "Preview",
           contentSize: "800 600",
           content: toolURL,
           disableOnMaximized: true,

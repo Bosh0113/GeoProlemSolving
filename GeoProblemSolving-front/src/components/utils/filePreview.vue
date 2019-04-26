@@ -156,7 +156,7 @@ export default {
       let formData = new FormData();
       let userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
       formData.append("file", file);
-      formData.append("description", "file reviewer tool");
+      formData.append("description", "file preview tool");
       formData.append("type", fileType);
       formData.append("uploaderId", userInfo.userId);
       formData.append("belong", userInfo.userName);
@@ -176,7 +176,7 @@ export default {
 
             let fileItem = {
               name: file.name,
-              description: "file reviewer tool",
+              description: "file preview tool",
               pathURL: "/GeoProblemSolving/resource/upload/" + fileName
             };
             if (that.isPaper) {

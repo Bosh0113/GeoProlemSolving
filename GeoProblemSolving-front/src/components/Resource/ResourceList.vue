@@ -77,25 +77,9 @@
                     <strong>{{ row.name }}</strong>
                   </template>
                   <template slot-scope="{ row, index }" slot="action">
-                     <a :href="specifiedResourceList[index].pathURL" :download="specifiedResourceList[index].name"><Icon type="md-download" :size="20" color="yellowgreen"/></a>
-                     <a @click="download(index)" style="margin-left: 10px" title="View"><Icon type="md-eye" :size="20" color="orange"/></a>
+                     <a :href="specifiedResourceList[index].pathURL" :download="specifiedResourceList[index].name" title="Download"><Icon type="md-download" :size="20" color="yellowgreen"/></a>
+                     <a @click="show(index)" style="margin-left: 10px" title="Preview"><Icon type="md-eye" :size="20" color="orange"/></a>
                      <a @click="deleteResource(index)" :disabled="judgeDelete(index)" style="margin-left: 10px"><Icon type="md-close" :size="20" color="red"/></a>
-                    <!-- <Button
-                      type="success"
-                      size="small"
-                      style="margin-right: 5px"
-                      @click="download(index)"
-                    >
-                      <Icon type="md-download"/>
-                    </Button>
-                    <Button
-                      type="error"
-                      size="small"
-                      @click="deleteResource(index)"
-                      :disabled="judgeDelete(index)"
-                    >
-                      <Icon type="md-close"/>
-                    </Button> -->
                   </template>
                 </Table>
                 <div style="display:flex;margin-top:20px;justify-content:center">
@@ -203,12 +187,19 @@ export default {
       file: "",
       fileDescription: "",
       fileType: "",
-      contentHeight:""
+      contentHeight:"",
+      panel:null
     };
   },
   mounted() {
     this.initLayout();
     this.onMenuSelect("image");
+  },
+  beforeRouteLeave(to, from, next) {
+    if (this.panel != null) {
+      this.panel.close();
+    }
+    next();
   },
   methods: {
     initLayout() {
@@ -296,8 +287,32 @@ export default {
         return true;
       }
     },
-    download(index) {
-      window.open(this.specifiedResourceList[index].pathURL);
+    show(index) {
+      let name = this.specifiedResourceList[index].name;
+        if (this.panel != null) {
+          this.panel.close();
+        }
+        let url =
+          "http://172.21.212.7:8012/previewFile?url=http://172.21.212.7:8082" +
+          this.specifiedResourceList[index].pathURL;
+        let toolURL =
+          "<iframe src=" + url + ' style="width: 100%;height:100%"></iframe>';
+        this.panel = jsPanel.create({
+          headerControls: {
+            smallify: "remove"
+          },
+          theme: "none",
+          headerTitle: "Preview",
+          contentSize: "800 600",
+          content: toolURL,
+          disableOnMaximized: true,
+          dragit: {
+            containment: 5
+          },
+          closeOnEscape: true
+        });
+        $(".jsPanel-content").css("font-size", "0");
+
     },
     deleteResource(index) {
       if (this.specifiedResourceList[index].resourceId != "") {

@@ -28,7 +28,7 @@
 <template>
   <Row>
     <Col span="22" offset="1">
-      <div class="main" :style={height:contentHeight}>
+      <div class="main" :style="{height:contentHeight}">
         <div class="sidebarTree">
           <Menu
             theme="light"
@@ -70,9 +70,13 @@
             <Row>
               <Col span="22" offset="1">
                 <Table :columns="resourceColumn" :data="showList" border>
-                  <template slot-scope="{ row, index }" slot="action" v-show="showList.length>0">
-                     <a :href="showList[index].pathURL" :download="showList[index].name"><Icon type="md-download" :size="20" color="yellowgreen"/></a>
-                     <a @click="download(index)" style="margin-left: 10px" title="View"><Icon type="md-eye" :size="20" color="orange"/></a>
+                  <template v-if="$store.getters.userState" slot-scope="{ row, index }" slot="action" v-show="showList.length>0">
+                     <a :href="showList[index].pathURL" :download="showList[index].name" title="Download"><Icon type="md-download" :size="20" color="yellowgreen"/></a>
+                     <a @click="show(index)" style="margin-left: 10px" title="Preview"><Icon type="md-eye" :size="20" color="orange"/></a>
+                  </template>
+                  <template v-if="!$store.getters.userState" slot-scope="{ row, index }" slot="action" v-show="showList.length>0">
+                     <a title="Please download after login"><Icon type="md-download" :size="20" color="gray"/></a>
+                     <a style="margin-left: 10px" title="Please preview after login"><Icon type="md-eye" :size="20" color="gray"/></a>
                   </template>
                 </Table>
                 <Page :total="dataCount" :page-size="pageSize" show-total @on-change="changepage" show-elevator style="position: absolute;top:550px"/>
@@ -186,12 +190,19 @@ export default {
       file: "",
       fileDescription: "",
       fileType: "",
-      contentHeight: ""
+      contentHeight: "",
+      panel:null,
     };
   },
   mounted() {
     this.initLayout();
     this.readResource();
+  },
+  beforeRouteLeave(to, from, next) {
+    if (this.panel != null) {
+      this.panel.close();
+    }
+    next();
   },
   methods: {
     initLayout() {
@@ -245,6 +256,32 @@ export default {
       var _start = (index - 1) * this.pageSize;
       var _end = index * this.pageSize;
       this.showList = this.allSelectedList.slice(_start,_end);
+    },
+    show(index){
+      let name = this.showList[index].name;
+        if (this.panel != null) {
+          this.panel.close();
+        }
+        let url =
+          "http://172.21.212.7:8012/previewFile?url=http://172.21.212.7:8082" +
+          this.showList[index].pathURL;
+        let toolURL =
+          "<iframe src=" + url + ' style="width: 100%;height:100%"></iframe>';
+        this.panel = jsPanel.create({
+          headerControls: {
+            smallify: "remove"
+          },
+          theme: "none",
+          headerTitle: "Preview",
+          contentSize: "800 600",
+          content: toolURL,
+          disableOnMaximized: true,
+          dragit: {
+            containment: 5
+          },
+          closeOnEscape: true
+        });
+        $(".jsPanel-content").css("font-size", "0");
     }
   }
 };
