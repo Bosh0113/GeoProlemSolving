@@ -1,6 +1,5 @@
 <style scoped>
 .Content {
-  /* background: url("./../../assets/back.png") no-repeat; */
   background-size: cover;
 }
 .header {
@@ -19,7 +18,6 @@
 }
 .registerForm {
   padding: 20px;
-  /* margin: 125px 0 50px 0; */
   min-width: 900px;
 }
 .register_title {
@@ -92,7 +90,7 @@
   <div>
     <Layout>
       <Header class="header">
-        <img src="@/assets/images/OGMS.png" id="logo" class="pic" @click="goHome" style="cursor:pointer">
+        <img src="@/assets/images/OGMS.png" id="logo" @click="goHome" style="cursor:pointer">
       </Header>
       <Content>
         <Row class="Content" id="register">
@@ -102,22 +100,22 @@
                 <h2 slot="title" class="register_title">Register</h2>
                 <!-- 实现注册的样式 -->
                 <Form
-                  ref="formValidate"
-                  :model="formValidate"
-                  :rules="ruleValidate"
+                  ref="registerForm"
+                  :model="registerForm"
+                  :rules="registerFormValidate"
                   :label-width="300"
                   inline
                 >
                   <FormItem label="Name" prop="userName">
                     <Input
-                      v-model="formValidate.userName"
+                      v-model="registerForm.userName"
                       placeholder="Plase enter username"
                       :class="{InputStyle: inputstyle}"
                     ></Input>
                   </FormItem>
                   <FormItem label="Password" prop="password">
                     <Input
-                      v-model="formValidate.password"
+                      v-model="registerForm.password"
                       placeholder="Plase enter password"
                       :class="{InputStyle: inputstyle}"
                       :type="pwdType"
@@ -131,7 +129,7 @@
                   <!-- Confirm Password -->
                   <FormItem label="Confirm password" prop="confimPassword">
                     <Input
-                      v-model="formValidate.confimPassword"
+                      v-model="registerForm.confimPassword"
                       placeholder="Plase enter password again"
                       :class="{InputStyle: inputstyle}"
                       :type="pwdType"
@@ -140,63 +138,63 @@
                   </FormItem>
                   <FormItem label="Job title" prop="jobTitle">
                     <Input
-                      v-model="formValidate.jobTitle"
+                      v-model="registerForm.jobTitle"
                       placeholder="Plase enter your job title"
                       :class="{InputStyle: inputstyle}"
                     ></Input>
                   </FormItem>
                   <FormItem label="E-mail" prop="email">
                     <Input
-                      v-model="formValidate.email"
+                      v-model="registerForm.email"
                       placeholder="Plase enter your e-mail"
                       :class="{InputStyle: inputstyle}"
                     ></Input>
                   </FormItem>
                   <FormItem label="Mobile phone" prop="mobilePhone">
                     <Input
-                      v-model="formValidate.mobilePhone"
+                      v-model="registerForm.mobilePhone"
                       placeholder="Plase enter your mobilePhone"
                       :class="{InputStyle: inputstyle}"
                     ></Input>
                   </FormItem>
                   <FormItem label="Country" prop="country">
                     <Input
-                      v-model="formValidate.country"
+                      v-model="registerForm.country"
                       placeholder="Plase enter your country"
                       :class="{InputStyle: inputstyle}"
                     ></Input>
                   </FormItem>
                   <FormItem label="City" prop="city">
                     <Input
-                      v-model="formValidate.city"
+                      v-model="registerForm.city"
                       placeholder="Plase enter your city"
                       :class="{InputStyle: inputstyle}"
                     ></Input>
                   </FormItem>
                   <FormItem label="Affiliation" prop="organization">
                     <Input
-                      v-model="formValidate.organization"
+                      v-model="registerForm.organization"
                       placeholder="Plase enter your affiliation"
                       :class="{InputStyle: inputstyle}"
                     ></Input>
                   </FormItem>
                   <FormItem label="Field" prop="field">
                     <Input
-                      v-model="formValidate.field"
+                      v-model="registerForm.field"
                       placeholder="Plase enter your research field"
                       :class="{InputStyle: inputstyle}"
                     ></Input>
                   </FormItem>
                   <FormItem label="Home page" prop="homePage">
                     <Input
-                      v-model="formValidate.homePage"
+                      v-model="registerForm.homePage"
                       placeholder="Plase enter your homepage url"
                       :class="{InputStyle: inputstyle}"
                     ></Input>
                   </FormItem>
                   <br>
                   <FormItem label="Gender" prop="gender">
-                    <RadioGroup v-model="formValidate.gender">
+                    <RadioGroup v-model="registerForm.gender">
                       <Radio label="male">Male</Radio>
                       <Radio label="female">Female</Radio>
                     </RadioGroup>
@@ -224,15 +222,15 @@
                   </FormItem>
                   <FormItem label="Introduce" prop="introduction" style="width:80%">
                     <Input
-                      v-model="formValidate.introduction"
+                      v-model="registerForm.introduction"
                       type="textarea"
                       :autosize="{minRows: 2,maxRows: 5}"
                       placeholder="Plase introduce yourself"
                     ></Input>
                   </FormItem>
                   <FormItem>
-                    <Button type="primary" @click="handleSubmit('formValidate')">Submit</Button>
-                    <Button @click="handleReset('formValidate')" style="margin-left: 8px">Reset</Button>
+                    <Button type="primary" @click="handleSubmit('registerForm')">Submit</Button>
+                    <Button @click="handleReset('registerForm')" style="margin-left: 8px">Reset</Button>
                   </FormItem>
                 </Form>
                 <!-- 注册样式结束 -->
@@ -257,7 +255,7 @@ export default {
     var validatePass = (rule, value, callback) => {
       if (value === "") {
         callback(new Error("Please enter your password again"));
-      } else if (value !== this.formValidate.password) {
+      } else if (value !== this.registerForm.password) {
         callback(new Error("The two passwords are inconsistent!"));
       } else {
         callback();
@@ -266,11 +264,10 @@ export default {
     return {
       //data预设
       country: "",
-      region: "",
       //input的样式设定
       inputstyle: true,
       //表单验证
-      formValidate: {
+      registerForm: {
         userName: "",
         email: "",
         password: "",
@@ -286,7 +283,7 @@ export default {
         homePage: "",
         avatar: ""
       },
-      ruleValidate: {
+      registerFormValidate: {
         userName: [
           {
             required: true,
@@ -315,10 +312,10 @@ export default {
           }
         ],
         confimPassword: [
-          { 
+          {
             required: true,
             validator: validatePass,
-            trigger: "blur" 
+            trigger: "blur"
           }
         ],
         jobTitle: [
@@ -401,23 +398,23 @@ export default {
       this.$refs[name].validate(valid => {
         if (valid) {
           var userJson = {};
-          userJson["userName"] = this.formValidate.userName;
-          userJson["email"] = this.formValidate.email;
-          userJson["password"] = this.formValidate.password;
-          userJson["mobilePhone"] = this.formValidate.mobilePhone;
-          userJson["gender"] = this.formValidate.gender;
-          userJson["jobTitle"] = this.formValidate.jobTitle;
-          userJson["country"] = this.formValidate.country;
-          userJson["city"] = this.formValidate.city;
-          userJson["organization"] = this.formValidate.organization;
-          userJson["introduction"] = this.formValidate.introduction;
-          userJson["direction"] = this.formValidate.field;
-          userJson["homePage"] = this.formValidate.homePage;
-          userJson["avatar"] = this.formValidate.avatar;
+          userJson["userName"] = this.registerForm.userName;
+          userJson["email"] = this.registerForm.email;
+          userJson["password"] = this.registerForm.password;
+          userJson["mobilePhone"] = this.registerForm.mobilePhone;
+          userJson["gender"] = this.registerForm.gender;
+          userJson["jobTitle"] = this.registerForm.jobTitle;
+          userJson["country"] = this.registerForm.country;
+          userJson["city"] = this.registerForm.city;
+          userJson["organization"] = this.registerForm.organization;
+          userJson["introduction"] = this.registerForm.introduction;
+          userJson["direction"] = this.registerForm.field;
+          userJson["homePage"] = this.registerForm.homePage;
+          userJson["avatar"] = this.registerForm.avatar;
           var that = this;
-          var passwordFro=this.formValidate.password;
+          var passwordFro=this.registerForm.password;
           var passwordAES = this.encrypto(passwordFro);
-          var email=this.formValidate.email;
+          var email=this.registerForm.email;
           this.axios
             .post(
               "/GeoProblemSolving/user/register",
@@ -477,7 +474,7 @@ export default {
       reader.onload = e => {
         // 读取到的图片base64 数据编码 将此编码字符串传给后台即可
         imgcode = e.target.result;
-         
+
         this.$store.commit("uploadAvatar", imgcode);
       };
     },

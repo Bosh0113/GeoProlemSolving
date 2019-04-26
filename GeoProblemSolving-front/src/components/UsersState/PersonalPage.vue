@@ -170,7 +170,7 @@
           >
             <div class="rightContent">
               <div class="parent">
-                <Tabs value="Overview" style="font-size:20px">
+                <Tabs value="Overview" style="font-size:20px" type="card">
                   <TabPane label="Overview" name="Overview">
                     <Col :lg="{span:22,offset:1}" :md="{span:22,offset:1}" :sm="{span:22,offset:1}">
                       <Card>

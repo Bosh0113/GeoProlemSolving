@@ -1,7 +1,4 @@
 <style scoped>
-.detail {
-  display: flex;
-}
 .sidebar {
   font-weight: bold;
   width: 15%;
@@ -11,29 +8,8 @@
   margin-left: 5%;
   height: 100%;
 }
-.single_part {
-  margin-left: 2.5%;
-  margin-right: 2.5%;
-}
-.addNodeStyle,
-.editNodeStyle {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 2.5%;
-}
-.addBtn,
-.removeBtn,
 .editBtn .createTaskBtn {
   font-size: 10px;
-}
-.addBtn:hover {
-  color: white;
-  background: #47cb89;
-}
-.removeBtn:hover {
-  color: white;
-  background: #f16643;
 }
 .editBtn:hover {
   color: white;
@@ -64,7 +40,7 @@
 .memebr-work {
   width: 70%;
   height: 60px;
-  margin: 0 20px;
+  margin: 0 5px;
 }
 .userName {
   height: 30px;
@@ -119,23 +95,19 @@
     <Row>
       <Col span="22" offset="1">
         <Card>
-          <div slot="title" style="height:20px;width:50%">
-            <Breadcrumb>
-              <BreadcrumbItem :to="toProjectPage">Project</BreadcrumbItem>
-              <BreadcrumbItem >Subproject</BreadcrumbItem>
-              <!-- <span>Subproject</span> -->
-              <!-- <BreadcrumbItem>
-              <span style="color:#999">>>></span>
-              <span>{{subProjectInfo.title}}</span></BreadcrumbItem>-->
-            </Breadcrumb>
-            <span style="float:right;margin-top:-15px;font-size:1.5rem"><strong>{{subProjectInfo.title}}</strong></span>
-          </div>
+          <div style="display:flex;height:40px">
+            <div slot="title" style="height:40px;width:20%;display:flex;align-items:center">
+              <Breadcrumb >
+                <BreadcrumbItem :to="toProjectPage">Project</BreadcrumbItem>
+                <BreadcrumbItem >Subproject</BreadcrumbItem>
+              </Breadcrumb>
+            </div>
+          <div style="text-align:center;font-size:1.5rem;width:60%;height:40px"><strong>{{subProjectInfo.title}}</strong></div>
           <div
             slot="extra"
-            style="height:20px;display:flex;align-items:center"
+            style="height:40px;display:flex;align-items:center;width:20%;float:right"
             class="operatePanel"
           >
-          
             <Button
               type="default"
               @click="gotoWorkingPanel()"
@@ -148,26 +120,24 @@
               icon="md-mail"
               title="Inform others to work together"
             >Inform</Button>
-            <!-- <Button
-              type="default"
-              @click="backProject()"
-              icon="md-arrow-back"
-              title="Back to project page"
-            >Back</Button> -->
           </div>
+          </div>
+
           <Row>
             <Col span="22" offset="1" style="background-color:white;">
-            <!-- <span >{{subProjectInfo.title}}</span> -->
               <Tabs type="card" v-model="currentTab" @on-click="currentTabChanged(name)">
                 <TabPane label="Subproject home" icon="ios-home" name="home">
-                  <div class="workspaceContent">
+                  <div class="workspaceContent" >
                     <Col
-                      :xs="8"
-                      :sm="7"
-                      :md="7"
-                      :lg="5"
+                      :xs="{span:8,offset:1}"
+                      :sm="{span:7,offset:1}"
+                      :md="{span:6,offset:1}"
+                      :lg="{span:5,offset:1}"
+
                       v-bind="this.participants"
                       :style="{height:sidebarHeight+14+'px'}"
+                      style="margin-top:30px"
+
                     >
                       <Card>
                         <div slot="title" style="font-size:18px"><strong>Participants</strong></div>
@@ -198,13 +168,13 @@
                                   ></avatar>
                                 </div>
                               </Badge>
-                              <div class="memebr-work">
+                              <div class="memebr-work" style="display:flex;align-items:center">
                                 <div class="userName">
-                                  <span style="padding:0 5px;float:right">{{member.userName}}</span>
+                                  <span style="padding:0 2.5px">{{member.userName}}({{member.organization}})</span>
                                 </div>
-                                <div class="organization">
+                                <!-- <div class="organization">
                                   <span style="padding:0 5px">{{member.organization}}</span>
-                                </div>
+                                </div> -->
                               </div>
                             </template>
                             <template v-else style="margin-top:5px">
@@ -301,15 +271,15 @@
                         </div>
                       </Card>
                     </Col>
-                    <Col :xs="15" :sm="16" :md="17" :lg="17" style="margin-left:20px;">
-                      <Card :style="{height:descHeight +'px'}" style="background-color:white;margin-left:30px;height:40px">
-                        <div slot="title" style="font-size:18px"><strong>Description</strong></div>
+                    <Col :xs="15" :sm="16" :md="17" :lg="17" style="margin-left:20px;margin-top:30px">
+                      <Card :style="{height:descHeight +'px'}" style="background-color:white;margin-left:30px">
+                        <div slot="title" style="font-size:18px;"><strong>Description</strong></div>
                         <div
-                          :style="{height:descHeight +'px'}"
+                          :style="{height:descHeight-60 +'px'}"
                           class="subProjectDesc"
+                          style="overflow-y:auto"
                         >{{subProjectInfo.description}}</div>
                       </Card>
-                        <!-- <div class="title">Description</div> -->
                       <div class="resourcePanel" style="padding:20px 0 0 30px">
                         <Card>
                           <div
@@ -410,7 +380,7 @@
                                 />
                               </FormItem>
                             </Form>
-                          </div>                          
+                          </div>
                           <Upload
                             :max-size="1024*1024"
                             multiple
@@ -1260,39 +1230,6 @@ export default {
         this.subprojectSocket.send(JSON.stringify(message));
       }
     },
-    // 返回项目页面
-    // backProject() {
-    //   let projectInfo = this.$store.getters.project;
-    //   if (
-    //     JSON.stringify(projectInfo) != "{}" &&
-    //     projectInfo.projectId == this.subProjectInfo.projectId
-    //   ) {
-    //     let id = projectInfo.projectId;
-    //     this.$router.push(`../${id}`);
-    //   } else {
-    //     this.axios
-    //       .get(
-    //         "/GeoProblemSolving/project/inquiry" +
-    //           "?key=projectId" +
-    //           "&value=" +
-    //           this.subProjectInfo.projectId
-    //       )
-    //       .then(res => {
-    //         if (res.data != "None" && res.data != "Fail") {
-    //           this.projectInfo = res.data[0];
-    //           this.$store.commit("setProjectInfo", res.data[0]);
-
-    //           let id = this.projectInfo.projectId;
-    //           this.$router.push(`../${id}`);
-    //         } else {
-    //           console.log(res.data);
-    //         }
-    //       })
-    //       .catch(err => {
-    //         console.log(err.data);
-    //       });
-    //   }
-    // },
     // 召集参与者
     conveneWork() {
       for (let i = 0; i < this.participants.length; i++) {
@@ -1925,7 +1862,7 @@ export default {
     },
     currentTabChanged(name) {
       if(this.oldTabPaneState !== name){
-        
+
         this.closeModuleSocket();
 
         if(name == 'task') {
@@ -1938,7 +1875,7 @@ export default {
     },
     show(index) {
       let name = this.subProjectResourceList[index].name;
-      
+
         if (this.panel != null) {
           this.panel.close();
         }
@@ -2043,8 +1980,6 @@ export default {
                   desc: "File uploaded successfully",
                   duration: 2
                 });
-                //这里重新获取一次该项目下的全部资源
-                // this.addUploadEvent(this.currentProjectDetail.projectId);
                 this.getAllResource();
                 this.subProjectFileUploadForm.description = "";
                 this.subProjectFileUploadForm.privacy = "";

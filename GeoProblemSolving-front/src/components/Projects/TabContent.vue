@@ -7,9 +7,6 @@ img {
   width: 100%;
   height: auto;
 }
-.whitespace {
-  height: 20px;
-}
 .projectTitle {
   height: 30px;
   line-height: 30px;

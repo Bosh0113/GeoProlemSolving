@@ -7,7 +7,7 @@
   z-index: 1;
   margin-top: 5px;
   margin-left: 2.5%;
-  /* margin-left: 5%; */
+  cursor:pointer
 }
 .header span {
   font-size: 15px;
@@ -49,6 +49,25 @@ footer {
 .menuItem span {
   font-size: 1.2em;
   font-weight: bold;
+}
+.menuItem:first-child{
+  margin-left:25%
+}
+.userImg{
+  width:40px;
+  height:40px;
+  vertical-align:middle;
+}
+.footerTop{
+  text-align:center;
+  color:white;
+  font-weight:bold;
+  margin-top:10px
+}
+.footerBottom{
+  text-align:center;
+  color:white;
+  font-size:.8em
 }
 </style>
 <template>
@@ -172,8 +191,8 @@ footer {
      <router-view @sendNotice="sendMessage" @readNotification="readNotification"></router-view>
     </section>
     <footer>
-      <h2 style="text-align:center;color:white;font-weight:bold;margin-top:10px"><i>Open Geographic Modeling and Simulation</i></h2>
-      <p style="text-align:center;color:white;font-size:.8em">copyright@2013-2019 OpenGMS.all rights reserved</p>
+      <h2 class="footerTop"><i>Open Geographic Modeling and Simulation</i></h2>
+      <p class="footerBottom">copyright@2013-2019 OpenGMS.all rights reserved</p>
     </footer>
   </div>
 </template>
@@ -301,7 +320,7 @@ export default {
       this.noticeSocket.onerror = this.onError;
     },
     onOpen() {
-      console.log("NoticeSocket连接成功！");
+      // console.log("NoticeSocket连接成功！");
     },
     onMessage(e) {
       if (e.data == "Notice") {
@@ -314,11 +333,11 @@ export default {
     },
     onClose(e) {
       this.removeTimer();
-      console.log("NoticeSocket连接断开！");
+      // console.log("NoticeSocket连接断开！");
     },
     onError(e) {
       this.removeTimer();
-      console.log("NoticeSocket连接错误！");
+      // console.log("NoticeSocket连接错误！");
     },
     sendMessage(recipientId) {
       this.noticeSocket.send(recipientId);

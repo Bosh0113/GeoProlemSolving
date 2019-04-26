@@ -14,19 +14,15 @@
 
 .btnPanel {
   flex: 1;
-  /* justify-content:flex-start; */
 }
 .btnPanel button {
   margin-left: 20px;
 }
-.searchPanel {
-  /* flex:1; */
-  display: flex;
-  float: right;
-  /* justify-content:flex-end; */
+.menuClass{
+  border:1px solid lightgray;
+  z-index:0
 }
 </style>
-
 <template>
   <Row>
     <Col span="22" offset="1">
@@ -36,7 +32,7 @@
             :theme="sidebarTheme"
             active-name="1"
             width="auto"
-            style="border:1px solid lightgray;z-index:0"
+            class="menuClass"
             :style="{height:sidebarTreeHeight}"
             @on-select="onMenuSelect"
           >
