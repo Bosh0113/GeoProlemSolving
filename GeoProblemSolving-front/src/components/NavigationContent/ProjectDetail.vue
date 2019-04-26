@@ -811,8 +811,10 @@ export default {
         subProjectTitle: [
           {
             required: true,
-            message: "The title can't be empty",
-            trigger: "blur"
+            message: "The title can't be empty and np moren than 60 words",
+            trigger: "blur",
+            type:'string',
+            max:60,
           },
           {
             required: true,

@@ -169,12 +169,8 @@
                       v-bind="this.participants"
                       :style="{height:sidebarHeight+14+'px'}"
                     >
-                      <div
-                        class="member-panel"
-                        :style="{height:sidebarHeight-6+'px'}"
-                        style="background-color:white;border:1px solid lightgray"
-                      >
-                        <div class="title">Participants</div>
+                      <Card>
+                        <div slot="title" style="font-size:18px"><strong>Participants</strong></div>
                         <div :style="{height:sidebarHeight-100+'px'}">
                           <div
                             class="member-desc"
@@ -238,9 +234,7 @@
                                   <span style="padding:0 5px">{{member.organization}}</span>
                                 </div>
                               </div>
-                              <!-- v-show="this.$store.getters.userId" -->
-                              <!-- v-show="this.subProjectInfo.managerId == this.$store.getters.userId" -->
-                            </template>
+                              </template>
                             <div style="line-height:60px" type="default">
                               <span
                                 style="cursor:pointer"
@@ -307,25 +301,23 @@
                             </div>
                           </Modal>
                         </div>
-                      </div>
+                      </Card>
                     </Col>
                     <Col :xs="15" :sm="16" :md="17" :lg="17" style="margin-left:20px;">
-                      <div
-                        style="background-color:white;margin-left:30px;height:40px;border:1px solid lightgray"
-                        :style="{height:descHeight +'px'}"
-                      >
-                        <div class="title">Description</div>
+                      <Card :style="{height:descHeight +'px'}" style="background-color:white;margin-left:30px;height:40px">
+                        <div slot="title" style="font-size:18px"><strong>Description</strong></div>
                         <div
                           :style="{height:descHeight +'px'}"
                           class="subProjectDesc"
                         >{{subProjectInfo.description}}</div>
-                      </div>
+                      </Card>
+                        <!-- <div class="title">Description</div> -->
                       <div class="resourcePanel" style="padding:20px 0 0 30px">
                         <Card>
-                          <p
+                          <div
                             slot="title"
-                            style="font-size:20px;height:20px;line-height:20px;"
-                          >Resource</p>
+                            style="font-size:18px;height:20px;line-height:20px;"
+                          ><strong>Resource</strong></div>
                           <div slot="extra" style="display:flex;align-items:center;height:20px">
                             <Button
                               id="upload"

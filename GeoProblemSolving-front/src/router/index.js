@@ -1,9 +1,9 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import 'mavon-editor/dist/css/index.css'
-import mavonEditor from 'mavon-editor'
+// import 'mavon-editor/dist/css/index.css'
+// import mavonEditor from 'mavon-editor'
 Vue.use(Router)
-Vue.use(mavonEditor)
+// Vue.use(mavonEditor)
 
 
 const routes = [{
