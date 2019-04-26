@@ -517,7 +517,7 @@
         >
           <div style="display:flex;;align-items:center">
             <span style="width:20%;text-align:center">Privacy</span>
-              <RadioGroup v-model="privacy" style="width:80%">
+            <RadioGroup v-model="privacy" style="width:80%">
               <Radio label="public"></Radio>
               <Radio label="privacy"></Radio>
             </RadioGroup>
@@ -537,7 +537,8 @@
           </div>
           <br>
           <div style="display:flex;text-align:center;align-items:center;justify-content:center">
-            Description:<br>
+            Description:
+            <br>
             <Input type="textarea" :rows="4" v-model="fileDescription"/>
           </div>
           <br>
@@ -840,8 +841,8 @@ export default {
       sidebarHeight: "",
       // 进度条模态框
       progressModalShow: false,
-      uploadProgress:0,
-      panel: null,
+      uploadProgress: 0,
+      panel: null
     };
   },
   created() {
@@ -884,9 +885,9 @@ export default {
     });
   },
   beforeRouteLeave(to, from, next) {
-    if(this.panel != null){
-        this.panel.close();
-      }
+    if (this.panel != null) {
+      this.panel.close();
+    }
     next();
   },
   methods: {
@@ -1203,27 +1204,33 @@ export default {
         });
     },
     show(index) {
-      
       let name = this.projectResourceList[index].name;
-      if(!/\.(pdf||zip||doc||docx||ppt||pptx||xls||xlsx)$/.test(name.toLowerCase())){
-        if(this.panel != null){
+      if (
+        !/\.(pdf||zip||doc||docx||ppt||pptx||xls||xlsx)$/.test(
+          name.toLowerCase()
+        )
+      ) {
+        if (this.panel != null) {
           this.panel.close();
         }
-        let url = "http://172.21.212.7:8012/previewFile?url="+this.projectResourceList[index].pathURL;
-        let toolURL ='<iframe src='+url+' style="width: 100%;height:100%"></iframe>'
+        let url =
+          "http://172.21.212.7:8012/previewFile?url=" +
+          this.projectResourceList[index].pathURL;
+        let toolURL =
+          "<iframe src=" + url + ' style="width: 100%;height:100%"></iframe>';
         this.panel = jsPanel.create({
           headerControls: {
-            smallify:'remove',
+            smallify: "remove"
           },
           theme: "none",
           headerTitle: "Review",
           contentSize: "800 600",
           content: toolURL,
           disableOnMaximized: true,
-          dragit:{
-            containment:5,
+          dragit: {
+            containment: 5
           },
-          closeOnEscape: true,
+          closeOnEscape: true
         });
         $(".jsPanel-content").css("font-size", "0");
       }
@@ -1422,12 +1429,13 @@ export default {
         url: "/GeoProblemSolving/resource/upload",
         method: "post",
         onUploadProgress: progressEvent => {
-          this.uploadProgress = (progressEvent.loaded / progressEvent.total * 100 | 0);
+          this.uploadProgress =
+            ((progressEvent.loaded / progressEvent.total) * 100) | 0;
           // let complete = (progressEvent.loaded / progressEvent.total * 100 | 0) + '%'
           console.log(progressEvent);
           console.log(this.uploadProgress);
         },
-        data:formData
+        data: formData
       })
         .then(res => {
           if (res.data != "Size over" && res.data.length > 0) {
