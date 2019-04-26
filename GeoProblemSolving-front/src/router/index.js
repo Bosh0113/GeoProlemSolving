@@ -22,7 +22,7 @@ const routes = [{
     { path: 'personalPage', name: 'PersonalPage', component: resolve=>(require(["@/components/UsersState/PersonalPage"],resolve)) },
     { path: 'notifications', name: 'Notifications', component: resolve=>(require(["@/components/UsersState/Notifications"],resolve)) },
     { path: 'memberPage/:id', name: 'MemberDetailPage', component: resolve=>(require(["@/components/UserPage/memberDetailPage"],resolve)) },
-    { path: 'resourceList', name: 'resourceList', component: resolve=>(require(["@/components/Resource/ResourceList"],resolve)) },
+    // { path: 'resourceList', name: 'resourceList', component: resolve=>(require(["@/components/Resource/ResourceList"],resolve)) },
     { path: 'publicResource', name: 'PublicResource', component: resolve=>(require(["@/components/Resource/PublicResourceList"],resolve)) },
   ]
 },

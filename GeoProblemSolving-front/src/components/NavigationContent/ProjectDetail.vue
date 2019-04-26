@@ -138,77 +138,156 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  width:70%
 }
 /* 按钮样式统一结束 */
+.projectCardTitle{
+    font-size:25px;
+    height:40px;
+    line-height:40px;
+    max-width:50%
+}
+.projectCardTitleExtra{
+    height:40px;
+    line-height:40px;
+    display:flex;
+    width:50%
+}
+.projectCardTitleExtra span{
+    cursor:pointer
+}
+.projectCardTitleExtra span:last-child{
+    margin-left:20px
+}
+.projectDescription{
+  height:80px;
+}
+.projectIntroduction{
+  height:220px;
+  padding-top:10px
+}
+.projectDescriptionContent{
+ height:56px;
+ overflow-y:auto;
+ text-indent:2em;
+ padding:0 5px;
+ word-break: break-word;
+}
+.projectIntroduction,.projectIntroduction h3{
+  margin-left:5px;
+}
+.projectIntroductionContent{
+  height:196px;
+  overflow-y: auto;
+  text-indent:2em;
+  padding:0 5px;
+  word-break: break-word;
+}
+.memberPanelTitle{
+  font-size:25px;
+  height:40px;
+  line-height:40px;
+}
+.memberList{
+  display:flex;
+  align-items:center
+}
+.memberList button{
+  margin-left:0.5%;
+  margin-right:0.5%
+}
+.subProjectsPanel{
+  padding:20px;
+}
+.subProjectsTitle{
+  font-size:25px;
+  height:40px;
+  line-height:40px
+}
+.subProjectTitleOperatePanel{
+ width:30%;
+ display:flex;
+ align-items:center
+}
+.subProjectTextInfo{
+  height:20px;
+  align-items:center;
+  display:flex;
+  justify-content:flex-start
+}
+.subProjectTextInfo:last-child{
+  margin-top:5px;
+}
+.subProjectTextInfo span{
+  height:20px;
+  margin-left:5%
+}
 </style>
 <template>
   <div class="main">
     <Row>
       <Col span="22" offset="1">
-        <div class="detail">
-          <div class="detail_description">
-            <Card>
-              <p
-                slot="title"
-                style="font-size:25px;height:40px;line-height:40px;max-width:50%"
-              >{{currentProjectDetail["title"]}}</p>
-              <div slot="extra" style="height:40px;line-height:40px;display:flex;width:50%">
-                <span
-                  type="default"
-                  title="edit"
-                  @click="editModalShow(currentProjectDetail['projectId'])"
-                  v-show="judgeIsManager(projectManager.userId)"
-                  style="cursor:pointer"
-                >
-                  <Icon type="ios-create" :size="30"></Icon>
-                </span>
-                <span
-                  type="default"
-                  title="remove"
-                  style="margin-left:20px;cursor:pointer"
-                  @click="deleteProjectShow()"
-                  v-show="judgeIsManager(projectManager.userId)"
-                >
-                  <Icon type="md-close" :size="30"></Icon>
-                </span>
-              </div>
-              <Row>
-                <Col :xs="12" :sm="10" :md="9" :lg="8">
-                  <div class="detail_image">
-                    <img
-                      :src="currentProjectDetail.picture"
-                      v-if="currentProjectDetail.picture!=''&&currentProjectDetail.picture!='undefined'"
-                    >
-                    <avatar
-                      :username="currentProjectDetail.title"
-                      :size="260"
-                      :title="currentProjectDetail.title"
-                      :rounded="false"
-                      v-else
-                    ></avatar>
-                  </div>
-                </Col>
-                <Col :xs="12" :sm="14" :md="15" :lg="16">
-                  <div style="height:80px;">
-                    <h3 style="margin-left:5px">Description</h3>
-                    <div
-                      style="height:56px;overflow-y:auto;text-indent:2em;padding:0 5px;word-break: break-word;"
-                    >{{currentProjectDetail.description}}</div>
-                  </div>
-                  <div style="height:220px;padding-top:10px">
-                    <h3 style="margin-left:5px">Introduction</h3>
-                    <div
-                      style="height:196px;overflow-y: auto;text-indent:2em;padding:0 5px;word-break: break-word;"
-                    >{{currentProjectDetail.introduction}}</div>
-                  </div>
-                </Col>
-              </Row>
-            </Card>
-          </div>
+        <div class="detail_description">
+          <Card>
+            <p
+              slot="title"
+              style=""
+              class="projectCardTitle"
+            >{{currentProjectDetail["title"]}}</p>
+            <div slot="extra" class="projectCardTitleExtra">
+              <span
+                type="default"
+                title="edit"
+                @click="editModalShow(currentProjectDetail['projectId'])"
+                v-show="judgeIsManager(projectManager.userId)"
+              >
+                <Icon type="ios-create" :size="30"></Icon>
+              </span>
+              <span
+                type="default"
+                title="remove"
+                @click="deleteProjectShow()"
+                v-show="judgeIsManager(projectManager.userId)"
+              >
+                <Icon type="md-close" :size="30"></Icon>
+              </span>
+            </div>
+            <Row>
+              <Col :xs="12" :sm="10" :md="9" :lg="8">
+                <div class="detail_image">
+                  <img
+                    :src="currentProjectDetail.picture"
+                    v-if="currentProjectDetail.picture!=''&&currentProjectDetail.picture!='undefined'"
+                  >
+                  <avatar
+                    :username="currentProjectDetail.title"
+                    :size="260"
+                    :title="currentProjectDetail.title"
+                    :rounded="false"
+                    v-else
+                  ></avatar>
+                </div>
+              </Col>
+              <Col :xs="12" :sm="14" :md="15" :lg="16">
+                <div class="projectDescription">
+                  <h3>Description</h3>
+                  <div
+                    class="projectDescriptionContent"
+                  >{{currentProjectDetail.description}}</div>
+                </div>
+                <div class="projectIntroduction">
+                  <h3>Introduction</h3>
+                  <div
+                    class="projectIntroductionContent"
+                  >{{currentProjectDetail.introduction}}</div>
+                </div>
+              </Col>
+            </Row>
+          </Card>
         </div>
         <div class="memberPanel">
           <Card :bordered="false">
-            <p slot="title" style="font-size:25px;height:40px;line-height:40px;">Members</p>
+            <p slot="title" class="memberPanelTitle">Members</p>
             <div slot="extra" style="height:40px">
               <Poptip trigger="hover" content="Invite other members" placement="right">
                 <Button
@@ -220,23 +299,20 @@
                 </Button>
               </Poptip>
             </div>
-            <div style="display:flex;align-items:center">
+            <div class="memberList">
               <Button
                 type="success"
-                style="margin-left:0.5%;margin-right:0.5%"
                 @click="gotoPersonalPage(projectManager.userId)"
               >{{this.projectManager.userName}}</Button>
               <Button
                 v-for="member in currentProjectDetail.members"
                 type="primary"
                 :key="member.index"
-                style="margin-left:0.5%;margin-right:0.5%"
                 @click="gotoPersonalPage(member.userId)"
               >{{member.userName}}</Button>
             </div>
           </Card>
         </div>
-
         <!-- 关于邀请其他成员的modal,禁用点击其他空白处误关模态框 -->
         <Modal
           v-model="inviteModal"
@@ -256,9 +332,8 @@
                 placeholder="input email and press enter button the email will be added below"
                 style="width:70%"
               >
-                <Option v-for="item in data2" :value="item" :key="item">{{ item }}</Option>
+                <Option v-for="item in prompt" :value="item" :key="item">{{ item }}</Option>
               </AutoComplete>
-              <!-- <Input v-model="emailInfo.inputEmail" placeholder="input email and press enter button the email will be added below" style="width:70%"/> -->
             </FormItem>
             <FormItem label="Title" prop="emailTitle" style="width:100%">
               <Input
@@ -272,10 +347,10 @@
             </FormItem>
           </Form>
         </Modal>
-        <div style="padding: 20px">
+        <div class="subProjectsPanel">
           <Card :bordered="false">
-            <p slot="title" style="font-size:25px;height:40px;line-height:40px">Subprojects</p>
-            <div slot="extra" style="height:40px">
+            <p slot="title" class="subProjectsTitle">Subprojects</p>
+            <div slot="extra">
               <Poptip trigger="hover" content="Create a new subproject" placement="right">
                 <Button
                   class="subProjectBtn"
@@ -290,7 +365,7 @@
                 ok-text="create"
                 cancel-text="cancel"
                 @on-ok="createSubProject('createSubProjectForm')"
-                @on-cancel="cancel()"
+                @on-cancel=""
                 title="Create sub project"
                 width="800px"
                 :mask-closable="false"
@@ -317,7 +392,6 @@
                       ></Input>
                     </FormItem>
                   </Form>
-
                 </div>
               </Modal>
             </div>
@@ -330,12 +404,12 @@
                       style="cursor:pointer"
                     >
                       <Card class="subProjectStyle">
-                        <div style="width:70%" class="subProjectTitle" slot="title">
+                        <div class="subProjectTitle" slot="title">
                           <span>{{subProject["title"]}}</span>
                         </div>
                         <div
                           slot="extra"
-                          style="height:40px;;width:30%;display:flex;align-items:center"
+                          class="subProjectTitleOperatePanel"
                         >
                           <div style="display:flex">
                             <span
@@ -373,18 +447,16 @@
                         <p class="subProjectDescription">{{subProject["description"]}}</p>
                         <br>
                         <div
-                          style="height:20px;align-items:center;display:flex;justify-content:flex-start"
+                          class="subProjectTextInfo"
                         >
                           <Icon type="md-body" :size="20"/>Manager
-                          <span style="height:20px;margin-left:5%">{{subProject.managerName}}</span>
+                          <span>{{subProject.managerName}}</span>
                         </div>
                         <div
-                          style="height:20px;margin-top:5px;align-items:center;display:flex;justify-content:flex-start"
+                          class="subProjectTextInfo"
                         >
                           <Icon type="md-clock" :size="20"/>Creation Time
-                          <span
-                            style="height:20px;margin-left:5%"
-                          >{{subProject.createTime.split(' ')[0]}}</span>
+                          <span>{{subProject.createTime.split(' ')[0]}}</span>
                         </div>
                       </Card>
                     </div>
@@ -397,7 +469,7 @@
                 ok-text="ok"
                 cancel-text="cancel"
                 @on-ok="handOverSubProject()"
-                @on-cancel
+                @on-cancel=""
                 width="500px"
                 :mask-closable="false"
               >
@@ -418,15 +490,12 @@
                 ok-text="submit"
                 cancel-text="cancel"
                 @on-ok="editSubProject('editSubProjectForm')"
-                @on-cancel="cancel()"
+                @on-cancel=""
                 title="Edit the information of this subproject"
                 width="800px"
                 :mask-closable="false"
               >
                 <div>
-                  <!-- editSubProjectFormValidate -->
-                  <!-- editSubProjectForm -->
-
                   <Form
                     ref="editSubProjectForm"
                     :model="editSubProjectForm"
@@ -440,26 +509,6 @@
                       <Input v-model="editSubProjectForm.subProjectDescriptionEdit"></Input>
                     </FormItem>
                   </Form>
-
-                  <!-- <div class="createSubProjectPanelInput">
-                    <span style="width:20%;text-align:center">Title</span>
-                    <Input
-                      v-model="subProjectTitleEdit"
-                      style="width: 800px;"
-                      :placeholder="subProjectTitleEdit"
-                    />
-                  </div>-->
-                  <!-- <br>
-                  <div class="createSubProjectPanelInput">
-                    <span style="width:20%;text-align:center">Description</span>
-                    <Input
-                      v-model="subProjectDescriptionEdit"
-                      :placeholder="subProjectDescriptionEdit"
-                      style="width: 800px;"
-                      :rows="4"
-                      type="textarea"
-                    />
-                  </div>-->
                 </div>
               </Modal>
               <Modal
@@ -531,7 +580,7 @@
           width="800px"
           :mask-closable="false"
           @on-ok="filesUpload('fileUploadForm')"
-          @on-cancel
+          @on-cancel=""
           ok-text="Submit"
           cancel-text="cancel"
         >
@@ -600,7 +649,7 @@
         v-model="removeProjectModal"
         title="Delete warning "
         @on-ok="deleteProject"
-        @on-cancel
+        @on-cancel=""
         ok-text="submit"
         cancel-text="cancel"
       >
@@ -612,7 +661,7 @@
       v-model="editProjectModal"
       title="Edit Project"
       @on-ok="editProjectSubmit('projectEditForm')"
-      @on-cancel
+      @on-cancel=""
       ok-text="Confirm"
       cancel-text="cancel"
       :mask-closable="false"
@@ -621,7 +670,12 @@
       <div>
         <!-- editProjectForm -->
         <!-- editProjectFormRuleValidate -->
-        <Form ref="projectEditForm" :model="projectEditForm" :rules="editProjectFormRuleValidate" :label-width="100">
+        <Form
+          ref="projectEditForm"
+          :model="projectEditForm"
+          :rules="editProjectFormRuleValidate"
+          :label-width="100"
+        >
           <FormItem label="Category" prop="category">
             <!-- <Input v-model="formValidate.name" placeholder="Enter your name"></Input> -->
             <RadioGroup v-model="projectEditForm.category">
@@ -637,10 +691,7 @@
             </RadioGroup>
           </FormItem>
           <FormItem label="Title" prop="title">
-            <Input
-            v-model="projectEditForm.title"
-            placeholder="Enter something..."
-          />
+            <Input v-model="projectEditForm.title" placeholder="Enter something..."/>
           </FormItem>
           <FormItem label="Description" prop="description">
             <Input v-model="projectEditForm.description"></Input>
@@ -663,7 +714,7 @@
               @click="addTag(inputTag)"
             >Add Tag</Button>
             <br>
-              <Tag
+            <Tag
               color="primary"
               v-for="(tag,index) in projectEditForm.editTags"
               :key="index"
@@ -673,27 +724,26 @@
           </FormItem>
           <FormItem label="Privacy" prop="privacy">
             <RadioGroup v-model="projectEditForm.privacy">
-            <Radio
-              label="Public"
-              title="Other users can find the group and see who has membership."
-            ></Radio>
-            <Radio
-              label="Discover"
-              title="Other users can find this group, but membership information is hidden."
-            ></Radio>
-            <Radio label="Private" title="Other users can not find this group."></Radio>
-          </RadioGroup>
+              <Radio
+                label="Public"
+                title="Other users can find the group and see who has membership."
+              ></Radio>
+              <Radio
+                label="Discover"
+                title="Other users can find this group, but membership information is hidden."
+              ></Radio>
+              <Radio label="Private" title="Other users can not find this group."></Radio>
+            </RadioGroup>
           </FormItem>
         </Form>
       </div>
-      <div style="flex">
-      </div>
+      <div style="flex"></div>
     </Modal>
     <Modal
       v-model="progressModalShow"
       title="Upload Progress"
-      @on-ok
-      @on-cancel
+      @on-ok=""
+      @on-cancel=""
       ok-text="ok"
       cancel-text="close"
     >
@@ -710,29 +760,50 @@ export default {
   },
   data() {
     return {
-      projectEditForm:{
-        description:"",
-        introduction:"",
-        title:"",
-        privacy:"",
-        category:"",
-        editTags:"",
+      projectEditForm: {
+        description: "",
+        introduction: "",
+        title: "",
+        privacy: "",
+        category: "",
+        editTags: ""
       },
-      editProjectFormRuleValidate:{
-        category:[
-          { required: true, message: 'The project description cannot be empty', trigger: 'blur' }
+      editProjectFormRuleValidate: {
+        category: [
+          {
+            required: true,
+            message: "The project description cannot be empty",
+            trigger: "blur"
+          }
         ],
-        description:[
-           { required: true, message: 'The project description cannot be empty', trigger: 'blur' }
+        description: [
+          {
+            required: true,
+            message: "The project description cannot be empty",
+            trigger: "blur"
+          }
         ],
-        title:[
-           { required: true, message: 'The project title cannot be empty', trigger: 'blur' }
+        title: [
+          {
+            required: true,
+            message: "The project title cannot be empty",
+            trigger: "blur"
+          }
         ],
-        privacy:[
-           { required: true, message: 'The project privacy cannot be empty', trigger: 'blur' }
+        privacy: [
+          {
+            required: true,
+            message: "The project privacy cannot be empty",
+            trigger: "blur"
+          }
         ],
-        introduction:[
-           { required: true, max: 100 , message: 'The project introduction cannot be empty', trigger: 'blur' }
+        introduction: [
+          {
+            required: true,
+            max: 100,
+            message: "The project introduction cannot be empty",
+            trigger: "blur"
+          }
         ]
       },
       //子项目表单
@@ -805,8 +876,8 @@ export default {
             required: true,
             message: "The title can't be empty and np moren than 60 words",
             trigger: "blur",
-            type:'string',
-            max:60,
+            type: "string",
+            max: 60
           },
           {
             required: true,
@@ -827,37 +898,21 @@ export default {
           }
         ]
       },
-      //编辑项目的字段
       /*编辑项目专用的字段*/
-      editType: "",
       // tag为array类型
       editTags: [],
       inputTag: "",
-      editDescription: "",
-      editTitle: "",
-      editIntroduction: "",
-      editPrivacy: "",
       editProjectId: "",
       /* 编辑项目字段结束*/
       projectManager: {},
       //确定用户是否有更新项目的权限，控制是否显示编辑的按钮，只有创建者才有权对项目进行编辑
       copyProjectId: "",
       copyProjectTitle: "",
-      copyProjectIdStatus: false,
-      copyProjectTitleStatus: false,
       currentProjectDetail: {
-        // members: [],
-        // introduction: "",
-        // projectId: ""
       },
-      //确定用户是否有更新项目的权限，控制是否显示编辑的按钮，只有创建者才有权对项目进行编辑
-      projectEditAble: false,
       //移交权限给新的管理者
       handOverSubProjectModal: false,
       newManagerId: "",
-      projectMembers: [],
-      //编辑项目的按钮
-      editinfoModal: false,
       //子项目的列表
       subProjectList: [],
       //创建子项目的模态框
@@ -950,18 +1005,13 @@ export default {
       authorizeModal: false,
       // 子项目成员数组
       subProjectMembers: [],
-      errorHint: "email format is not correct , please check it again",
       //关于邮箱提示的
-      value2: "",
-      data2: [],
-
-      // 关于进度条
-      xhr: new XMLHttpRequest(),
-      showProgress: false,
+      prompt: [],
       //侧边tab栏的高度
       sidebarHeight: "",
       // 进度条模态框
       progressModalShow: false,
+      // 上传进度
       uploadProgress: 0,
       panel: null
     };
@@ -1096,9 +1146,6 @@ export default {
       this.$Message.info("ok");
     },
     ok() {},
-    cancel() {
-      this.$Message.info("cancel");
-    },
     //前往工作空间
     goWorkspace(id, memberList, isManager) {
       var isMember;
@@ -1127,7 +1174,9 @@ export default {
       this.$refs[form].validate(valid => {
         if (valid) {
           let SubProject = {};
-          SubProject["description"] = this.createSubProjectForm.subProjectDescription;
+          SubProject[
+            "description"
+          ] = this.createSubProjectForm.subProjectDescription;
           SubProject["title"] = this.createSubProjectForm.subProjectTitle;
           SubProject["projectId"] = this.currentProjectDetail.projectId;
           SubProject["managerId"] = this.$store.getters.userId;
@@ -1214,7 +1263,7 @@ export default {
               if (
                 subProjectInfoList[i].subProjectId == newSubProject.subProjectId
               ) {
-                subProjectInfoList.splice(i,1,res.data);
+                subProjectInfoList.splice(i, 1, res.data);
                 this.identity(subProjectInfoList);
                 this.$Message.success("Handover management authority success!");
                 break;
@@ -1256,17 +1305,20 @@ export default {
           this.axios
             .post("/GeoProblemSolving/subProject/update", obj)
             .then(res => {
-          if(res.data!="Fail"){
-            var newSubProject = res.data;
-            for(var i=0;i<this.subProjectList.length;i++){
-              if(this.subProjectList[i].subProjectId==newSubProject.subProjectId){
-                this.subProjectList.splice(i,1,res.data);
-                break;
+              if (res.data != "Fail") {
+                var newSubProject = res.data;
+                for (var i = 0; i < this.subProjectList.length; i++) {
+                  if (
+                    this.subProjectList[i].subProjectId ==
+                    newSubProject.subProjectId
+                  ) {
+                    this.subProjectList.splice(i, 1, res.data);
+                    break;
+                  }
+                }
+              } else {
+                this.$Message.error("Update sub-project failed.");
               }
-            }
-          }else{
-            this.$Message.error("Update sub-project failed.");
-          };
             })
             .catch(err => {
               console.log(err.data);
@@ -1386,29 +1438,29 @@ export default {
     },
     show(index) {
       let name = this.projectResourceList[index].name;
-        if (this.panel != null) {
-          this.panel.close();
-        }
-        let url =
-          "http://172.21.212.7:8012/previewFile?url=http://172.21.212.7:8082" +
-          this.projectResourceList[index].pathURL;
-        let toolURL =
-          "<iframe src=" + url + ' style="width: 100%;height:100%"></iframe>';
-        this.panel = jsPanel.create({
-          headerControls: {
-            smallify: "remove"
-          },
-          theme: "none",
-          headerTitle: "Review",
-          contentSize: "800 600",
-          content: toolURL,
-          disableOnMaximized: true,
-          dragit: {
-            containment: 5
-          },
-          closeOnEscape: true
-        });
-        $(".jsPanel-content").css("font-size", "0");
+      if (this.panel != null) {
+        this.panel.close();
+      }
+      let url =
+        "http://172.21.212.7:8012/previewFile?url=http://172.21.212.7:8082" +
+        this.projectResourceList[index].pathURL;
+      let toolURL =
+        "<iframe src=" + url + ' style="width: 100%;height:100%"></iframe>';
+      this.panel = jsPanel.create({
+        headerControls: {
+          smallify: "remove"
+        },
+        theme: "none",
+        headerTitle: "Review",
+        contentSize: "800 600",
+        content: toolURL,
+        disableOnMaximized: true,
+        dragit: {
+          containment: 5
+        },
+        closeOnEscape: true
+      });
+      $(".jsPanel-content").css("font-size", "0");
     },
     gotoPersonalPage(id) {
       if (id == this.$store.getters.userId) {
@@ -1434,8 +1486,8 @@ export default {
       this.editProjectId = editProjectInfo.projectId;
     },
     editProjectSubmit(form) {
-      this.$refs[form].validate((valid)=>{
-        if(valid){
+      this.$refs[form].validate(valid => {
+        if (valid) {
           let form = new URLSearchParams();
           form.append("title", this.projectEditForm.title);
           form.append("category", this.projectEditForm.category);
@@ -1453,10 +1505,10 @@ export default {
             .catch(err => {
               console.log(err.data);
             });
-        }else{
-          alert("please check your form again!")
+        } else {
+          alert("please check your form again!");
         }
-      })
+      });
       // 将项目变更的信息进行提交
     },
     // 判断项目详情页面是否具备编辑权限，根据userId与projectId来比较
@@ -1502,9 +1554,6 @@ export default {
         .catch(err => {
           console.log(err.data);
         });
-    },
-    removeProjectModalShow() {
-      this.removeProjectModal = true;
     },
     //删除项目的函数
     deleteProjectShow() {
@@ -1557,11 +1606,8 @@ export default {
           console.log("申请失败的原因是：" + err.data);
         });
     },
-    authorizeModalShow() {
-      this.authorizeModal = true;
-    },
     handleSearch2(value) {
-      this.data2 =
+      this.prompt =
         !value || value.indexOf("@") >= 0
           ? []
           : [
@@ -1571,7 +1617,6 @@ export default {
               value + "@126.com",
               value + "@qq.com"
             ];
-      // this.emailInfo.inputEmail = this.value2;
     },
     filesUpload(form) {
       this.$refs[form].validate(valid => {
