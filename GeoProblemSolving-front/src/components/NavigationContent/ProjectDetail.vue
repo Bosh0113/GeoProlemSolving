@@ -1301,10 +1301,6 @@ export default {
                     break;
                   }
                 }
-              } else {
-                this.$Message.error("Update sub-project failed.");
-              }
-            }
             this.identity(this.subProjectList);
           }else{
             this.$Message.error("Update sub-project failed.");
