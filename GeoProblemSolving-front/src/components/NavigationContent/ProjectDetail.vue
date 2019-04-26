@@ -289,32 +289,35 @@
                 v-model="subProjectModal"
                 ok-text="create"
                 cancel-text="cancel"
-                @on-ok="createSubProject()"
+                @on-ok="createSubProject('createSubProjectForm')"
                 @on-cancel="cancel()"
                 title="Create sub project"
                 width="800px"
                 :mask-closable="false"
               >
                 <div>
-                  <div class="createSubProjectPanelInput">
-                    <span style="width:20%;text-align:center">Title</span>
-                    <Input
-                      v-model="subProjectTitle"
-                      placeholder="Sub project title"
-                      style="width: 800px;"
-                    />
-                  </div>
-                  <br>
-                  <div class="createSubProjectPanelInput">
-                    <span style="width:20%;text-align:center">Description</span>
-                    <Input
-                      v-model="subProjectDescription"
-                      placeholder="Sub project description"
-                      style="width: 800px;"
-                      :rows="4"
-                      type="textarea"
-                    />
-                  </div>
+                  <Form
+                    ref="createSubProjectForm"
+                    :model="createSubProjectForm"
+                    :rules="createSubprojectRuleValidate"
+                    :label-width="120"
+                  >
+                    <FormItem label="Title" prop="subProjectTitle">
+                      <Input
+                        v-model="createSubProjectForm.subProjectTitle"
+                        placeholder="Enter sub project's title"
+                      ></Input>
+                    </FormItem>
+                    <FormItem label="Description" prop="subProjectDescription">
+                      <Input
+                        v-model="createSubProjectForm.subProjectDescription"
+                        placeholder="Enter sub project description"
+                        :rows="4"
+                        type="textarea"
+                      ></Input>
+                    </FormItem>
+                  </Form>
+
                 </div>
               </Modal>
             </div>
@@ -414,22 +417,39 @@
                 v-model="editSubProjectModal"
                 ok-text="submit"
                 cancel-text="cancel"
-                @on-ok="editSubProject()"
+                @on-ok="editSubProject('editSubProjectForm')"
                 @on-cancel="cancel()"
                 title="Edit the information of this subproject"
                 width="800px"
                 :mask-closable="false"
               >
                 <div>
-                  <div class="createSubProjectPanelInput">
+                  <!-- editSubProjectFormValidate -->
+                  <!-- editSubProjectForm -->
+
+                  <Form
+                    ref="editSubProjectForm"
+                    :model="editSubProjectForm"
+                    :rules="editSubProjectFormRuleValidate"
+                    :label-width="120"
+                  >
+                    <FormItem label="Name" prop="subProjectTitleEdit">
+                      <Input v-model="editSubProjectForm.subProjectTitleEdit"></Input>
+                    </FormItem>
+                    <FormItem label="Description" prop="subProjectDescriptionEdit">
+                      <Input v-model="editSubProjectForm.subProjectDescriptionEdit"></Input>
+                    </FormItem>
+                  </Form>
+
+                  <!-- <div class="createSubProjectPanelInput">
                     <span style="width:20%;text-align:center">Title</span>
                     <Input
                       v-model="subProjectTitleEdit"
                       style="width: 800px;"
                       :placeholder="subProjectTitleEdit"
                     />
-                  </div>
-                  <br>
+                  </div>-->
+                  <!-- <br>
                   <div class="createSubProjectPanelInput">
                     <span style="width:20%;text-align:center">Description</span>
                     <Input
@@ -439,7 +459,7 @@
                       :rows="4"
                       type="textarea"
                     />
-                  </div>
+                  </div>-->
                 </div>
               </Modal>
               <Modal
@@ -508,48 +528,48 @@
         <Modal
           v-model="uploadFileModal"
           title="upload file"
-          width="600px"
+          width="800px"
           :mask-closable="false"
-          @on-ok="filesUpload"
+          @on-ok="filesUpload('fileUploadForm')"
           @on-cancel
           ok-text="Confirm"
           cancel-text="cancel"
         >
-          <div style="display:flex;;align-items:center">
-            <span style="width:20%;text-align:center">Privacy</span>
-            <RadioGroup v-model="privacy" style="width:80%">
-              <Radio label="public"></Radio>
-              <Radio label="privacy"></Radio>
-            </RadioGroup>
+          <div>
+            <Form
+              ref="fileUploadForm"
+              :model="fileUploadForm"
+              :rules="fileUploadFormRuleValidate"
+              :label-width="100"
+            >
+              <FormItem label="Privacy" prop="privacy">
+                <RadioGroup v-model="fileUploadForm.privacy" style="width:80%">
+                  <Radio label="public"></Radio>
+                  <Radio label="privacy"></Radio>
+                </RadioGroup>
+              </FormItem>
+              <FormItem label="Type" prop="type">
+                <RadioGroup v-model="fileUploadForm.type">
+                  <Radio label="image"></Radio>
+                  <Radio label="video"></Radio>
+                  <Radio label="data"></Radio>
+                  <Radio label="paper"></Radio>
+                  <Radio label="document"></Radio>
+                  <Radio label="model"></Radio>
+                  <Radio label="others"></Radio>
+                </RadioGroup>
+              </FormItem>
+              <FormItem label="Description" prop="description">
+                <Input
+                  type="textarea"
+                  :rows="4"
+                  v-model="fileUploadForm.description"
+                  placeholder="Enter file description"
+                />
+              </FormItem>
+            </Form>
           </div>
-          <div style="display:flex;text-align:center;align-items:center">
-            <!-- 这里定义上传的几种资源类型供用户选择 -->
-            <span style="width:20%;text-align:center">Type</span>
-            <RadioGroup v-model="fileType" style="float:left">
-              <Radio label="image"></Radio>
-              <Radio label="video"></Radio>
-              <Radio label="data"></Radio>
-              <Radio label="paper"></Radio>
-              <Radio label="document"></Radio>
-              <Radio label="model"></Radio>
-              <Radio label="others"></Radio>
-            </RadioGroup>
-          </div>
-          <br>
-          <div style="display:flex;text-align:center;align-items:center;justify-content:center">
-            Description:
-            <br>
-            <Input type="textarea" :rows="4" v-model="fileDescription"/>
-          </div>
-          <br>
-          <Upload
-            :max-size="1024*1024"
-            multiple
-            type="drag"
-            :before-upload="gatherFile"
-            action="-"
-            ::on-progress="handleOnProgress3"
-          >
+          <Upload :max-size="1024*1024" multiple type="drag" :before-upload="gatherFile" action="-">
             <div style="padding: 20px 0">
               <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
               <p>Click or drag files here to upload</p>
@@ -559,7 +579,7 @@
             <ul v-for="(list,index) in file" :key="index">
               <li style="display:flex">
                 filename:
-                <span style="font-size:10px;width:20%">{{ list.name }}</span>
+                <span style="font-size:10px;width:60%">{{ list.name }}</span>
                 size:
                 <span
                   style="font-size:10px;width:70%"
@@ -591,82 +611,68 @@
     <Modal
       v-model="editProjectModal"
       title="Edit Project"
-      @on-ok="editProjectSubmit()"
+      @on-ok="editProjectSubmit('projectEditForm')"
       @on-cancel
       ok-text="Confirm"
       cancel-text="cancel"
       :mask-closable="false"
       width="900px"
     >
-      <div style="flex">
-        <div class="editStyle">
-          <span>Category</span>
-          <RadioGroup style="margin-left:5%;width:100%" v-model="editType">
-            <Radio label="Terrestrial">Terrestrial System</Radio>
-            <Radio label="Coastal">Coastal System</Radio>
-            <Radio label="Marine">Marine System</Radio>
-            <Radio label="Climate">Climate System</Radio>
-            <Radio label="Ecological">Ecological System</Radio>
-            <Radio label="Geological">Geological System</Radio>
-            <Radio label="Human">Human-Activity</Radio>
-            <Radio label="GISRS">GIS & RS</Radio>
-            <Radio label="General">General</Radio>
-          </RadioGroup>
-        </div>
-        <div class="editStyle">
-          <span>Title</span>
-          <Input
-            v-model="editTitle"
+      <div>
+        <!-- editProjectForm -->
+        <!-- editProjectFormRuleValidate -->
+        <Form ref="projectEditForm" :model="projectEditForm" :rules="editProjectFormRuleValidate" :label-width="100">
+          <FormItem label="Category" prop="category">
+            <!-- <Input v-model="formValidate.name" placeholder="Enter your name"></Input> -->
+            <RadioGroup v-model="projectEditForm.category">
+              <Radio label="Terrestrial">Terrestrial System</Radio>
+              <Radio label="Coastal">Coastal System</Radio>
+              <Radio label="Marine">Marine System</Radio>
+              <Radio label="Climate">Climate System</Radio>
+              <Radio label="Ecological">Ecological System</Radio>
+              <Radio label="Geological">Geological System</Radio>
+              <Radio label="Human">Human-Activity</Radio>
+              <Radio label="GISRS">GIS & RS</Radio>
+              <Radio label="General">General</Radio>
+            </RadioGroup>
+          </FormItem>
+          <FormItem label="Title" prop="title">
+            <Input
+            v-model="projectEditForm.title"
             placeholder="Enter something..."
-            style="margin-left:5%;width:100%"
           />
-        </div>
-        <div class="editStyle">
-          <span>Description</span>
-          <Input
-            v-model="editDescription"
-            placeholder="Enter something..."
-            style="margin-left:5%;width:100%"
-          />
-        </div>
-        <div class="editStyle">
-          <span>Introduction</span>
-          <Input
-            v-model="editIntroduction"
-            type="textarea"
-            placeholder="Enter something..."
-            style="margin-left:5%;width:100%"
-            :rows="4"
-          />
-        </div>
-        <div class="editStyle">
-          <span>Tag</span>
-          <Input
-            v-model="inputTag"
-            placeholder="Enter some tag to introduce the project"
-            style="margin-left:0.5%;width: 200px"
-            @keyup.enter.native="addTag(inputTag)"
-          />
-          <Button
-            icon="ios-add"
-            type="dashed"
-            size="small"
-            style="margin-left:2.5%"
-            @click="addTag(inputTag)"
-          >Add Tag</Button>
-        </div>
-        <div style="width:80%;margin-left:20%">
-          <Tag
-            color="primary"
-            v-for="(tag,index) in editTags"
-            :key="index"
-            closable
-            @on-close="deleteTag(index)"
-          >{{tag}}</Tag>
-        </div>
-        <div class="editStyle">
-          <span>Privacy</span>
-          <RadioGroup style="margin-left:0.5%" v-model="editPrivacy">
+          </FormItem>
+          <FormItem label="Description" prop="description">
+            <Input v-model="projectEditForm.description"></Input>
+          </FormItem>
+          <FormItem label="Introduction" prop="introduction">
+            <Input v-model="projectEditForm.introduction" type="textarea" :rows="4"></Input>
+          </FormItem>
+          <FormItem label="Tag" prop="tag">
+            <Input
+              v-model="inputTag"
+              placeholder="Enter some tag to introduce the project"
+              style="margin-left:0.5%;width: 200px"
+              @keyup.enter.native="addTag(inputTag)"
+            />
+            <Button
+              icon="ios-add"
+              type="dashed"
+              size="small"
+              style="margin-left:2.5%"
+              @click="addTag(inputTag)"
+            >Add Tag</Button>
+            <br>
+              <Tag
+              color="primary"
+              v-for="(tag,index) in projectEditForm.editTags"
+              :key="index"
+              closable
+              @on-close="deleteTag(index)"
+            >{{tag}}</Tag>
+          </FormItem>
+          <FormItem label="Privacy" prop="privacy">
+            <RadioGroup v-model="projectEditForm.privacy">
             <Radio
               label="Public"
               title="Other users can find the group and see who has membership."
@@ -677,10 +683,12 @@
             ></Radio>
             <Radio label="Private" title="Other users can not find this group."></Radio>
           </RadioGroup>
-        </div>
+          </FormItem>
+        </Form>
+      </div>
+      <div style="flex">
       </div>
     </Modal>
-    <!-- progressModalShow -->
     <Modal
       v-model="progressModalShow"
       title="Upload Progress"
@@ -702,6 +710,123 @@ export default {
   },
   data() {
     return {
+      projectEditForm:{
+        description:"",
+        introduction:"",
+        title:"",
+        privacy:"",
+        category:"",
+        editTags:"",
+      },
+      editProjectFormRuleValidate:{
+        category:[
+          { required: true, message: 'The project description cannot be empty', trigger: 'blur' }
+        ],
+        description:[
+           { required: true, message: 'The project description cannot be empty', trigger: 'blur' }
+        ],
+        title:[
+           { required: true, message: 'The project title cannot be empty', trigger: 'blur' }
+        ],
+        privacy:[
+           { required: true, message: 'The project privacy cannot be empty', trigger: 'blur' }
+        ],
+        introduction:[
+           { required: true, max: 100 , message: 'The project introduction cannot be empty', trigger: 'blur' }
+        ]
+      },
+      //子项目表单
+      createSubProjectForm: {
+        subProjectTitle: "",
+        subProjectDescription: ""
+      },
+      editSubProjectForm: {
+        subProjectTitleEdit: "",
+        subProjectDescriptionEdit: ""
+      },
+      fileUploadForm: {
+        type: "",
+        privacy: "",
+        description: ""
+      },
+      fileUploadFormRuleValidate: {
+        type: [
+          {
+            required: true,
+            message: "The type cannot be empty",
+            trigger: "blur"
+          }
+        ],
+        privacy: [
+          {
+            required: true,
+            message: "The privacy cannot be empty",
+            trigger: "blur"
+          }
+        ],
+        description: [
+          {
+            required: true,
+            type: "string",
+            message: "Please inpput file description",
+            trigger: "blur"
+          }
+        ]
+      },
+      editSubProjectFormRuleValidate: {
+        subProjectTitleEdit: [
+          {
+            required: true,
+            message: "The title can't be empty",
+            trigger: "blur"
+          },
+          {
+            required: true,
+            message: "The title can't be empty",
+            trigger: "blur"
+          }
+        ],
+        subProjectDescriptionEdit: [
+          {
+            required: true,
+            message: "The description can't be empty",
+            trigger: "blur"
+          },
+          {
+            required: true,
+            message: "The description can't be empty",
+            trigger: "blur"
+          }
+        ]
+      },
+      createSubprojectRuleValidate: {
+        subProjectTitle: [
+          {
+            required: true,
+            message: "The title can't be empty and np moren than 60 words",
+            trigger: "blur",
+            type:'string',
+            max:60,
+          },
+          {
+            required: true,
+            message: "The title can't be empty",
+            trigger: "blur"
+          }
+        ],
+        subProjectDescription: [
+          {
+            required: true,
+            message: "The description can't be empty",
+            trigger: "blur"
+          },
+          {
+            required: true,
+            message: "The description can't be empty",
+            trigger: "blur"
+          }
+        ]
+      },
       //编辑项目的字段
       /*编辑项目专用的字段*/
       editType: "",
@@ -789,11 +914,7 @@ export default {
         "/",
       //上传文件相关的
       uploadFileModal: false,
-      // 默认是公开的
-      privacy: "public",
-      file: "",
-      fileDescription: "",
-      fileType: "",
+      file: [],
       //获取的资源的列表
       projectResourceList: [],
       projectTableColName: [
@@ -833,7 +954,7 @@ export default {
       //关于邮箱提示的
       value2: "",
       data2: [],
-      file: [],
+
       // 关于进度条
       xhr: new XMLHttpRequest(),
       showProgress: false,
@@ -1002,25 +1123,33 @@ export default {
       }
     },
     //创建子项目
-    createSubProject() {
-      let SubProject = {};
-      SubProject["description"] = this.subProjectDescription;
-      SubProject["title"] = this.subProjectTitle;
-      SubProject["projectId"] = this.currentProjectDetail.projectId;
-      SubProject["managerId"] = this.$store.getters.userId;
-      this.axios
-        .post("/GeoProblemSolving/subProject/create", SubProject)
-        .then(res => {
-          if (res.data != "Fail") {
-            this.$Message.info("create success");
-            this.subProjectTitle = "";
-            this.subProjectDescription = "";
-            this.getAllSubProject();
-          } else {
-            this.$Message.info("fail");
-          }
-        })
-        .catch(err => {});
+    createSubProject(form) {
+      this.$refs[form].validate(valid => {
+        if (valid) {
+          let SubProject = {};
+          SubProject[
+            "description"
+          ] = this.createSubProjectForm.subProjectDescription;
+          SubProject["title"] = this.createSubProjectForm.subProjectTitle;
+          SubProject["projectId"] = this.currentProjectDetail.projectId;
+          SubProject["managerId"] = this.$store.getters.userId;
+          this.axios
+            .post("/GeoProblemSolving/subProject/create", SubProject)
+            .then(res => {
+              if (res.data != "Fail") {
+                this.$Message.info("create success");
+                this.createSubProjectForm.subProjectTitle = "";
+                this.createSubProjectForm.subProjectDescription = "";
+                this.getAllSubProject();
+              } else {
+                this.$Message.info("fail");
+              }
+            })
+            .catch(err => {});
+        } else {
+          this.$Message.error("Please check your form again!");
+        }
+      });
     },
     inviteModalShow() {
       this.inviteModal = true;
@@ -1087,26 +1216,39 @@ export default {
     editSubProjectShow(index) {
       this.editSubProjectindex = index;
       this.editSubProjectModal = true;
-      this.subProjectTitleEdit = this.subProjectList[index].title;
-      this.subProjectDescriptionEdit = this.subProjectList[index].description;
+      this.editSubProjectForm.subProjectTitleEdit = this.subProjectList[
+        index
+      ].title;
+      this.editSubProjectForm.subProjectDescriptionEdit = this.subProjectList[
+        index
+      ].description;
     },
-    editSubProject() {
-      this.editSubProjectModal = false;
-      let obj = new URLSearchParams();
-      obj.append(
-        "subProjectId",
-        this.subProjectList[this.editSubProjectindex].subProjectId
-      );
-      obj.append("title", this.subProjectTitleEdit);
-      obj.append("description", this.subProjectDescriptionEdit);
-      this.axios
-        .post("/GeoProblemSolving/subProject/update", obj)
-        .then(res => {
-          this.getAllSubProject();
-        })
-        .catch(err => {
-          console.log(err.data);
-        });
+    editSubProject(form) {
+      this.$refs[form].validate(valid => {
+        if (valid) {
+          this.editSubProjectModal = false;
+          let obj = new URLSearchParams();
+          obj.append(
+            "subProjectId",
+            this.subProjectList[this.editSubProjectindex].subProjectId
+          );
+          obj.append("title", this.editSubProjectForm.subProjectTitleEdit);
+          obj.append(
+            "description",
+            this.editSubProjectForm.subProjectDescriptionEdit
+          );
+          this.axios
+            .post("/GeoProblemSolving/subProject/update", obj)
+            .then(res => {
+              this.getAllSubProject();
+            })
+            .catch(err => {
+              console.log(err.data);
+            });
+        } else {
+          alert("please check your form again!");
+        }
+      });
     },
     deleteSubProjectShow(index) {
       this.editSubProjectindex = index;
@@ -1245,40 +1387,45 @@ export default {
     editModalShow(id) {
       this.editProjectModal = true;
       let editProjectInfo = this.currentProjectDetail;
-      this.editTitle = editProjectInfo.title;
-      this.editIntroduction = editProjectInfo.introduction;
-      this.editDescription = editProjectInfo.description;
-      this.editType = editProjectInfo.category;
+      console.log(editProjectInfo);
+      this.projectEditForm.title = editProjectInfo.title;
+      this.projectEditForm.introduction = editProjectInfo.introduction;
+      this.projectEditForm.description = editProjectInfo.description;
+      this.projectEditForm.category = editProjectInfo.category;
+      this.projectEditForm.privacy = editProjectInfo.privacy;
       var tags = editProjectInfo["tag"].split(",");
       if (tags[0] == "") {
-        this.editTags = [];
+        this.projectEditForm.editTags = [];
       } else {
-        this.editTags = tags;
+        this.projectEditForm.editTags = tags;
       }
-      this.editPrivacy = editProjectInfo.privacy;
       this.editProjectId = editProjectInfo.projectId;
     },
-    editProjectSubmit() {
+    editProjectSubmit(form) {
+      this.$refs[form].validate((valid)=>{
+        if(valid){
+          let form = new URLSearchParams();
+          form.append("title", this.projectEditForm.title);
+          form.append("category", this.projectEditForm.category);
+          form.append("introduction", this.projectEditForm.introduction);
+          form.append("description", this.projectEditForm.description);
+          form.append("tag", this.projectEditForm.editTags);
+          form.append("privacy", this.projectEditForm.privacy);
+          form.append("projectId", this.editProjectId);
+          form.append("managerId", this.$store.getters.userId);
+          this.axios
+            .post("/GeoProblemSolving/project/update ", form)
+            .then(res => {
+              this.getProjectDetail();
+            })
+            .catch(err => {
+              console.log(err.data);
+            });
+        }else{
+          alert("please check your form again!")
+        }
+      })
       // 将项目变更的信息进行提交
-      let projectEditForm = new URLSearchParams();
-      //做一个判断
-      projectEditForm.append("title", this.editTitle);
-      projectEditForm.append("category", this.editType);
-      projectEditForm.append("introduction", this.editIntroduction);
-      projectEditForm.append("description", this.editDescription);
-      projectEditForm.append("tag", this.editTags);
-      projectEditForm.append("privacy", this.editPrivacy);
-      projectEditForm.append("projectId", this.editProjectId);
-      projectEditForm.append("managerId", this.$store.getters.userId);
-      this.axios
-        .post("/GeoProblemSolving/project/update ", projectEditForm)
-        .then(res => {
-          this.getProjectDetail();
-          // this.getManagerProjectList();
-        })
-        .catch(err => {
-          console.log(err.data);
-        });
     },
     // 判断项目详情页面是否具备编辑权限，根据userId与projectId来比较
     judgeIsManager(projectManagerId) {
@@ -1291,13 +1438,13 @@ export default {
     // 编辑项目的添加tag标签
     addTag(tag) {
       if (tag != "") {
-        this.editTags.push(tag);
+        this.projectEditForm.editTags.push(tag);
       }
       this.inputTag = "";
     },
     // 删除指定的标签
     deleteTag(index) {
-      this.editTags.splice(index, 1);
+      this.projectEditForm.editTags.splice(index, 1);
     },
     toResourceList() {
       this.$router.push({ path: "/resourceList" });
@@ -1307,7 +1454,7 @@ export default {
       let description =
         this.$store.getters.userName +
         " uploaded a " +
-        this.fileType +
+        this.fileUploadForm.type +
         " file in " +
         " project called " +
         this.currentProjectDetail.title;
@@ -1404,53 +1551,63 @@ export default {
             ];
       // this.emailInfo.inputEmail = this.value2;
     },
-    filesUpload() {
-      let that = this;
-      if (that.file.length != 0) {
-        var formData = new FormData();
-        for (var i = 0; i < that.file.length; i++) {
-          formData.append("file", that.file[i]); // 文件对象
-        }
-        let userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
-        formData.append("description", this.fileDescription);
-        formData.append("type", this.fileType);
-        formData.append("uploaderId", this.$store.getters.userInfo.userId);
-        formData.append("belong", this.currentProjectDetail.title);
-        let scopeObject = {
-          projectId: this.currentProjectDetail.projectId,
-          subprojectId: "",
-          moduleId: ""
-        };
-        formData.append("scope", JSON.stringify(scopeObject));
-        formData.append("privacy", this.privacy);
-        this.progressModalShow = true;
-      }
-      this.axios({
-        url: "/GeoProblemSolving/resource/upload",
-        method: "post",
-        onUploadProgress: progressEvent => {
-          this.uploadProgress =
-            ((progressEvent.loaded / progressEvent.total) * 100) | 0;
-          // let complete = (progressEvent.loaded / progressEvent.total * 100 | 0) + '%'
-          console.log(progressEvent);
-          console.log(this.uploadProgress);
-        },
-        data: formData
-      })
-        .then(res => {
-          if (res.data != "Size over" && res.data.length > 0) {
-            this.$Notice.open({
-              title: "Upload notification title",
-              desc: "File uploaded successfully",
-              duration: 2
-            });
-            //这里重新获取一次该项目下的全部资源
-            this.addUploadEvent(this.currentProjectDetail.projectId);
-            this.getAllResource();
-            // 创建一个函数根据pid去后台查询该项目下的资源
+    filesUpload(form) {
+      this.$refs[form].validate(valid => {
+        if (valid) {
+          let that = this;
+          if (that.file.length != 0) {
+            var formData = new FormData();
+            for (var i = 0; i < that.file.length; i++) {
+              formData.append("file", that.file[i]); // 文件对象
+            }
+            let userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
+            formData.append("description", this.fileUploadForm.description);
+            formData.append("type", this.fileUploadForm.type);
+            formData.append("uploaderId", this.$store.getters.userInfo.userId);
+            formData.append("belong", this.currentProjectDetail.title);
+            let scopeObject = {
+              projectId: this.currentProjectDetail.projectId,
+              subprojectId: "",
+              moduleId: ""
+            };
+            formData.append("scope", JSON.stringify(scopeObject));
+            formData.append("privacy", this.fileUploadForm.privacy);
+            this.progressModalShow = true;
           }
-        })
-        .catch(err => {});
+          this.axios({
+            url: "/GeoProblemSolving/resource/upload",
+            method: "post",
+            onUploadProgress: progressEvent => {
+              this.uploadProgress =
+                ((progressEvent.loaded / progressEvent.total) * 100) | 0;
+              // let complete = (progressEvent.loaded / progressEvent.total * 100 | 0) + '%'
+              console.log(progressEvent);
+              console.log(this.uploadProgress);
+            },
+            data: formData
+          })
+            .then(res => {
+              if (res.data != "Size over" && res.data.length > 0) {
+                this.$Notice.open({
+                  title: "Upload notification title",
+                  desc: "File uploaded successfully",
+                  duration: 2
+                });
+                //这里重新获取一次该项目下的全部资源
+                this.addUploadEvent(this.currentProjectDetail.projectId);
+                this.getAllResource();
+                this.file = [];
+                this.fileUploadForm.description = "";
+                this.fileUploadForm.privacy = "";
+                this.fileUploadForm.type = "";
+                // 创建一个函数根据pid去后台查询该项目下的资源
+              }
+            })
+            .catch(err => {});
+        } else {
+          alert("please check your form!");
+        }
+      });
     },
     gatherFile(file) {
       let that = this;
@@ -1470,17 +1627,6 @@ export default {
       let that = this;
       that.file.splice(index, 1);
       console.log(that.file);
-    },
-    handleOnProgress3(event, file, fileList) {
-      console.log(event);
-      console.log(file.percentage);
-      console.log(fileList);
-      //this.isUpload3 = true
-      if (file.percentage < 100) {
-        window.onbeforeunload = function(event) {
-          return "文件正在上传中，您确定要离开此页面吗？";
-        };
-      }
     }
   }
 };

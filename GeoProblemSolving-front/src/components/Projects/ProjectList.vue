@@ -55,14 +55,15 @@ img {
             <TabPane label="GIS & RS" name="GISRS" icon="ios-globe"></TabPane>
             <TabPane label="General" name="General" icon="ios-grid"></TabPane>
           </Tabs>
-          <div style="width:40%;display:flex;justify-content:flex-end">
+          <div style="width:15%;display:flex;justify-content:flex-end">
             <Button
               @click="newProject"
               type="default"
               class="btnCreate"
               style="margin-right:2.5%;font-size:15px;height:40px"
               icon="md-add"
-            >Create</Button>
+              title="Create a project"
+            ></Button>
           </div>
         </div>
       </Col>
