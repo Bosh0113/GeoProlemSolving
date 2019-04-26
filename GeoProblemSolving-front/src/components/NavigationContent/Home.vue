@@ -174,6 +174,8 @@ export default {};
 $firstHeight: 700px;
 
 .home-screen {
+  position: relative;
+  transform: translateY(-60px);
   img {
     max-width: 100%;
     min-height: 100%;
@@ -253,7 +255,6 @@ $firstHeight: 700px;
     border-color: #ff9900;
     color: #ff9900;
   }
-
 
   .tools {
     padding: 2rem 0 5rem 0;
@@ -390,7 +391,7 @@ $firstHeight: 700px;
   .flow {
     margin: 5rem auto 0 auto;
     width: 80%;
-    min-height:500px;
+    min-height: 500px;
     // .color-cover {
     //   position: absolute;
     //   width: 50%;
