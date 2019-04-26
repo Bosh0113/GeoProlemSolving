@@ -40,7 +40,7 @@
 .memebr-work {
   width: 70%;
   height: 60px;
-  margin: 0 20px;
+  margin: 0 5px;
 }
 .userName {
   height: 30px;
@@ -95,19 +95,19 @@
     <Row>
       <Col span="22" offset="1">
         <Card>
-          <div slot="title" style="height:20px;width:50%">
-            <Breadcrumb>
-              <BreadcrumbItem :to="toProjectPage">Project</BreadcrumbItem>
-              <BreadcrumbItem >Subproject</BreadcrumbItem>
-            </Breadcrumb>
-            <span style="float:right;margin-top:-15px;font-size:1.5rem"><strong>{{subProjectInfo.title}}</strong></span>
-          </div>
+          <div style="display:flex;height:40px">
+            <div slot="title" style="height:40px;width:20%;display:flex;align-items:center">
+              <Breadcrumb >
+                <BreadcrumbItem :to="toProjectPage">Project</BreadcrumbItem>
+                <BreadcrumbItem >Subproject</BreadcrumbItem>
+              </Breadcrumb>
+            </div>
+          <div style="text-align:center;font-size:1.5rem;width:60%;height:40px"><strong>{{subProjectInfo.title}}</strong></div>
           <div
             slot="extra"
-            style="height:20px;display:flex;align-items:center"
+            style="height:40px;display:flex;align-items:center;width:20%;float:right"
             class="operatePanel"
           >
-
             <Button
               type="default"
               @click="gotoWorkingPanel()"
@@ -121,18 +121,23 @@
               title="Inform others to work together"
             >Inform</Button>
           </div>
+          </div>
+
           <Row>
             <Col span="22" offset="1" style="background-color:white;">
               <Tabs type="card" v-model="currentTab" @on-click="currentTabChanged(name)">
                 <TabPane label="Subproject home" icon="ios-home" name="home">
-                  <div class="workspaceContent">
+                  <div class="workspaceContent" >
                     <Col
-                      :xs="8"
-                      :sm="7"
-                      :md="7"
-                      :lg="5"
+                      :xs="{span:8,offset:1}"
+                      :sm="{span:7,offset:1}"
+                      :md="{span:6,offset:1}"
+                      :lg="{span:5,offset:1}"
+
                       v-bind="this.participants"
                       :style="{height:sidebarHeight+14+'px'}"
+                      style="margin-top:30px"
+
                     >
                       <Card>
                         <div slot="title" style="font-size:18px"><strong>Participants</strong></div>
@@ -163,13 +168,13 @@
                                   ></avatar>
                                 </div>
                               </Badge>
-                              <div class="memebr-work">
+                              <div class="memebr-work" style="display:flex;align-items:center">
                                 <div class="userName">
-                                  <span style="padding:0 5px;float:right">{{member.userName}}</span>
+                                  <span style="padding:0 2.5px">{{member.userName}}({{member.organization}})</span>
                                 </div>
-                                <div class="organization">
+                                <!-- <div class="organization">
                                   <span style="padding:0 5px">{{member.organization}}</span>
-                                </div>
+                                </div> -->
                               </div>
                             </template>
                             <template v-else style="margin-top:5px">
@@ -266,12 +271,13 @@
                         </div>
                       </Card>
                     </Col>
-                    <Col :xs="15" :sm="16" :md="17" :lg="17" style="margin-left:20px;">
-                      <Card :style="{height:descHeight +'px'}" style="background-color:white;margin-left:30px;height:40px">
-                        <div slot="title" style="font-size:18px"><strong>Description</strong></div>
+                    <Col :xs="15" :sm="16" :md="17" :lg="17" style="margin-left:20px;margin-top:30px">
+                      <Card :style="{height:descHeight +'px'}" style="background-color:white;margin-left:30px">
+                        <div slot="title" style="font-size:18px;"><strong>Description</strong></div>
                         <div
-                          :style="{height:descHeight +'px'}"
+                          :style="{height:descHeight-60 +'px'}"
                           class="subProjectDesc"
+                          style="overflow-y:auto"
                         >{{subProjectInfo.description}}</div>
                       </Card>
                       <div class="resourcePanel" style="padding:20px 0 0 30px">
