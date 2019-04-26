@@ -7,8 +7,8 @@ Vue.use(mavonEditor)
 
 
 const routes = [{
-  path: '/', name: 'Navigation', component: resolve=>(require(["@/components/Navigation"],resolve)), children: [
-    { path: '', redirect: 'home', component: resolve=>(require(["@/components/NavigationContent/Home"],resolve)) },
+  path: '/', name: 'Navigation',component: resolve=>(require(["@/components/Navigation"],resolve)), children: [
+    { path: '', redirect: 'home'},
     { path: 'home', name: 'Home', component: resolve=>(require(["@/components/NavigationContent/Home"],resolve)) },
     { path: 'projectlist', name: 'Projects', component: resolve=>(require(["@/components/Projects/ProjectList"],resolve)) },
     { path: 'project/:id', name: 'ProjectDetail', component: resolve=>(require(["@/components/NavigationContent/ProjectDetail"],resolve)) },

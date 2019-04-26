@@ -12,32 +12,31 @@
 .header span {
   font-size: 15px;
 }
-.container{
+.container {
   display: flex;
   flex-direction: column;
   height: 100%;
 }
 header {
   height: 60px;
-  top:0;
-  z-index:100;
-  position:fixed;
-  width:100%;
+  top: 0;
+  z-index: 100;
+  position: absolute;
+  width: 100%;
   flex: 0 0 auto;
 }
-.content{
+.content {
   flex: 1 0 auto;
-  margin-top:60px;
+  margin-top: 60px;
   /* margin-bottom:20px; */
-  min-height:800px;
+  min-height: 800px;
 }
-footer{
-  background-color:#515a6e;
-  height:60px;
-  width:100%;
-  bottom:0;
+footer {
+  background-color: #515a6e;
+  height: 60px;
+  width: 100%;
+  bottom: 0;
   flex: 0 0 auto;
-
 }
 .userState {
   position: absolute;
@@ -49,82 +48,133 @@ footer{
 .navPart {
   width: 85%;
 }
-.menuItem span{
-  font-size:1.2em;
-  font-weight:bold;
+.menuItem span {
+  font-size: 1.2em;
+  font-weight: bold;
 }
 </style>
 <template>
   <div class="container">
-    <header>
-      <img src="@/assets/images/OGMS.png" id="logo" class="pic" @click="goHome" style="cursor:pointer">
+    <header :style="absoluteStyle">
+      <img
+        src="@/assets/images/OGMS.png"
+        id="logo"
+        class="pic"
+        @click="goHome"
+        style="cursor:pointer"
+      >
       <div class="navPart">
         <Menu
           mode="horizontal"
           theme="dark"
           active-name="home"
           @on-select="turnContent"
-          style="z-index:0"
+          :style="`z-index:0;background:`+headerBgColor"
           width="auto"
         >
-          <MenuItem name="home" class="menuItem" style="margin-left:30%">
-            <span>Home</span>
+          <MenuItem
+            name="home"
+            class="menuItem"
+            style="margin-left:30%"
+          >
+          <span>Home</span>
           </MenuItem>
-          <MenuItem name="projects" class="menuItem">
-            <span>Projects</span>
+          <MenuItem
+            name="projects"
+            class="menuItem"
+          >
+          <span>Projects</span>
           </MenuItem>
-          <MenuItem name="resources" class="menuItem">
-            <span> Resources</span>
+          <MenuItem
+            name="resources"
+            class="menuItem"
+          >
+          <span> Resources</span>
           </MenuItem>
-          <MenuItem name="community" class="menuItem">
-            <span>Community</span>
+          <MenuItem
+            name="community"
+            class="menuItem"
+          >
+          <span>Community</span>
           </MenuItem>
-          <MenuItem name="help" class="menuItem">
-            <span>Help</span>
+          <MenuItem
+            name="help"
+            class="menuItem"
+          >
+          <span>Help</span>
           </MenuItem>
         </Menu>
         <div class="userState">
-            <Menu mode="horizontal" theme="dark" @on-select="unlogin" style="z-index:0" v-show="!userState"  class="menuItem">
-              <MenuItem name="login">
-                <span>Login</span>
-              </MenuItem>
-              <MenuItem name="register">
-                 <span>Sign up</span>
-              </MenuItem>
-            </Menu>
-            <Menu mode="horizontal" theme="dark" @on-select="logged" style="z-index:0"  v-show="userState"  class="menuItem">
-              <MenuItem name="notification">
-                <Badge :count="unreadNoticeCount" id="noticeBadge">
-                  <Icon type="ios-notifications-outline" size="25"></Icon>
-                </Badge>
-              </MenuItem>
-              <MenuItem name="personal" style="width:100px">
-                <Dropdown @on-click="changeSelect" placement="bottom-start">
-                  <img
-                    v-bind:src="avatar"
-                    v-if="avatar!=''&&avatar!='undefined'"
-                    :title="userName"
-                    style="width:40px;height:40px;vertical-align:middle;"
-                  >
-                  <avatar
-                    :username="userName"
-                    :size="40"
-                    style="margin-top:10px"
-                    :title="userName"
-                    v-else
-                  ></avatar>
-                  <DropdownMenu slot="list" >
-                      <DropdownItem name="personalPage">User Space</DropdownItem>
-                      <DropdownItem name="logout">Log out</DropdownItem>
-                  </DropdownMenu>
-                </Dropdown>
-              </MenuItem>
-            </Menu>
+          <Menu
+            mode="horizontal"
+            theme="dark"
+            @on-select="unlogin"
+            :style="`z-index:0;background:`+headerBgColor"
+            v-show="!userState"
+            class="menuItem"
+          >
+            <MenuItem name="login">
+            <span>Login</span>
+            </MenuItem>
+            <MenuItem name="register">
+            <span>Sign up</span>
+            </MenuItem>
+          </Menu>
+          <Menu
+            mode="horizontal"
+            theme="dark"
+            @on-select="logged"
+            :style="`z-index:0;background:`+headerBgColor"
+            v-show="userState"
+            class="menuItem"
+          >
+            <MenuItem name="notification">
+            <Badge
+              :count="unreadNoticeCount"
+              id="noticeBadge"
+            >
+              <Icon
+                type="ios-notifications-outline"
+                size="25"
+              ></Icon>
+            </Badge>
+            </MenuItem>
+            <MenuItem
+              name="personal"
+              style="width:100px"
+            >
+            <Dropdown
+              @on-click="changeSelect"
+              placement="bottom-start"
+            >
+              <img
+                v-bind:src="avatar"
+                v-if="avatar!=''&&avatar!='undefined'"
+                :title="userName"
+                style="width:40px;height:40px;vertical-align:middle;"
+              >
+              <avatar
+                :username="userName"
+                :size="40"
+                style="margin-top:10px"
+                :title="userName"
+                v-else
+              ></avatar>
+              <DropdownMenu slot="list">
+                <DropdownItem name="personalPage">User Space</DropdownItem>
+                <DropdownItem name="logout">Log out</DropdownItem>
+              </DropdownMenu>
+            </Dropdown>
+            </MenuItem>
+          </Menu>
         </div>
       </div>
     </header>
     <section class="content">
-     <router-view @sendNotice="sendMessage" @readNotification="readNotification"></router-view>
+      <router-view
+        @sendNotice="sendMessage"
+        @readNotification="readNotification"
+      ></router-view>
     </section>
     <footer>
       <h2 style="text-align:center;color:white;font-weight:bold;margin-top:10px"><i>Open Geographic Modeling and Simulation</i></h2>
@@ -143,7 +193,7 @@ export default {
       unreadNoticeCount: 0,
       timer: null,
       //导航栏宽度
-      headerWidth: "",
+      headerWidth: ""
       // contentHeight:"",
     };
   },
@@ -172,6 +222,12 @@ export default {
     },
     avatar() {
       return this.$store.getters.avatar;
+    },
+    headerBgColor() {
+      return this.$route.name === "Home" ? "none" : "";
+    },
+    absoluteStyle() {
+      return this.$route.name === "Home" ? "position:absolute" : "position:fixed";
     }
   },
   methods: {
@@ -236,7 +292,8 @@ export default {
       }
       // var noticeSocketURL = "ws://localhost:8081/GeoProblemSolving/NoticeSocket";
       // var noticeSocketURL = "ws://202.195.237.252:8082/GeoProblemSolving/NoticeSocket";
-      var noticeSocketURL = "ws://172.21.212.7:8082/GeoProblemSolving/NoticeSocket";
+      var noticeSocketURL =
+        "ws://172.21.212.7:8082/GeoProblemSolving/NoticeSocket";
       this.noticeSocket = new WebSocket(noticeSocketURL);
       this.noticeSocket.onopen = this.onOpen;
       this.noticeSocket.onmessage = this.onMessage;
@@ -298,7 +355,7 @@ export default {
       } else if (name == "personalPage") {
         this.$router.push({ name: "PersonalPage" });
       }
-    },
+    }
   }
 };
 </script>
