@@ -20,7 +20,12 @@ img {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.btnCreate:hover,.joinProjectBtn:hover {
+.btnCreate{
+  font-size:15px;
+  height:40px;
+  margin:10px
+}
+.btnCreate:hover,{
   background-color: #19be6b;
   color: white;
 }
@@ -41,11 +46,10 @@ img {
               @click="newProject"
               type="default"
               class="btnCreate"
-              style="font-size:15px;height:40px;margin:10px"
               icon="md-add"
             >Create a new project</Button>
           </div>
-        <div style="display:flex">
+        <div>
           <Tabs value="All" type="card">
             <TabPane label="All" name="All" icon="ios-list">
               <project-list :projectList = currentProjectList projectType="All"></project-list>
