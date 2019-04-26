@@ -27,9 +27,7 @@ header {
 }
 .content {
   flex: 1 0 auto;
-  margin-top: 60px;
-  /* margin-bottom:20px; */
-  min-height: 800px;
+  margin-top:60px;
 }
 footer {
   background-color: #515a6e;
@@ -170,11 +168,8 @@ footer {
         </div>
       </div>
     </header>
-    <section class="content">
-      <router-view
-        @sendNotice="sendMessage"
-        @readNotification="readNotification"
-      ></router-view>
+    <section class="content" :style="{minHeight:contentHeight}">
+     <router-view @sendNotice="sendMessage" @readNotification="readNotification"></router-view>
     </section>
     <footer>
       <h2 style="text-align:center;color:white;font-weight:bold;margin-top:10px"><i>Open Geographic Modeling and Simulation</i></h2>
@@ -193,19 +188,22 @@ export default {
       unreadNoticeCount: 0,
       timer: null,
       //导航栏宽度
-      headerWidth: ""
-      // contentHeight:"",
+      headerWidth: "",
+      contentHeight: window.innerHeight-120+'px',
     };
   },
   mounted() {
-    // this.contentHeight = window.innerHeight-120+'px';
+    this.contentHeight = window.innerHeight-120+'px';
     if (this.$store.getters.userState) {
       this.setTimer();
       this.initWebSocket();
       this.getUnreadNoticeCount();
     }
     this.headerWidth = window.innerWidth + "px";
-    // alert(this.headerWidth);
+    window.addEventListener("resize", this.reSize);
+  },
+  beforeDestroy: function() {
+    window.removeEventListener("resize", this.reSize);
   },
   updated() {
     $(".userState sup").css("margin-top", "20px");
@@ -231,13 +229,16 @@ export default {
     }
   },
   methods: {
+    reSize() {
+      this.contentHeight = window.innerHeight-120+'px';
+    },
     turnContent(name) {
       if (name === "home") {
         this.$router.replace({ name: "Home" });
       } else if (name == "projects") {
         this.$router.replace({ name: "Projects" });
       } else if (name == "resources") {
-        this.$router.replace({ name: "resourceList" });
+        this.$router.replace({ name: "PublicResource" });
       } else if (name == "community") {
         this.$router.replace({ name: "Community" });
       } else if (name == "help") {
@@ -290,7 +291,7 @@ export default {
       if (this.noticeSocket != null) {
         this.noticeSocket = null;
       }
-      // var noticeSocketURL = "ws://localhost:8081/GeoProblemSolving/NoticeSocket";
+      //var noticeSocketURL = "ws://localhost:8081/GeoProblemSolving/NoticeSocket";
       // var noticeSocketURL = "ws://202.195.237.252:8082/GeoProblemSolving/NoticeSocket";
       var noticeSocketURL =
         "ws://172.21.212.7:8082/GeoProblemSolving/NoticeSocket";

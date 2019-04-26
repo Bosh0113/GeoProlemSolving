@@ -43,7 +43,7 @@ img {
               class="btnCreate"
               style="font-size:15px;height:40px;margin:10px"
               icon="md-add"
-            >Create New Project</Button>
+            >Create a new project</Button>
           </div>
         <div style="display:flex">
           <Tabs value="All" type="card">

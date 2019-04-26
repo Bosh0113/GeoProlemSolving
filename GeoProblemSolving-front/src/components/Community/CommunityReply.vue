@@ -20,7 +20,7 @@ As I grew older, the gifts gave way to heart shaped boxes filled with my favorit
           </p>
         </div>
         <div id="editor">
-          <mavon-editor style="height: 100%" v-model="value">111</mavon-editor>
+          <!-- <mavon-editor style="height: 100%" v-model="value">111</mavon-editor> -->
         </div>
         <div class="replyList">
           <div class="replyCount">There are
@@ -210,7 +210,7 @@ export default {
   methods: {
     setMainStyle() {
       this.mainstyle.height = window.innerHeight - 60 + "px";
-       
+
     },
     getTopicDetail() {
       let title = this.$route.params.id;

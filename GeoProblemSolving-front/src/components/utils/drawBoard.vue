@@ -107,15 +107,16 @@
         </FormItem>
       </Form>
     </Modal>
+    <toolStyle></toolStyle>
   </div>
 </template>
 <script>
 import { Photoshop } from "vue-color";
-import { canvas } from "leaflet";
 import * as socketApi from "./../../api/socket.js";
-// import MuseUI from "./../../utils/MuseUI";
+import toolStyle from "./toolStyle";
 export default {
-  name: "draw",
+  // name: "toolDrawer",
+  components: { toolStyle },
   data() {
     return {
       //关于复制
@@ -230,7 +231,8 @@ export default {
         fileDescription: [
           { required: false, message: "Drawing tool", trigger: "blur" }
         ]
-      }
+      },
+      socketLineStore:[]
     };
   },
   methods: {
@@ -404,6 +406,11 @@ export default {
         }
 
         this.isMouseDown = false;
+        
+        // 执行缓存中的socket操作
+        for(let i = 0; i < this.socketLineStore.length; i++){
+          this.getSocketConnect(this.socketLineStore[i]);
+        }       
 
         // 协同
         let line = {
@@ -794,47 +801,54 @@ export default {
     },
     getSocketConnect(data) {
       let lineData = data;
+      if (!this.isMouseDown) {
 
-      if (lineData.from === "Test") {
-        console.log(lineData.content);
-      } else if (lineData.type === "members") {
-      } else if (lineData.type === "drawing") {
-        //画面协同更新
-        if (lineData.content !== {}) {
-          let line = lineData.content;
-          this.collaDrawLine(line);
-          // 存储笔划
-          this.lines.push(line);
+        if (lineData.from === "Test") {
+          console.log(lineData.content);
+        } else if (lineData.type === "members") {
+        } else if (lineData.type === "drawing") {
+          //画面协同更新
+          if (lineData.content !== {}) {
 
-          this.storeCanvasList = [];
-        }
-      } else if (lineData.type === "clear") {
-        //画面协同更新
-        this.clearContext("1");
-        this.lines = [];
-      } else if (lineData.type === "last") {
-        //画面协同更新
-        this.cancel();
-
-        if (this.lines.length > 0) {
-          this.storeLines.push(this.lines.pop());
-        }
-      } else if (lineData.type === "next") {
-        //画面协同更新
-        this.next();
-
-        if (this.storeLines.length > 0) {
-          this.lines.push(this.storeLines.pop());
-        }
-      } else if (lineData.type == undefined && lineData.length > 0) {
-        for (let i = 0; i < lineData.length; i++) {
-          if (lineData[i].content != {}) {
-            let line = lineData[i].content;
+            let line = lineData.content;
             this.collaDrawLine(line);
             // 存储笔划
             this.lines.push(line);
+
+            this.storeCanvasList = [];
+          }
+        } else if (lineData.type === "clear") {
+          //画面协同更新
+          this.clearContext("1");
+          this.lines = [];
+        } else if (lineData.type === "last") {
+          //画面协同更新
+          this.cancel();
+
+          if (this.lines.length > 0) {
+            this.storeLines.push(this.lines.pop());
+          }
+        } else if (lineData.type === "next") {
+          //画面协同更新
+          this.next();
+
+          if (this.storeLines.length > 0) {
+            this.lines.push(this.storeLines.pop());
+          }
+        } else if (lineData.type == undefined && lineData.length > 0) {
+          for (let i = 0; i < lineData.length; i++) {
+            if (lineData[i].content != {}) {
+              let line = lineData[i].content;
+              this.collaDrawLine(line);
+              // 存储笔划
+              this.lines.push(line);
+            }
           }
         }
+
+      }
+      else{
+        this.socketLineStore.push(lineData);
       }
     },
     collaDrawLine(line) {
