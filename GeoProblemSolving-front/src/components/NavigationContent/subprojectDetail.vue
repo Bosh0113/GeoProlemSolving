@@ -1,7 +1,4 @@
 <style scoped>
-.detail {
-  display: flex;
-}
 .sidebar {
   font-weight: bold;
   width: 15%;
@@ -11,29 +8,8 @@
   margin-left: 5%;
   height: 100%;
 }
-.single_part {
-  margin-left: 2.5%;
-  margin-right: 2.5%;
-}
-.addNodeStyle,
-.editNodeStyle {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 2.5%;
-}
-.addBtn,
-.removeBtn,
 .editBtn .createTaskBtn {
   font-size: 10px;
-}
-.addBtn:hover {
-  color: white;
-  background: #47cb89;
-}
-.removeBtn:hover {
-  color: white;
-  background: #f16643;
 }
 .editBtn:hover {
   color: white;
@@ -123,10 +99,6 @@
             <Breadcrumb>
               <BreadcrumbItem :to="toProjectPage">Project</BreadcrumbItem>
               <BreadcrumbItem >Subproject</BreadcrumbItem>
-              <!-- <span>Subproject</span> -->
-              <!-- <BreadcrumbItem>
-              <span style="color:#999">>>></span>
-              <span>{{subProjectInfo.title}}</span></BreadcrumbItem>-->
             </Breadcrumb>
             <span style="float:right;margin-top:-15px;font-size:1.5rem"><strong>{{subProjectInfo.title}}</strong></span>
           </div>
@@ -135,7 +107,7 @@
             style="height:20px;display:flex;align-items:center"
             class="operatePanel"
           >
-          
+
             <Button
               type="default"
               @click="gotoWorkingPanel()"
@@ -148,16 +120,9 @@
               icon="md-mail"
               title="Inform others to work together"
             >Inform</Button>
-            <!-- <Button
-              type="default"
-              @click="backProject()"
-              icon="md-arrow-back"
-              title="Back to project page"
-            >Back</Button> -->
           </div>
           <Row>
             <Col span="22" offset="1" style="background-color:white;">
-            <!-- <span >{{subProjectInfo.title}}</span> -->
               <Tabs type="card" v-model="currentTab" @on-click="currentTabChanged(name)">
                 <TabPane label="Subproject home" icon="ios-home" name="home">
                   <div class="workspaceContent">
@@ -309,7 +274,6 @@
                           class="subProjectDesc"
                         >{{subProjectInfo.description}}</div>
                       </Card>
-                        <!-- <div class="title">Description</div> -->
                       <div class="resourcePanel" style="padding:20px 0 0 30px">
                         <Card>
                           <div
@@ -410,7 +374,7 @@
                                 />
                               </FormItem>
                             </Form>
-                          </div>                          
+                          </div>
                           <Upload
                             :max-size="1024*1024"
                             multiple
@@ -1258,39 +1222,6 @@ export default {
     sendMessage(message) {
       this.subprojectSocket.send(JSON.stringify(message));
     },
-    // 返回项目页面
-    // backProject() {
-    //   let projectInfo = this.$store.getters.project;
-    //   if (
-    //     JSON.stringify(projectInfo) != "{}" &&
-    //     projectInfo.projectId == this.subProjectInfo.projectId
-    //   ) {
-    //     let id = projectInfo.projectId;
-    //     this.$router.push(`../${id}`);
-    //   } else {
-    //     this.axios
-    //       .get(
-    //         "/GeoProblemSolving/project/inquiry" +
-    //           "?key=projectId" +
-    //           "&value=" +
-    //           this.subProjectInfo.projectId
-    //       )
-    //       .then(res => {
-    //         if (res.data != "None" && res.data != "Fail") {
-    //           this.projectInfo = res.data[0];
-    //           this.$store.commit("setProjectInfo", res.data[0]);
-
-    //           let id = this.projectInfo.projectId;
-    //           this.$router.push(`../${id}`);
-    //         } else {
-    //           console.log(res.data);
-    //         }
-    //       })
-    //       .catch(err => {
-    //         console.log(err.data);
-    //       });
-    //   }
-    // },
     // 召集参与者
     conveneWork() {
       for (let i = 0; i < this.participants.length; i++) {
@@ -1923,7 +1854,7 @@ export default {
     },
     currentTabChanged(name) {
       if(this.oldTabPaneState !== name){
-        
+
         this.closeModuleSocket();
 
         if(name == 'task') {
@@ -1936,7 +1867,7 @@ export default {
     },
     show(index) {
       let name = this.subProjectResourceList[index].name;
-      
+
         if (this.panel != null) {
           this.panel.close();
         }
@@ -2041,8 +1972,6 @@ export default {
                   desc: "File uploaded successfully",
                   duration: 2
                 });
-                //这里重新获取一次该项目下的全部资源
-                // this.addUploadEvent(this.currentProjectDetail.projectId);
                 this.getAllResource();
                 this.subProjectFileUploadForm.description = "";
                 this.subProjectFileUploadForm.privacy = "";

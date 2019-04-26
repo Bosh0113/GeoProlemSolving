@@ -138,89 +138,90 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  width:70%
+  width: 70%;
 }
 /* 按钮样式统一结束 */
-.projectCardTitle{
-    font-size:25px;
-    height:40px;
-    line-height:40px;
-    max-width:50%
+.projectCardTitle {
+  font-size: 25px;
+  height: 40px;
+  line-height: 40px;
+  max-width: 50%;
 }
-.projectCardTitleExtra{
-    height:40px;
-    line-height:40px;
-    display:flex;
-    width:50%
+.projectCardTitleExtra {
+  height: 40px;
+  line-height: 40px;
+  display: flex;
+  width: 50%;
 }
-.projectCardTitleExtra span{
-    cursor:pointer
+.projectCardTitleExtra span {
+  cursor: pointer;
 }
-.projectCardTitleExtra span:last-child{
-    margin-left:20px
+.projectCardTitleExtra span:last-child {
+  margin-left: 20px;
 }
-.projectDescription{
-  height:80px;
+.projectDescription {
+  height: 80px;
 }
-.projectIntroduction{
-  height:220px;
-  padding-top:10px
+.projectIntroduction {
+  height: 220px;
+  padding-top: 10px;
 }
-.projectDescriptionContent{
- height:56px;
- overflow-y:auto;
- text-indent:2em;
- padding:0 5px;
- word-break: break-word;
-}
-.projectIntroduction,.projectIntroduction h3{
-  margin-left:5px;
-}
-.projectIntroductionContent{
-  height:196px;
+.projectDescriptionContent {
+  height: 56px;
   overflow-y: auto;
-  text-indent:2em;
-  padding:0 5px;
+  text-indent: 2em;
+  padding: 0 5px;
   word-break: break-word;
 }
-.memberPanelTitle{
-  font-size:25px;
-  height:40px;
-  line-height:40px;
+.projectIntroduction,
+.projectIntroduction h3 {
+  margin-left: 5px;
 }
-.memberList{
-  display:flex;
-  align-items:center
+.projectIntroductionContent {
+  height: 196px;
+  overflow-y: auto;
+  text-indent: 2em;
+  padding: 0 5px;
+  word-break: break-word;
 }
-.memberList button{
-  margin-left:0.5%;
-  margin-right:0.5%
+.memberPanelTitle {
+  font-size: 25px;
+  height: 40px;
+  line-height: 40px;
 }
-.subProjectsPanel{
-  padding:20px;
+.memberList {
+  display: flex;
+  align-items: center;
 }
-.subProjectsTitle{
-  font-size:25px;
-  height:40px;
-  line-height:40px
+.memberList button {
+  margin-left: 0.5%;
+  margin-right: 0.5%;
 }
-.subProjectTitleOperatePanel{
- width:30%;
- display:flex;
- align-items:center
+.subProjectsPanel {
+  padding: 20px;
 }
-.subProjectTextInfo{
-  height:20px;
-  align-items:center;
-  display:flex;
-  justify-content:flex-start
+.subProjectsTitle {
+  font-size: 25px;
+  height: 40px;
+  line-height: 40px;
 }
-.subProjectTextInfo:last-child{
-  margin-top:5px;
+.subProjectTitleOperatePanel {
+  width: 30%;
+  display: flex;
+  align-items: center;
 }
-.subProjectTextInfo span{
-  height:20px;
-  margin-left:5%
+.subProjectTextInfo {
+  height: 20px;
+  align-items: center;
+  display: flex;
+  justify-content: flex-start;
+}
+.subProjectTextInfo:last-child {
+  margin-top: 5px;
+}
+.subProjectTextInfo span {
+  height: 20px;
+  margin-left: 5%;
 }
 </style>
 <template>
@@ -229,11 +230,7 @@
       <Col span="22" offset="1">
         <div class="detail_description">
           <Card>
-            <p
-              slot="title"
-              style=""
-              class="projectCardTitle"
-            >{{currentProjectDetail["title"]}}</p>
+            <p slot="title" style class="projectCardTitle">{{currentProjectDetail["title"]}}</p>
             <div slot="extra" class="projectCardTitleExtra">
               <span
                 type="default"
@@ -271,15 +268,11 @@
               <Col :xs="12" :sm="14" :md="15" :lg="16">
                 <div class="projectDescription">
                   <h3>Description</h3>
-                  <div
-                    class="projectDescriptionContent"
-                  >{{currentProjectDetail.description}}</div>
+                  <div class="projectDescriptionContent">{{currentProjectDetail.description}}</div>
                 </div>
                 <div class="projectIntroduction">
                   <h3>Introduction</h3>
-                  <div
-                    class="projectIntroductionContent"
-                  >{{currentProjectDetail.introduction}}</div>
+                  <div class="projectIntroductionContent">{{currentProjectDetail.introduction}}</div>
                 </div>
               </Col>
             </Row>
@@ -365,7 +358,7 @@
                 ok-text="create"
                 cancel-text="cancel"
                 @on-ok="createSubProject('createSubProjectForm')"
-                @on-cancel=""
+                @on-cancel
                 title="Create sub project"
                 width="800px"
                 :mask-closable="false"
@@ -407,10 +400,7 @@
                         <div class="subProjectTitle" slot="title">
                           <span>{{subProject["title"]}}</span>
                         </div>
-                        <div
-                          slot="extra"
-                          class="subProjectTitleOperatePanel"
-                        >
+                        <div slot="extra" class="subProjectTitleOperatePanel">
                           <div style="display:flex">
                             <span
                               v-show="subProject.isManager == true"
@@ -446,15 +436,11 @@
                         </div>
                         <p class="subProjectDescription">{{subProject["description"]}}</p>
                         <br>
-                        <div
-                          class="subProjectTextInfo"
-                        >
+                        <div class="subProjectTextInfo">
                           <Icon type="md-body" :size="20"/>Manager
                           <span>{{subProject.managerName}}</span>
                         </div>
-                        <div
-                          class="subProjectTextInfo"
-                        >
+                        <div class="subProjectTextInfo">
                           <Icon type="md-clock" :size="20"/>Creation Time
                           <span>{{subProject.createTime.split(' ')[0]}}</span>
                         </div>
@@ -469,7 +455,7 @@
                 ok-text="ok"
                 cancel-text="cancel"
                 @on-ok="handOverSubProject()"
-                @on-cancel=""
+                @on-cancel
                 width="500px"
                 :mask-closable="false"
               >
@@ -490,7 +476,7 @@
                 ok-text="submit"
                 cancel-text="cancel"
                 @on-ok="editSubProject('editSubProjectForm')"
-                @on-cancel=""
+                @on-cancel
                 title="Edit the information of this subproject"
                 width="800px"
                 :mask-closable="false"
@@ -580,7 +566,7 @@
           width="800px"
           :mask-closable="false"
           @on-ok="filesUpload('fileUploadForm')"
-          @on-cancel=""
+          @on-cancel
           ok-text="Submit"
           cancel-text="cancel"
         >
@@ -631,8 +617,8 @@
                 <span style="font-size:10px;width:60%">{{ list.name }}</span>
                 size:
                 <span
-                  style="font-size:10px;width:70%"
-                >{{Math.round(list.size/1024)}}kb</span>
+                  style="font-size:10px;width:30%;margin-left:20px"
+                >{{Math.round(list.size/Math.pow(1024,2))}}MB</span>
                 <Icon
                   type="ios-close"
                   size="20"
@@ -649,7 +635,7 @@
         v-model="removeProjectModal"
         title="Delete warning "
         @on-ok="deleteProject"
-        @on-cancel=""
+        @on-cancel
         ok-text="submit"
         cancel-text="cancel"
       >
@@ -661,7 +647,7 @@
       v-model="editProjectModal"
       title="Edit Project"
       @on-ok="editProjectSubmit('projectEditForm')"
-      @on-cancel=""
+      @on-cancel
       ok-text="Confirm"
       cancel-text="cancel"
       :mask-closable="false"
@@ -742,8 +728,8 @@
     <Modal
       v-model="progressModalShow"
       title="Upload Progress"
-      @on-ok=""
-      @on-cancel=""
+      @on-ok
+      @on-cancel
       ok-text="ok"
       cancel-text="close"
     >
@@ -908,8 +894,7 @@ export default {
       //确定用户是否有更新项目的权限，控制是否显示编辑的按钮，只有创建者才有权对项目进行编辑
       copyProjectId: "",
       copyProjectTitle: "",
-      currentProjectDetail: {
-      },
+      currentProjectDetail: {},
       //移交权限给新的管理者
       handOverSubProjectModal: false,
       newManagerId: "",
@@ -1406,11 +1391,6 @@ export default {
     uploadFileModalShow() {
       this.uploadFileModal = true;
     },
-    getFile(event) {
-      this.file = event.target.files[0];
-
-      // this.file = event.target.files;
-    },
 
     //获取全部资源的方法
     getAllResource() {
@@ -1624,50 +1604,67 @@ export default {
           let that = this;
           if (that.file.length != 0) {
             var formData = new FormData();
+            var total = 0;
             for (var i = 0; i < that.file.length; i++) {
-              formData.append("file", that.file[i]); // 文件对象
-            }
-            let userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
-            formData.append("description", this.fileUploadForm.description);
-            formData.append("type", this.fileUploadForm.type);
-            formData.append("uploaderId", this.$store.getters.userInfo.userId);
-            formData.append("belong", this.currentProjectDetail.title);
-            let scopeObject = {
-              projectId: this.currentProjectDetail.projectId,
-              subprojectId: "",
-              moduleId: ""
-            };
-            formData.append("scope", JSON.stringify(scopeObject));
-            formData.append("privacy", this.fileUploadForm.privacy);
-            this.progressModalShow = true;
-          }
-          this.axios({
-            url: "/GeoProblemSolving/resource/upload",
-            method: "post",
-            onUploadProgress: progressEvent => {
-              this.uploadProgress =
-                ((progressEvent.loaded / progressEvent.total) * 100) | 0;
-            },
-            data: formData
-          })
-            .then(res => {
-              if (res.data != "Size over" && res.data.length > 0) {
-                this.$Notice.open({
-                  title: "Upload notification title",
-                  desc: "File uploaded successfully",
-                  duration: 2
-                });
-                //这里重新获取一次该项目下的全部资源
-                this.addUploadEvent(this.currentProjectDetail.projectId);
-                this.getAllResource();
-                this.file = [];
-                this.fileUploadForm.description = "";
-                this.fileUploadForm.privacy = "";
-                this.fileUploadForm.type = "";
-                // 创建一个函数根据pid去后台查询该项目下的资源
+              if (that.file[i].fileSize < Math.pow(1024, 2)) {
+                formData.append("file", that.file[i]); // 文件对象
+              } else {
+                // this.$Message.error(
+                //   "size over, one file size must smaller than 1 GB one time!"
+                // );
               }
-            })
-            .catch(err => {});
+              total += that.file[i].fileSize;
+            }
+            if (total < Math.pow(1024, 2)) {
+              let userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
+              formData.append("description", this.fileUploadForm.description);
+              formData.append("type", this.fileUploadForm.type);
+              formData.append(
+                "uploaderId",
+                this.$store.getters.userInfo.userId
+              );
+              formData.append("belong", this.currentProjectDetail.title);
+              let scopeObject = {
+                projectId: this.currentProjectDetail.projectId,
+                subprojectId: "",
+                moduleId: ""
+              };
+              formData.append("scope", JSON.stringify(scopeObject));
+              formData.append("privacy", this.fileUploadForm.privacy);
+              this.progressModalShow = true;
+              this.axios({
+                url: "/GeoProblemSolving/resource/upload",
+                method: "post",
+                onUploadProgress: progressEvent => {
+                  this.uploadProgress =
+                    ((progressEvent.loaded / progressEvent.total) * 100) | 0;
+                },
+                data: formData
+              })
+                .then(res => {
+                  if (res.data != "Size over" && res.data.length > 0) {
+                    this.$Notice.open({
+                      title: "Upload notification title",
+                      desc: "File uploaded successfully",
+                      duration: 2
+                    });
+                    //这里重新获取一次该项目下的全部资源
+                    this.addUploadEvent(this.currentProjectDetail.projectId);
+                    this.getAllResource();
+                    this.file = [];
+                    this.fileUploadForm.description = "";
+                    this.fileUploadForm.privacy = "";
+                    this.fileUploadForm.type = "";
+                    // 创建一个函数根据pid去后台查询该项目下的资源
+                  }
+                })
+                .catch(err => {});
+            } else {
+              this.$Message.error(
+                "size over,all the file size must smaller than 1 GB one time!"
+              );
+            }
+          }
         } else {
           alert("please check your form!");
         }
@@ -1676,7 +1673,7 @@ export default {
     gatherFile(file) {
       let that = this;
       if (that.file.length >= 5) {
-        this.$Message.info("最多只能上传5个文件");
+        this.$Message.info("you can upload 5 files one time!");
       } else {
         that.file.push(file);
         that.file.map(element => {

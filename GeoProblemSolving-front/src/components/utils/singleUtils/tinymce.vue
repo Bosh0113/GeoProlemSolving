@@ -4,8 +4,8 @@
       <toolStyle></toolStyle>
     </div>
     <div id="main" style="flex:4;z-index:10;margin-left:40px;overflow:hidden" :style="{height:toolHeight}">
-      <tinymce id="d1" v-model="data"></tinymce>
-      <Button type="primary" @click="saveModalShow">save
+      <tinymce id="d1" v-model="data" style="min-height:600px" :other_options="options"></tinymce>
+      <Button type="primary" @click="saveModalShow" style="margin-top:20px">save
       </Button>
     </div>
     <Modal
@@ -37,6 +37,10 @@ export default {
       mdFile:{
         name:"",
         description:"",
+      },
+      options:{
+        width:"100%",
+        height:"600",
       }
     };
   },
@@ -62,6 +66,7 @@ export default {
           moduleId: sessionStorage.getItem("moduleId")
         };
         formData.append("scope", JSON.stringify(scopeObject));
+        formData.append("privacy", "Public");
         this.axios.defaults.headers = {
           "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
         }

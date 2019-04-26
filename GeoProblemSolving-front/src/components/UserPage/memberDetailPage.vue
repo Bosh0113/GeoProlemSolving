@@ -64,15 +64,27 @@
             :xs="{span:11,offset:1}"
           >
             <div class="rightContent">
-              <Tabs value="Overview">
+              <Tabs value="Overview" type="card" style="cursor:pointer;font-weight:bold">
                 <TabPane label="Overview" name="Overview">
                   <Col :lg="{span:22,offset:1}" :md="{span:22,offset:1}" :sm="{span:22,offset:1}">
                     <Card>
                       <p slot="title">History Line</p>
+
                       <Timeline
                         style="margin-top:20px;margin-left:5%;max-height:300px;overflow-y:auto"
                       >
-                        <TimelineItem v-for="(item,index) in userEventList" :key="index">
+                      <div v-if="memberEventList.length==0">
+                            <div style="display:flex;justify-content:center">
+                              <Icon type="md-alert" size="40" color="gray"/>
+                            </div>
+                            <br>
+                            <div style="display:flex;justify-content:center">
+                              <h3
+                                style="text-align:center;width:80%"
+                              >Sorry,there are no events here.Once you upload or join in some projects,here will list your events timeline.</h3>
+                            </div>
+                          </div>
+                        <TimelineItem v-for="(item,index) in memberEventList" :key="index" v-show="memberEventList.length>0">
                           <strong>
                             <p class="time">{{item.createTime}}</p>
                           </strong>
@@ -82,7 +94,7 @@
                     </Card>
                   </Col>
                 </TabPane>
-                <TabPane label="Participatory Project" name="Participatory">
+                <TabPane label="Joined Project" name="Participatory">
                   <Card :bordered="false" v-if="joinedProjectsList.length == 0">
                       <div style="display:flex;justify-content:center">
                         <Icon type="md-alert" size="40" color="gray"/>
@@ -118,7 +130,7 @@
                     </Col>
                   </div>
                 </TabPane>
-                <TabPane label="Management Project" name="Management">
+                <TabPane label="Managed Project" name="Management">
                   <Card :bordered="false" v-if="userManagerProjectList.length == 0">
                       <div style="display:flex;justify-content:center">
                         <Icon type="md-alert" size="40" color="gray"/>
@@ -364,7 +376,7 @@ export default {
       },
       detailSidebarHeight: "",
       // 用户event列表
-      userEventList: [],
+      memberEventList: [],
       userResourceList: [],
       joinedProjectsNameArray: [],
       //加入的项目详情数组列表
@@ -415,8 +427,9 @@ export default {
             this.$route.params.id
         )
         .then(res => {
-          this.userEventList = res.data;
-
+          if(res.data !="None"){
+            this.memberEventList = res.data;
+          }
         })
         .catch(err => {
           console.log(err.data);
