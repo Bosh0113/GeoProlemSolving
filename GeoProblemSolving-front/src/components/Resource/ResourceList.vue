@@ -114,7 +114,7 @@
       v-model="uploadModal"
       title="Upload resource"
       @on-ok="submitFile()"
-      @on-cancel="cancel()"
+      @on-cancel=""
       ok-text="submit"
       cancel-text="cancel"
       :mask-closable="false"
@@ -219,18 +219,18 @@ export default {
       this.uploaderArray = [];
       this.specifiedResourceList = [];
       this.axios
-        // .get(
-        //   "/GeoProblemSolving/resource/inquiry" + "?key=type" + "&value=" + name
-        // )
         .get(
-          "/GeoProblemSolving/resource/allPublic"
+          "/GeoProblemSolving/resource/inquiry" + "?key=type" + "&value=" + name
         )
+        // .get(
+        //   "/GeoProblemSolving/resource/allPublic"
+        // )
         .then(res => {
           if (res.data != "None") {
             let specifiedResourceListPre = res.data;
             specifiedResourceListPre.forEach(function(list) {
               list["uploader"] =
-                list.uploaderName + "(" + list.organization + ")";
+                list.uploaderName;
             });
             this.$set(this, "specifiedResourceList", specifiedResourceListPre);
           }
@@ -240,7 +240,14 @@ export default {
       this.$refs.selection.selectAll(status);
     },
     fileUploadModalShow() {
-      this.uploadModal = true;
+      if(this.$store.getters.userState){
+        this.uploadModal = true;
+      }else{
+        this.$Notice.open({
+          title:"Login Please",
+          desc: 'If you want to upload a file here, please login first.'
+        });
+      }
     },
     //上传文件
     submitFile() {
@@ -300,7 +307,7 @@ export default {
           .then(res => {
             if (res.data == "Success") {
               this.$Message.info("Delete successfully");
-              this.getUserResource();
+              this.specifiedResourceList.splice(index,1);
             } else if (res.data == "Fail") {
               this.$Message.info("Failure");
             }
@@ -309,7 +316,6 @@ export default {
             console.log(err.data);
           });
       }
-      // this.specifiedResourceList[index].resourceId
     }
   }
 };

@@ -128,8 +128,8 @@
                       </Button>
                     </Input>
                   </FormItem>
-                  <!-- confimPassword -->
-                  <FormItem label="Confim password" prop="confimPassword">
+                  <!-- Confirm Password -->
+                  <FormItem label="Confirm password" prop="confimPassword">
                     <Input
                       v-model="formValidate.confimPassword"
                       placeholder="Plase enter password again"

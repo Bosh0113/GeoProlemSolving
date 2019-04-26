@@ -525,7 +525,7 @@
           cancel-text="cancel"
         >
           <div style="display:flex;text-align:center;align-items:center">
-            <span style="width:20%">privacy</span>
+            <span style="width:20%">Privacy</span>
             <RadioGroup v-model="privacy" style="width:40%">
               <Radio label="public"></Radio>
               <Radio label="privacy"></Radio>
