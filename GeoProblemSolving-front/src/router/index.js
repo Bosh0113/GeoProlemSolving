@@ -41,6 +41,7 @@ const routes = [{
 { path: '/resetPassword/:email', name: 'resetPassword', component: resolve=>(require(["@/components/UsersState/ResetPwd"],resolve)) },
 { path: '/toolStyle', name: 'tool', component: resolve=>(require(["@/components/utils/singleUtils/toolStyle"],resolve)) },
 { path: '/tinymce', name: 'tinymce', component: resolve=>(require(["@/components/utils/singleUtils/tinymce"],resolve)) },
+{ path: '/folderTree', name: 'FolderTree', component: resolve=>(require(["@/components/SubProject/FolderTree"],resolve)) },
 
 ]
 export default new Router({
