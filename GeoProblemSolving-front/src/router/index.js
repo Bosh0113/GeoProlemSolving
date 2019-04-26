@@ -23,6 +23,7 @@ const routes = [{
     { path: 'notifications', name: 'Notifications', component: resolve=>(require(["@/components/UsersState/Notifications"],resolve)) },
     { path: 'memberPage/:id', name: 'MemberDetailPage', component: resolve=>(require(["@/components/UserPage/memberDetailPage"],resolve)) },
     { path: 'resourceList', name: 'resourceList', component: resolve=>(require(["@/components/Resource/ResourceList"],resolve)) },
+    { path: 'publicResource', name: 'PublicResource', component: resolve=>(require(["@/components/Resource/PublicResourceList"],resolve)) },
   ]
 },
 { path: '/login', name: 'Login', component: resolve=>(require(["@/components/UsersState/Login"],resolve)) },
@@ -38,7 +39,6 @@ const routes = [{
 { path: '/review', name: 'pdfViewer', component: resolve=>(require(["@/components/utils/fileReview"],resolve)) },
 { path: '/join/:id/:email', name: 'joinProject', component: resolve=>(require(["@/components/createNew/joinNewProject"],resolve)) },
 { path: '/resetPassword/:email', name: 'resetPassword', component: resolve=>(require(["@/components/UsersState/ResetPwd"],resolve)) },
-// { path: '/upload', name: 'upload', component: resolve=>(require(["@/components/NavigationContent/testUpload"],resolve)) },
 { path: '/toolStyle', name: 'tool', component: resolve=>(require(["@/components/utils/singleUtils/toolStyle"],resolve)) },
 { path: '/tinymce', name: 'tinymce', component: resolve=>(require(["@/components/utils/singleUtils/tinymce"],resolve)) },
 
@@ -46,11 +46,11 @@ const routes = [{
 export default new Router({
   routes,
   mode: 'history',
-  scrollBehavior (to, from, savedPosition) {
-    if (savedPosition) {
-      return savedPosition
-    } else {
-      return { x: 0, y: 0 }
+  scrollBehavior(to,from,savedPosition){
+    if(savedPosition){
+      return savedPosition;
+    }else{
+      return {x:0,y:0}
     }
   }
 })
