@@ -25,7 +25,7 @@
             hahaha
           </div> -->
         <div class="flow-content">
-          <h1></h1>
+          <span class="flow-title">Solve the Problem in This Way</span>
           <div class="flow-item-container">
             <span class="flow-item">
               <span class="flow-item-icon blue">
@@ -57,6 +57,7 @@
       </div>
 
       <div class="cases">
+        <span class="case-title">Smart Cases</span>
         <Row class="case-content">
           <Col
             class="case-item"
@@ -105,7 +106,7 @@
       </div>
 
       <div class="tools">
-        <h1 class="tools-title">Explore More</h1>
+        <span class="tools-title">Explore More</span>
         <Row
           class="tools-container"
           type="flex"
@@ -253,16 +254,13 @@ $firstHeight: 700px;
     color: #ff9900;
   }
 
-  .flow,
-  .cases,
-  .tools {
-    // border: solid 1px red;
-    min-height: 500px;
-  }
+
   .tools {
     padding: 2rem 0 5rem 0;
     .tools-title {
-      font-size: 2.875rem;
+      display: block;
+      font-family: Georgia, sans-serif, serif;
+      font-size: 2.5rem;
       padding: 1rem 0 3rem 0;
     }
     .tools-container {
@@ -318,6 +316,12 @@ $firstHeight: 700px;
     }
   }
   .cases {
+    .case-title {
+      display: block;
+      font-family: Georgia, sans-serif, serif;
+      font-size: 2.5rem;
+      padding: 1rem 0 3rem 0;
+    }
     .case-content {
       min-height: 500px;
       .case-item {
@@ -384,8 +388,9 @@ $firstHeight: 700px;
     }
   }
   .flow {
-    margin: 5rem auto;
+    margin: 5rem auto 0 auto;
     width: 80%;
+    min-height:500px;
     // .color-cover {
     //   position: absolute;
     //   width: 50%;
@@ -413,6 +418,11 @@ $firstHeight: 700px;
     //   }
     // }
     .flow-content {
+      .flow-title {
+        font-family: Georgia, sans-serif, serif;
+        font-size: 2.5rem;
+        padding: 1rem 0 3rem 0;
+      }
       .flow-line {
         background: linear-gradient(left, #5cadff, #5cadff);
         position: absolute;
