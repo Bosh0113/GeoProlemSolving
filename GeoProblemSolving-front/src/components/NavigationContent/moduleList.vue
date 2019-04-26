@@ -172,14 +172,18 @@
     <Row>
       <Col span="22" offset="1">
         <Card>
-          <p
-            slot="title"
-            style="height:30px;line-height:30px;font-size:20px;display: inline-block;cursor: pointer;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;max-width: 50%;"
-            @click="backtoSubproject()"
-          >{{subProjectInfo.title}}</p>
+          <div slot="title" style="height:20px;width:50%" >
+            <Breadcrumb>
+              <BreadcrumbItem :to="toProjectPage">Project</BreadcrumbItem>
+              <BreadcrumbItem :to="toSubProjectPage">Subproject</BreadcrumbItem>
+              <BreadcrumbItem>Working panel</BreadcrumbItem>
+
+            </Breadcrumb>
+            <span style="float:right;margin-top:-15px;font-size:1.5rem"><strong>{{subProjectInfo.title}}</strong></span>
+          </div>
           <div
             slot="extra"
-            style="height:30px;display:flex;align-items:center"
+            style="height:20px;display:flex;align-items:center"
             class="operatePanel"
           >
             <template v-if="this.$store.getters.userInfo.userId == this.subProjectInfo.managerId">
@@ -361,7 +365,7 @@
                         <p style="text-indent:2em;overflow:hidden;break-word:word-break">{{this.currentModuleNoticeList[this.currentModuleNoticeList.length-1].description}}</p>
                       </div>
                       <div v-if="this.currentModuleNoticeList.length==0">
-                        <p style="text-indent:2em;overflow:hidden;break-word:word-break">Sorry,there are no notice recently</p>
+                        <p style="text-indent:2em;overflow:hidden;break-word:word-break">There is no notice recently</p>
                       </div>
                     </div>
                   </Card>
@@ -370,7 +374,6 @@
                     v-model="noticeModalShow"
                     title="Create a new notice"
                     @on-ok="createNotice"
-                    @on-cancel=""
                     ok-text="Confirm"
                     cancel-text="cancel">
                       <Form :model="formItem" :label-width="60">
@@ -387,7 +390,6 @@
                     v-model="noticeDetailShowModal"
                     title="Notice detail update"
                     @on-ok="editNotice()"
-                    @on-cancel=""
                     ok-text="Confirm"
                     cancel-text="cancel">
                   <Form :model="editFormItem" :label-width="60">
@@ -408,7 +410,6 @@
               <Col span="12">
                 <div
                   style="border:1px solid lightgray;background-color:white;margin-left:30px"
-
                 >
                   <Card>
                     <h2 slot="title">Timeline</h2>
@@ -516,6 +517,7 @@
                             size="small"
                             style="margin-right: 5px"
                             title="View"
+                            @click="reviewRes(index)"
                           >
                             <Icon type="md-eye"/>
                           </Button>
@@ -863,6 +865,7 @@
                             size="small"
                             style="margin-right: 5px"
                             title="View"
+                            @click="reviewRes(index)"
                           >
                             <Icon type="md-eye"/>
                           </Button>
@@ -1176,7 +1179,11 @@ export default {
       // 控制点击notice后模态框显示的modal
       noticeDetailShowModal:false,
       // 当前选中通知条目的详情
-      currentNoticeDetail:[]
+      currentNoticeDetail:[],
+      panelList:[],
+      panel:null,
+      toProjectPage: "",
+      toSubProjectPage: ""
     };
   },
   created() {
@@ -1187,6 +1194,8 @@ export default {
     this.openModuleSocket();
     this.getHistoryRecords();
     this.getAllModules("init");
+    this.toProjectPage = "/project/"+ sessionStorage.getItem("projectId");
+    this.toSubProjectPage = "/project/"+ sessionStorage.getItem("subProjectId")+"/subproject";
   },
   // add by mzy for navigation guards
   beforeRouteEnter: (to, from, next) => {
@@ -1205,6 +1214,7 @@ export default {
   beforeRouteLeave(to, from, next) {
     this.removeTimer();
     this.closeModuleSocket();
+    this.closePanel();
     next();
   },
   beforeDestroy: function() {
@@ -1378,10 +1388,9 @@ export default {
         this.subprojectSocket = null;
       }
       let subProjectId = this.subProjectInfo.subProjectId;
-      // var subprojectSocketURL =
-        // "ws://localhost:8081/GeoProblemSolving/Module/" + subProjectId;
+      var subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + subProjectId;
       // var subprojectSocketURL = "ws://202.195.237.252:8082/GeoProblemSolving/Module/" + subProjectId;
-      var subprojectSocketURL = "ws://172.21.212.7:8082/GeoProblemSolving/Module/" + subProjectId;
+      // var subprojectSocketURL = "ws://172.21.212.7:8082/GeoProblemSolving/Module/" + subProjectId;
       this.subprojectSocket = new WebSocket(subprojectSocketURL);
       this.subprojectSocket.onopen = this.onOpen;
       this.subprojectSocket.onmessage = this.onMessage;
@@ -1886,16 +1895,6 @@ export default {
     toResourceList() {
       this.$router.push({ path: "/resourceList" });
     },
-    getResourceList() {
-      this.axios
-        .get(url, {
-          params: {
-            id: paramId
-          }
-        })
-        .then(function(response) {})
-        .catch(function(error) {});
-    },
     getFile(event) {
       this.file = event.target.files[0];
     },
@@ -1971,9 +1970,6 @@ export default {
     },
     //获取全部资源的方法
     getAllResource() {
-      // url是请求的网址
-      // 查询的形式是key-value格式
-      // this.axios.get("/GeoProblemSolving/resource/inquiry",obj)
       this.axios
         .get(
           "/GeoProblemSolving/resource/inquiry" +
@@ -1982,14 +1978,13 @@ export default {
             window.sessionStorage.getItem("moduleId")
         )
         .then(res => {
-          // 写渲染函数，取到所有资源
           if (res.data !== "None") {
-            this.$set(this, "resourceList", res.data);
+            this.$set(this, "resourceList", res.data);  
+            //存入store          
+            sessionStorage.setItem("resources", JSON.stringify(res.data));
           } else {
             this.resourceList = [];
           }
-          // 渲染函数，将列表展现出来，下载
-          // this.showProjectResource(this.resourceList);
         })
         .catch(err => {
           console.log(err.data);
@@ -2221,15 +2216,14 @@ export default {
         toolName = "video Tool";
       }
 
-      var panel = jsPanel.create({
+      let panel = jsPanel.create({
         theme: "primary",
         headerTitle: toolName,
         contentSize: "1000 600",
         content: toolURL,
         disableOnMaximized: true,
-        resizeit: {
-          minWidth:1200,
-          minHeight:900,
+        dragit:{
+          containment:5,
         },
         callback: function() {
           // this.content.style.padding = "20px";
@@ -2237,6 +2231,8 @@ export default {
       });
       // panel.resizeit("disable");
       $(".jsPanel-content").css("font-size", "0");
+      this.panelList.push(panel);
+
       // 生成records, 同步
       let record = {
         who: this.$store.getters.userName,
@@ -2249,6 +2245,15 @@ export default {
       };
       this.subprojectSocket.send(JSON.stringify(record));
       // this.allRecords.push(record);
+    },
+    closePanel(){
+      for(let i = 0;i<this.panelList.length;i++){
+        this.panelList[i].close();
+      }
+      
+      if(this.panel != null){
+          this.panel.close();
+        }
     },
     createNotice(){
       let noticeForm ={};
@@ -2322,7 +2327,30 @@ export default {
       this.editFormItem.title = this.currentNoticeDetail.title;
       this.editFormItem.description = this.currentNoticeDetail.description;
       // this.currentModuleNoticeList[index];显示在模态框里面的内容
-    }
+    },    
+    reviewRes(index) {
+      let name = this.resourceList[index].name;
+        if(this.panel != null){
+          this.panel.close();
+        }
+        let url = "http://172.21.212.7:8012/previewFile?url=http://172.21.212.7:8082"+this.resourceList[index].pathURL;
+        let toolURL ='<iframe src='+url+' style="width: 100%;height:100%"></iframe>'
+        this.panel = jsPanel.create({
+          headerControls: {
+            smallify:'remove',
+          },
+          theme: "none",
+          headerTitle: "Review",
+          contentSize: "800 600",
+          content: toolURL,
+          disableOnMaximized: true,
+          dragit:{
+            containment:5,
+          },
+          closeOnEscape: true,
+        });
+        $(".jsPanel-content").css("font-size", "0");
+    },
   }
 };
 </script>

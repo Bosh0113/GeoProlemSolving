@@ -28,8 +28,6 @@ header {
 .content{
   flex: 1 0 auto;
   margin-top:60px;
-  /* margin-bottom:20px; */
-  /* min-height:800px; */
 }
 footer{
   background-color:#515a6e;
@@ -144,7 +142,7 @@ export default {
       timer: null,
       //导航栏宽度
       headerWidth: "",
-      contentHeight:"",
+      contentHeight: window.innerHeight-120+'px',
     };
   },
   mounted() {
@@ -155,7 +153,10 @@ export default {
       this.getUnreadNoticeCount();
     }
     this.headerWidth = window.innerWidth + "px";
-    // alert(this.headerWidth);
+    window.addEventListener("resize", this.reSize);
+  },
+  beforeDestroy: function() {
+    window.removeEventListener("resize", this.reSize);
   },
   updated() {
     $(".userState sup").css("margin-top", "20px");
@@ -175,6 +176,9 @@ export default {
     }
   },
   methods: {
+    reSize() {
+      this.contentHeight = window.innerHeight-120+'px';
+    },
     turnContent(name) {
       if (name === "home") {
         this.$router.replace({ name: "Home" });
@@ -234,9 +238,9 @@ export default {
       if (this.noticeSocket != null) {
         this.noticeSocket = null;
       }
-      // var noticeSocketURL = "ws://localhost:8081/GeoProblemSolving/NoticeSocket";
+      var noticeSocketURL = "ws://localhost:8081/GeoProblemSolving/NoticeSocket";
       // var noticeSocketURL = "ws://202.195.237.252:8082/GeoProblemSolving/NoticeSocket";
-      var noticeSocketURL = "ws://172.21.212.7:8082/GeoProblemSolving/NoticeSocket";
+      // var noticeSocketURL = "ws://172.21.212.7:8082/GeoProblemSolving/NoticeSocket";
       this.noticeSocket = new WebSocket(noticeSocketURL);
       this.noticeSocket.onopen = this.onOpen;
       this.noticeSocket.onmessage = this.onMessage;

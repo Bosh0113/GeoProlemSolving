@@ -13,10 +13,8 @@
 }
 
 .content {
-  /* background: url("./../../assets/back.png") no-repeat; */
   background-color: var(--layout-background);
   display: flex;
-  /* align-items:center; */
   justify-content: center;
 }
 .loginDiv {
@@ -35,12 +33,12 @@
   color: var(--loginFontColor);
   font-size: 30px;
   font-weight: bold;
+  padding: 0;
 }
 .login-content {
   background-color: var(--loginContentColor);
-  padding: 10px;
+  padding: 50px 20px 20px 20px;
 }
-
 #logo {
   position: absolute;
   width: 129px;
@@ -57,91 +55,105 @@
   background-color: var(--loginTitleColor);
   font-size: var(--loginBtnFontSize);
 }
+img {
+  cursor: pointer;
+}
+.reUseDiv {
+  display: flex;
+  text-align: center;
+  justify-content: center;
+}
+.reciverSpan {
+  width: 100px;
+  text-align: center;
+}
+.resetReuseDiv {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+}
+.resetReuseDiv p,
+.resetReuseDiv input {
+  width: 100%;
+}
 </style>
 <template>
   <div class="layout">
-    <Layout>
-      <div class="header">
-        <img src="@/assets/images/OGMS.png" id="logo" class="pic" @click="goHome" style="cursor:pointer;">
-      </div>
-      <div class="content" ref="homePage" v-if="Userstate===false" v-bind:style="contentStyle">
-        <div class="loginDiv" v-bind:style="loginStyle">
-              <div class="login_title" style="padding:0">Log in</div>
-              <div class="login-content">
-                <Form ref="formInline" :model="formInline" :rules="ruleInline" style="margin:25px">
-                  <div>
-                    <FormItem prop="user" label="E-mail" :label-width="100">
-                      <Input
-                        placeholder="Please input your username"
-                        style="width: 90%"
-                        v-model="formInline.user"
-                        type="text"
-                      />
-                    </FormItem>
-                  </div>
-                  <br>
-                  <FormItem prop="password" label="Password" :label-width="100">
-                    <Input
-                      placeholder="please input your password"
-                      style="width: 90%"
-                      v-model="formInline.password"
-                      @keyup.enter.native="login('formInline')"
-                      type="password"
-                    />
-
-                  </FormItem>
-                  <div style="display:flex;text-align:center;justify-content:center">
-                    <Checkbox v-model="checked">Automatic login within one week</Checkbox>
-                  </div>
-                  <div style="display:flex;text-align:center;justify-content:center">
-                <p>
-                  Forget password?
-                  <!-- <a @click="sendResetEmail()">Reset</a> -->
-                  <a @click="resetModalSHow=true">Reset</a>
-                  <Modal v-model="resetModalSHow" @on-ok="sendResetEmail" @on-cancel="" ok-text="Confirm" cancel-text="cancel" title="Reset password board">
-                    <div style="display:flex;align-items:center">
-                      <span style="width:100px;text-align:center">reciever: </span><Input v-model="formInline.user" style="width: 300px" />
-                    </div>
-                    <div style="display:flex;align-items:center;padding:20px">
-                      <Icon type="ios-information-circle-outline" :size="20" color="lightblue"/>
-                      <p style="margin-left:5px">We will send you an email with a url you can visit it and reset your password,if you agree,you can click the Confirm button and you will get an email soon.</p>
-                    </div>
-                  </Modal>
-                </p>
-              </div>
-                  <br>
-                  <FormItem>
-                    <div style="display:flex;align-items:center;justify-content:center">
-                      <Button
-                        type="default"
-                        @click='login("formInline")'
-                        v-model="formInline.State"
-                        class="loginBtn"
-                      >Log in</Button>
-                    </div>
-                  </FormItem>
-                  <div style="display:flex;text-align:center;justify-content:center">
-                    <span>If you don't hava an account,click <a @click="goRegister">Here</a> to register.</span>
-                  </div>
-                  <div>
-                    <!-- <div style="display:flex;text-align:center;justify-content:center">
-                      <Spin fix v-if="loadingStatus==true">
-                        <Icon type="ios-loading" size=18 class="demo-spin-icon-load"></Icon>
-                        <div>Loading</div>
-                      </Spin>
-                      <Icon type="md-checkmark-circle" v-if="loginStatus==true"/>
-                    </div> -->
-                  </div>
-                </Form>
-              </div>
+    <div class="header">
+      <img src="@/assets/images/OGMS.png" id="logo" @click="goHome">
+    </div>
+    <div class="content" ref="homePage" v-if="Userstate===false" v-bind:style="contentStyle">
+      <div class="loginDiv" v-bind:style="loginStyle">
+        <div class="login_title">Log in</div>
+        <div class="login-content">
+          <Form ref="loginForm" :model="loginForm" :rules="loginFormRule">
+            <FormItem prop="user" label="E-mail" :label-width="100">
+              <Input
+                placeholder="Please input your username"
+                style="width: 90%"
+                v-model="loginForm.user"
+                type="text"
+              />
+            </FormItem>
+            <FormItem prop="password" label="Password" :label-width="100">
+              <Input
+                placeholder="please input your password"
+                style="width: 90%"
+                v-model="loginForm.password"
+                @keyup.enter.native="login('loginForm')"
+                type="password"
+              />
+            </FormItem>
+            <div class="reUseDiv">
+              <Checkbox v-model="checked">Automatic login within one week</Checkbox>
             </div>
+            <div class="reUseDiv">
+              <p>
+                Forget password?
+                <a @click="resetModalSHow=true">Reset</a>
+              </p>
+            </div>
+            <br>
+            <FormItem>
+              <div class="reUseDiv">
+                <Button
+                  type="default"
+                  @click="login('loginForm')"
+                  v-model="loginForm.State"
+                  class="loginBtn"
+                >Log in</Button>
+              </div>
+            </FormItem>
+            <div class="reUseDiv">
+              <span>
+                If you don't hava an account,click
+                <a @click="goRegister">Here</a> to register.
+              </span>
+            </div>
+          </Form>
+        </div>
       </div>
-    </Layout>
+    </div>
+    <Modal
+      v-model="resetModalSHow"
+      @on-ok="sendResetEmail"
+      @on-cancel
+      ok-text="Confirm"
+      cancel-text="cancel"
+      title="Reset password board"
+    >
+      <div class="resetReuseDiv">
+        <span class="reciverSpan">reciever:</span>
+        <Input v-model="loginForm.user"/>
+      </div>
+      <div class="resetReuseDiv">
+        <Icon type="ios-information-circle-outline" :size="20" color="lightblue"/>
+        <p>We will send you an email with a url you can visit it and reset your password,if you agree,you can click the Confirm button and you will get an email soon.</p>
+      </div>
+    </Modal>
   </div>
 </template>
 <script>
-import axios from "axios";
-
 export default {
   components: {},
   computed: {
@@ -154,11 +166,11 @@ export default {
   },
   data() {
     return {
-      formInline: {
+      loginForm: {
         user: "",
         password: ""
       },
-      ruleInline: {
+      loginFormRule: {
         user: [
           {
             required: true,
@@ -180,7 +192,6 @@ export default {
           }
         ]
       },
-      clientHeight: "",
       loginStyle: {
         marginTop: ""
       },
@@ -188,42 +199,38 @@ export default {
         height: ""
       },
       checked: false,
-      changePwdEmailStyle:"This email is used for help you reset your password,you can click this url ",
-      urlAddress:"http://172.21.212.7:8082/GeoProblemSolving/resetPassword/",
-      resetModalSHow:false,
-      // loginStatus:false,
-      // loadingStatus:false,
+      changePwdEmailStyle:
+        "This email is used for help you reset your password,you can click this url ",
+      urlAddress: "http://172.21.212.7:8082/GeoProblemSolving/resetPassword/",
+      resetModalSHow: false
     };
   },
   mounted() {
     this.$Notice.config({
-    top: 100,
-    duration: 1
+      top: 100,
+      duration: 1
     });
     this.contentStyle.height = window.innerHeight - 60 + "px";
     this.loginStyle.marginTop = window.innerHeight / 5 + "px";
     this.getlocalStorage();
   },
   methods: {
-    login(name) {
-      // 设置一个缓冲动画
-      // this.loadingStatus = true;
-      this.$refs[name].validate(valid => {
+    login(form) {
+      this.$refs[form].validate(valid => {
         if (valid) {
           if (this.checked == true) {
-            localStorage.setItem("user", this.formInline.user);
-            var password = this.formInline.password
-            password=this.encrypto(password);
+            localStorage.setItem("user", this.loginForm.user);
+            var password = this.loginForm.password;
+            password = this.encrypto(password);
             localStorage.setItem("password", password);
             localStorage.setItem("statusRecord", this.checked);
-            //  statusRecord
           } else if (this.checked == false) {
             localStorage.setItem("user", "");
             localStorage.setItem("password", "");
             localStorage.setItem("statusRecord", false);
           }
-          var email = this.formInline.user
-          var passwordFro = this.formInline.password;
+          var email = this.loginForm.user;
+          var passwordFro = this.loginForm.password;
           var passwordAES = this.encrypto(passwordFro);
           var passwordAESURI = window.encodeURIComponent(passwordAES);
           this.axios
@@ -237,20 +244,11 @@ export default {
             .then(res => {
               if (res.data === "Email") {
                 this.$Message.error("Email does not exist.");
-              }
-              else if(res.data === "Password"||res.data === "Fail"){
+              } else if (res.data === "Password" || res.data === "Fail") {
                 this.$Message.error("Invalid account or password.");
-              }
-               else {
-                //  this.loadingStatus = false;
-                //  this.loginStatus = true;
-                //  this.$Message.info("Login Success");
-                // this.$Message.success("Success!");
+              } else {
                 this.$store.commit("userLogin", res.data);
-                setTimeout(this.goBack,100);
-                // 这里逻辑有问题，需要修改
-                // this.$router.push({ path: "/login" });
-                // this.$router.go(-1);
+                setTimeout(this.goBack, 100);
               }
             });
         } else {
@@ -260,18 +258,18 @@ export default {
         }
       });
     },
-    goBack(){
+    goBack() {
       this.$router.go(-1);
     },
-    register: function() {
+    register() {
       this.$router.push({ name: "Register" });
     },
     goHome() {
       this.$router.push({ name: "Home" });
     },
     getlocalStorage() {
-      this.formInline.user = localStorage.getItem("user");
-      this.formInline.password = this.decrypto(localStorage.getItem("password"));
+      this.loginForm.user = localStorage.getItem("user");
+      this.loginForm.password = this.decrypto(localStorage.getItem("password"));
       // 将字符串格式的true转换为boolean模式的true
       if (localStorage.getItem("statusRecord")) {
         this.checked = eval(localStorage.getItem("statusRecord"));
@@ -299,23 +297,24 @@ export default {
       var key = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
       var iv = CryptoJS.enc.Utf8.parse("NjnuOgmsNjnuOgms");
       var decrypt = CryptoJS.AES.decrypt(context, key, {
-          iv: iv,
-          mode: CryptoJS.mode.CBC,
-          padding: CryptoJS.pad.Pkcs7
+        iv: iv,
+        mode: CryptoJS.mode.CBC,
+        padding: CryptoJS.pad.Pkcs7
       });
       var decryptedStr = decrypt.toString(CryptoJS.enc.Utf8);
       return decryptedStr.toString();
     },
-    goRegister(){
-      this.$router.push({name:"Register"});
+    goRegister() {
+      this.$router.push({ name: "Register" });
     },
     sendResetEmail() {
       var emailFormBody = {};
-      emailFormBody["recipient"] = this.formInline.user;
+      emailFormBody["recipient"] = this.loginForm.user;
       emailFormBody["mailTitle"] = "Reset password notification";
       emailFormBody["mailContent"] =
         this.changePwdEmailStyle +
-        this.urlAddress + this.formInline.user +
+        this.urlAddress +
+        this.loginForm.user +
         " to change your password, thanks.";
       this.axios
         .post("/GeoProblemSolving/email/send", emailFormBody)
@@ -323,14 +322,12 @@ export default {
           if (res.data == "Success") {
             this.$Notice.success({
               title: "Email send success",
-              desc:
-                "The email has been sent successfully."
+              desc: "The email has been sent successfully."
             });
           } else {
             this.$Notice.error({
               title: "Email send fail",
-              desc:
-                "Maybe you input a wrong email , please check it out."
+              desc: "Maybe you input a wrong email , please check it out."
             });
           }
         })
