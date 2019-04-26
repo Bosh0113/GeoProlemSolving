@@ -1,7 +1,6 @@
 <template>
   <div class="participants">
     <h1>{{msg}}</h1>
-    <!-- <mavon-editor style="height: 100%" :ishljs = "true" v-model="markhtml" @change="changeData"></mavon-editor> -->
     <br>
     <Row>
       <Col span="22" offset="1">

@@ -95,7 +95,7 @@ h1 {
     <div>
       <Form ref="formInline" :model="formInline" :rules="newProjectRule" class="projectForm">
       <!-- 选择类别 -->
-      <FormItem prop="category" label="category" :label-width="100">
+      <FormItem prop="category" label="Category" :label-width="100">
           <RadioGroup v-model="formInline.category" style="width:80%">
             <Radio label="Terrestrial">Terrestrial System</Radio>
             <Radio label="Coastal">Coastal System</Radio>
@@ -108,10 +108,10 @@ h1 {
             <Radio label="General">General</Radio>
           </RadioGroup>
       </FormItem>
-      <FormItem prop="title" label="title" :label-width="100">
+      <FormItem prop="title" label="Title" :label-width="100">
           <Input v-model="formInline.title" placeholder="Enter Title..."/>
       </FormItem>
-      <FormItem prop="description" label="description" :label-width="100">
+      <FormItem prop="description" label="Description" :label-width="100">
           <Input
             v-model="formInline.description"
             placeholder="Enter a brief introduction ..."
@@ -131,7 +131,7 @@ h1 {
           </RadioGroup>
 
       </FormItem>
-      <FormItem prop="tag" label="tag" :label-width="100">
+      <FormItem prop="tag" label="Tag" :label-width="100">
           <Input
             v-model="inputTag"
             placeholder="Enter some tag to introduce the project"
@@ -155,14 +155,14 @@ h1 {
             >{{item}}</Tag>
           </div>
           <div>
-            <span>example:</span>
+            <span>Example:</span>
             <Tag>anti-smog mask</Tag>
             <Tag>water</Tag>
             <Tag>pollution problem</Tag>
             <Tag>smoggy day</Tag>
           </div>
       </FormItem>
-      <FormItem prop="image" label="image" :label-width="100">
+      <FormItem prop="image" label="Image" :label-width="100">
         <div class="inline_style">
           <div class="demo-upload-list" v-if="img!=''">
             <template>
@@ -183,7 +183,7 @@ h1 {
           </Modal>
         </div>
       </FormItem>
-      <FormItem prop="introduction" label="introduction" :label-width="100">
+      <FormItem prop="introduction" label="Introduction" :label-width="100">
         <div class="inline_style">
             <Input v-model="formInline.introduction" type="textarea" placeholder="Enter detailed introduction about this problem..." style="height:100%;width:100%"/>
         </div>
