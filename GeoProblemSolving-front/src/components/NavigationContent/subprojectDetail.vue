@@ -315,7 +315,7 @@
                           <div
                             slot="title"
                             style="font-size:18px;height:20px;line-height:20px;"
-                          ><strong>Resource</strong></div>
+                          ><strong>Resources</strong></div>
                           <div slot="extra" style="display:flex;align-items:center;height:20px">
                             <Button
                               id="upload"
@@ -336,7 +336,7 @@
                               <Icon type="md-more"/>
                             </Button>
                           </div>
-                          <div style="height:200px;overflow-y:scroll">
+                          <div style="height:250px;overflow-y:scroll">
                             <div v-show="this.subProjectResourceList==[]">
                               <span
                                 style="text-align:center"
@@ -376,9 +376,6 @@
                           title="Upload resource here"
                         >
                           <div>
-                            <!-- subProjectFileUploadForm -->
-
-                            <!-- subProjectFileUploadFormRuleValidate -->
                             <Form
                               ref="subProjectFileUploadForm"
                               :model="subProjectFileUploadForm"
@@ -393,7 +390,6 @@
                                   <Radio label="public"></Radio>
                                   <Radio label="privacy"></Radio>
                                 </RadioGroup>
-                                <!-- <Input v-model="formValidate.name" placeholder="Enter your name"></Input> -->
                               </FormItem>
                               <FormItem label="Type" prop="type">
                                 <RadioGroup v-model="subProjectFileUploadForm.type">
@@ -405,7 +401,6 @@
                                   <Radio label="model"></Radio>
                                   <Radio label="others"></Radio>
                                 </RadioGroup>
-                                <!-- <Input v-model="formValidate.mail" placeholder="Enter your e-mail"></Input> -->
                               </FormItem>
                               <FormItem label="Description" prop="description">
                                 <Input
@@ -415,33 +410,7 @@
                                 />
                               </FormItem>
                             </Form>
-                          </div>
-                          <!-- <div style="display:flex;;align-items:center">
-                          <span style="width:20%;text-align:center"><Icon type="md-star" color="red"/>Privacy</span>
-                            <RadioGroup v-model="privacy" style="width:80%">
-                            <Radio label="public"></Radio>
-                            <Radio label="privacy"></Radio>
-                          </RadioGroup>
-                          </div>-->
-                          <!-- <br> -->
-                          <!-- <div style="display:flex;text-align:center;align-items:center">
-                          <span style="width:20%;text-align:center"><Icon type="md-star" color="red"/>Type</span>
-                          <RadioGroup v-model="fileType" style="float:left">
-                            <Radio label="image"></Radio>
-                            <Radio label="video"></Radio>
-                            <Radio label="data"></Radio>
-                            <Radio label="paper"></Radio>
-                            <Radio label="document"></Radio>
-                            <Radio label="model"></Radio>
-                            <Radio label="others"></Radio>
-                          </RadioGroup>
-                          </div>-->
-                          <!-- <br>
-                        <div style="display:flex;text-align:center;align-items:center;justify-content:center">
-                       <span style="width:20%;text-align:center">Description</span>
-                        <Input type="textarea" :rows="4" v-model="fileDescription"/>
-                          </div>-->
-                          <!-- <br> -->
+                          </div>                          
                           <Upload
                             :max-size="1024*1024"
                             multiple
@@ -1049,7 +1018,8 @@ export default {
           width: 250,
           align: "center"
         }
-      ]
+      ],
+      panel:null
     };
   },
   created() {
@@ -1086,6 +1056,9 @@ export default {
   },
   beforeRouteLeave(to, from, next) {
     this.removeTimer();
+    if (this.panel != null) {
+      this.panel.close();
+    }
     next();
   },
   beforeDestroy: function() {
@@ -1962,7 +1935,31 @@ export default {
       this.$router.push({ path: "/resourceList" });
     },
     show(index) {
-      window.open(this.subProjectResourceList[index].pathURL);
+      let name = this.subProjectResourceList[index].name;
+      
+        if (this.panel != null) {
+          this.panel.close();
+        }
+        let url =
+          "http://172.21.212.7:8012/previewFile?url=http://172.21.212.7:8082" +
+          this.subProjectResourceList[index].pathURL;
+        let toolURL =
+          "<iframe src=" + url + ' style="width: 100%;height:100%"></iframe>';
+        this.panel = jsPanel.create({
+          headerControls: {
+            smallify: "remove"
+          },
+          theme: "none",
+          headerTitle: "Review",
+          contentSize: "800 600",
+          content: toolURL,
+          disableOnMaximized: true,
+          dragit: {
+            containment: 5
+          },
+          closeOnEscape: true
+        });
+        $(".jsPanel-content").css("font-size", "0");
     },
     gotoWorkingPanel(){
       this.$router.push(`./workspace`);
@@ -1981,7 +1978,6 @@ export default {
           //写渲染函数，取到所有资源
           if (res.data !== "None") {
             this.$set(this, "subProjectResourceList", res.data);
-            console.table(this.subProjectResourceList);
           } else {
             this.projectResourceList = [];
           }
@@ -1996,12 +1992,10 @@ export default {
       if (that.file.length >= 5) {
         this.$Message.info("最多只能上传5个文件");
       } else {
-        console.table(this.file);
         that.file.push(file);
         that.file.map(element => {
           element["fileSize"] = Math.round((element.size / 1024) * 100) / 100;
         });
-        console.log(that.file);
       }
       return false;
     },
@@ -2037,9 +2031,6 @@ export default {
             onUploadProgress: progressEvent => {
               this.uploadProgress =
                 ((progressEvent.loaded / progressEvent.total) * 100) | 0;
-              // let complete = (progressEvent.loaded / progressEvent.total * 100 | 0) + '%'
-              console.log(progressEvent);
-              console.log(this.uploadProgress);
             },
             data: formData
           })
@@ -2067,7 +2058,6 @@ export default {
     delFileList(index) {
       let that = this;
       that.file.splice(index, 1);
-      console.log(that.file);
     }
   }
 };

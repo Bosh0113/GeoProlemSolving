@@ -155,7 +155,10 @@ export default {
       this.getUnreadNoticeCount();
     }
     this.headerWidth = window.innerWidth + "px";
-    // alert(this.headerWidth);
+    window.addEventListener("resize", this.reSize);
+  },
+  beforeDestroy: function() {
+    window.removeEventListener("resize", this.reSize);
   },
   updated() {
     $(".userState sup").css("margin-top", "20px");
@@ -175,6 +178,9 @@ export default {
     }
   },
   methods: {
+    reSize() {
+      this.contentHeight = window.innerHeight-120+'px';
+    },
     turnContent(name) {
       if (name === "home") {
         this.$router.replace({ name: "Home" });

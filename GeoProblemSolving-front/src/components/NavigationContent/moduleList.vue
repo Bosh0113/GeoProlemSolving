@@ -2330,11 +2330,10 @@ export default {
     },    
     reviewRes(index) {
       let name = this.resourceList[index].name;
-      if(!/\.(pdf||zip||doc||docx||ppt||pptx||xls||xlsx)$/.test(name.toLowerCase())){
         if(this.panel != null){
           this.panel.close();
         }
-        let url = "http://172.21.212.7:8012/previewFile?url="+this.resourceList[index].pathURL;
+        let url = "http://172.21.212.7:8012/previewFile?url=http://172.21.212.7:8082"+this.resourceList[index].pathURL;
         let toolURL ='<iframe src='+url+' style="width: 100%;height:100%"></iframe>'
         this.panel = jsPanel.create({
           headerControls: {
@@ -2351,9 +2350,6 @@ export default {
           closeOnEscape: true,
         });
         $(".jsPanel-content").css("font-size", "0");
-      }
-      else{
-      }
     },
   }
 };
