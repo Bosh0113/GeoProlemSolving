@@ -75,7 +75,7 @@
     <div class="fileSpace">
       <Card :padding="1">
         <div slot="title" class="resourceTitle">
-          <strong>Resource</strong></div>
+          <strong>Resources</strong></div>
           <div slot="extra" class="resourceBtnDiv">
             <Tooltip content="Back" placement="bottom" class="fileBtn">
               <Button @click="backforeFolder">
@@ -188,12 +188,8 @@
             <div style="padding:0 10px 0 10px">
                 <ul v-for="(list,index) in toUploadFiles" :key="index">
                     <li style="display:flex">
-                    filename:
-                    <span style="font-size:10px;width:60%">{{ list.name }}</span>
-                    size:
-                    <span
-                        style="font-size:10px;width:70%"
-                    >{{list.fileSize}}</span>
+                    File name:
+                    <span style="font-size:10px;margin: 0 5px 0 5px">{{ list.name }} ( {{list.fileSize}} )</span>
                     <Icon
                         type="ios-close"
                         size="20"

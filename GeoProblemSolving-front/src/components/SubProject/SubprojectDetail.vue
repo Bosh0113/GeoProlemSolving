@@ -122,7 +122,7 @@
           </Row>
           <Row>
             <Col span="22" offset="1" style="background-color:white;">
-              <Tabs type="card" v-model="currentTab" @on-click="currentTabChanged(name)">
+              <Tabs type="card" v-model="currentTab" @on-click="currentTabChanged">
                 <TabPane label="Subproject home" icon="ios-home" name="home">
                   <Row type="flex" justify="space-around">
                     <Col
@@ -138,7 +138,7 @@
                         <div slot="title" style="font-size:18px">
                           <strong>Participants</strong>
                         </div>
-                        <div :style="{height:sidebarHeight-100+'px'}">
+                        <div :style="{height:sidebarHeight-150+'px'}">
                           <div
                             class="member-desc"
                             v-for="(member,index) in this.participants"
@@ -282,7 +282,7 @@
                         >{{subProjectInfo.description}}</div>
                       </Card>
                         <!-- <div class="title">Description</div> -->
-                      <div class="resourcePanel" style="padding:20px 0 0 30px">
+                      <div class="resourcePanel" style="padding-top: 20px" >
                         <folder-tree :subProjectId = subProjectInfo.subProjectId></folder-tree>
                       </div>
                       <div
@@ -874,6 +874,7 @@ export default {
     this.contentHeight = window.innerHeight + "px";
     this.toProjectPage = "/project/" + sessionStorage.getItem("projectId");
     this.inquiryTask();
+    window.addEventListener("resize", this.initSize);
   },
   // add by mzy for navigation guards
   beforeRouteEnter: (to, from, next) => {
@@ -911,8 +912,8 @@ export default {
   methods: {
     initSize() {
       //侧边栏的高度随着屏幕的高度自适应
-      this.sidebarHeight = window.innerHeight - 227;
-      this.descHeight = (window.innerHeight - 227) / 3;
+      this.sidebarHeight = window.innerHeight - 250;
+      this.descHeight = (window.innerHeight - 250) / 3;
       this.taskContainerHeight = this.sidebarHeight + 10;
       //通知栏的属性设置，top表示距离顶部的距离，duration表示持续的时间
       this.$Notice.config({
@@ -1047,9 +1048,8 @@ export default {
       }
       let roomId = this.subProjectInfo.subProjectId + "task";
       // var subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + roomId;
-      // var subprojectSocketURL = "ws://202.195.237.252:8082/GeoProblemSolving/Module/" + roomId;
-      var subprojectSocketURL =
-        "ws://172.21.212.7:8082/GeoProblemSolving/Module/" + roomId;
+      var subprojectSocketURL = "ws://172.21.213.185:8080/GeoProblemSolving/Module/" + roomId;
+      // var subprojectSocketURL =  "ws://172.21.212.7:8082/GeoProblemSolving/Module/" + roomId;
       this.subprojectSocket = new WebSocket(subprojectSocketURL);
       this.subprojectSocket.onopen = this.onOpen;
       this.subprojectSocket.onmessage = this.onMessage;
