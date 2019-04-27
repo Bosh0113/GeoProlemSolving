@@ -28,15 +28,12 @@
 <template>
   <Row>
     <Col span="23" offset="1">
-      <h2 style="margin-top: 20px;">Here are public resources shared by users. We will NEVER make your resources public until you share it.</h2>
+      <h2
+        style="margin-top: 20px;"
+      >Here are public resources shared by users. We will NEVER make your resources public until you share it.</h2>
       <div class="main" :style="{height:contentHeight}">
         <div class="sidebarTree">
-          <Menu
-            theme="light"
-            active-name="all"
-            width="auto"
-            @on-select="onMenuSelect"
-          >
+          <Menu theme="light" active-name="all" width="auto" @on-select="onMenuSelect">
             <MenuGroup title="File type">
               <MenuItem name="all">
                 <Icon type="ios-list-box-outline"/>All
@@ -70,40 +67,57 @@
           <div class="resourcePanel">
             <Row>
               <template v-if="$store.getters.userState">
-              <Col span="22" offset="1">
-                <Table :columns="resourceColumn" :data="showList" border>
-                  <template slot-scope="{ row, index }" slot="action" v-show="showList.length>0">
-                     <a :href="showList[index].pathURL" :download="showList[index].name" title="Download"><Icon type="md-download" :size="20" color="yellowgreen"/></a>
-                     <a @click="show(index)" style="margin-left: 10px" title="Preview"><Icon type="md-eye" :size="20" color="orange"/></a>
-                  </template>
-                </Table>
-              </Col>
+                <Col span="22" offset="1">
+                  <Table :columns="resourceColumn" :data="showList" border>
+                    <template slot-scope="{ row, index }" slot="action" v-show="showList.length>0">
+                      <a
+                        :href="showList[index].pathURL"
+                        :download="showList[index].name"
+                        title="Download"
+                      >
+                        <Icon type="md-download" :size="20" color="yellowgreen"/>
+                      </a>
+                      <a @click="show(index)" style="margin-left: 10px" title="Preview">
+                        <Icon type="md-eye" :size="20" color="orange"/>
+                      </a>
+                    </template>
+                  </Table>
+                </Col>
               </template>
               <template v-else>
-              <Col span="22" offset="1">
-                <Table :columns="resourceColumn" :data="showList" border>
-                  <template slot-scope="{ row, index }" slot="action" v-show="showList.length>0">
-                     <a title="Please download after login"><Icon type="md-download" :size="20" color="gray"/></a>
-                     <a style="margin-left: 10px" title="Please preview after login"><Icon type="md-eye" :size="20" color="gray"/></a>
-                  </template>
-                </Table>
-                
-              </Col>
+                <Col span="22" offset="1">
+                  <Table :columns="resourceColumn" :data="showList" border>
+                    <template slot-scope="{ row, index }" slot="action" v-show="showList.length>0">
+                      <a title="Please download after login">
+                        <Icon type="md-download" :size="20" color="gray"/>
+                      </a>
+                      <a style="margin-left: 10px" title="Please preview after login">
+                        <Icon type="md-eye" :size="20" color="gray"/>
+                      </a>
+                    </template>
+                  </Table>
+                </Col>
               </template>
             </Row>
             <div style="display:flex;justify-content:center">
-              <Page :total="dataCount" :page-size="pageSize" show-total @on-change="changepage" show-elevator style="position: absolute;top:600px"/>
+              <Page
+                :total="dataCount"
+                :page-size="pageSize"
+                show-total
+                @on-change="changepage"
+                show-elevator
+                style="position: absolute;top:600px"
+              />
             </div>
           </div>
         </div>
-        
       </div>
     </Col>
     <Modal
       v-model="uploadModal"
       title="Upload resource"
       @on-ok="submitFile()"
-      @on-cancel=""
+      @on-cancel
       ok-text="submit"
       cancel-text="cancel"
       :mask-closable="false"
@@ -140,36 +154,36 @@ export default {
       // 侧边栏的颜色主题
       resourceColumn: [
         {
-          type:"index",
-          maxWidth:50,
-          align:"center"
+          type: "index",
+          maxWidth: 50,
+          align: "center"
         },
         {
           title: "Name",
           key: "name",
-          minWidth:10,
+          minWidth: 10,
           tooltip: true,
-          sortable: true,
+          sortable: true
         },
         {
           title: "Type",
           key: "type",
           width: 100,
-          sortable: true,
+          sortable: true
         },
         {
           title: "Size",
           key: "fileSize",
           width: 100,
-          sortable: true,
+          sortable: true
         },
         {
           title: "Description",
           key: "description",
-          minWidth:30,
+          minWidth: 30,
           tooltip: true
         },
-        {          
+        {
           title: "Upload time",
           key: "uploadTime",
           width: 160,
@@ -179,21 +193,21 @@ export default {
           title: "Action",
           slot: "action",
           width: 120,
-          align:"center"
+          align: "center"
         }
       ],
-      allResourceList:[],
-      allSelectedList:[],
+      allResourceList: [],
+      allSelectedList: [],
       showList: [],
-      dataCount:0,
-      pageSize:10,
+      dataCount: 0,
+      pageSize: 10,
       // 上传文件的模态框
       uploadModal: false,
       file: "",
       fileDescription: "",
       fileType: "",
       contentHeight: "",
-      panel:null,
+      panel: null
     };
   },
   mounted() {
@@ -210,7 +224,7 @@ export default {
     initLayout() {
       this.contentHeight = window.innerHeight - 180 + "px";
     },
-    readResource(){
+    readResource() {
       this.allResourceList = [];
       this.showList = [];
       this.axios.get("/GeoProblemSolving/resource/allPublic").then(res => {
@@ -227,63 +241,69 @@ export default {
         }
       });
     },
-    sliceList(){
+    sliceList() {
       var tempResourceList = this.allSelectedList;
-      if(this.dataCount<this.pageSize){
+      if (this.dataCount < this.pageSize) {
         this.$set(this, "showList", tempResourceList);
-      }
-      else{
-        this.$set(this, "showList", tempResourceList.slice(0,this.pageSize));
+      } else {
+        this.$set(this, "showList", tempResourceList.slice(0, this.pageSize));
       }
     },
     onMenuSelect(name) {
-      if(name=='all'){
+      if (name == "all") {
         this.$set(this, "allSelectedList", this.allResourceList);
-      }else{
+      } else {
         this.mapResourceList(name);
       }
       this.dataCount = this.allSelectedList.length;
       this.sliceList();
     },
-    mapResourceList(name){
+    mapResourceList(name) {
       var newList = [];
-      newList = this.allResourceList.filter(function(e){
-        if(e.type==name){
+      newList = this.allResourceList.filter(function(e) {
+        if (e.type == name) {
           return e;
         }
       });
       this.$set(this, "allSelectedList", newList);
     },
-    changepage(index){
+    changepage(index) {
       var _start = (index - 1) * this.pageSize;
       var _end = index * this.pageSize;
-      this.showList = this.allSelectedList.slice(_start,_end);
+      this.showList = this.allSelectedList.slice(_start, _end);
     },
-    show(index){
+    show(index) {
       let name = this.showList[index].name;
-        if (this.panel != null) {
-          this.panel.close();
-        }
-        let url =
-          "http://172.21.212.7:8012/previewFile?url=http://172.21.212.7:8082" +
-          this.showList[index].pathURL;
-        let toolURL =
-          "<iframe src=" + url + ' style="width: 100%;height:100%"></iframe>';
-        this.panel = jsPanel.create({
-          headerControls: {
-            smallify: "remove"
-          },
-          theme: "none",
-          headerTitle: "Preview",
-          contentSize: "800 600",
-          content: toolURL,
-          disableOnMaximized: true,
-          dragit: {
-            containment: 5
-          },
-          closeOnEscape: true
+      if (/\.(shx)$/.test(name.toLowerCase())) {
+        this.$Notice.error({
+          title: "Open failed",
+          desc: "Not supported file format."
         });
-        $(".jsPanel-content").css("font-size", "0");
+        return false;
+      }
+      if (this.panel != null) {
+        this.panel.close();
+      }
+      let url =
+        "http://172.21.212.7:8012/previewFile?url=http://172.21.212.7:8082" +
+        this.showList[index].pathURL;
+      let toolURL =
+        "<iframe src=" + url + ' style="width: 100%;height:100%"></iframe>';
+      this.panel = jsPanel.create({
+        headerControls: {
+          smallify: "remove"
+        },
+        theme: "light",
+        headerTitle: "Preview",
+        contentSize: "800 600",
+        content: toolURL,
+        disableOnMaximized: true,
+        dragit: {
+          containment: 5
+        },
+        closeOnEscape: true
+      });
+      $(".jsPanel-content").css("font-size", "0");
     }
   }
 };

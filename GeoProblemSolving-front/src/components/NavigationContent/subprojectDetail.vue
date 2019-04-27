@@ -95,52 +95,53 @@
     <Row>
       <Col span="22" offset="1">
         <Card>
-          <div style="display:flex;height:40px">
-            <div slot="title" style="height:40px;width:20%;display:flex;align-items:center">
-              <Breadcrumb >
-                <BreadcrumbItem :to="toProjectPage">Project</BreadcrumbItem>
-                <BreadcrumbItem >Subproject</BreadcrumbItem>
-              </Breadcrumb>
-            </div>
-          <div style="text-align:center;font-size:1.5rem;width:60%;height:40px"><strong>{{subProjectInfo.title}}</strong></div>
-          <div
-            slot="extra"
-            style="height:40px;display:flex;align-items:center;width:20%;float:right"
-            class="operatePanel"
-          >
-            <Button
-              type="default"
-              @click="gotoWorkingPanel()"
-              icon="ios-git-network"
-              title="Back to project page"
-            >Work</Button>
-            <Button
-              type="default"
-              @click="conveneWork()"
-              icon="md-mail"
-              title="Inform others to work together"
-            >Inform</Button>
-          </div>
-          </div>
-
+          <Row>
+              <Col span="5" offset="1" style="height:40px">
+                <Breadcrumb>
+                  <BreadcrumbItem :to="toProjectPage">Project</BreadcrumbItem>
+                  <BreadcrumbItem>Subproject</BreadcrumbItem>
+                </Breadcrumb>
+              </Col>
+              <Col span="13" style="text-align:center;font-size:1.5rem;height:40px">
+                <strong>{{subProjectInfo.title}}</strong>
+              </Col>
+              <Col
+                span="4" 
+                style="height:40px;text-align:right;"
+                class="operatePanel"
+              >
+                <Button
+                  type="default"
+                  @click="gotoWorkingPanel()"
+                  icon="ios-git-network"
+                  title="Back to project page"
+                >Work</Button>
+                <Button
+                  type="default"
+                  @click="conveneWork()"
+                  icon="md-mail"
+                  title="Inform others to work together"
+                >Inform</Button>
+              </Col>
+          </Row>
           <Row>
             <Col span="22" offset="1" style="background-color:white;">
               <Tabs type="card" v-model="currentTab" @on-click="currentTabChanged(name)">
                 <TabPane label="Subproject home" icon="ios-home" name="home">
-                  <div class="workspaceContent" >
+                  <div class="workspaceContent">
                     <Col
                       :xs="{span:8,offset:1}"
                       :sm="{span:7,offset:1}"
                       :md="{span:6,offset:1}"
                       :lg="{span:5,offset:1}"
-
                       v-bind="this.participants"
                       :style="{height:sidebarHeight+14+'px'}"
                       style="margin-top:30px"
-
                     >
                       <Card>
-                        <div slot="title" style="font-size:18px"><strong>Participants</strong></div>
+                        <div slot="title" style="font-size:18px">
+                          <strong>Participants</strong>
+                        </div>
                         <div :style="{height:sidebarHeight-100+'px'}">
                           <div
                             class="member-desc"
@@ -170,11 +171,13 @@
                               </Badge>
                               <div class="memebr-work" style="display:flex;align-items:center">
                                 <div class="userName">
-                                  <span style="padding:0 2.5px">{{member.userName}}({{member.organization}})</span>
+                                  <span
+                                    style="padding:0 2.5px"
+                                  >{{member.userName}}({{member.organization}})</span>
                                 </div>
                                 <!-- <div class="organization">
                                   <span style="padding:0 5px">{{member.organization}}</span>
-                                </div> -->
+                                </div>-->
                               </div>
                             </template>
                             <template v-else style="margin-top:5px">
@@ -204,7 +207,7 @@
                                   <span style="padding:0 5px">{{member.organization}}</span>
                                 </div>
                               </div>
-                              </template>
+                            </template>
                             <div style="line-height:60px" type="default">
                               <span
                                 style="cursor:pointer"
@@ -271,9 +274,20 @@
                         </div>
                       </Card>
                     </Col>
-                    <Col :xs="15" :sm="16" :md="17" :lg="17" style="margin-left:20px;margin-top:30px">
-                      <Card :style="{height:descHeight +'px'}" style="background-color:white;margin-left:30px">
-                        <div slot="title" style="font-size:18px;"><strong>Description</strong></div>
+                    <Col
+                      :xs="15"
+                      :sm="16"
+                      :md="17"
+                      :lg="17"
+                      style="margin-left:20px;margin-top:30px"
+                    >
+                      <Card
+                        :style="{height:descHeight +'px'}"
+                        style="background-color:white;margin-left:30px"
+                      >
+                        <div slot="title" style="font-size:18px;">
+                          <strong>Description</strong>
+                        </div>
                         <div
                           :style="{height:descHeight-60 +'px'}"
                           class="subProjectDesc"
@@ -282,10 +296,9 @@
                       </Card>
                       <div class="resourcePanel" style="padding:20px 0 0 30px">
                         <Card>
-                          <div
-                            slot="title"
-                            style="font-size:18px;height:20px;line-height:20px;"
-                          ><strong>Resources</strong></div>
+                          <div slot="title" style="font-size:18px;height:20px;line-height:20px;">
+                            <strong>Resources</strong>
+                          </div>
                           <div slot="extra" style="display:flex;align-items:center;height:20px">
                             <Button
                               id="upload"
@@ -329,8 +342,17 @@
                                 >
                                   <Icon type="md-download" :size="20"/>
                                 </a>
-                                <span @click="show(index)" style="margin-left: 10px" title="Preview">
-                                  <Icon type="md-eye" :size="20" style="cursor:pointer" color="#2d8cf0"/>
+                                <span
+                                  @click="show(index)"
+                                  style="margin-left: 10px"
+                                  title="Preview"
+                                >
+                                  <Icon
+                                    type="md-eye"
+                                    :size="20"
+                                    style="cursor:pointer"
+                                    color="#2d8cf0"
+                                  />
                                 </span>
                               </template>
                             </Table>
@@ -341,9 +363,8 @@
                           v-model="uploadShow"
                           :mask-closable="false"
                           @on-ok="subProjectfilesUpload('subProjectFileUploadForm')"
-                          ok-text="submit"
-                          @on-cancel
-                          cancel-text="cancel"
+                          ok-text="Submit"
+                          cancel-text="Cancel"
                           title="Upload resource here"
                         >
                           <div>
@@ -397,29 +418,29 @@
                           <div style="padding:0 10px 0 10px">
                             <ul v-for="(list,index) in file" :key="index">
                               <li style="display:flex">
-                                filename:
-                                <span style="font-size:10px;width:60%">{{ list.name }}</span>
-                                size:
-                                <span
-                                  style="font-size:10px;width:70%"
-                                >{{Math.round(list.size/1024)}}kb</span>
-                                <Icon
-                                  type="ios-close"
-                                  size="20"
-                                  @click="delFileList(index)"
-                                  style="display:flex;justify-content:flex-end"
-                                ></Icon>
-                              </li>
+                              File name:
+                              <span style="font-size:10px;margin: 0 5px 0 5px" :title="list.name">{{ list.name }}</span>
+                              (Size:
+                              <span v-if="list.size<(1024*1024)" style="font-size:10px;margin-right:10px"
+                              >{{(list.size/1024).toFixed(2)}}KB)</span>
+                              <span v-else style="font-size:10px;margin-right:10px"
+                              >{{(list.size/1024/1024).toFixed(2)}}MB)</span>
+                              <Icon
+                                type="ios-close"
+                                size="20"
+                                @click="delFileList(index)"
+                                style="display:flex;justify-content:flex-end;cursor:pointer"
+                                title="Cancel"
+                              ></Icon>
+                            </li>
                             </ul>
                           </div>
                         </Modal>
                         <Modal
                           v-model="progressModalShow"
                           title="Upload Progress"
-                          @on-ok
-                          @on-cancel
-                          ok-text="ok"
-                          cancel-text="close"
+                          ok-text="Ok"
+                          cancel-text="Close"
                         >
                           <Progress :percent="uploadProgress"></Progress>
                         </Modal>
@@ -667,7 +688,6 @@
           </Row>
         </Card>
       </Col>
-
       <template>
         <BackTop></BackTop>
       </template>
@@ -898,7 +918,7 @@ export default {
       candidates: [],
       inviteList: [],
       inviteAble: true,
-      oldTabPaneState:"home",
+      oldTabPaneState: "home",
       // 后台获取的module下的task列表
       taskList: [],
       selectTaskIndex: 0,
@@ -968,7 +988,7 @@ export default {
         {
           title: "Name",
           key: "name",
-          tooltip:true,
+          tooltip: true,
           sortable: true
         },
         {
@@ -986,7 +1006,7 @@ export default {
         {
           title: "Description",
           key: "description",
-          tooltip:true,
+          tooltip: true,
           sortable: true
         },
         {
@@ -1002,7 +1022,7 @@ export default {
           align: "center"
         }
       ],
-      panel:null
+      panel: null
     };
   },
   created() {
@@ -1010,7 +1030,7 @@ export default {
   },
   mounted() {
     this.contentHeight = window.innerHeight + "px";
-    this.toProjectPage = "/project/"+ sessionStorage.getItem("projectId");
+    this.toProjectPage = "/project/" + sessionStorage.getItem("projectId");
     this.inquiryTask();
     this.getAllResource();
   },
@@ -1187,7 +1207,8 @@ export default {
       let roomId = this.subProjectInfo.subProjectId + "task";
       // var subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + roomId;
       // var subprojectSocketURL = "ws://202.195.237.252:8082/GeoProblemSolving/Module/" + roomId;
-      var subprojectSocketURL = "ws://172.21.212.7:8082/GeoProblemSolving/Module/" + roomId;
+      var subprojectSocketURL =
+        "ws://172.21.212.7:8082/GeoProblemSolving/Module/" + roomId;
       this.subprojectSocket = new WebSocket(subprojectSocketURL);
       this.subprojectSocket.onopen = this.onOpen;
       this.subprojectSocket.onmessage = this.onMessage;
@@ -1239,7 +1260,7 @@ export default {
       clearInterval(this.timer);
     },
     sendMessage(message) {
-      if(this.subprojectSocket!=null){
+      if (this.subprojectSocket != null) {
         this.subprojectSocket.send(JSON.stringify(message));
       }
     },
@@ -1874,11 +1895,10 @@ export default {
         });
     },
     currentTabChanged(name) {
-      if(this.oldTabPaneState !== name){
-
+      if (this.oldTabPaneState !== name) {
         this.closeModuleSocket();
 
-        if(name == 'task') {
+        if (name == "task") {
           this.openModuleSocket();
         }
       }
@@ -1888,32 +1908,38 @@ export default {
     },
     show(index) {
       let name = this.subProjectResourceList[index].name;
-
-        if (this.panel != null) {
-          this.panel.close();
-        }
-        let url =
-          "http://172.21.212.7:8012/previewFile?url=http://172.21.212.7:8082" +
-          this.subProjectResourceList[index].pathURL;
-        let toolURL =
-          "<iframe src=" + url + ' style="width: 100%;height:100%"></iframe>';
-        this.panel = jsPanel.create({
-          headerControls: {
-            smallify: "remove"
-          },
-          theme: "none",
-          headerTitle: "Preview",
-          contentSize: "800 600",
-          content: toolURL,
-          disableOnMaximized: true,
-          dragit: {
-            containment: 5
-          },
-          closeOnEscape: true
+      if (/\.(shx)$/.test(name.toLowerCase())) {
+        this.$Notice.error({
+          title: "Open failed",
+          desc: "Not supported file format."
         });
-        $(".jsPanel-content").css("font-size", "0");
+        return false;
+      }
+      if (this.panel != null) {
+        this.panel.close();
+      }
+      let url =
+        "http://172.21.212.7:8012/previewFile?url=http://172.21.212.7:8082" +
+        this.subProjectResourceList[index].pathURL;
+      let toolURL =
+        "<iframe src=" + url + ' style="width: 100%;height:100%"></iframe>';
+      this.panel = jsPanel.create({
+        headerControls: {
+          smallify: "remove"
+        },
+        theme: "light",
+        headerTitle: "Preview",
+        contentSize: "800 600",
+        content: toolURL,
+        disableOnMaximized: true,
+        dragit: {
+          containment: 5
+        },
+        closeOnEscape: true
+      });
+      $(".jsPanel-content").css("font-size", "0");
     },
-    gotoWorkingPanel(){
+    gotoWorkingPanel() {
       this.$router.push(`./workspace`);
     },
     getAllResource() {

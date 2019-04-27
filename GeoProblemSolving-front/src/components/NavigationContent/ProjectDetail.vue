@@ -1434,6 +1434,14 @@ export default {
     },
     show(index) {
       let name = this.projectResourceList[index].name;
+      
+      if (/\.(shx)$/.test(name.toLowerCase())) {
+        this.$Notice.error({
+          title: "Open failed",
+          desc: "Not supported file format."
+        });
+        return false;
+      }
         if (this.panel != null) {
           this.panel.close();
         }
@@ -1446,7 +1454,7 @@ export default {
           headerControls: {
             smallify: "remove"
           },
-          theme: "none",
+          theme: "light",
           headerTitle: "Preview",
           contentSize: "800 600",
           content: toolURL,
