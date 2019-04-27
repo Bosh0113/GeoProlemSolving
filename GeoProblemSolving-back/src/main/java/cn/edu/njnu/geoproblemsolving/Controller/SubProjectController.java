@@ -109,4 +109,10 @@ public class SubProjectController {
         }
         return subProjectDao.updateFileStruct(subProjectId,struct);
     }
+
+    @GetMapping(value = "/createFolderTree")
+    public String createFolderTree(){
+        SubProjectDaoImpl subProjectDao = new SubProjectDaoImpl(mongoTemplate);
+        return subProjectDao.createFolderTree();
+    }
 }

@@ -221,7 +221,7 @@ export default {
           }
         })
         .catch(err => {
-          this.$Message.danger("Judge fail");
+          this.$Message.error("Judge fail");
         });
     },
     joinByMail(){
@@ -252,7 +252,7 @@ export default {
           }
         })
         .catch(err => {
-          this.$Message.danger("Join fail");
+          this.$Message.error("Join fail");
         });
     },
     goHome() {

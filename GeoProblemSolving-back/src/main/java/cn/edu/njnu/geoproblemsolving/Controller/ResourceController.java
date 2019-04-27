@@ -48,7 +48,7 @@ public class ResourceController {
         String fileStruct = subProjectDao.getFileStruct(subProjectId);
         String newFileStruct = EditJsonUtil.updateFileStruct(fileStruct, subProjectId,parentId, uploadInfo.getResourceId(), uploadInfo.getFileName(),FileStructConst.UPLOAD_FILE);
         String result = subProjectDao.updateFileStruct(subProjectId,newFileStruct);
-        if("Success".equals(result)){
+        if(!"Fail".equals(result)){
             return newFileStruct;
         }else{
             return "Fail";

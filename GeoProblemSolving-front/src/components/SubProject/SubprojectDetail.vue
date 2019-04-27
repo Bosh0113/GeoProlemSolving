@@ -281,163 +281,9 @@
                           style="overflow-y:auto"
                         >{{subProjectInfo.description}}</div>
                       </Card>
-                      <div class="resourcePanel" style="padding-top:20px">
-                        <Card>
-                          <div slot="title" style="font-size:18px;height:20px;line-height:20px;">
-                            <strong>Resources</strong>
-                          </div>
-                          <div slot="extra" style="display:flex;align-items:center;height:20px">
-                            <Button
-                              id="upload"
-                              type="default"
-                              @click="uploadShow=true"
-                              class="uploadBtn"
-                              title="upload resource"
-                            >
-                              <Icon type="md-cloud-upload" size="20"/>
-                            </Button>
-                            <Button
-                              class="moreBtn"
-                              type="default"
-                              style="margin-left: 10px"
-                              @click="toResourceList()"
-                              title="more"
-                            >
-                              <Icon type="md-more"/>
-                            </Button>
-                          </div>
-                          <div style="height:250px;overflow-y:scroll">
-                            <div v-show="this.subProjectResourceList==[]">
-                              <span
-                                style="text-align:center"
-                              >There are no any resources in this subproject</span>
-                            </div>
-                            <Table
-                              :columns="projectTableColName"
-                              :data="this.subProjectResourceList"
-                              v-show="this.subProjectResourceList!=[]&&this.subProjectResourceList!='None'"
-                            >
-                              <template slot-scope="{ row }" slot="name">
-                                <strong>{{ row.name }}</strong>
-                              </template>
-
-                              <template slot-scope="{ row, index }" slot="action">
-                                <a
-                                  :href="subProjectResourceList[index].pathURL"
-                                  :download="subProjectResourceList[index].name"
-                                  title="Download"
-                                >
-                                  <Icon type="md-download" :size="20"/>
-                                </a>
-                                <span
-                                  @click="show(index)"
-                                  style="margin-left: 10px"
-                                  title="Preview"
-                                >
-                                  <Icon
-                                    type="md-eye"
-                                    :size="20"
-                                    style="cursor:pointer"
-                                    color="#2d8cf0"
-                                  />
-                                </span>
-                              </template>
-                            </Table>
-                          </div>
-                        </Card>
-                        <Modal
-                          width="800"
-                          v-model="uploadShow"
-                          :mask-closable="false"
-                          @on-ok="subProjectfilesUpload('subProjectFileUploadForm')"
-                          ok-text="Submit"
-                          cancel-text="Cancel"
-                          title="Upload resource here"
-                        >
-                          <div>
-                            <Form
-                              ref="subProjectFileUploadForm"
-                              :model="subProjectFileUploadForm"
-                              :rules="subProjectFileUploadFormRuleValidate"
-                              :label-width="100"
-                            >
-                              <FormItem label="Privacy" prop="privacy">
-                                <RadioGroup
-                                  v-model="subProjectFileUploadForm.privacy"
-                                  style="width:80%"
-                                >
-                                  <Radio label="private">Private</Radio>
-                                  <Radio label="public">Public</Radio>
-                                </RadioGroup>
-                              </FormItem>
-                              <FormItem label="Type" prop="type">
-                                <RadioGroup v-model="subProjectFileUploadForm.type">
-                                  <Radio label="data">Data</Radio>
-                                  <Radio label="image">Images</Radio>
-                                  <Radio label="video">Videos</Radio>
-                                  <Radio label="paper">Papers</Radio>
-                                  <Radio label="document">Documents</Radio>
-                                  <Radio label="model">Models</Radio>
-                                  <Radio label="others">Others</Radio>
-                                </RadioGroup>
-                              </FormItem>
-                              <FormItem label="Description" prop="description">
-                                <Input
-                                  type="textarea"
-                                  :rows="4"
-                                  v-model="subProjectFileUploadForm.description"
-                                />
-                              </FormItem>
-                            </Form>
-                          </div>
-                          <Upload
-                            :max-size="1024*1024"
-                            multiple
-                            type="drag"
-                            :before-upload="gatherFile"
-                            action="-"
-                          >
-                            <div style="padding: 20px 0">
-                              <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
-                              <p>Click or drag files here to upload</p>
-                            </div>
-                          </Upload>
-                          <div style="padding:0 10px 0 10px">
-                            <ul v-for="(list,index) in file" :key="index">
-                              <li style="display:flex">
-                                File name:
-                                <span
-                                  style="font-size:10px;margin: 0 5px 0 5px"
-                                  :title="list.name"
-                                >{{ list.name }}</span>
-                                (Size:
-                                <span
-                                  v-if="list.size<(1024*1024)"
-                                  style="font-size:10px;margin-right:10px"
-                                >{{(list.size/1024).toFixed(2)}}KB)</span>
-                                <span
-                                  v-else
-                                  style="font-size:10px;margin-right:10px"
-                                >{{(list.size/1024/1024).toFixed(2)}}MB)</span>
-                                <Icon
-                                  type="ios-close"
-                                  size="20"
-                                  @click="delFileList(index)"
-                                  style="display:flex;justify-content:flex-end;cursor:pointer"
-                                  title="Cancel"
-                                ></Icon>
-                              </li>
-                            </ul>
-                          </div>
-                        </Modal>
-                        <Modal
-                          v-model="progressModalShow"
-                          title="Upload Progress"
-                          ok-text="Ok"
-                          cancel-text="Close"
-                        >
-                          <Progress :percent="uploadProgress"></Progress>
-                        </Modal>
+                        <!-- <div class="title">Description</div> -->
+                      <div class="resourcePanel" style="padding:20px 0 0 30px">
+                        <folder-tree :subProjectId = subProjectInfo.subProjectId></folder-tree>
                       </div>
                       <div
                         style="display:flex;align-items:center;justify-content:center;height:60px;margin-left:30px"
@@ -856,6 +702,7 @@
 import { VueFlowy, FlowChart } from "vue-flowy";
 import draggable from "vuedraggable";
 import Avatar from "vue-avatar";
+import folderTree from "./FolderTree.vue"
 export default {
   updated() {
     $(".userAvatar sup").css("margin", "15px 15px 0 0");
@@ -868,7 +715,8 @@ export default {
   components: {
     VueFlowy,
     draggable,
-    Avatar
+    Avatar,
+    folderTree
   },
   data() {
     return {
@@ -1026,7 +874,6 @@ export default {
     this.contentHeight = window.innerHeight + "px";
     this.toProjectPage = "/project/" + sessionStorage.getItem("projectId");
     this.inquiryTask();
-    this.getAllResource();
   },
   // add by mzy for navigation guards
   beforeRouteEnter: (to, from, next) => {
@@ -1422,11 +1269,11 @@ export default {
                   if (result.data == "Success") {
                     this.$emit("sendNotice", this.inviteList[i]); // 改apply.content.userId
                   } else {
-                    this.$Message.danger("reply fail.");
+                    this.$Message.error("reply fail.");
                   }
                 })
                 .catch(err => {
-                  this.$Message.danger("reply fail.");
+                  this.$Message.error("reply fail.");
                 });
             }
           }
@@ -1897,138 +1744,9 @@ export default {
         }
       }
     },
-    toResourceList() {
-      this.$router.push({ path: "/resourceList" });
-    },
-    show(index) {
-      let name = this.subProjectResourceList[index].name;
-      if (/\.(shx)$/.test(name.toLowerCase())) {
-        this.$Notice.error({
-          title: "Open failed",
-          desc: "Not supported file format."
-        });
-        return false;
-      }
-      if (this.panel != null) {
-        this.panel.close();
-      }
-      let url =
-        "http://172.21.212.7:8012/previewFile?url=http://172.21.212.7:8082" +
-        this.subProjectResourceList[index].pathURL;
-      let toolURL =
-        "<iframe src=" + url + ' style="width: 100%;height:100%"></iframe>';
-      this.panel = jsPanel.create({
-        headerControls: {
-          smallify: "remove"
-        },
-        theme: "light",
-        headerTitle: "Preview",
-        contentSize: "800 600",
-        content: toolURL,
-        disableOnMaximized: true,
-        dragit: {
-          containment: 5
-        },
-        closeOnEscape: true
-      });
-      $(".jsPanel-content").css("font-size", "0");
-    },
-    gotoWorkingPanel() {
+    gotoWorkingPanel(){
       this.$router.push(`./workspace`);
     },
-    getAllResource() {
-      // url是请求的网址
-      //查询的形式是key-value格式
-      this.axios
-        .get(
-          "/GeoProblemSolving/resource/inquiry" +
-            "?key=scope.subprojectId" +
-            "&value=" +
-            sessionStorage.getItem("subProjectId")
-        )
-        .then(res => {
-          //写渲染函数，取到所有资源
-          if (res.data !== "None") {
-            this.$set(this, "subProjectResourceList", res.data);
-          } else {
-            this.projectResourceList = [];
-          }
-          //渲染函数，将列表展现出来，下载
-        })
-        .catch(err => {
-          console.log(err.data);
-        });
-    },
-    gatherFile(file) {
-      let that = this;
-      if (that.file.length >= 5) {
-        this.$Message.info("最多只能上传5个文件");
-      } else {
-        that.file.push(file);
-        that.file.map(element => {
-          element["fileSize"] = Math.round((element.size / 1024) * 100) / 100;
-        });
-      }
-      return false;
-    },
-    subProjectfilesUpload(form) {
-      this.$refs[form].validate(valid => {
-        if (valid) {
-          let that = this;
-          if (that.file.length != 0) {
-            var formData = new FormData();
-            for (var i = 0; i < that.file.length; i++) {
-              formData.append("file", that.file[i]); // 文件对象
-            }
-            let userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
-            formData.append(
-              "description",
-              this.subProjectFileUploadForm.description
-            );
-            formData.append("type", this.subProjectFileUploadForm.type);
-            formData.append("uploaderId", this.$store.getters.userInfo.userId);
-            formData.append("belong", sessionStorage.getItem("subProjectName"));
-            let scopeObject = {
-              projectId: sessionStorage.getItem("projectId"),
-              subprojectId: sessionStorage.getItem("subProjectId"),
-              moduleId: ""
-            };
-            formData.append("scope", JSON.stringify(scopeObject));
-            formData.append("privacy", this.subProjectFileUploadForm.privacy);
-            this.progressModalShow = true;
-          }
-          this.axios({
-            url: "/GeoProblemSolving/resource/upload",
-            method: "post",
-            onUploadProgress: progressEvent => {
-              this.uploadProgress =
-                ((progressEvent.loaded / progressEvent.total) * 100) | 0;
-            },
-            data: formData
-          })
-            .then(res => {
-              if (res.data != "Size over" && res.data.length > 0) {
-                this.$Notice.open({
-                  title: "Upload notification title",
-                  desc: "File uploaded successfully",
-                  duration: 2
-                });
-                this.getAllResource();
-                this.subProjectFileUploadForm.description = "";
-                this.subProjectFileUploadForm.privacy = "";
-                this.subProjectFileUploadForm.type = "";
-                this.file = [];
-              }
-            })
-            .catch(err => {});
-        } else {
-        }
-      });
-    },
-    delFileList(index) {
-      let that = this;
-      that.file.splice(index, 1);
-    }
   }
 };
 </script>

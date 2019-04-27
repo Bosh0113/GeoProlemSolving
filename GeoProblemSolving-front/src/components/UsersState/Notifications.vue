@@ -260,11 +260,11 @@ export default {
             this.$set(this, "applyList", applyListTest);
           }
           else{
-            this.$Message.danger("load notifications fail");
+            this.$Message.error("load notifications fail");
           }
         })
         .catch(err => {
-          this.$Message.danger("load notifications fail");
+          this.$Message.error("load notifications fail");
         });
     },
     deleteNotice(notice) {
@@ -279,11 +279,11 @@ export default {
             }
             this.loadNotifications();
           } else {
-            this.$Message.danger("delete notification fail.");
+            this.$Message.error("delete notification fail.");
           }
         })
         .catch(err => {
-          this.$Message.danger("delete notification fail.");
+          this.$Message.error("delete notification fail.");
         });
     },
     readNotice(noticeId) {
@@ -295,11 +295,11 @@ export default {
             this.$store.commit("getUserInfo");
             this.loadNotifications();
           } else {
-            this.$Message.danger("update notification fail.");
+            this.$Message.error("update notification fail.");
           }
         })
         .catch(err => {
-          this.$Message.danger("update notification fail.");
+          this.$Message.error("update notification fail.");
         });
     },
     gotoWork(noticeId,subProjectId){      
@@ -310,11 +310,11 @@ export default {
             this.$emit("readNotification");
             this.loadNotifications();
           } else {
-            this.$Message.danger("update notification fail.");
+            this.$Message.error("update notification fail.");
           }
         })
         .catch(err => {
-          this.$Message.danger("update notification fail.");
+          this.$Message.error("update notification fail.");
         });
       
       this.$router.push( `./project/${id}/subproject`);
@@ -347,18 +347,18 @@ export default {
                 if (result.data == "Success") {
                   this.$emit("sendNotice", apply.content.userId);
                 } else {
-                  this.$Message.danger("reply fail.");
+                  this.$Message.error("reply fail.");
                 }
               })
               .catch(err => {
-                this.$Message.danger("reply fail.");
+                this.$Message.error("reply fail.");
               });
           } else {
-            this.$Message.danger("update notification fail.");
+            this.$Message.error("update notification fail.");
           };
         })
         .catch(err => {
-          this.$Message.danger("update notification fail.");
+          this.$Message.error("update notification fail.");
         });
     },
     approveApply(apply) {
@@ -384,7 +384,7 @@ export default {
               )
               .then(res => {
                 if (res.data === "Fail") {
-                  this.$Message.danger("Join fail.");
+                  this.$Message.error("Join fail.");
                 } else if (res.data === "Exist") {
                   this.$Message.info(
                     "he/her have already be a member in project."
@@ -392,7 +392,7 @@ export default {
                 }
               })
               .catch(err => {
-                this.$Message.danger("Join fail");
+                this.$Message.error("Join fail");
               });
             //reply to applicant
             let replyNotice = {};
@@ -411,18 +411,18 @@ export default {
                 if (result.data == "Success") {
                   this.$emit("sendNotice", apply.content.userId);
                 } else {
-                  this.$Message.danger("reply fail.");
+                  this.$Message.error("reply fail.");
                 }
               })
               .catch(err => {
-                this.$Message.danger("reply fail.");
+                this.$Message.error("reply fail.");
               });
           } else {
-            this.$Message.danger("update notification fail.");
+            this.$Message.error("update notification fail.");
           }
         })
         .catch(err => {
-          this.$Message.danger("update notification fail.");
+          this.$Message.error("update notification fail.");
         });
     }
   }
