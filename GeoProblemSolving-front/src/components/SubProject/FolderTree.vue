@@ -3,10 +3,8 @@
   padding: 100px;
 }
 .folderContent {
-  width: 500px;
   height: 300px;
   overflow-y: auto;
-  border: 0.3px yellowgreen solid;
   padding: 5px;
   margin: 3px;
 }
@@ -14,31 +12,112 @@
   cursor: pointer;
   color: red;
   float: right;
-  margin: 0 5px;
+  margin: 0 1%;
 }
 .folderRenameBtn {
   cursor: pointer;
   color: blue;
   float: right;
-  margin: 0 5px;
+  margin: 0 1%;
+}
+.fileDownloadBtn{
+  color: #9999a5;
+  float: right;
+  margin: 0 1%;
+}
+.filePreviewBtn{
+  cursor: pointer;
+  color: #32d64f;
+  float: right;
+  margin: 0 1%;
+}
+.fileDeleteBtn{
+  cursor: pointer;
+  color: #d65f2f;
+  float: right;
+  margin: 0 1%;
+}
+.resourceTitle {
+  font-size: 18px;
+  height: 20px;
+  line-height: 20px;
+}
+.resourceBtnDiv {
+  display: flex;
+  align-items: center;
+  height: 20px;
+  padding: 5px;
+}
+.fileBtn {
+  margin: 0px 3px;
+}
+.itemIcon {
+  margin-right: 5px;
+}
+.fileItemName {
+  width: 35%;
+  margin-right: 5%;
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  height: 16px;
+  cursor: pointer;
+}
+.fileItemSize{
+  width: 10%;
+  margin-right: 5%;
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  height: 16px;
 }
 </style>
 <template>
     <div class="fileSpace">
-        <h1>Folder Tree</h1>
-        <Button @click="backforeFolder">back</Button>
-        <div class="folderContent">
-            <div v-show="currentFolder!='{}'">
-                <div v-for="(folder,index) in currentFolder.folders" :key="index">
-                    <a @click="enterFolder(folder)" class="folderItem">{{folder.name}}</a>
-                    <span @click="deleteFolder(folder)" class="folderDeleteBtn">x</span>
-                    <span @click="renameFolderModalShow(folder)" class="folderRenameBtn">=</span>
-                </div>
-                <p v-for="(file,index) in currentFileList" @click="getFileInfo(file)">{{file.name}}------{{file.fileSize}}</p>
-            </div>
-        </div>
-        <Button @click="addFolderModalShow">newFolder</Button>
-        <Button @click="uploadModalShow" title="upload resource"><Icon type="md-cloud-upload" size="20"/></Button>
+      <Card :padding="1">
+        <div slot="title" class="resourceTitle">
+          <strong>Resource</strong></div>
+          <div slot="extra" class="resourceBtnDiv">
+            <Tooltip content="Back" placement="bottom" class="fileBtn">
+              <Button @click="backforeFolder">
+                <Icon type="md-arrow-round-back" size="20" />
+              </Button>
+            </Tooltip>
+            <Tooltip content="New folder" placement="bottom" class="fileBtn">
+              <Button @click="addFolderModalShow">
+                <Icon type="ios-folder" size="20" />
+              </Button>
+            </Tooltip>
+            <Tooltip content="Upload files" placement="bottom" class="fileBtn">
+              <Button @click="uploadModalShow" title="upload resource">
+                <Icon type="md-cloud-upload" size="20"/>
+              </Button>
+            </Tooltip>
+          </div>
+          <div class="folderContent">
+              <div v-show="currentFolder!='{}'">
+                  <Card v-for="(folder,index) in currentFolder.folders" :key="folder.index" :padding="5">
+                    <div>
+                      <Icon type="ios-folder-open" class="itemIcon" size="25"/>
+                      <a @click="enterFolder(folder)" :title="folder.name">{{folder.name}}</a>
+                      <span @click="deleteFolder(folder)" class="folderDeleteBtn"><Icon type="ios-trash-outline" title="Delete" size="25"/></span>
+                      <span @click="renameFolderModalShow(folder)" class="folderRenameBtn"><Icon type="ios-create-outline" title="Rename" size="25"/></span>
+                    </div>
+                  </Card>
+                  <Card v-for="(file,index) in currentFileList" :key="file.index" :padding="5">
+                    <Icon type="ios-document-outline" class="itemIcon" size="25"/>
+                    <span @click="getFileInfo(file)" class="fileItemName" :title="file.name" >{{file.name}}</span>
+                    <span class="fileItemSize">{{file.fileSize}}</span>
+                    <span style="width:20%;margin-right:5%">{{file.uploadTime}}</span>
+                    <span @click="fileDelete(file)" class="fileDeleteBtn"><Icon type="ios-trash" title="Remove" size="25"/></span>
+                    <a :href="file.pathURL" :download="file.name" class="fileDownloadBtn"><Icon type="ios-cloud-download" title="Download" size="25"/></a>
+                    <span @click="filePreview(file)" class="filePreviewBtn"><Icon type="md-eye" title="Preview" size="25"/></span>
+                  </Card>
+              </div>
+          </div>
+        </Card>
         <Modal
             v-model="renameFolderModal"
             title="Rename folder"
@@ -136,6 +215,16 @@
             :closable="false"
         >
             <Progress :percent="uploadProgress"></Progress>
+            <div slot="footer"></div>
+        </Modal>
+        <Modal
+            v-model="fileInfoModal"
+            title="File Info"
+        >
+          <Table :columns="selectedFileColumns" :data="selectedFileData" stripe border :show-header="false"></Table>
+          <div slot="footer">
+            <Button type="primary" @click="fileInfoModal=false">OK</Button>
+          </div>
         </Modal>
     </div>
 </template>
@@ -210,7 +299,21 @@ export default {
       },
       toUploadFiles: [],
       progressModalShow: false,
-      uploadProgress: 0
+      uploadProgress: 0,
+      fileInfoModal: false,
+      selectedFileColumns: [
+        {
+          title: "key",
+          key: "key",
+          minWidth: 10,
+          width: 100
+        },
+        {
+          title: "value",
+          key: "value"
+        }
+      ],
+      selectedFileData: []
     };
   },
   methods: {
@@ -244,7 +347,7 @@ export default {
       var files = this.currentFolder.files;
       var count = files.length;
       var filesInfoList = [];
-      if(files.length>0){
+      if (files.length > 0) {
         for (var i = 0; i < files.length; i++) {
           var fileId = files[i].uid;
           this.axios
@@ -257,6 +360,7 @@ export default {
             .then(res => {
               if (res != "Fail") {
                 var fileInfo = res.data[0];
+                fileInfo.uploadTime = fileInfo.uploadTime.substring(0,10);
                 filesInfoList.push(fileInfo);
                 if (--count == 0) {
                   this.$set(this, "currentFileList", filesInfoList);
@@ -269,7 +373,7 @@ export default {
               console.log("Get file info fail.");
             });
         }
-      }else{
+      } else {
         this.$set(this, "currentFileList", filesInfoList);
       }
     },
@@ -282,7 +386,29 @@ export default {
       }
     },
     getFileInfo(file) {
-      confirm(file.pathURL);
+      this.selectedFileData = [
+        {
+          key: "File name",
+          value: file.name
+        },
+        {
+          key: "Description",
+          value: file.description
+        },
+        {
+          key: "Type",
+          value: file.type
+        },
+        {
+          key: "File size",
+          value: file.fileSize
+        },
+        {
+          key: "Uploader",
+          value: file.uploaderName
+        }
+      ];
+      this.fileInfoModal = true;
     },
     addFolderModalShow() {
       this.newValidate.setName = "";
@@ -330,7 +456,7 @@ export default {
         }
       }
     },
-    refreshCurrentAll(folder, uid){
+    refreshCurrentAll(folder, uid) {
       this.refreshCurrentFolder(folder, uid);
       this.getCurrentFilesInfo();
     },
@@ -402,6 +528,11 @@ export default {
       });
     },
     uploadModalShow() {
+      this.uploadValidate = {
+        privacy: "private",
+        type: "data",
+        description: ""
+      };
       this.toUploadFiles = [];
       this.uploadModal = true;
     },
@@ -463,20 +594,74 @@ export default {
               data: formData
             })
               .then(res => {
+                this.progressModalShow = false;
                 if (res.data != "Fail") {
                   this.subProjectFileStruct = res.data;
                   this.refreshCurrentAll(res.data, this.currentFolder.uid);
-                  this.progressModalShow = false;
                 } else {
                   this.$Message.warning("Upload fail.");
                 }
               })
               .catch(err => {
+                this.progressModalShow = false;
                 this.$Message.warning("Upload fail.");
               });
           }
         }
       });
+    },
+    filePreview(fileInfo){
+      if (this.panel != null) {
+          this.panel.close();
+        }
+        let url =
+          "http://172.21.212.7:8012/previewFile?url=http://172.21.212.7:8082" +
+          fileInfo.pathURL;
+        let toolURL =
+          "<iframe src=" + url + ' style="width: 100%;height:100%"></iframe>';
+        this.panel = jsPanel.create({
+          headerControls: {
+            smallify: "remove"
+          },
+          theme: "none",
+          headerTitle: "Review",
+          contentSize: "800 600",
+          content: toolURL,
+          disableOnMaximized: true,
+          dragit: {
+            containment: 5
+          },
+          closeOnEscape: true
+        });
+        $(".jsPanel-content").css("font-size", "0");
+    },
+    fileDelete(fileInfo){
+      if (confirm("Are you sure to delete this file?")) {
+        var currentFolderUid = this.currentFolder.uid;
+        var subProjectId = this.subProjectId;
+        var deleteFileUid = fileInfo.resourceId;
+        this.axios
+          .post(
+            "/GeoProblemSolving/subProject/deleteFile" +
+              "?subProjectId=" +
+              subProjectId +
+              "&parentId=" +
+              currentFolderUid +
+              "&fileUid=" +
+              deleteFileUid
+          )
+          .then(res => {
+            if (res.data != "Fail") {
+              this.subProjectFileStruct = res.data;
+              this.refreshCurrentAll(res.data, this.currentFolder.uid);
+            } else {
+              this.$Message.warning("Delete file fail.");
+            }
+          })
+          .catch(err => {
+            this.$Message.warning("Delete file fail.");
+          });
+      }
     }
   }
 };
