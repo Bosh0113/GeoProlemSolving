@@ -4,7 +4,7 @@
 }
 .folderContent{
     width: 300px;
-    height: 100px;
+    height: 300px;
     overflow-y: auto;
     border: 0.3px yellowgreen solid;
     padding: 5px;
@@ -112,11 +112,11 @@ export default {
     methods:{
         getSubProjectInfo(){
             this.axios
-            .get("/GeoProblemSolving/subProject/inquiry"+"?key=subProjectId"+"&value="+this.subProjectId)
+            .get("/GeoProblemSolving/subProject/getFileStrcut"+"?subProjectId="+this.subProjectId)
             .then(res=>{
-                var subProjectInfo = res.data[0];
-                this.subProjectFileStruct = JSON.parse(subProjectInfo.fileStruct);
-                this.currentFolder =  JSON.parse(subProjectInfo.fileStruct);
+                var fileStruct = res.data;
+                this.subProjectFileStruct = fileStruct;
+                this.currentFolder = fileStruct;
                 this.enterFolder(this.currentFolder);
             })
             .catch(err=>{
@@ -181,25 +181,27 @@ export default {
             }
         },
         deleteFolder(folder){
-            var currentFolderUid = this.currentFolder.uid;
-            var subProjectId = this.subProjectId;
-            var deleteFolderUid = folder.uid;
-            this.axios
-            .post("/GeoProblemSolving/subProject/deleteFolder"+
-            "?subProjectId="+subProjectId+
-            "&parentId="+currentFolderUid+
-            "&folderUid="+deleteFolderUid)
-            .then(res=>{
-                if(res.data!="Fail"){
-                    this.subProjectFileStruct = res.data;
-                    this.refreshCurrentFolder(res.data,this.currentFolder.uid);
-                }else{
+            if(confirm("Are you sure to delete this folder?")){
+                var currentFolderUid = this.currentFolder.uid;
+                var subProjectId = this.subProjectId;
+                var deleteFolderUid = folder.uid;
+                this.axios
+                .post("/GeoProblemSolving/subProject/deleteFolder"+
+                "?subProjectId="+subProjectId+
+                "&parentId="+currentFolderUid+
+                "&folderUid="+deleteFolderUid)
+                .then(res=>{
+                    if(res.data!="Fail"){
+                        this.subProjectFileStruct = res.data;
+                        this.refreshCurrentFolder(res.data,this.currentFolder.uid);
+                    }else{
+                        console.log("Delete folder fail.");
+                    }
+                })
+                .catch(err=>{
                     console.log("Delete folder fail.");
-                }
-            })
-            .catch(err=>{
-                console.log("Delete folder fail.");
-            });
+                });
+            }
         },
         renameFolderModalShow(folder){
             this.renameFolderInfo = folder;
