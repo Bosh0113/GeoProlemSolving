@@ -1590,7 +1590,7 @@ export default {
             formData.append("belong", this.currentProjectDetail.title);
             let scopeObject = {
               projectId: this.currentProjectDetail.projectId,
-              subprojectId: "",
+              subProjectId: "",
               moduleId: ""
             };
             formData.append("scope", JSON.stringify(scopeObject));

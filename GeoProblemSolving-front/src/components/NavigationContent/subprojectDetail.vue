@@ -1972,7 +1972,7 @@ export default {
       this.axios
         .get(
           "/GeoProblemSolving/resource/inquiry" +
-            "?key=scope.subprojectId" +
+            "?key=scope.subProjectId" +
             "&value=" +
             sessionStorage.getItem("subProjectId")
         )
@@ -2020,7 +2020,7 @@ export default {
             formData.append("belong", sessionStorage.getItem("subProjectName"));
             let scopeObject = {
               projectId: sessionStorage.getItem("projectId"),
-              subprojectId: sessionStorage.getItem("subProjectId"),
+              subProjectId: sessionStorage.getItem("subProjectId"),
               moduleId: ""
             };
             formData.append("scope", JSON.stringify(scopeObject));

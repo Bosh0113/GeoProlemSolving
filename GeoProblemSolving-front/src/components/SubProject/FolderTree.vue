@@ -16,62 +16,114 @@
         <h1>Folder Tree</h1>
         <Button @click="backforeFolder">back</Button>
         <div class="folderContent">
-            <a v-for="(folder,index) in currentFolder.folders" :key="index" @click="enterFolder(folder)">{{folder.name}}</a>
-            <p v-for="(file,index) in currentFolder.files" @click="getFileInfo(file)">{{file.name}}</p>
+            <div v-show="currentFolder!='{}'">
+                <div v-for="(folder,index) in currentFolder.folders" :key="index">
+                    <a @click="enterFolder(folder)" class="folderItem">{{folder.name}}</a>
+                    <span @click="deleteFolder(folder)" style="cursor:pointer;color:red;float:right">x</span>
+                </div>
+                <p v-for="(file,index) in currentFolder.files" @click="getFileInfo(file)">{{file.name}}</p>
+            </div>
         </div>
+        <Input v-model="newFolderName" placeholder="The name of new folder" style="width: 200px"/><Button @click="addFolder">newFolder</Button>
     </div>
 </template>
 <script>
 export default {
     created(){
-        this.currentFolder = this.subProjectFiles;
-        this.enterFolder(this.currentFolder);
+        this.getSubProjectInfo();
     },
     data(){
         return{
+            subProjectFileStruct:{},
+            subProjectId:"fbd438e0-b23b-49f6-93c8-36b678c70720",
             currentFolder:{},
             folderStack:[],
-            subProjectFiles:{
-                "files": [{
-                    "name": "0_readme412098.txt",
-                    "uid": "4b09d875-b7d1-4617-b25f-4013377feabb"
-                }],
-                "folders": [{
-                    "files": [{
-                        "name": "NSA_SSA_DEM1033912.txt",
-                        "uid": "cba382e6-ac83-485a-86cf-73a9828f02bf"
-                    },
-                    {
-                        "name": "NSA_SSA_DEM893872.txt",
-                        "uid": "47336869-d4b5-4d87-b3e4-8ba4358bcf73"
-                    }],
-                    "folders": [{
-                        "files": [],
-                        "floders":[],
-                        "name":"last",
-                        "uid":"947dc95d-95c0-4315-88c0-a5b5211efb6c"
-                    }],
-                    "name": "文件夹1",
-                    "uid": "4b09d875-b7d1-4617-b25f-4013377feabc"
-                }],
-                "uid": "4128126e-5aa9-4764-b13c-478715dd0f36"
-            },
+            newFolderName:"",
         }
     },
     methods:{
+        getSubProjectInfo(){
+            this.axios
+            .get("/GeoProblemSolving/subProject/inquiry"+"?key=subProjectId"+"&value="+this.subProjectId)
+            .then(res=>{
+                var subProjectInfo = res.data[0];
+                this.subProjectFileStruct = JSON.parse(subProjectInfo.fileStruct);
+                this.currentFolder =  JSON.parse(subProjectInfo.fileStruct);
+                this.enterFolder(this.currentFolder);
+            })
+            .catch(err=>{
+                console.log("Get sub-project's info fail.");
+            });
+        },
         enterFolder(folder){
-            this.folderStack.push(this.currentFolder);
+            this.folderStack.push(this.currentFolder.uid);
             this.currentFolder = folder;
         },
         backforeFolder(){
             if(this.folderStack.length>1){
-                this.currentFolder = this.folderStack.pop();
+                var foreFolderUid= this.folderStack.pop();
+                this.refreshCurrentFolder(this.subProjectFileStruct,foreFolderUid);
             }else{
                 confirm("no fore folder.");
             }
         },
         getFileInfo(file){
             confirm(file.uid);
+        },
+        addFolder(){
+            var currentFolderUid = this.currentFolder.uid;
+            var subProjectId = this.subProjectId;
+            var newFolderName = this.newFolderName;
+            this.axios
+            .post("/GeoProblemSolving/subProject/createFolder"+
+            "?subProjectId="+subProjectId+
+            "&parentId="+currentFolderUid+
+            "&folderName="+newFolderName)
+            .then(res=>{
+                if(res.data!="Fail"){
+                    this.subProjectFileStruct = res.data;
+                    this.refreshCurrentFolder(res.data,this.currentFolder.uid);
+                    this.newFolderName="";
+                }else{
+                    console.log("New folder fail.");
+                }
+            })
+            .catch(err=>{
+                console.log("New folder fail.");
+            });
+        },
+        refreshCurrentFolder(folder,uid){
+            if(folder.uid == uid){
+                this.currentFolder = Object.assign({},folder);
+                return;
+            }
+            else{
+                var subFolder = folder.folders;
+                for(let i=0;i<subFolder.length;i++){
+                    this.refreshCurrentFolder(subFolder[i],uid);
+                }
+            }
+        },
+        deleteFolder(folder){
+            var currentFolderUid = this.currentFolder.uid;
+            var subProjectId = this.subProjectId;
+            var deleteFolderUid = folder.uid;
+            this.axios
+            .post("/GeoProblemSolving/subProject/deleteFolder"+
+            "?subProjectId="+subProjectId+
+            "&parentId="+currentFolderUid+
+            "&folderUid="+deleteFolderUid)
+            .then(res=>{
+                if(res.data!="Fail"){
+                    this.subProjectFileStruct = res.data;
+                    this.refreshCurrentFolder(res.data,this.currentFolder.uid);
+                }else{
+                    console.log("Delete folder fail.");
+                }
+            })
+            .catch(err=>{
+                console.log("Delete folder fail.");
+            });
         }
     }
 }
