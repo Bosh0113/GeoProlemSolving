@@ -194,7 +194,7 @@ $firstHeight: 700px;
     position: absolute;
     width: 100%;
     height: 100%;
-    background-color: rgb(139, 139, 139);
+    background-color: rgb(59, 59, 59);
     opacity: 0.5;
     left: 0;
     top: 0;
