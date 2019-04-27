@@ -1,9 +1,6 @@
 <style scoped>
-.fileSpace {
-  padding: 100px;
-}
 .folderContent {
-  height: 300px;
+  height: 330px;
   overflow-y: auto;
   padding: 5px;
   margin: 3px;
@@ -97,7 +94,7 @@
             </Tooltip>
           </div>
           <div class="folderContent">
-              <div v-show="currentFolder!='{}'">
+              <div v-if="currentFolder.folders.length>0||currentFileList.length>0">
                   <Card v-for="(folder,index) in currentFolder.folders" :key="folder.index" :padding="5">
                     <div>
                       <Icon type="ios-folder-open" class="itemIcon" size="25"/>
@@ -115,6 +112,9 @@
                     <a :href="file.pathURL" :download="file.name" class="fileDownloadBtn"><Icon type="ios-cloud-download" title="Download" size="25"/></a>
                     <span @click="filePreview(file)" class="filePreviewBtn"><Icon type="md-eye" title="Preview" size="25"/></span>
                   </Card>
+              </div>
+              <div v-else style="text-align:center">
+                <h1>No file or folder</h1>
               </div>
           </div>
         </Card>
@@ -230,13 +230,13 @@
 </template>
 <script>
 export default {
+  props: ["subProjectId"],
   created() {
     this.getSubProjectfileStruct();
   },
   data() {
     return {
       subProjectFileStruct: {},
-      subProjectId: "fbd438e0-b23b-49f6-93c8-36b678c70720",
       currentFolder: {},
       currentFileList: [],
       folderUIDStack: [],
