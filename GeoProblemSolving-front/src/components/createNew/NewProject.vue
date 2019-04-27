@@ -124,7 +124,7 @@ h1 {
               title="Other users can find the group and see who has membership."
             ></Radio>
             <Radio
-              label="Discover"
+              label="Discoverable"
               title="Other users can find this group, but membership information is hidden."
             ></Radio>
             <Radio label="Private" title="Other users can not find this group."></Radio>

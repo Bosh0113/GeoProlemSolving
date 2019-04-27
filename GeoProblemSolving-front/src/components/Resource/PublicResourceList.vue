@@ -117,7 +117,6 @@
       v-model="uploadModal"
       title="Upload resource"
       @on-ok="submitFile()"
-      @on-cancel
       ok-text="submit"
       cancel-text="cancel"
       :mask-closable="false"
@@ -127,13 +126,13 @@
         <!-- 这里定义上传的几种资源类型供用户选择 -->
         <span style="width:20%">Type</span>
         <RadioGroup v-model="fileType" style="width:80%">
-          <Radio label="image"></Radio>
-          <Radio label="video"></Radio>
-          <Radio label="data"></Radio>
-          <Radio label="paper"></Radio>
-          <Radio label="document"></Radio>
-          <Radio label="model"></Radio>
-          <Radio label="others"></Radio>
+          <Radio label="data">Data</Radio>
+          <Radio label="image">Images</Radio>
+          <Radio label="video">Videos</Radio>
+          <Radio label="paper">Papers</Radio>
+          <Radio label="document">Documents</Radio>
+          <Radio label="model">Models</Radio>
+          <Radio label="others">Others</Radio>
         </RadioGroup>
         <!-- 结束 -->
       </div>
@@ -205,7 +204,7 @@ export default {
       uploadModal: false,
       file: "",
       fileDescription: "",
-      fileType: "",
+      fileType: "data",
       contentHeight: "",
       panel: null
     };

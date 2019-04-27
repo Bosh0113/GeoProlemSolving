@@ -18,15 +18,15 @@
 .btnPanel button {
   margin-left: 20px;
 }
-.menuClass{
-  border:1px solid lightgray;
-  z-index:0
+.menuClass {
+  border: 1px solid lightgray;
+  z-index: 0;
 }
 </style>
 <template>
   <Row>
     <Col span="22" offset="1">
-    <h2 style="margin-top: 20px;">Resource center</h2>
+      <h2 style="margin-top: 20px;">Resource center</h2>
       <div class="main" :style="{height:contentHeight-60 + 'px'}">
         <div class="sidebarTree">
           <Menu
@@ -72,9 +72,23 @@
                     <strong>{{ row.name }}</strong>
                   </template>
                   <template slot-scope="{ row, index }" slot="action">
-                     <a :href="specifiedResourceList[index].pathURL" :download="specifiedResourceList[index].name" title="Download"><Icon type="md-download" :size="20" color="yellowgreen"/></a>
-                     <span @click="show(index)" style="margin-left: 10px" title="Preview"><Icon type="md-eye" :size="20" color="orange"/></span>
-                     <span @click="deleteResource(index)" :disabled="judgeDelete(index)" style="margin-left: 10px"><Icon type="md-close" :size="20" color="red"/></span>
+                    <a
+                      :href="specifiedResourceList[index].pathURL"
+                      :download="specifiedResourceList[index].name"
+                      title="Download"
+                    >
+                      <Icon type="md-download" :size="20" color="yellowgreen"/>
+                    </a>
+                    <span @click="show(index)" style="margin-left: 10px" title="Preview">
+                      <Icon type="md-eye" :size="20" color="orange"/>
+                    </span>
+                    <span
+                      @click="deleteResource(index)"
+                      :disabled="judgeDelete(index)"
+                      style="margin-left: 10px"
+                    >
+                      <Icon type="md-close" :size="20" color="red"/>
+                    </span>
                   </template>
                 </Table>
                 <div style="display:flex;margin-top:20px;justify-content:right">
@@ -85,7 +99,14 @@
               </Col>
             </Row>
             <div style="display:flex;justify-content:center">
-              <Page :total="dataCount" :page-size="pageSize" show-total @on-change="changepage" show-elevator style="position: absolute;top:600px"/>
+              <Page
+                :total="dataCount"
+                :page-size="pageSize"
+                show-total
+                @on-change="changepage"
+                show-elevator
+                style="position: absolute;top:600px"
+              />
             </div>
           </div>
         </div>
@@ -95,7 +116,6 @@
       v-model="uploadModal"
       title="Upload resource"
       @on-ok="submitFile()"
-      @on-cancel=""
       ok-text="submit"
       cancel-text="cancel"
       :mask-closable="false"
@@ -105,13 +125,13 @@
         <!-- 这里定义上传的几种资源类型供用户选择 -->
         <span style="width:20%">Type</span>
         <RadioGroup v-model="fileType" style="width:80%">
-          <Radio label="image"></Radio>
-          <Radio label="video"></Radio>
-          <Radio label="data"></Radio>
-          <Radio label="paper"></Radio>
-          <Radio label="document"></Radio>
-          <Radio label="model"></Radio>
-          <Radio label="others"></Radio>
+          <Radio label="data">Data</Radio>
+          <Radio label="image">Images</Radio>
+          <Radio label="video">Videos</Radio>
+          <Radio label="paper">Papers</Radio>
+          <Radio label="document">Documents</Radio>
+          <Radio label="model">Models</Radio>
+          <Radio label="others">Others</Radio>
         </RadioGroup>
         <!-- 结束 -->
       </div>
@@ -135,36 +155,36 @@ export default {
       sidebarTheme: "light",
       resourceColumn: [
         {
-          type:"index",
-          maxWidth:50,
-          align:"center"
+          type: "index",
+          maxWidth: 50,
+          align: "center"
         },
         {
           title: "Name",
           key: "name",
-          minWidth:10,
+          minWidth: 10,
           tooltip: true,
-          sortable: true,
+          sortable: true
         },
         {
           title: "Type",
           key: "type",
           width: 100,
-          sortable: true,
+          sortable: true
         },
         {
           title: "Size",
           key: "fileSize",
           width: 100,
-          sortable: true,
+          sortable: true
         },
         {
           title: "Description",
           key: "description",
-          minWidth:30,
+          minWidth: 30,
           tooltip: true
         },
-        {          
+        {
           title: "Upload time",
           key: "uploadTime",
           width: 160,
@@ -174,7 +194,7 @@ export default {
           title: "Action",
           slot: "action",
           width: 150,
-          align:"center"
+          align: "center"
         }
       ],
       uploaderArray: [],
@@ -183,15 +203,15 @@ export default {
       uploadModal: false,
       file: "",
       fileDescription: "",
-      fileType: "",
-      contentHeight:"",
-      panel:null,
+      fileType: "data",
+      contentHeight: "",
+      panel: null,
       // 分页
-      allResourceList:[],
-      allSelectedList:[],
+      allResourceList: [],
+      allSelectedList: [],
       showList: [],
-      dataCount:0,
-      pageSize:10,
+      dataCount: 0,
+      pageSize: 10
     };
   },
   mounted() {
@@ -207,7 +227,7 @@ export default {
   methods: {
     initLayout() {
       this.sidebarTreeHeight = window.innerHeight - 200 + "px";
-      this.contentHeight = window.innerHeight-120;
+      this.contentHeight = window.innerHeight - 120;
     },
     onMenuSelect(name) {
       this.uploaderArray = [];
@@ -220,8 +240,7 @@ export default {
           if (res.data != "None") {
             let specifiedResourceListPre = res.data;
             specifiedResourceListPre.forEach(function(list) {
-              list["uploader"] =
-                list.uploaderName;
+              list["uploader"] = list.uploaderName;
             });
             this.dataCount = specifiedResourceListPre.length;
             this.$set(this, "specifiedResourceList", specifiedResourceListPre);
@@ -229,30 +248,29 @@ export default {
           }
         });
     },
-    sliceList(){
+    sliceList() {
       var tempResourceList = this.specifiedResourceList;
-      if(this.dataCount < this.pageSize){
+      if (this.dataCount < this.pageSize) {
         this.$set(this, "showList", tempResourceList);
-      }
-      else{
-        this.$set(this, "showList", tempResourceList.slice(0,this.pageSize));
+      } else {
+        this.$set(this, "showList", tempResourceList.slice(0, this.pageSize));
       }
     },
-    changepage(index){
+    changepage(index) {
       var _start = (index - 1) * this.pageSize;
       var _end = index * this.pageSize;
-      this.showList = this.specifiedResourceList.slice(_start,_end);
+      this.showList = this.specifiedResourceList.slice(_start, _end);
     },
     handleSelectAll(status) {
       this.$refs.selection.selectAll(status);
     },
     fileUploadModalShow() {
-      if(this.$store.getters.userState){
+      if (this.$store.getters.userState) {
         this.uploadModal = true;
-      }else{
+      } else {
         this.$Notice.open({
-          title:"Login Please",
-          desc: 'If you want to upload a file here, please login first.'
+          title: "Login Please",
+          desc: "If you want to upload a file here, please login first."
         });
       }
     },
@@ -305,7 +323,7 @@ export default {
     },
     show(index) {
       let name = this.specifiedResourceList[index].name;
-      
+
       if (/\.(shx)$/.test(name.toLowerCase())) {
         this.$Notice.error({
           title: "Open failed",
@@ -313,29 +331,29 @@ export default {
         });
         return false;
       }
-        if (this.panel != null) {
-          this.panel.close();
-        }
-        let url =
-          "http://172.21.212.7:8012/previewFile?url=http://172.21.212.7:8082" +
-          this.specifiedResourceList[index].pathURL;
-        let toolURL =
-          "<iframe src=" + url + ' style="width: 100%;height:100%"></iframe>';
-        this.panel = jsPanel.create({
-          headerControls: {
-            smallify: "remove"
-          },
-          theme: "light",
-          headerTitle: "Preview",
-          contentSize: "800 600",
-          content: toolURL,
-          disableOnMaximized: true,
-          dragit: {
-            containment: 5
-          },
-          closeOnEscape: true
-        });
-        $(".jsPanel-content").css("font-size", "0");
+      if (this.panel != null) {
+        this.panel.close();
+      }
+      let url =
+        "http://172.21.212.7:8012/previewFile?url=http://172.21.212.7:8082" +
+        this.specifiedResourceList[index].pathURL;
+      let toolURL =
+        "<iframe src=" + url + ' style="width: 100%;height:100%"></iframe>';
+      this.panel = jsPanel.create({
+        headerControls: {
+          smallify: "remove"
+        },
+        theme: "light",
+        headerTitle: "Preview",
+        contentSize: "800 600",
+        content: toolURL,
+        disableOnMaximized: true,
+        dragit: {
+          containment: 5
+        },
+        closeOnEscape: true
+      });
+      $(".jsPanel-content").css("font-size", "0");
     },
     deleteResource(index) {
       if (this.specifiedResourceList[index].resourceId != "") {
@@ -345,7 +363,7 @@ export default {
           .then(res => {
             if (res.data == "Success") {
               this.$Message.info("Delete successfully");
-              this.specifiedResourceList.splice(index,1);
+              this.specifiedResourceList.splice(index, 1);
             } else if (res.data == "Fail") {
               this.$Message.info("Failure");
             }

@@ -6,10 +6,10 @@
       <div class="mask"></div>
       <div class="content">
         <div>
-          <span class="title">Complex geographical problems? No longer.</span>
-          <span class="sub-title">Build / Explore / Share</span>
+          <span class="title">Solving complex geo-problems? Collaboration.</span>
+          <span class="sub-title">Build Projects | Build Teams | Communicate Ideas | Explore Solutions</span>
           <span class="desc">The platform is full of vitality, where all people can express their views conveniently and in real time, <br />cooperate and exchange, and collide with intense sparks of thought.</span>
-          <Button class="home-start-btn">go right now</Button>
+          <Button class="home-start-btn">Try it now</Button>
         </div>
       </div>
     </div>
@@ -25,14 +25,14 @@
             hahaha
           </div> -->
         <div class="flow-content">
-          <span class="flow-title">Solve the Problem in This Way</span>
+          <span class="flow-title">Solve a Problem Collaboratively</span>
           <div class="flow-item-container">
             <span class="flow-item">
               <span class="flow-item-icon blue">
                 <span class="flow-item-bg"></span>
                 <Icon type="md-build" />
               </span>
-              <span class="flow-item-text">Preparatory & Analysis</span>
+              <span class="flow-item-text">Register as a participant</span>
             </span>
             <span class="flow-item">
 
@@ -40,7 +40,7 @@
                 <span class="flow-item-bg"></span>
                 <Icon type="md-search" />
               </span>
-              <span class="flow-item-text">Modeling & Simulation</span>
+              <span class="flow-item-text">Create or join a project</span>
             </span>
 
             <span class="flow-item">
@@ -49,7 +49,7 @@
                 <span class="flow-item-bg"></span>
                 <Icon type="md-share" />
               </span>
-              <span class="flow-item-text">Comparation & Verification</span>
+              <span class="flow-item-text">Communicate ideas in a team</span>
 
             </span>
           </div>
@@ -57,7 +57,7 @@
       </div>
 
       <div class="cases">
-        <span class="case-title">Smart Cases</span>
+        <span class="case-title">Demo and Popular Projects</span>
         <Row class="case-content">
           <Col
             class="case-item"

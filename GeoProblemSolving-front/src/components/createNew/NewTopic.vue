@@ -28,7 +28,7 @@
           <div class="hintTitle">Privacy</div>
           <RadioGroup v-model="formInline.privacy" style="width:80%">
           <Radio label="Public" title="Other users can find the group and see who has membership."></Radio>
-          <Radio label="Discover" title="Other users can find this group, but membership information is hidden."></Radio>
+          <Radio label="Discoverable" title="Other users can find this group, but membership information is hidden."></Radio>
           <Radio label="Private" title="Other users can not find this group."></Radio>
           </RadioGroup>
         </div>

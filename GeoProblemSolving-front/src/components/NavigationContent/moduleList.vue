@@ -172,66 +172,65 @@
     <Row>
       <Col span="22" offset="1">
         <Card>
-          <div slot="title" style="height:20px;width:50%" >
-            <Breadcrumb>
-              <BreadcrumbItem :to="toProjectPage">Project</BreadcrumbItem>
-              <BreadcrumbItem :to="toSubProjectPage">Subproject</BreadcrumbItem>
-              <BreadcrumbItem>Working panel</BreadcrumbItem>
-
-            </Breadcrumb>
-            <span style="float:right;margin-top:-15px;font-size:1.5rem"><strong>{{subProjectInfo.title}}</strong></span>
-          </div>
-          <div
-            slot="extra"
-            style="height:20px;display:flex;align-items:center"
-            class="operatePanel"
-          >
-            <template v-if="this.$store.getters.userInfo.userId == this.subProjectInfo.managerId">
-              <template v-if="this.moduleList.length == 0">
-                <Button
-                  type="default"
-                  @click="addModal = true"
-                  icon="md-add"
-                  class="addBtn"
-                  title="Add a new module"
-                >Add</Button>
+          <Row>
+            <Col span="7" style="height:20px">
+              <Breadcrumb>
+                <BreadcrumbItem :to="toProjectPage">Project</BreadcrumbItem>
+                <BreadcrumbItem :to="toSubProjectPage">Subproject</BreadcrumbItem>
+                <BreadcrumbItem>Working panel</BreadcrumbItem>
+              </Breadcrumb>
+            </Col>
+            <Col span="12" style="text-align:center;font-size:1.5rem;height:20px;;margin-top:-10px">
+              <strong>{{subProjectInfo.title}}</strong>
+            </Col>
+            <Col span="4" style="height:20px;display:flex;align-items:center" class="operatePanel">
+              <template v-if="this.$store.getters.userInfo.userId == this.subProjectInfo.managerId">
+                <template v-if="this.moduleList.length == 0">
+                  <Button
+                    type="default"
+                    @click="addModal = true"
+                    icon="md-add"
+                    class="addBtn"
+                    title="Add a new module"
+                  >Add</Button>
+                </template>
+                <template v-else>
+                  <Button
+                    type="default"
+                    @click="chooseResource()"
+                    icon="md-add"
+                    class="addBtn"
+                    title="Add a new module"
+                  >Add</Button>
+                </template>
+                <template v-if="this.currentModule.activeStatus">
+                  <Button
+                    type="default"
+                    @click="editModalShow()"
+                    icon="ios-create"
+                    class="editBtn"
+                    title="Edit this module"
+                  >Edit</Button>
+                </template>
+                <template v-else>
+                  <Button
+                    type="default"
+                    @click="activateModal = true"
+                    icon="md-bulb"
+                    class="editBtn"
+                    title="Activate this module"
+                  >Activate</Button>
+                  <Button
+                    type="default"
+                    @click="delModal = true"
+                    icon="md-remove"
+                    class="removeBtn"
+                    title="Remove this module"
+                  >Remove</Button>
+                </template>
               </template>
-              <template v-else>
-                <Button
-                  type="default"
-                  @click="chooseResource()"
-                  icon="md-add"
-                  class="addBtn"
-                  title="Add a new module"
-                >Add</Button>
-              </template>
-              <template v-if="this.currentModule.activeStatus">
-                <Button
-                  type="default"
-                  @click="editModalShow()"
-                  icon="ios-create"
-                  class="editBtn"
-                  title="Edit this module"
-                >Edit</Button>
-              </template>
-              <template v-else>
-                <Button
-                  type="default"
-                  @click="activateModal = true"
-                  icon="md-bulb"
-                  class="editBtn"
-                  title="Activate this module"
-                >Activate</Button>
-                <Button
-                  type="default"
-                  @click="delModal = true"
-                  icon="md-remove"
-                  class="removeBtn"
-                  title="Remove this module"
-                >Remove</Button>
-              </template>
-            </template>
-          </div>
+            </Col>
+          </Row>
           <Row>
             <Col span="22" offset="1" style="background-color:white;">
               <template v-if="this.$store.getters.userInfo.userId == this.subProjectInfo.managerId">
@@ -267,7 +266,11 @@
       <Row style="margin-top:20px" :style="{height:sidebarHeight+30+'px'}">
         <Col span="22" offset="1">
           <Card class="noModule">
-            <div @click="addModal = true" style="cursor:pointer" v-if="this.$store.getters.userInfo.userId == this.subProjectInfo.managerId">
+            <div
+              @click="addModal = true"
+              style="cursor:pointer"
+              v-if="this.$store.getters.userInfo.userId == this.subProjectInfo.managerId"
+            >
               <h1>Start your work!</h1>
             </div>
             <div v-else>
@@ -351,21 +354,47 @@
               <Col span="8">
                 <div style="height:100%;margin-left:30px">
                   <Card :style="{height:sidebarHeight/3*1 +'px'}">
-                     <h2 slot="title">
-                      Announcement
-                    </h2>
-                    <div slot="extra" style="display:flex;align-items:center" v-if="this.$store.getters.userInfo.userId == this.subProjectInfo.managerId">
-                     <span @click="noticeModalShow=true" style="cursor:pointer" title="add a notice"><Icon type="md-add" /></span>
-                     <span @click="noticeDetailShow()" style="cursor:pointer;margin-left:10px" title="edit" ><Icon type="ios-create" /></span>
-                     <span @click="deleteNotice()" style="cursor:pointer;margin-left:10px" title="remove" ><Icon type="ios-trash" /></span>
+                    <h2 slot="title">Announcement</h2>
+                    <div
+                      slot="extra"
+                      style="display:flex;align-items:center"
+                      v-if="this.$store.getters.userInfo.userId == this.subProjectInfo.managerId"
+                    >
+                      <span
+                        @click="noticeModalShow=true"
+                        style="cursor:pointer"
+                        title="add a notice"
+                      >
+                        <Icon type="md-add"/>
+                      </span>
+                      <span
+                        @click="noticeDetailShow()"
+                        style="cursor:pointer;margin-left:10px"
+                        title="edit"
+                      >
+                        <Icon type="ios-create"/>
+                      </span>
+                      <span
+                        @click="deleteNotice()"
+                        style="cursor:pointer;margin-left:10px"
+                        title="remove"
+                      >
+                        <Icon type="ios-trash"/>
+                      </span>
                     </div>
                     <div>
                       <div v-if="this.currentModuleNoticeList.length!=0">
-                        <h3 style="text-align:center">{{this.currentModuleNoticeList[this.currentModuleNoticeList.length-1].title}}</h3>
-                        <p style="text-indent:2em;overflow:hidden;break-word:word-break">{{this.currentModuleNoticeList[this.currentModuleNoticeList.length-1].description}}</p>
+                        <h3
+                          style="text-align:center"
+                        >{{this.currentModuleNoticeList[this.currentModuleNoticeList.length-1].title}}</h3>
+                        <p
+                          style="text-indent:2em;overflow:hidden;break-word:word-break"
+                        >{{this.currentModuleNoticeList[this.currentModuleNoticeList.length-1].description}}</p>
                       </div>
                       <div v-if="this.currentModuleNoticeList.length==0">
-                        <p style="text-indent:2em;overflow:hidden;break-word:word-break">There is no notice recently</p>
+                        <p
+                          style="text-indent:2em;overflow:hidden;break-word:word-break"
+                        >There is no notice recently</p>
                       </div>
                     </div>
                   </Card>
@@ -375,32 +404,42 @@
                     title="Create a new notice"
                     @on-ok="createNotice"
                     ok-text="Confirm"
-                    cancel-text="cancel">
-                      <Form :model="formItem" :label-width="60">
+                    cancel-text="cancel"
+                  >
+                    <Form :model="formItem" :label-width="60">
                       <FormItem label="title">
-                          <Input v-model="formItem.title" placeholder="Enter bulletin title" ></Input>
+                        <Input v-model="formItem.title" placeholder="Enter bulletin title"></Input>
                       </FormItem>
                       <FormItem label="content">
-                          <Input v-model="formItem.content" placeholder="Enter bulletin content" type="textarea" ></Input>
+                        <Input
+                          v-model="formItem.content"
+                          placeholder="Enter bulletin content"
+                          type="textarea"
+                        ></Input>
                       </FormItem>
                     </Form>
-                </Modal>
-                <Modal
+                  </Modal>
+                  <Modal
                     width="400px"
                     v-model="noticeDetailShowModal"
                     title="Notice detail update"
                     @on-ok="editNotice()"
                     ok-text="Confirm"
-                    cancel-text="cancel">
-                  <Form :model="editFormItem" :label-width="60">
+                    cancel-text="cancel"
+                  >
+                    <Form :model="editFormItem" :label-width="60">
                       <FormItem label="title">
-                          <Input v-model="editFormItem.title" placeholder="Enter bulletin title"></Input>
+                        <Input v-model="editFormItem.title" placeholder="Enter bulletin title"></Input>
                       </FormItem>
                       <FormItem label="content">
-                          <Input v-model="editFormItem.description" placeholder="Enter bulletin content" type="textarea"></Input>
+                        <Input
+                          v-model="editFormItem.description"
+                          placeholder="Enter bulletin content"
+                          type="textarea"
+                        ></Input>
                       </FormItem>
                     </Form>
-                </Modal>
+                  </Modal>
                 </div>
               </Col>
             </Col>
@@ -408,9 +447,7 @@
           <template>
             <Col :xs="15" :sm="16" :md="17" :lg="17">
               <Col span="11">
-                <div
-                  style="border:1px solid lightgray;background-color:white;margin-left:30px"
-                >
+                <div style="border:1px solid lightgray;background-color:white;margin-left:30px">
                   <Card>
                     <h2 slot="title">Timeline</h2>
                     <div
@@ -460,10 +497,7 @@
                 </div>
               </Col>
               <Col span="13">
-                <div
-                  style="background-color:white;margin-left:30px"
-                  class="resourcePanel"
-                >
+                <div style="background-color:white;margin-left:30px" class="resourcePanel">
                   <Card>
                     <h2 slot="title">Resource</h2>
                     <div slot="extra" style="display:flex;align-items:center">
@@ -686,7 +720,6 @@
                         />
                       </div>
                       <div class="singl_tool_style">
-
                         <Icon
                           type="logo-youtube"
                           size="60"
@@ -749,14 +782,14 @@
         <Row style="margin-top:20px" :style="{height:sidebarHeight+8+'px'}">
           <template>
             <Col span="22" offset="1" :style="{height:sidebarHeight/3*1+'px'}">
-            <Card :style="{height:sidebarHeight/3*1 +'px'}">
-                    <h2 slot="title">{{this.currentModule.title}}</h2>
-                    <div style="width:100%;padding:10px">
-                      <span
-                        style="word-break: break-all;text-indent:2em;padding:10px"
-                      >{{this.currentModule.description}}</span>
-                    </div>
-                  </Card>
+              <Card :style="{height:sidebarHeight/3*1 +'px'}">
+                <h2 slot="title">{{this.currentModule.title}}</h2>
+                <div style="width:100%;padding:10px">
+                  <span
+                    style="word-break: break-all;text-indent:2em;padding:10px"
+                  >{{this.currentModule.description}}</span>
+                </div>
+              </Card>
             </Col>
           </template>
           <template>
@@ -766,53 +799,51 @@
                   <Card>
                     <h2 slot="title">Timeline</h2>
                     <div
-                    class="recordLine"
-                    :style="{height:sidebarHeight/3*2 - 120 + 'px'}"
-                    style="overflow-y:auto"
-                  >
-                    <Timeline style="padding:10px">
-                      <TimelineItem v-for="(item,index) in historyRecords" :key="index">
-                        <template v-if="item.type == 'participants'">
-                          <span class="time" style="color:gray">{{item.time}}</span>
-                          <span class="time" style="color:gray; margin-left:10px">{{item.who}}</span>
-                          <span
-                            class="content"
-                            style="color:gray; margin-left:10px; word-break:break-word"
-                          >{{item.content}}</span>
-                        </template>
-                        <template v-if="item.type == 'resource'">
-                          <span class="time" style="color:#0664a2">{{item.time}}</span>
-                          <span class="time" style="color:#0664a2;margin-left:10px">{{item.who}}</span>
-                          <span
-                            class="content"
-                            style="color:#0664a2;margin-left:10px; word-break:break-word"
-                          >{{item.content}}</span>
-                          <a
-                            style="cursor:pointer;color:green;margin-left:5px"
-                            :href="'http://172.21.212.7:8081/GeoProblemSolving/resource/upload/'+item.file"
-                            target="_blank"
-                          >download</a>
-                        </template>
-                        <template v-if="item.type == 'tools'">
-                          <span class="time" style="color:#0664a2">{{item.time}}</span>
-                          <span class="time" style="color:#0664a2; margin-left:10px">{{item.who}}</span>
-                          <span
-                            class="content"
-                            style="color:#0664a2; margin-left:10px; word-break:break-word; cursor:pointer"
-                            @click="toolPanel(item.toolType)"
-                          >{{item.content}}</span>
-                        </template>
-                      </TimelineItem>
-                    </Timeline>
-                  </div>
+                      class="recordLine"
+                      :style="{height:sidebarHeight/3*2 - 120 + 'px'}"
+                      style="overflow-y:auto"
+                    >
+                      <Timeline style="padding:10px">
+                        <TimelineItem v-for="(item,index) in historyRecords" :key="index">
+                          <template v-if="item.type == 'participants'">
+                            <span class="time" style="color:gray">{{item.time}}</span>
+                            <span class="time" style="color:gray; margin-left:10px">{{item.who}}</span>
+                            <span
+                              class="content"
+                              style="color:gray; margin-left:10px; word-break:break-word"
+                            >{{item.content}}</span>
+                          </template>
+                          <template v-if="item.type == 'resource'">
+                            <span class="time" style="color:#0664a2">{{item.time}}</span>
+                            <span class="time" style="color:#0664a2;margin-left:10px">{{item.who}}</span>
+                            <span
+                              class="content"
+                              style="color:#0664a2;margin-left:10px; word-break:break-word"
+                            >{{item.content}}</span>
+                            <a
+                              style="cursor:pointer;color:green;margin-left:5px"
+                              :href="'http://172.21.212.7:8081/GeoProblemSolving/resource/upload/'+item.file"
+                              target="_blank"
+                            >download</a>
+                          </template>
+                          <template v-if="item.type == 'tools'">
+                            <span class="time" style="color:#0664a2">{{item.time}}</span>
+                            <span class="time" style="color:#0664a2; margin-left:10px">{{item.who}}</span>
+                            <span
+                              class="content"
+                              style="color:#0664a2; margin-left:10px; word-break:break-word; cursor:pointer"
+                              @click="toolPanel(item.toolType)"
+                            >{{item.content}}</span>
+                          </template>
+                        </TimelineItem>
+                      </Timeline>
+                    </div>
                   </Card>
                 </div>
               </Col>
               <Col span="12">
-                <div
-                  style="background-color:white;margin-left:15px"
-                >
-                <Card>
+                <div style="background-color:white;margin-left:15px">
+                  <Card>
                     <h2 slot="title">Resource</h2>
                     <div slot="extra" style="display:flex;align-items:center">
                       <span
@@ -1010,13 +1041,13 @@
       >
         <FormItem label="File type: " prop="fileType">
           <RadioGroup v-model="formValidate3.fileType">
-            <Radio label="image"></Radio>
-            <Radio label="video"></Radio>
-            <Radio label="data"></Radio>
-            <Radio label="paper"></Radio>
-            <Radio label="document"></Radio>
-            <Radio label="model"></Radio>
-            <Radio label="others"></Radio>
+            <Radio label="data">Data</Radio>
+            <Radio label="image">Images</Radio>
+            <Radio label="video">Videos</Radio>
+            <Radio label="paper">Papers</Radio>
+            <Radio label="document">Documents</Radio>
+            <Radio label="model">Models</Radio>
+            <Radio label="others">Others</Radio>
           </RadioGroup>
         </FormItem>
       </Form>
@@ -1108,7 +1139,7 @@ export default {
         ]
       },
       formValidate3: {
-        fileType: ""
+        fileType: "data"
       },
       ruleValidate3: {
         fileType: [
@@ -1144,7 +1175,7 @@ export default {
           title: "Name",
           key: "name",
           sortable: true,
-          tooltip:true,
+          tooltip: true
         },
         {
           title: "Type",
@@ -1167,25 +1198,22 @@ export default {
       selectResource: [],
       listStyle: { width: "210px", height: "300px" },
       //通知相关的变量
-      noticeModalShow:false,
+      noticeModalShow: false,
       formItem: {
-        title:"",
-        content:"",
+        title: "",
+        content: ""
       },
-      editFormItem:{
-        title:"",
-        description:"",
+      editFormItem: {
+        title: "",
+        description: ""
       },
-      currentModuleNoticeList:[
-        {title:"",
-        description:""}
-        ],
+      currentModuleNoticeList: [{ title: "", description: "" }],
       // 控制点击notice后模态框显示的modal
-      noticeDetailShowModal:false,
+      noticeDetailShowModal: false,
       // 当前选中通知条目的详情
-      currentNoticeDetail:[],
-      panelList:[],
-      panel:null,
+      currentNoticeDetail: [],
+      panelList: [],
+      panel: null,
       toProjectPage: "",
       toSubProjectPage: ""
     };
@@ -1198,8 +1226,9 @@ export default {
     this.openModuleSocket();
     this.getHistoryRecords();
     this.getAllModules("init");
-    this.toProjectPage = "/project/"+ sessionStorage.getItem("projectId");
-    this.toSubProjectPage = "/project/"+ sessionStorage.getItem("subProjectId")+"/subproject";
+    this.toProjectPage = "/project/" + sessionStorage.getItem("projectId");
+    this.toSubProjectPage =
+      "/project/" + sessionStorage.getItem("subProjectId") + "/subproject";
   },
   // add by mzy for navigation guards
   beforeRouteEnter: (to, from, next) => {
@@ -1394,7 +1423,8 @@ export default {
       let subProjectId = this.subProjectInfo.subProjectId;
       // var subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + subProjectId;
       // var subprojectSocketURL = "ws://202.195.237.252:8082/GeoProblemSolving/Module/" + subProjectId;
-      var subprojectSocketURL = "ws://172.21.212.7:8082/GeoProblemSolving/Module/" + subProjectId;
+      var subprojectSocketURL =
+        "ws://172.21.212.7:8082/GeoProblemSolving/Module/" + subProjectId;
       this.subprojectSocket = new WebSocket(subprojectSocketURL);
       this.subprojectSocket.onopen = this.onOpen;
       this.subprojectSocket.onmessage = this.onMessage;
@@ -1435,8 +1465,7 @@ export default {
       // module 更新
       else if (messageJson.type == "module") {
         this.getAllModules("init");
-      }
-      else if (messageJson.type == "members") {
+      } else if (messageJson.type == "members") {
         // 比较 判断人员动态 更新records
 
         let members = messageJson.message
@@ -1983,8 +2012,8 @@ export default {
         )
         .then(res => {
           if (res.data !== "None") {
-            this.$set(this, "resourceList", res.data);  
-            //存入store          
+            this.$set(this, "resourceList", res.data);
+            //存入store
             sessionStorage.setItem("resources", JSON.stringify(res.data));
           } else {
             this.resourceList = [];
@@ -2107,10 +2136,9 @@ export default {
 
       if (type == "map") {
         toolURL =
-        // http://localhost:8080/tinymce
+          // http://localhost:8080/tinymce
           '<iframe src="http://localhost:8080/map" style="width: 100%;height:100%"></iframe>';
         toolName = "Map";
-
       } else if (type == "draw") {
         toolURL =
           '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/draw" style="width: 100%;height:100%"></iframe>';
@@ -2130,7 +2158,6 @@ export default {
           this.currentModule.moduleId +
           '" style="width: 100%;height:100%"></iframe>';
         toolName = "Sketchpad";
-
       } else if (type == "3DmodelViewer") {
         toolURL =
           '<iframe src="/GeoProblemSolving/Collaborative/3DmodelViewer/index.html' +
@@ -2138,7 +2165,6 @@ export default {
           this.currentModule.moduleId +
           '" style="width: 100%;height:100%"></iframe>';
         toolName = "3D model viewer";
-
       } else if (type == "LogicalModel") {
         toolURL =
           '<iframe src="/GeoProblemSolving/Collaborative/LogicalModel/index.html' +
@@ -2146,7 +2172,6 @@ export default {
           this.currentModule.moduleId +
           '" style="width: 100%;height:100%"></iframe>';
         toolName = "Logical modeling";
-
       } else if (type == "ConceptualModel") {
         toolURL =
           '<iframe src="/GeoProblemSolving/Collaborative/ConceptualModel/index.html' +
@@ -2190,8 +2215,7 @@ export default {
         toolURL =
           '<iframe src="/GeoProblemSolving/Collaborative/jexcelTool/excelToolSingle.html' +
           '" style="width: 100%;height:100%"></iframe>';
-          toolName = "Table editor";
-
+        toolName = "Table editor";
       } else if (type == "nc-3DmodelViewer") {
         toolURL =
           '<iframe src="/GeoProblemSolving/Collaborative/3DmodelViewer/indexSingle.html' +
@@ -2209,12 +2233,11 @@ export default {
         toolURL =
           '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/pdfview" style="width: 100%;height:100%"></iframe>';
         toolName = "Pdf viewer";
-      }else if(type == "Doc Edit"){
+      } else if (type == "Doc Edit") {
         toolURL =
           '<iframe src="http://localhost:8080/tinymce" style="width: 100%;height:100%"></iframe>';
         toolName = "doc editor";
-      }
-      else if(type == "video Tool"){
+      } else if (type == "video Tool") {
         toolURL =
           '<iframe src="/GeoProblemSolving/Collaborative/vedioChat/WebRtcTest.html" style="width: 100%;height:100%"></iframe>';
         toolName = "video Tool";
@@ -2226,8 +2249,8 @@ export default {
         contentSize: "1000 600",
         content: toolURL,
         disableOnMaximized: true,
-        dragit:{
-          containment:5,
+        dragit: {
+          containment: 5
         },
         callback: function() {
           // this.content.style.padding = "20px";
@@ -2250,91 +2273,93 @@ export default {
       this.subprojectSocket.send(JSON.stringify(record));
       // this.allRecords.push(record);
     },
-    closePanel(){
-      for(let i = 0;i<this.panelList.length;i++){
+    closePanel() {
+      for (let i = 0; i < this.panelList.length; i++) {
         this.panelList[i].close();
       }
-      
-      if(this.panel != null){
-          this.panel.close();
-        }
+
+      if (this.panel != null) {
+        this.panel.close();
+      }
     },
-    createNotice(){
-      let noticeForm ={};
+    createNotice() {
+      let noticeForm = {};
       noticeForm["title"] = this.formItem.title;
       noticeForm["description"] = this.formItem.content;
       noticeForm["moduleId"] = this.currentModule.moduleId;
       this.axios
-      .post("/GeoProblemSolving/bulletin/save",noticeForm)
-      .then(res=> {
-        if(res.data!="Fail"){
-          this.$Notice.success({
-            title: "Create notice result",
-            desc: "The notice has been created successfully!"
-          });
-          this.inquiryNotice();
-
-        }
-      })
-      .catch(err=> {
-        console.log(err.data);
-      })
+        .post("/GeoProblemSolving/bulletin/save", noticeForm)
+        .then(res => {
+          if (res.data != "Fail") {
+            this.$Notice.success({
+              title: "Create notice result",
+              desc: "The notice has been created successfully!"
+            });
+            this.inquiryNotice();
+          }
+        })
+        .catch(err => {
+          console.log(err.data);
+        });
     },
-    inquiryNotice(){
-      this.axios.get("/GeoProblemSolving/bulletin/inquiry?key=moduleId&value=" + window.sessionStorage.getItem("moduleId"))
-      .then(res=> {
-        if(res.data!="Fail"){
-          this.currentModuleNoticeList = res.data;
-        }
-      })
-      .catch(err=>{
-      })
+    inquiryNotice() {
+      this.axios
+        .get(
+          "/GeoProblemSolving/bulletin/inquiry?key=moduleId&value=" +
+            window.sessionStorage.getItem("moduleId")
+        )
+        .then(res => {
+          if (res.data != "Fail") {
+            this.currentModuleNoticeList = res.data;
+          }
+        })
+        .catch(err => {});
     },
-    editNotice(){
+    editNotice() {
       let updateForm = new URLSearchParams();
-      updateForm.append("bulletinId",this.currentNoticeDetail["bulletinId"]);
-      updateForm.append("title",this.editFormItem["title"]);
-      updateForm.append("description",this.editFormItem["description"]);
-      this.axios.post("/GeoProblemSolving/bulletin/update", updateForm)
-      .then(res=> {
-        if(res.data!="Fail"){
-          this.$Notice.info({
-            title:"update result",
-            desc:"update announcement successfully!"
-          });
-          this.inquiryNotice();
-        }
-      })
-      .catch(err=> {
-      })
+      updateForm.append("bulletinId", this.currentNoticeDetail["bulletinId"]);
+      updateForm.append("title", this.editFormItem["title"]);
+      updateForm.append("description", this.editFormItem["description"]);
+      this.axios
+        .post("/GeoProblemSolving/bulletin/update", updateForm)
+        .then(res => {
+          if (res.data != "Fail") {
+            this.$Notice.info({
+              title: "update result",
+              desc: "update announcement successfully!"
+            });
+            this.inquiryNotice();
+          }
+        })
+        .catch(err => {});
     },
-    deleteNotice(){
-      var index = this.currentModuleNoticeList.length-1;
-      let bulletinId = this.currentModuleNoticeList[index]["bulletinId"]
-      this.axios.get("/GeoProblemSolving/bulletin/delete"+"?bulletinId=" + bulletinId)
-      .then(res=> {
-        if(res.data!="Fail"){
-          this.$Notice.info({
-            title:"delete result",
-            desc:"delete announcement successfully!"
-          });
-          this.inquiryNotice();
-        }
-      })
-      .catch(err=> {
-      })
+    deleteNotice() {
+      var index = this.currentModuleNoticeList.length - 1;
+      let bulletinId = this.currentModuleNoticeList[index]["bulletinId"];
+      this.axios
+        .get("/GeoProblemSolving/bulletin/delete" + "?bulletinId=" + bulletinId)
+        .then(res => {
+          if (res.data != "Fail") {
+            this.$Notice.info({
+              title: "delete result",
+              desc: "delete announcement successfully!"
+            });
+            this.inquiryNotice();
+          }
+        })
+        .catch(err => {});
     },
-    noticeDetailShow(){
+    noticeDetailShow() {
       this.noticeDetailShowModal = true;
-      let index = this.currentModuleNoticeList.length-1;
+      let index = this.currentModuleNoticeList.length - 1;
       this.currentNoticeDetail = this.currentModuleNoticeList[index];
       this.editFormItem.title = this.currentNoticeDetail.title;
       this.editFormItem.description = this.currentNoticeDetail.description;
       // this.currentModuleNoticeList[index];显示在模态框里面的内容
-    },    
+    },
     previewRes(index) {
       let name = this.resourceList[index].name;
-      
+
       if (/\.(shx)$/.test(name.toLowerCase())) {
         this.$Notice.error({
           title: "Open failed",
@@ -2342,27 +2367,30 @@ export default {
         });
         return false;
       }
-        if(this.panel != null){
-          this.panel.close();
-        }
-        let url = "http://172.21.212.7:8012/previewFile?url=http://172.21.212.7:8082"+this.resourceList[index].pathURL;
-        let toolURL ='<iframe src='+url+' style="width: 100%;height:100%"></iframe>'
-        this.panel = jsPanel.create({
-          headerControls: {
-            smallify:'remove',
-          },
-          theme: "light",
-          headerTitle: "Preview",
-          contentSize: "800 600",
-          content: toolURL,
-          disableOnMaximized: true,
-          dragit:{
-            containment:5,
-          },
-          closeOnEscape: true,
-        });
-        $(".jsPanel-content").css("font-size", "0");
-    },
+      if (this.panel != null) {
+        this.panel.close();
+      }
+      let url =
+        "http://172.21.212.7:8012/previewFile?url=http://172.21.212.7:8082" +
+        this.resourceList[index].pathURL;
+      let toolURL =
+        "<iframe src=" + url + ' style="width: 100%;height:100%"></iframe>';
+      this.panel = jsPanel.create({
+        headerControls: {
+          smallify: "remove"
+        },
+        theme: "light",
+        headerTitle: "Preview",
+        contentSize: "800 600",
+        content: toolURL,
+        disableOnMaximized: true,
+        dragit: {
+          containment: 5
+        },
+        closeOnEscape: true
+      });
+      $(".jsPanel-content").css("font-size", "0");
+    }
   }
 };
 </script>

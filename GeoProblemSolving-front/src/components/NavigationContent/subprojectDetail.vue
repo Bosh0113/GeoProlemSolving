@@ -96,47 +96,43 @@
       <Col span="22" offset="1">
         <Card>
           <Row>
-              <Col span="5" offset="1" style="height:40px">
-                <Breadcrumb>
-                  <BreadcrumbItem :to="toProjectPage">Project</BreadcrumbItem>
-                  <BreadcrumbItem>Subproject</BreadcrumbItem>
-                </Breadcrumb>
-              </Col>
-              <Col span="13" style="text-align:center;font-size:1.5rem;height:40px">
-                <strong>{{subProjectInfo.title}}</strong>
-              </Col>
-              <Col
-                span="4" 
-                style="height:40px;text-align:right;"
-                class="operatePanel"
-              >
-                <Button
-                  type="default"
-                  @click="gotoWorkingPanel()"
-                  icon="ios-git-network"
-                  title="Back to project page"
-                >Work</Button>
-                <Button
-                  type="default"
-                  @click="conveneWork()"
-                  icon="md-mail"
-                  title="Inform others to work together"
-                >Inform</Button>
-              </Col>
+            <Col span="5" offset="1" style="height:40px;">
+              <Breadcrumb>
+                <BreadcrumbItem :to="toProjectPage">Project</BreadcrumbItem>
+                <BreadcrumbItem>Subproject</BreadcrumbItem>
+              </Breadcrumb>
+            </Col>
+            <Col span="13" style="text-align:center;font-size:1.5rem;height:40px">
+              <strong>{{subProjectInfo.title}}</strong>
+            </Col>
+            <Col span="4" style="height:40px;" class="operatePanel">
+              <Button
+                type="default"
+                @click="gotoWorkingPanel()"
+                icon="ios-git-network"
+                title="Back to project page"
+              >Work</Button>
+              <Button
+                type="default"
+                @click="conveneWork()"
+                icon="md-mail"
+                title="Inform others to work together"
+              >Inform</Button>
+            </Col>
           </Row>
           <Row>
             <Col span="22" offset="1" style="background-color:white;">
               <Tabs type="card" v-model="currentTab" @on-click="currentTabChanged(name)">
                 <TabPane label="Subproject home" icon="ios-home" name="home">
-                  <div class="workspaceContent">
+                  <Row type="flex" justify="space-around">
                     <Col
-                      :xs="{span:8,offset:1}"
-                      :sm="{span:7,offset:1}"
-                      :md="{span:6,offset:1}"
-                      :lg="{span:5,offset:1}"
+                      :xs="{span:9}"
+                      :sm="{span:8}"
+                      :md="{span:7}"
+                      :lg="{span:6}"
                       v-bind="this.participants"
                       :style="{height:sidebarHeight+14+'px'}"
-                      style="margin-top:30px"
+                      style="margin-top:30px;padding-left:20px"
                     >
                       <Card>
                         <div slot="title" style="font-size:18px">
@@ -274,17 +270,8 @@
                         </div>
                       </Card>
                     </Col>
-                    <Col
-                      :xs="15"
-                      :sm="16"
-                      :md="17"
-                      :lg="17"
-                      style="margin-left:20px;margin-top:30px"
-                    >
-                      <Card
-                        :style="{height:descHeight +'px'}"
-                        style="background-color:white;margin-left:30px"
-                      >
+                    <Col :xs="15" :sm="16" :md="17" :lg="17" style="margin-top:30px">
+                      <Card :style="{height:descHeight +'px'}" style="background-color:white;">
                         <div slot="title" style="font-size:18px;">
                           <strong>Description</strong>
                         </div>
@@ -294,7 +281,7 @@
                           style="overflow-y:auto"
                         >{{subProjectInfo.description}}</div>
                       </Card>
-                      <div class="resourcePanel" style="padding:20px 0 0 30px">
+                      <div class="resourcePanel" style="padding-top:20px">
                         <Card>
                           <div slot="title" style="font-size:18px;height:20px;line-height:20px;">
                             <strong>Resources</strong>
@@ -379,19 +366,19 @@
                                   v-model="subProjectFileUploadForm.privacy"
                                   style="width:80%"
                                 >
-                                  <Radio label="public"></Radio>
-                                  <Radio label="privacy"></Radio>
+                                  <Radio label="private">Private</Radio>
+                                  <Radio label="public">Public</Radio>
                                 </RadioGroup>
                               </FormItem>
                               <FormItem label="Type" prop="type">
                                 <RadioGroup v-model="subProjectFileUploadForm.type">
-                                  <Radio label="image"></Radio>
-                                  <Radio label="video"></Radio>
-                                  <Radio label="data"></Radio>
-                                  <Radio label="paper"></Radio>
-                                  <Radio label="document"></Radio>
-                                  <Radio label="model"></Radio>
-                                  <Radio label="others"></Radio>
+                                  <Radio label="data">Data</Radio>
+                                  <Radio label="image">Images</Radio>
+                                  <Radio label="video">Videos</Radio>
+                                  <Radio label="paper">Papers</Radio>
+                                  <Radio label="document">Documents</Radio>
+                                  <Radio label="model">Models</Radio>
+                                  <Radio label="others">Others</Radio>
                                 </RadioGroup>
                               </FormItem>
                               <FormItem label="Description" prop="description">
@@ -418,21 +405,28 @@
                           <div style="padding:0 10px 0 10px">
                             <ul v-for="(list,index) in file" :key="index">
                               <li style="display:flex">
-                              File name:
-                              <span style="font-size:10px;margin: 0 5px 0 5px" :title="list.name">{{ list.name }}</span>
-                              (Size:
-                              <span v-if="list.size<(1024*1024)" style="font-size:10px;margin-right:10px"
-                              >{{(list.size/1024).toFixed(2)}}KB)</span>
-                              <span v-else style="font-size:10px;margin-right:10px"
-                              >{{(list.size/1024/1024).toFixed(2)}}MB)</span>
-                              <Icon
-                                type="ios-close"
-                                size="20"
-                                @click="delFileList(index)"
-                                style="display:flex;justify-content:flex-end;cursor:pointer"
-                                title="Cancel"
-                              ></Icon>
-                            </li>
+                                File name:
+                                <span
+                                  style="font-size:10px;margin: 0 5px 0 5px"
+                                  :title="list.name"
+                                >{{ list.name }}</span>
+                                (Size:
+                                <span
+                                  v-if="list.size<(1024*1024)"
+                                  style="font-size:10px;margin-right:10px"
+                                >{{(list.size/1024).toFixed(2)}}KB)</span>
+                                <span
+                                  v-else
+                                  style="font-size:10px;margin-right:10px"
+                                >{{(list.size/1024/1024).toFixed(2)}}MB)</span>
+                                <Icon
+                                  type="ios-close"
+                                  size="20"
+                                  @click="delFileList(index)"
+                                  style="display:flex;justify-content:flex-end;cursor:pointer"
+                                  title="Cancel"
+                                ></Icon>
+                              </li>
                             </ul>
                           </div>
                         </Modal>
@@ -455,7 +449,7 @@
                         >Delete this sub-project ?</Button>
                       </div>
                     </Col>
-                  </div>
+                  </Row>
                 </TabPane>
                 <TabPane label="Task assignment" icon="md-list" name="task">
                   <Col
@@ -878,7 +872,7 @@ export default {
   },
   data() {
     return {
-      subProjectFileUploadForm: { privacy: "", type: "", description: "" },
+      subProjectFileUploadForm: { privacy: "private", type: "data", description: "" },
       subProjectFileUploadFormRuleValidate: {
         privacy: [
           {

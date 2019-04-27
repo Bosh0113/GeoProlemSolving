@@ -567,7 +567,6 @@
           width="800px"
           :mask-closable="false"
           @on-ok="filesUpload('fileUploadForm')"
-          @on-cancel
           ok-text="Submit"
           cancel-text="cancel"
         >
@@ -580,19 +579,19 @@
             >
               <FormItem label="Privacy" prop="privacy">
                 <RadioGroup v-model="fileUploadForm.privacy" style="width:80%">
-                  <Radio label="public"></Radio>
-                  <Radio label="privacy"></Radio>
+                  <Radio label="private">Private</Radio>
+                  <Radio label="public">Public</Radio>
                 </RadioGroup>
               </FormItem>
               <FormItem label="Type" prop="type">
                 <RadioGroup v-model="fileUploadForm.type">
-                  <Radio label="image"></Radio>
-                  <Radio label="video"></Radio>
-                  <Radio label="data"></Radio>
-                  <Radio label="paper"></Radio>
-                  <Radio label="document"></Radio>
-                  <Radio label="model"></Radio>
-                  <Radio label="others"></Radio>
+                  <Radio label="data">Data</Radio>
+                  <Radio label="image">Images</Radio>
+                  <Radio label="video">Videos</Radio>
+                  <Radio label="paper">Papers</Radio>
+                  <Radio label="document">Documents</Radio>
+                  <Radio label="model">Models</Radio>
+                  <Radio label="others">Others</Radio>
                 </RadioGroup>
               </FormItem>
               <FormItem label="Description" prop="description">
@@ -718,7 +717,7 @@
                 title="Other users can find the group and see who has membership."
               ></Radio>
               <Radio
-                label="Discover"
+                label="Discoverable"
                 title="Other users can find this group, but membership information is hidden."
               ></Radio>
               <Radio label="Private" title="Other users can not find this group."></Radio>
@@ -805,8 +804,8 @@ export default {
         subProjectDescriptionEdit: ""
       },
       fileUploadForm: {
-        type: "",
-        privacy: "",
+        type: "data",
+        privacy: "private",
         description: ""
       },
       fileUploadFormRuleValidate: {
