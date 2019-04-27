@@ -1457,11 +1457,11 @@ export default {
                   if (result.data == "Success") {
                     this.$emit("sendNotice", this.inviteList[i]); // 改apply.content.userId
                   } else {
-                    this.$Message.danger("reply fail.");
+                    this.$Message.error("reply fail.");
                   }
                 })
                 .catch(err => {
-                  this.$Message.danger("reply fail.");
+                  this.$Message.error("reply fail.");
                 });
             }
           }
