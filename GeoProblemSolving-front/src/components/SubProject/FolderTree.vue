@@ -3,7 +3,7 @@
   padding: 100px;
 }
 .folderContent {
-  width: 300px;
+  width: 500px;
   height: 300px;
   overflow-y: auto;
   border: 0.3px yellowgreen solid;
@@ -34,7 +34,7 @@
                     <span @click="deleteFolder(folder)" class="folderDeleteBtn">x</span>
                     <span @click="renameFolderModalShow(folder)" class="folderRenameBtn">=</span>
                 </div>
-                <p v-for="(file,index) in currentFolder.files" @click="getFileInfo(file)">{{file.name}}</p>
+                <p v-for="(file,index) in currentFileList" @click="getFileInfo(file)">{{file.name}}------{{file.fileSize}}</p>
             </div>
         </div>
         <Button @click="addFolderModalShow">newFolder</Button>
@@ -129,18 +129,27 @@
                 <Button type="success" @click="subProjectUpload('uploadValidate')">Upload</Button>
             </div>
         </Modal>
+        <Modal
+            v-model="progressModalShow"
+            title="Upload Progress"
+            :mask-closable="false"
+            :closable="false"
+        >
+            <Progress :percent="uploadProgress"></Progress>
+        </Modal>
     </div>
 </template>
 <script>
 export default {
   created() {
-    this.getSubProjectInfo();
+    this.getSubProjectfileStruct();
   },
   data() {
     return {
       subProjectFileStruct: {},
       subProjectId: "fbd438e0-b23b-49f6-93c8-36b678c70720",
       currentFolder: {},
+      currentFileList: [],
       folderUIDStack: [],
       newFolderModal: false,
       setFolderName: "",
@@ -199,11 +208,13 @@ export default {
           }
         ]
       },
-      toUploadFiles: []
+      toUploadFiles: [],
+      progressModalShow: false,
+      uploadProgress: 0
     };
   },
   methods: {
-    getSubProjectInfo() {
+    getSubProjectfileStruct() {
       this.axios
         .get(
           "/GeoProblemSolving/subProject/getFileStrcut" +
@@ -211,29 +222,67 @@ export default {
             this.subProjectId
         )
         .then(res => {
-          var fileStruct = res.data;
-          this.subProjectFileStruct = fileStruct;
-          this.currentFolder = fileStruct;
-          this.enterFolder(this.currentFolder);
+          if (res.data != "Fail") {
+            var fileStruct = res.data;
+            this.subProjectFileStruct = fileStruct;
+            this.currentFolder = fileStruct;
+            this.enterFolder(this.currentFolder);
+          } else {
+            this.$Message.warning("Get sub-project's info fail.");
+          }
         })
         .catch(err => {
-          console.log("Get sub-project's info fail.");
+          this.$Message.warning("Get sub-project's info fail.");
         });
     },
     enterFolder(folder) {
       this.folderUIDStack.push(this.currentFolder.uid);
       this.currentFolder = folder;
+      this.getCurrentFilesInfo();
+    },
+    getCurrentFilesInfo() {
+      var files = this.currentFolder.files;
+      var count = files.length;
+      var filesInfoList = [];
+      if(files.length>0){
+        for (var i = 0; i < files.length; i++) {
+          var fileId = files[i].uid;
+          this.axios
+            .get(
+              "/GeoProblemSolving/resource/inquiry" +
+                "?key=resourceId" +
+                "&value=" +
+                fileId
+            )
+            .then(res => {
+              if (res != "Fail") {
+                var fileInfo = res.data[0];
+                filesInfoList.push(fileInfo);
+                if (--count == 0) {
+                  this.$set(this, "currentFileList", filesInfoList);
+                }
+              } else {
+                console.log("Get file info fail.");
+              }
+            })
+            .catch(err => {
+              console.log("Get file info fail.");
+            });
+        }
+      }else{
+        this.$set(this, "currentFileList", filesInfoList);
+      }
     },
     backforeFolder() {
       if (this.folderUIDStack.length > 1) {
         var foreFolderUid = this.folderUIDStack.pop();
-        this.refreshCurrentFolder(this.subProjectFileStruct, foreFolderUid);
+        this.refreshCurrentAll(this.subProjectFileStruct, foreFolderUid);
       } else {
         this.$Message.warning("This is the root folder.");
       }
     },
     getFileInfo(file) {
-      confirm(file.uid);
+      confirm(file.pathURL);
     },
     addFolderModalShow() {
       this.newValidate.setName = "";
@@ -258,14 +307,14 @@ export default {
             .then(res => {
               if (res.data != "Fail") {
                 this.subProjectFileStruct = res.data;
-                this.refreshCurrentFolder(res.data, this.currentFolder.uid);
+                this.refreshCurrentAll(res.data, this.currentFolder.uid);
                 this.newFolderModal = false;
               } else {
-                console.log("New folder fail.");
+                this.$Message.warning("New folder fail.");
               }
             })
             .catch(err => {
-              console.log("New folder fail.");
+              this.$Message.warning("New folder fail.");
             });
         }
       });
@@ -280,6 +329,10 @@ export default {
           this.refreshCurrentFolder(subFolder[i], uid);
         }
       }
+    },
+    refreshCurrentAll(folder, uid){
+      this.refreshCurrentFolder(folder, uid);
+      this.getCurrentFilesInfo();
     },
     deleteFolder(folder) {
       if (confirm("Are you sure to delete this folder?")) {
@@ -299,13 +352,13 @@ export default {
           .then(res => {
             if (res.data != "Fail") {
               this.subProjectFileStruct = res.data;
-              this.refreshCurrentFolder(res.data, this.currentFolder.uid);
+              this.refreshCurrentAll(res.data, this.currentFolder.uid);
             } else {
-              console.log("Delete folder fail.");
+              this.$Message.warning("Delete folder fail.");
             }
           })
           .catch(err => {
-            console.log("Delete folder fail.");
+            this.$Message.warning("Delete folder fail.");
           });
       }
     },
@@ -336,13 +389,13 @@ export default {
             .then(res => {
               if (res.data != "Fail") {
                 this.subProjectFileStruct = res.data;
-                this.refreshCurrentFolder(res.data, this.currentFolder.uid);
+                this.refreshCurrentAll(res.data, this.currentFolder.uid);
               } else {
-                console.log("Rename fail.");
+                this.$Message.warning("Rename fail.");
               }
             })
             .catch(err => {
-              console.log("Rename fail.");
+              this.$Message.warning("Rename fail.");
             });
           this.renameFolderModal = false;
         }
@@ -376,7 +429,52 @@ export default {
     subProjectUpload(name) {
       this.$refs[name].validate(valid => {
         if (valid) {
-          confirm("可以上传");
+          this.uploadModal = false;
+          var uploadFiles = this.toUploadFiles;
+          if (uploadFiles.length > 0) {
+            var formData = new FormData();
+            for (var i = 0; i < uploadFiles.length; i++) {
+              formData.append("file", uploadFiles[i]);
+            }
+            formData.append("description", this.uploadValidate.description);
+            formData.append("type", this.uploadValidate.type);
+            formData.append("uploaderId", this.$store.getters.userInfo.userId);
+            formData.append("belong", sessionStorage.getItem("subProjectName"));
+            let scopeObject = {
+              projectId: sessionStorage.getItem("projectId"),
+              subProjectId: sessionStorage.getItem("subProjectId"),
+              moduleId: ""
+            };
+            formData.append("scope", JSON.stringify(scopeObject));
+            formData.append("privacy", this.uploadValidate.privacy);
+            formData.append(
+              "subProjectId",
+              sessionStorage.getItem("subProjectId")
+            );
+            formData.append("parentId", this.currentFolder.uid);
+            this.progressModalShow = true;
+            this.axios({
+              url: "/GeoProblemSolving/resource/subProjectUpload",
+              method: "post",
+              onUploadProgress: progressEvent => {
+                this.uploadProgress =
+                  ((progressEvent.loaded / progressEvent.total) * 100) | 0;
+              },
+              data: formData
+            })
+              .then(res => {
+                if (res.data != "Fail") {
+                  this.subProjectFileStruct = res.data;
+                  this.refreshCurrentAll(res.data, this.currentFolder.uid);
+                  this.progressModalShow = false;
+                } else {
+                  this.$Message.warning("Upload fail.");
+                }
+              })
+              .catch(err => {
+                this.$Message.warning("Upload fail.");
+              });
+          }
         }
       });
     }

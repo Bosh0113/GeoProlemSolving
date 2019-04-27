@@ -207,7 +207,7 @@ public class SubProjectDaoImpl implements ISubProjectDao {
             Query query = new Query(Criteria.where("subProjectId").is(subProjectId));
             Update update = Update.update("fileStruct", fileStruct);
             mongoTemplate.updateFirst(query,update,SubProjectEntity.class);
-            return fileStruct;
+            return "Success";
         }catch (Exception e){
             return "Fail";
         }
