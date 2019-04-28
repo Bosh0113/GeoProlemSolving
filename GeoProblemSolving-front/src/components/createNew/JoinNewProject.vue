@@ -221,7 +221,7 @@ export default {
           }
         })
         .catch(err => {
-          this.$Message.danger("Judge fail");
+          this.$Message.error("Judge fail");
         });
     },
     joinByMail(){
@@ -252,7 +252,7 @@ export default {
           }
         })
         .catch(err => {
-          this.$Message.danger("Join fail");
+          this.$Message.error("Join fail");
         });
     },
     goHome() {
@@ -290,8 +290,8 @@ export default {
         this.noticeSocket = null;
       }
       // var noticeSocketURL = "ws://localhost:8081/GeoProblemSolving/NoticeSocket";
-      // var noticeSocketURL = "ws://202.195.237.252:8082/GeoProblemSolving/NoticeSocket";
-      var noticeSocketURL = "ws://172.21.212.7:8082/GeoProblemSolving/NoticeSocket";
+      var noticeSocketURL = "ws://172.21.213.185:8080/GeoProblemSolving/NoticeSocket";
+      // var noticeSocketURL = "ws://172.21.212.7:8082/GeoProblemSolving/NoticeSocket";
       this.noticeSocket = new WebSocket(noticeSocketURL);
       this.noticeSocket.onopen = this.onOpen;
       this.noticeSocket.onmessage = this.onMessage;

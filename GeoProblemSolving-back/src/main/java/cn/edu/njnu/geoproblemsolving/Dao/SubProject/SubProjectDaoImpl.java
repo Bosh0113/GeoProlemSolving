@@ -1,10 +1,10 @@
 package cn.edu.njnu.geoproblemsolving.Dao.SubProject;
 
 import cn.edu.njnu.geoproblemsolving.Commen.FileStructConst;
-import cn.edu.njnu.geoproblemsolving.Dao.Method.EncodeUtil;
-import cn.edu.njnu.geoproblemsolving.Entity.ProjectEntity;
-import cn.edu.njnu.geoproblemsolving.Entity.SubProjectEntity;
 import cn.edu.njnu.geoproblemsolving.Dao.Method.CommonMethod;
+import cn.edu.njnu.geoproblemsolving.Dao.Method.EncodeUtil;
+import cn.edu.njnu.geoproblemsolving.Entity.ResourceEntity;
+import cn.edu.njnu.geoproblemsolving.Entity.SubProjectEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.UserEntity;
 import cn.edu.njnu.geoproblemsolving.utils.EditJsonUtil;
 import com.alibaba.fastjson.JSONArray;
@@ -18,7 +18,6 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -291,5 +290,35 @@ public class SubProjectDaoImpl implements ISubProjectDao {
             return "Fail";
         }
         return newFileStruct;
+    }
+
+    public String createFolderTree(){
+        try {
+            List<SubProjectEntity> subProjectEntities = mongoTemplate.findAll(SubProjectEntity.class);
+            for (SubProjectEntity subProjectEntity:subProjectEntities){
+                Query query =Query.query(Criteria.where("scope.subProjectId").is(subProjectEntity.getSubProjectId()));
+                List<ResourceEntity> resourceEntities = mongoTemplate.find(query,ResourceEntity.class);
+                JSONObject fileStruct = new JSONObject();
+                JSONArray fileList = new JSONArray();
+                for (ResourceEntity resourceEntity:resourceEntities){
+                    JSONObject fileInfo = new JSONObject();
+                    fileInfo.put("name",resourceEntity.getName());
+                    fileInfo.put("uid",resourceEntity.getResourceId());
+                    fileList.add(fileInfo);
+                }
+                JSONArray folderList = new JSONArray();
+                fileStruct.put("name",subProjectEntity.getTitle());
+                fileStruct.put("uid",subProjectEntity.getSubProjectId());
+                fileStruct.put("files",fileList);
+                fileStruct.put("folders",folderList);
+                Update update = new Update();
+                update.set("fileStruct",fileStruct.toJSONString());
+                Query query1= Query.query(Criteria.where("subProjectId").is(subProjectEntity.getSubProjectId()));
+                mongoTemplate.updateFirst(query1,update,SubProjectEntity.class);
+            }
+            return "Success";
+        }catch (Exception e){
+            return "Fail";
+        }
     }
 }

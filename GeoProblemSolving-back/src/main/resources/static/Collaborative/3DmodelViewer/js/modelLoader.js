@@ -108,7 +108,8 @@ $(document).ready(function() {
     var roomId = sessionStorage.getItem("moduleId");
     if (WebSocket) {
         // wsTModel = new WebSocket("ws://localhost:8081/GeoProblemSolving/3DviewerServer/"+roomId);
-        wsTModel = new WebSocket("ws://172.21.212.7:8082/GeoProblemSolving/3DviewerServer/"+roomId);
+        // wsTModel = new WebSocket("ws://172.21.212.7:8082/GeoProblemSolving/3DviewerServer/"+roomId);
+        wsTModel = new WebSocket("ws://172.21.213.185:8080/GeoProblemSolving/3DviewerServer/"+roomId);
     }
     else {
         alert("浏览器不支持websocket！");

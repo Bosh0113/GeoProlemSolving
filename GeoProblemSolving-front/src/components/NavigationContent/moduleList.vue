@@ -1422,9 +1422,8 @@ export default {
       }
       let subProjectId = this.subProjectInfo.subProjectId;
       // var subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + subProjectId;
-      // var subprojectSocketURL = "ws://202.195.237.252:8082/GeoProblemSolving/Module/" + subProjectId;
-      var subprojectSocketURL =
-        "ws://172.21.212.7:8082/GeoProblemSolving/Module/" + subProjectId;
+      var subprojectSocketURL = "ws://172.21.213.185:8080/GeoProblemSolving/Module/" + subProjectId;
+      // var subprojectSocketURL ="ws://172.21.212.7:8082/GeoProblemSolving/Module/" + subProjectId;
       this.subprojectSocket = new WebSocket(subprojectSocketURL);
       this.subprojectSocket.onopen = this.onOpen;
       this.subprojectSocket.onmessage = this.onMessage;
@@ -2135,21 +2134,20 @@ export default {
       let toolName = "";
 
       if (type == "map") {
-        toolURL =
-          // http://localhost:8080/tinymce
-          '<iframe src="http://localhost:8080/map" style="width: 100%;height:100%"></iframe>';
+        // toolURL = '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/map" style="width: 100%;height:100%"></iframe>';
+        toolURL = '<iframe src="http://172.21.213.185:8080/GeoProblemSolving/map" style="width: 100%;height:100%"></iframe>';
         toolName = "Map";
       } else if (type == "draw") {
-        toolURL =
-          '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/draw" style="width: 100%;height:100%"></iframe>';
+        // toolURL =  '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/draw" style="width: 100%;height:100%"></iframe>';
+        toolURL =  '<iframe src="http://172.21.213.185:8080/GeoProblemSolving/draw" style="width: 100%;height:100%"></iframe>';
         toolName = "Drawing";
       } else if (type == "chart") {
-        toolURL =
-          '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/charts" style="width: 100%;height:100%"></iframe>';
+        // toolURL = '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/charts" style="width: 100%;height:100%"></iframe>';
+        toolURL = '<iframe src="http://172.21.213.185:8080/GeoProblemSolving/charts" style="width: 100%;height:100%"></iframe>';
         toolName = "Chart";
       } else if (type == "chat") {
-        toolURL =
-          '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/chat" style="width: 100%;height:100%"></iframe>';
+        // toolURL = '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/chat" style="width: 100%;height:100%"></iframe>';
+        toolURL = '<iframe src="http://172.21.213.185:8080/GeoProblemSolving/chat" style="width: 100%;height:100%"></iframe>';
         toolName = "Chatroom";
       } else if (type == "graphEditor") {
         toolURL =
@@ -2196,20 +2194,26 @@ export default {
       } else if (type == "nc-map") {
         // toolURL =
         //   '<iframe src="http://localhost:8080/nc/map" style="width: 100%;height:100%"></iframe>';
+        // toolURL =
+        //   '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/nc/map" style="width: 100%;height:100%"></iframe>';
         toolURL =
-          '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/nc/map" style="width: 100%;height:100%"></iframe>';
+          '<iframe src="http://172.21.213.185:8080/GeoProblemSolving/nc/map" style="width: 100%;height:100%"></iframe>';
         toolName = "Map";
       } else if (type == "nc-draw") {
         // toolURL =
         //   '<iframe src="http://localhost:8080/nc/draw" style="width: 100%;height:100%"></iframe>';
+        // toolURL =
+        //   '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/nc/draw" style="width: 100%;height:100%"></iframe>';
         toolURL =
-          '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/nc/draw" style="width: 100%;height:100%"></iframe>';
+          '<iframe src="http://172.21.213.185:8080/GeoProblemSolving/nc/draw" style="width: 100%;height:100%"></iframe>';
         toolName = "Drawing";
       } else if (type == "nc-chart") {
         // toolURL =
         //   '<iframe src="http://localhost:8080/nc/charts" style="width: 100%;height:100%"></iframe>';
+        // toolURL =
+        //   '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/nc/charts" style="width: 100%;height:100%"></iframe>';
         toolURL =
-          '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/nc/charts" style="width: 100%;height:100%"></iframe>';
+          '<iframe src="http://172.21.213.185:8080/GeoProblemSolving/nc/charts" style="width: 100%;height:100%"></iframe>';
         toolName = "Chart";
       } else if (type == "cn-tableEditor") {
         toolURL =
@@ -2224,23 +2228,29 @@ export default {
       } else if (type == "nc-video") {
         // toolURL =
         //   '<iframe src="http://localhost:8080/video" style="width: 100%;height:100%"></iframe>';
+        // toolURL =
+        //   '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/video" style="width: 100%;height:100%"></iframe>';
         toolURL =
-          '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/video" style="width: 100%;height:100%"></iframe>';
+          '<iframe src="http://172.21.213.185:8080/GeoProblemSolving/video" style="width: 100%;height:100%"></iframe>';
         toolName = "Video player";
       } else if (type == "nc-pdf") {
         // toolURL =
         //   '<iframe src="http://localhost:8080/pdfview" style="width: 100%;height:100%"></iframe>';
+        // toolURL =
+        //   '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/pdfview" style="width: 100%;height:100%"></iframe>';
         toolURL =
-          '<iframe src="http://172.21.212.7:8082/GeoProblemSolving/pdfview" style="width: 100%;height:100%"></iframe>';
+          '<iframe src="http://172.21.213.185:8080/GeoProblemSolving/pdfview" style="width: 100%;height:100%"></iframe>';
         toolName = "Pdf viewer";
       } else if (type == "Doc Edit") {
+        // toolURL =
+        //   '<iframe src="http://localhost:8080/tinymce" style="width: 100%;height:100%"></iframe>';
         toolURL =
-          '<iframe src="http://localhost:8080/tinymce" style="width: 100%;height:100%"></iframe>';
-        toolName = "doc editor";
+          '<iframe src="http://172.21.213.185:8080/GeoProblemSolving/tinymce" style="width: 100%;height:100%"></iframe>';
+        toolName = "Text editor";
       } else if (type == "video Tool") {
         toolURL =
           '<iframe src="/GeoProblemSolving/Collaborative/vedioChat/WebRtcTest.html" style="width: 100%;height:100%"></iframe>';
-        toolName = "video Tool";
+        toolName = "Video Tool";
       }
 
       let panel = jsPanel.create({

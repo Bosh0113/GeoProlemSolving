@@ -63,26 +63,12 @@ public class EditJsonUtil {
                     return "Success";
                 }
             }
-        }
-        while (folders!=null&&folders.size()>=0){
+        }else{
             for(int i=0;i<folders.size();i++){
-                uid = folders.get(i).getUid();
-                if(parentId.equals(uid)){
-                    files = folders.get(i).getFiles();
-                    if(null == files || files.size()<=0){
-                        return "Fail";
-                    }
-                    for(int j =0;j<files.size();j++){
-                        if(id.equals(files.get(j).getUid())){
-                            files.remove(j);
-                            return "Success";
-                        }
-                    }
+                String res = deleteFile(folders.get(i),parentId,id);
+                if(res == "Success"){
+                    return res;
                 }
-                folders = folders.get(i).getFolders();
-            }
-            if(parentId.equals(uid)){
-                break;
             }
         }
         return "Fail";
@@ -101,26 +87,12 @@ public class EditJsonUtil {
                     return "Success";
                 }
             }
-        }
-        while (folders!=null&&folders.size()>=0){
+        }else{
             for(int i=0;i<folders.size();i++){
-                uid = folders.get(i).getUid();
-                if(parentId.equals(uid)){
-                    folders = folders.get(i).getFolders();
-                    if(null == folders || folders.size()<=0){
-                        return "Fail";
-                    }
-                    for(int j =0;j<folders.size();j++){
-                        if(id.equals(folders.get(j).getUid())){
-                            folders.get(i).setName(name);
-                            return "Success";
-                        }
-                    }
+                String res = renameFolder(folders.get(i),parentId,id,name);
+                if(res == "Success"){
+                    return res;
                 }
-                folders = folders.get(i).getFolders();
-            }
-            if(parentId.equals(uid)){
-                break;
             }
         }
         return "Fail";
@@ -139,31 +111,16 @@ public class EditJsonUtil {
                     return "Success";
                 }
             }
-        }
-        while (folders!=null&&folders.size()>=0){
+        }else{
             for(int i=0;i<folders.size();i++){
-                uid = folders.get(i).getUid();
-                if(parentId.equals(uid)){
-                    folders = folders.get(i).getFolders();
-                    if(null == folders || folders.size()<=0){
-                        return "Fail";
-                    }
-                    for(int j =0;j<folders.size();j++){
-                        if(id.equals(folders.get(j).getUid())){
-                            folders.remove(j);
-                            return "Success";
-                        }
-                    }
+                String res = deleteFolder(folders.get(i),parentId,id);
+                if(res == "Success"){
+                    return res;
                 }
-                folders = folders.get(i).getFolders();
-            }
-            if(parentId.equals(uid)){
-                break;
             }
         }
         return "Fail";
     }
-
 
     private static String createFolder(FileStruct fileStruct, String parentId, FileStruct folderStruct){
         String uid = fileStruct.getUid();
@@ -174,23 +131,12 @@ public class EditJsonUtil {
             }
             folders.add(folderStruct);
             return "Success";
-        }
-        while (folders!=null&&folders.size()>=0){
+        }else{
             for(int i=0;i<folders.size();i++){
-                uid = folders.get(i).getUid();
-                if(parentId.equals(uid)){
-                    ArrayList<FileStruct> foldersChild = folders.get(i).getFolders();
-                    if(null == foldersChild){
-                        foldersChild = new ArrayList<>();
-                    }
-                    foldersChild.add(folderStruct);
-                    folders.get(i).setFolders(foldersChild);
-                    return "Success";
+                String res = createFolder(folders.get(i),parentId,folderStruct);
+                if(res == "Success"){
+                    return res;
                 }
-                folders = folders.get(i).getFolders();
-            }
-            if(parentId.equals(uid)){
-                break;
             }
         }
         return "Fail";
@@ -207,27 +153,15 @@ public class EditJsonUtil {
             }
             files.add(fileNode);
             return "Success";
-        }
-        while (folders!=null&&folders.size()>=0){
+        }else{
             for(int i=0;i<folders.size();i++){
-                uid = folders.get(i).getUid();
-                if(parentId.equals(uid)){
-                    files = folders.get(i).getFiles();
-                    if(null == files){
-                        files = new ArrayList<>();
-                    }
-                    files.add(fileNode);
-                    folders.get(i).setFiles(files);
-                    return "Success";
+                String res = addFileJson(folders.get(i),fileNode,parentId);
+                if(res == "Success"){
+                    return res;
                 }
-                folders = folders.get(i).getFolders();
-            }
-            if(parentId.equals(uid)){
-               break;
             }
         }
         return "Fail";
-
     }
 
 
