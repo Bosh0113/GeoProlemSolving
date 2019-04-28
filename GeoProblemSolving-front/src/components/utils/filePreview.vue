@@ -192,7 +192,7 @@ export default {
       return false;
     },
     selectResource(url){
-      this.fileURL = "http://172.21.212.7:8012/previewFile?url="+url;
+      this.fileURL = "http://172.21.212.7:8012/previewFile?url=http://172.21.213.185:8080"+url;
     }
   }
 };

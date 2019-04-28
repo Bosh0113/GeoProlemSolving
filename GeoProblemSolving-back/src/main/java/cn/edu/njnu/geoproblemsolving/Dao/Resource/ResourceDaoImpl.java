@@ -39,7 +39,7 @@ public class ResourceDaoImpl implements IResourceDao {
     }
 
     @Override
-    public Object saveResource(HttpServletRequest request) {
+    public Object saveResource(HttpServletRequest request,String folderName) {
         ArrayList<ResourceUploadInfo> uploadInfos = new ArrayList<>();
         try {
             InetAddress address = InetAddress.getLocalHost();
@@ -63,7 +63,7 @@ public class ResourceDaoImpl implements IResourceDao {
                         String suffix = fileNames.substring(fileNames.lastIndexOf(".") + 1);
                         String regexp = "[^A-Za-z_0-9\\u4E00-\\u9FA5]";
                         String saveName = fileName.replaceAll(regexp, "");
-                        String folderPath = servicePath + "resource\\upload";
+                        String folderPath = servicePath + "resource\\"+folderName;
                         File temp = new File(folderPath);
                         if (!temp.exists()) {
                             temp.mkdirs();

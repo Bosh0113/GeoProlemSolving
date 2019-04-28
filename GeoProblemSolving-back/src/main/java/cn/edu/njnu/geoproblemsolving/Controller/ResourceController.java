@@ -23,7 +23,7 @@ public class ResourceController {
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
     public Object uploadResource(HttpServletRequest request) {
         ResourceDaoImpl resourceDao = new ResourceDaoImpl(mongoTemplate);
-        return resourceDao.saveResource(request);
+        return resourceDao.saveResource(request,"upload");
     }
 
     @RequestMapping(value = "/subProjectUpload", method = RequestMethod.POST)
@@ -31,7 +31,7 @@ public class ResourceController {
         ResourceDaoImpl resourceDao = new ResourceDaoImpl(mongoTemplate);
         ResourceUploadInfo uploadInfo;
         try {
-            ArrayList<ResourceUploadInfo> uploadInfos= (ArrayList<ResourceUploadInfo>) resourceDao.saveResource(request);
+            ArrayList<ResourceUploadInfo> uploadInfos= (ArrayList<ResourceUploadInfo>) resourceDao.saveResource(request,"subProjectUpload");
             if(uploadInfos==null || uploadInfos.size()==0){
                 return "Fail";
             }

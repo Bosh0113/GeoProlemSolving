@@ -1,14 +1,11 @@
 package cn.edu.njnu.geoproblemsolving.Dao.Resource;
 
-import cn.edu.njnu.geoproblemsolving.Entity.ResourceEntity;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.OutputStream;
 
 public interface IResourceDao {
 
-    Object saveResource(HttpServletRequest request);
+    Object saveResource(HttpServletRequest request,String folderName);
 
     Object readResource(String key,String value);
 
