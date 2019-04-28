@@ -29,30 +29,31 @@ public class ResourceController {
     @RequestMapping(value = "/subProjectUpload", method = RequestMethod.POST)
     public Object uploadSubProjResource(HttpServletRequest request) {
         ResourceDaoImpl resourceDao = new ResourceDaoImpl(mongoTemplate);
-        ResourceUploadInfo uploadInfo;
+        ArrayList<ResourceUploadInfo> uploadInfos;
+        String newFileStruct="";
         try {
-            ArrayList<ResourceUploadInfo> uploadInfos= (ArrayList<ResourceUploadInfo>) resourceDao.saveResource(request,"subProjectUpload");
+            uploadInfos= (ArrayList<ResourceUploadInfo>) resourceDao.saveResource(request,"subProjectUpload");
             if(uploadInfos==null || uploadInfos.size()==0){
                 return "Fail";
             }
-            uploadInfo = uploadInfos.get(0);
         }catch (Exception e){
             return "Fail";
         }
 
-        String subProjectId = request.getParameter("subProjectId");
-        String parentId = request.getParameter("parentId");
-        //更新subProject fileStruct
-        SubProjectDaoImpl subProjectDao=new SubProjectDaoImpl(mongoTemplate);
-        //1 获取subProject fileStruct
-        String fileStruct = subProjectDao.getFileStruct(subProjectId);
-        String newFileStruct = EditJsonUtil.updateFileStruct(fileStruct, subProjectId,parentId, uploadInfo.getResourceId(), uploadInfo.getFileName(),FileStructConst.UPLOAD_FILE);
-        String result = subProjectDao.updateFileStruct(subProjectId,newFileStruct);
-        if(!"Fail".equals(result)){
-            return newFileStruct;
-        }else{
-            return "Fail";
+        for(ResourceUploadInfo uploadInfo:uploadInfos){
+            String subProjectId = request.getParameter("subProjectId");
+            String parentId = request.getParameter("parentId");
+            //更新subProject fileStruct
+            SubProjectDaoImpl subProjectDao=new SubProjectDaoImpl(mongoTemplate);
+            //1 获取subProject fileStruct
+            String fileStruct = subProjectDao.getFileStruct(subProjectId);
+            newFileStruct = EditJsonUtil.updateFileStruct(fileStruct, subProjectId,parentId, uploadInfo.getResourceId(), uploadInfo.getFileName(),FileStructConst.UPLOAD_FILE);
+            String result = subProjectDao.updateFileStruct(subProjectId,newFileStruct);
+            if(result.equals("Fail")){
+                return "Fail";
+            }
         }
+        return newFileStruct;
     }
 
     @RequestMapping(value = "/inquiry", method = RequestMethod.GET)
