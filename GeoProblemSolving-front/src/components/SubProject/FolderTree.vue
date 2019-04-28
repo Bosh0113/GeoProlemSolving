@@ -233,7 +233,9 @@ export default {
   data() {
     return {
       subProjectFileStruct: {},
-      currentFolder: {},
+      currentFolder: {
+        folders:[],
+      },
       currentFileList: [],
       folderUIDStack: [],
       newFolderModal: false,
@@ -569,14 +571,14 @@ export default {
             formData.append("belong", sessionStorage.getItem("subProjectName"));
             let scopeObject = {
               projectId: sessionStorage.getItem("projectId"),
-              subProjectId: sessionStorage.getItem("subProjectId"),
+              subProjectId: this.$store.getters.subProject.subProjectId,
               moduleId: ""
             };
             formData.append("scope", JSON.stringify(scopeObject));
             formData.append("privacy", this.uploadValidate.privacy);
             formData.append(
               "subProjectId",
-              sessionStorage.getItem("subProjectId")
+              this.$store.getters.subProject.subProjectId
             );
             formData.append("parentId", this.currentFolder.uid);
             this.progressModalShow = true;
