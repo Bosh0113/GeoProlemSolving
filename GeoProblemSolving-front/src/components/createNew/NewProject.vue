@@ -12,10 +12,6 @@ h1 {
 .inline_style {
   display: flex;
 }
-/* .hintTitle {
-  text-align: center;
-  width: 20%;
-} */
 .create {
   width: 20%;
   margin-right: 40%;
@@ -109,12 +105,12 @@ h1 {
           </RadioGroup>
       </FormItem>
       <FormItem prop="title" label="Title" :label-width="100">
-          <Input v-model="formInline.title" placeholder="Enter Title..."/>
+          <Input v-model="formInline.title" placeholder="Enter Title (less than 60 characters)..."/>
       </FormItem>
       <FormItem prop="description" label="Description" :label-width="100">
           <Input
             v-model="formInline.description"
-            placeholder="Enter a brief introduction ..."
+            placeholder="Enter a brief introduction (less than 180 characters)..."
           />
       </FormItem>
       <FormItem prop="privacy" label="Privacy" :label-width="100">
@@ -156,10 +152,9 @@ h1 {
           </div>
           <div>
             <span>Example:</span>
-            <Tag>anti-smog mask</Tag>
-            <Tag>water</Tag>
-            <Tag>pollution problem</Tag>
-            <Tag>smoggy day</Tag>
+            <Tag style="cursor:default">water</Tag>
+            <Tag style="cursor:default">pollution problem</Tag>
+            <Tag style="cursor:default">smoggy day</Tag>
           </div>
       </FormItem>
       <FormItem prop="image" label="Image" :label-width="100">
@@ -217,8 +212,9 @@ export default {
         title: [
           {
             required: true,
-            message: "The title cannot be empty",
-            trigger: "blur"
+            message: "The title cannot be empty and no more than 60 characters",
+            trigger: "blur",
+            max: 60
           }
         ],
         category: [
@@ -237,7 +233,7 @@ export default {
         ],
         introduction:[
           {
-            required: true,
+            required: false,
             message: "give a detailed introduction about this project",
             trigger: "blur"
           }
@@ -245,8 +241,9 @@ export default {
         description:[
           {
             required: true,
-            message: "The description cannot be empty and no more than 40 words",
-            trigger: "blur"
+            message: "The description cannot be empty and no more than 180 words",
+            trigger: "blur",
+            max: 180
           }
         ]
       },

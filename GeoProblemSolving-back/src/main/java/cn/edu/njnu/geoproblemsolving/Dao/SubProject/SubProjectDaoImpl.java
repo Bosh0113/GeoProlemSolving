@@ -3,6 +3,7 @@ package cn.edu.njnu.geoproblemsolving.Dao.SubProject;
 import cn.edu.njnu.geoproblemsolving.Commen.FileStructConst;
 import cn.edu.njnu.geoproblemsolving.Dao.Method.CommonMethod;
 import cn.edu.njnu.geoproblemsolving.Dao.Method.EncodeUtil;
+import cn.edu.njnu.geoproblemsolving.Entity.FileStruct;
 import cn.edu.njnu.geoproblemsolving.Entity.ResourceEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.SubProjectEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.UserEntity;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -218,11 +220,14 @@ public class SubProjectDaoImpl implements ISubProjectDao {
         String fileStruct="";
         Query query = new Query(Criteria.where("subProjectId").is(subProjectId));
         SubProjectEntity entity = mongoTemplate.findOne(query, SubProjectEntity.class);
+
         if(entity!=null && entity.getFileStruct()!=null){
             fileStruct = entity.getFileStruct();
         }
         if(fileStruct.isEmpty()){
-            return "Fail";
+            FileStruct newStruct = new FileStruct("",subProjectId,new ArrayList<>(),new ArrayList<>());
+
+            fileStruct = updateFileStruct(subProjectId, JSONObject.toJSONString(newStruct));
         }
         return fileStruct;
     }

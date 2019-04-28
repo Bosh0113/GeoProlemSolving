@@ -105,7 +105,7 @@
             <Col span="13" style="text-align:center;font-size:1.5rem;height:40px">
               <strong>{{subProjectInfo.title}}</strong>
             </Col>
-            <Col span="4" style="height:40px;" class="operatePanel">
+            <Col span="5" style="height:40px;" class="operatePanel">
               <Button
                 type="default"
                 @click="gotoWorkingPanel()"
@@ -273,7 +273,7 @@
                       </Card>
                     </Col>
                     <Col :xs="15" :sm="16" :md="17" :lg="17" style="margin-top:30px">
-                      <Card :style="{height:descHeight +'px'}" style="background-color:white;">
+                      <Card style="background-color:white;">
                         <div slot="title" style="font-size:18px;">
                           <strong>Description</strong>
                         </div>
@@ -1049,8 +1049,8 @@ export default {
         this.subprojectSocket = null;
       }
       let roomId = this.subProjectInfo.subProjectId + "task";
-      // var subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + roomId;
-      var subprojectSocketURL = "ws://172.21.213.185:8080/GeoProblemSolving/Module/" + roomId;
+      var subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + roomId;
+      // var subprojectSocketURL = "ws://172.21.213.185:8080/GeoProblemSolving/Module/" + roomId;
       // var subprojectSocketURL =  "ws://172.21.212.7:8082/GeoProblemSolving/Module/" + roomId;
       this.subprojectSocket = new WebSocket(subprojectSocketURL);
       this.subprojectSocket.onopen = this.onOpen;

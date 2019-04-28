@@ -11,8 +11,8 @@ function getWebIP() {
 
 function initWebSocket(para) { //初始化websocket
     // var wsurl = "ws://172.21.212.7:8082/GeoProblemSolving/" + para;
-    var wsurl = "ws://172.21.213.185:8080/GeoProblemSolving/" + para;
-    // var wsurl = "ws://localhost:8081/GeoProblemSolving/" + para;
+    // var wsurl = "ws://172.21.213.185:8080/GeoProblemSolving/" + para;
+    var wsurl = "ws://localhost:8081/GeoProblemSolving/" + para;
     // console.log(wsurl);
     // var wsurl = "ws://" +getWebIP()+ ":" + serverPort;
     //switch 使用时提供一个参数type

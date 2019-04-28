@@ -159,6 +159,7 @@ footer {
             <MenuItem
               name="personal"
               style="width:100px"
+              to="/personalPage"
             >
             <Dropdown
               @on-click="changeSelect"
@@ -178,7 +179,7 @@ footer {
                 v-else
               ></avatar>
               <DropdownMenu slot="list">
-                <DropdownItem name="personalPage">User Space</DropdownItem>
+                <!-- <DropdownItem name="personalPage">User Space</DropdownItem> -->
                 <DropdownItem name="logout">Log out</DropdownItem>
               </DropdownMenu>
             </Dropdown>
@@ -310,8 +311,8 @@ export default {
       if (this.noticeSocket != null) {
         this.noticeSocket = null;
       }
-      // var noticeSocketURL = "ws://localhost:8081/GeoProblemSolving/NoticeSocket";
-      var noticeSocketURL = "ws://172.21.213.185:8080/GeoProblemSolving/NoticeSocket";
+      var noticeSocketURL = "ws://localhost:8081/GeoProblemSolving/NoticeSocket";
+      // var noticeSocketURL = "ws://172.21.213.185:8080/GeoProblemSolving/NoticeSocket";
       // var noticeSocketURL = "ws://172.21.212.7:8082/GeoProblemSolving/NoticeSocket";
       this.noticeSocket = new WebSocket(noticeSocketURL);
       this.noticeSocket.onopen = this.onOpen;
@@ -371,8 +372,6 @@ export default {
           .catch(err => {
             confirm("logout fail!");
           });
-      } else if (name == "personalPage") {
-        this.$router.push({ name: "PersonalPage" });
       }
     }
   }

@@ -7,9 +7,9 @@
       <div class="content">
         <div>
           <span class="title">Solving complex geo-problems? Collaboration.</span>
-          <span class="sub-title">Build Projects | Build Teams | Communicate Ideas | Explore Solutions</span>
-          <span class="desc">The platform is full of vitality, where all people can express their views conveniently and in real time, <br />cooperate and exchange, and collide with intense sparks of thought.</span>
-          <Button class="home-start-btn">Try it now</Button>
+          <span class="sub-title">Build Projects | Assemble Participants | Communicate Ideas | Explore Solutions</span>
+          <span class="desc">The platform is full of vitality, where resesrchers can exchange their views, collide their thoughts,<br/>and establish their collabarations.</span>
+          <Button class="home-start-btn" @click="start">Try it now</Button>
         </div>
       </div>
     </div>
@@ -69,7 +69,7 @@
           <div class="mask">
             <div class="bg"></div>
             <div class="case-text">
-              <Icon type="md-planet " />
+              <Icon type="md-planet"/>
               <div>Planet</div>
             </div>
           </div>
@@ -166,7 +166,22 @@
 
 </template>
 <script>
-export default {};
+export default {
+  data() {
+    return {
+    };
+  },
+  methods:{
+    start(){
+      if(this.$store.getters.userState){
+        this.$router.push({ name: "Projects" });
+      }
+      else{
+        this.$router.push({ name: "Login" });
+      }
+    }
+  }
+};
 </script>
 
 <style lang="scss" scoped>
