@@ -3,24 +3,34 @@
     <div style="z-index:20">
       <toolStyle></toolStyle>
     </div>
-    <div id="main" style="flex:4;z-index:10;margin-left:40px;overflow:hidden" :style="{height:toolHeight}">
+    <div
+      id="main"
+      style="flex:4;z-index:10;margin-left:40px;overflow:hidden"
+      :style="{height:toolHeight}"
+    >
       <tinymce id="d1" v-model="data" style="min-height:600px" :other_options="options"></tinymce>
-      <Button type="primary" @click="saveModalShow" style="margin-top:20px">save
-      </Button>
+      <iframe id="form_target" name="form_target" style="display:none"></iframe>
+      <form
+        id="my_form"
+        action="/upload/"
+        target="form_target"
+        method="post"
+        enctype="multipart/form-data"
+        style="width:0px;height:0;overflow:hidden"
+      >
+        <input name="image" type="file" @change="uploadPhoto($event)" accept="image/*">
+      </form>
+      <Button type="primary" @click="saveModalShow" style="margin-top:20px">save</Button>
     </div>
-    <Modal
-        v-model="saveModal"
-        title="Upload txt file"
-        @on-ok="uploadFile"
-        @on-cancel="">
-        <Form :model="mdFile" :label-width="80">
+    <Modal v-model="saveModal" title="Upload txt file" @on-ok="uploadFile" @on-cancel>
+      <Form :model="mdFile" :label-width="80">
         <FormItem label="name">
-            <Input v-model="mdFile.name" placeholder="Enter something..."></Input>
+          <Input v-model="mdFile.name" placeholder="Enter something..."></Input>
         </FormItem>
         <FormItem label="description">
-            <Input v-model="mdFile.description" placeholder="Enter something..."></Input>
+          <Input v-model="mdFile.description" placeholder="Enter something..."></Input>
         </FormItem>
-    </Form>
+      </Form>
     </Modal>
   </div>
 </template>
@@ -33,27 +43,44 @@ export default {
     return {
       data: "",
       toolHeight: "",
-      saveModal:false,
-      mdFile:{
-        name:"",
-        description:"",
+      saveModal: false,
+      mdFile: {
+        name: "",
+        description: ""
       },
-      options:{
-        width:"100%",
-        height:"600",
-      }
+      inster_field_name: "",
+      options: {
+        width: "100%",
+        height: "600",
+        autoresize_min_height: 350,
+        file_browser_callback: (field_name, url, type, win)=> {
+          this.inster_field_name = field_name;
+          if (type == "image")
+          $("#my_form input").click();
+        }
+      },
+      Editor: null,
+      pictureUrl: ""
     };
+  },
+  mounted() {
+    this.init();
   },
   methods: {
     init() {
-      this.toolHeight = window.innerHeight + "px";
+      const self = this;
+      // this.toolHeight = window.innerHeight + "px";
     },
-    saveModalShow(){
+    saveModalShow() {
       this.saveModal = true;
     },
-    uploadFile(){
-      var blob = new Blob(['<meta charset="UTF-8">'+this.data],{type:" text/plain;charset=UTF-8"});
-      let fileOfBlob = new File([blob], this.mdFile.name +".html", {type: "text/plain; charset=UTF-8"});
+    uploadFile() {
+      var blob = new Blob(['<meta charset="UTF-8">' + this.data], {
+        type: " text/plain;charset=UTF-8"
+      });
+      let fileOfBlob = new File([blob], this.mdFile.name + ".html", {
+        type: "text/plain; charset=UTF-8"
+      });
       var formData = new FormData();
       formData.append("description", this.mdFile.description);
       formData.append("file", fileOfBlob);
@@ -61,16 +88,16 @@ export default {
       formData.append("uploaderId", this.$store.getters.userInfo.userId);
       formData.append("belong", this.$store.getters.userInfo.userName);
       let scopeObject = {
-          projectId: sessionStorage.getItem("projectId"),
-          subProjectId: sessionStorage.getItem("subProjectId"),
-          moduleId: sessionStorage.getItem("moduleId")
-        };
-        formData.append("scope", JSON.stringify(scopeObject));
-        formData.append("privacy", "private");
-        this.axios.defaults.headers = {
-          "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
-        }
-        this.axios
+        projectId: sessionStorage.getItem("projectId"),
+        subProjectId: sessionStorage.getItem("subProjectId"),
+        moduleId: sessionStorage.getItem("moduleId")
+      };
+      formData.append("scope", JSON.stringify(scopeObject));
+      formData.append("privacy", "Public");
+      this.axios.defaults.headers = {
+        "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
+      };
+      this.axios
         .post("/GeoProblemSolving/resource/upload", formData)
         .then(res => {
           if (res.data != "Size over" && res.data.length > 0) {
@@ -82,6 +109,39 @@ export default {
           }
         })
         .catch(err => {});
+    },
+    uploadPhoto(e) {
+      // 利用fileReader对象获取file
+      var file = e.target.files[0];
+      var filesize = file.size;
+      // 2,621,440   2M
+      if (filesize > 2101440) {
+        // 图片大于2MB
+        this.$Message.error("size > 2MB");
+      } else {
+        var reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = e => {
+          // 读取到的图片base64 数据编码 将此编码字符串传给后台即可
+          let formData = new FormData();
+          formData.append("picture", file);
+          this.axios
+            .post("/GeoProblemSolving/project/picture", formData)
+            .then(res => {
+              if (res.data != "Fail") {
+                this.pictureUrl = "http://localhost:8080" + res.data;
+                console.log(this.pictureUrl,this.inster_field_name);
+                // let val = "http://localhost:8080" + this.pictureUrl;
+                document.getElementById(this.inster_field_name).value = this.pictureUrl;
+                // http://172.21.212.7:8082/GeoProblemSolving/
+                // document.getElementById(this.inster_field_name).value = "http://localhost:8080" + this.pictureUrl;
+              } else {
+                this.$Message.error("upload picture Fail!");
+              }
+            })
+            .catch();
+        };
+      }
     }
   }
 };
