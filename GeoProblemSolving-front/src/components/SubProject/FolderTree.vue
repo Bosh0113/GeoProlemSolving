@@ -607,20 +607,22 @@ export default {
       });
     },
     filePreview(fileInfo){
-      if (this.panel != null) {
+
+      if (/\.(pdf|doc|docx|xls|xlsx|ppt|pptx|zip)$/.test(fileInfo.name.toLowerCase())) {
+        if (this.panel != null) {
           this.panel.close();
         }
         let url =
           "http://172.21.212.7:8012/previewFile?url=http://172.21.213.185:8080" +
           fileInfo.pathURL;
         let toolURL =
-          "<iframe src=" + url + ' style="width: 100%;height:100%"></iframe>';
+          '<iframe src=' + url + ' style="width: 100%;height:100%"></iframe>';
         this.panel = jsPanel.create({
           headerControls: {
             smallify: "remove"
           },
-          theme: "none",
-          headerTitle: "Review",
+          theme: "light",
+          headerTitle: "Preview",
           contentSize: "800 600",
           content: toolURL,
           disableOnMaximized: true,
@@ -630,6 +632,62 @@ export default {
           closeOnEscape: true
         });
         $(".jsPanel-content").css("font-size", "0");
+      }
+      else if(/\.(mp4)$/.test(name.toLowerCase())) {
+        if (this.panel != null) {
+          this.panel.close();
+        }
+        let url =
+          "http://172.21.212.7:8082" + fileInfo.pathURL;
+        let toolURL =
+          '<video src=' + url + ' style="width: 100%;height:100%" controls></video>';
+        this.panel = jsPanel.create({
+          headerControls: {
+            smallify: "remove"
+          },
+          theme: "light",
+          headerTitle: "Preview",
+          contentSize: "800 600",
+          content: toolURL,
+          disableOnMaximized: true,
+          dragit: {
+            containment: 5
+          },
+          closeOnEscape: true
+        });
+        $(".jsPanel-content").css("font-size", "0");
+      }
+      else if(/\.(xml|json|md|gif|jpg|png)$/.test(name.toLowerCase())){
+        if (this.panel != null) {
+          this.panel.close();
+        }
+        let url =
+          "http://172.21.212.7:8082" + fileInfo.pathURL;
+        let toolURL =
+          '<iframe src=' + url + ' style="width: 100%;height:100%" controls></iframe>';
+        this.panel = jsPanel.create({
+          headerControls: {
+            smallify: "remove"
+          },
+          theme: "light",
+          headerTitle: "Preview",
+          contentSize: "800 600",
+          content: toolURL,
+          disableOnMaximized: true,
+          dragit: {
+            containment: 5
+          },
+          closeOnEscape: true
+        });
+        $(".jsPanel-content").css("font-size", "0");
+      }
+      else {
+        this.$Notice.error({
+          title: "Open failed",
+          desc: "Not supported file format."
+        });
+        return false;
+      }
     },
     fileDelete(fileInfo){
       if (confirm("Are you sure to delete this file?")) {
