@@ -194,12 +194,8 @@
   line-height: 40px;
 }
 .memberList {
-  display: flex;
+  /* display: flex; */
   align-items: center;
-}
-.memberList button {
-  margin-left: 0.5%;
-  margin-right: 0.5%;
 }
 .subProjectsPanel {
   padding: 20px;
@@ -301,11 +297,13 @@
               <Button
                 type="success"
                 @click="gotoPersonalPage(projectManager.userId)"
+                style="margin: 5px"
               >{{this.projectManager.userName}}</Button>
               <Button
                 v-for="member in currentProjectDetail.members"
                 type="primary"
                 :key="member.index"
+                style="margin: 5px"
                 @click="gotoPersonalPage(member.userId)"
               >{{member.userName}}</Button>
             </div>
