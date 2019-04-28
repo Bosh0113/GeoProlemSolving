@@ -615,10 +615,10 @@ export default {
         if (this.panel != null) {
           this.panel.close();
         }
-        let url =
+        var url =
           "http://172.21.212.7:8012/previewFile?url=" +'http://'+this.$store.state.IP_Port+
           fileInfo.pathURL;
-        let toolURL =
+        var toolURL =
           '<iframe src=' + url + ' style="width: 100%;height:100%"></iframe>';
         this.panel = jsPanel.create({
           headerControls: {
@@ -636,13 +636,13 @@ export default {
         });
         $(".jsPanel-content").css("font-size", "0");
       }
-      else if(/\.(mp4)$/.test(name.toLowerCase())) {
+      else if(/\.(mp4)$/.test(fileInfo.name.toLowerCase())) {
         if (this.panel != null) {
           this.panel.close();
         }
-        let url =
-          'http://'+this.$store.state.IP_Port+ fileInfo.pathURL;
-        let toolURL =
+        var url =
+          "http://"+this.$store.state.IP_Port+ fileInfo.pathURL;
+        var toolURL =
           '<video src=' + url + ' style="width: 100%;height:100%" controls></video>';
         this.panel = jsPanel.create({
           headerControls: {
@@ -660,14 +660,12 @@ export default {
         });
         $(".jsPanel-content").css("font-size", "0");
       }
-      else if(/\.(xml|json|md|gif|jpg|png)$/.test(name.toLowerCase())){
+      else if(/\.(xml|json|md|gif|jpg|png)$/.test(fileInfo.name.toLowerCase())){
         if (this.panel != null) {
           this.panel.close();
         }
-        let url =
-          'http://'+this.$store.state.IP_Port+ fileInfo.pathURL;
-        let toolURL =
-          '<iframe src=' + url + ' style="width: 100%;height:100%" controls></iframe>';
+        var url = "http://"+this.$store.state.IP_Port+ fileInfo.pathURL;
+        var toolURL = '<iframe src=' + url + ' style="width: 100%;height:100%" controls></iframe>';
         this.panel = jsPanel.create({
           headerControls: {
             smallify: "remove"
