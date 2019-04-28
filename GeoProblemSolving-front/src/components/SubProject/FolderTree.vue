@@ -55,7 +55,6 @@
   width: 35%;
   margin-right: 5%;
   display: inline-block;
-  overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   height: 16px;
@@ -597,10 +596,12 @@ export default {
                 } else {
                   this.$Message.warning("Upload fail.");
                 }
+                this.uploadProgress = 0;
               })
               .catch(err => {
                 this.progressModalShow = false;
                 this.$Message.warning("Upload fail.");
+                this.uploadProgress = 0;
               });
           }
         }

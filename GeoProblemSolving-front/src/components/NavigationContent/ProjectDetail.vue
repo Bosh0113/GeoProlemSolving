@@ -52,8 +52,10 @@
  text-indent: 25px;
  overflow:hidden;
  text-overflow:ellipsis;
- display:-webkit-box; /* autoprefixer: off */
--webkit-box-orient:vertical; /* autoprefixer: on */
+ display:-webkit-box; 
+ /*! autoprefixer: off */
+-webkit-box-orient:vertical; 
+/* autoprefixer: on */
 -webkit-line-clamp:5;
 }
 /* .subProjectDescription {
@@ -1760,9 +1762,12 @@ export default {
                     this.fileUploadForm.privacy = "";
                     this.fileUploadForm.type = "";
                     // 创建一个函数根据pid去后台查询该项目下的资源
+                    this.uploadProgress = 0;
                   }
                 })
-                .catch(err => {});
+                .catch(err => { 
+                  this.uploadProgress = 0;
+                });
             } else {
               this.$Message.error(
                 "size over,all the file size must smaller than 1 GB one time!"
