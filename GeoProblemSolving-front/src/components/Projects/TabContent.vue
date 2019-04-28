@@ -133,7 +133,8 @@ img {
         width="800px">
           <Table stripe border :columns="columns" :data="projectInfoShow" :show-header="false"></Table>
           <div slot="footer">
-            <Alert show-icon style="float: right;width: fit-content;display: inline-block;" v-show="!UserState">If you want to participate in the project, please login.</Alert>
+            <Alert show-icon style="float: left;width: fit-content;display: inline-block;" v-show="!UserState">If you want to participate in the project, please login.</Alert>
+            <Button @click="projectInfoModal=false" v-show="!UserState">Cancel</Button>
             <Button type="success" @click="joinApplyModalShow(selectedProjectInfo)" v-show="!selectedProjectInfo.isMember&&!selectedProjectInfo.isManager&&UserState" >Apply</Button>
             <Button type="primary" @click="goSingleProject()" v-show="UserState&&(selectedProjectInfo.isMember||selectedProjectInfo.isManager)">Enter</Button>
           </div>
