@@ -55,7 +55,7 @@ public class FileStruct {
 
     @Override
     public String toString() {
-        return "FileStruct{" +
+        return "{" +
                 "name='" + name + '\'' +
                 ", uid='" + uid + '\'' +
                 ", folders=" + folders +

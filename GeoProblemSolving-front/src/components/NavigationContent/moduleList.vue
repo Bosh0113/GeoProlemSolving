@@ -180,10 +180,10 @@
                 <BreadcrumbItem>Working panel</BreadcrumbItem>
               </Breadcrumb>
             </Col>
-            <Col span="12" style="text-align:center;font-size:1.5rem;height:20px;;margin-top:-10px">
+            <Col span="10" style="text-align:center;font-size:1.5rem;height:20px;;margin-top:-10px">
               <strong>{{subProjectInfo.title}}</strong>
             </Col>
-            <Col span="4" style="height:20px;display:flex;align-items:center" class="operatePanel">
+            <Col span="6" offset="1" style="height:20px;display:flex;align-items:center" class="operatePanel">
               <template v-if="this.$store.getters.userInfo.userId == this.subProjectInfo.managerId">
                 <template v-if="this.moduleList.length == 0">
                   <Button
@@ -1421,8 +1421,8 @@ export default {
         this.subprojectSocket = null;
       }
       let subProjectId = this.subProjectInfo.subProjectId;
-      // var subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + subProjectId;
-      var subprojectSocketURL = "ws://172.21.213.185:8080/GeoProblemSolving/Module/" + subProjectId;
+      var subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + subProjectId;
+      // var subprojectSocketURL = "ws://172.21.213.185:8080/GeoProblemSolving/Module/" + subProjectId;
       // var subprojectSocketURL ="ws://172.21.212.7:8082/GeoProblemSolving/Module/" + subProjectId;
       this.subprojectSocket = new WebSocket(subprojectSocketURL);
       this.subprojectSocket.onopen = this.onOpen;

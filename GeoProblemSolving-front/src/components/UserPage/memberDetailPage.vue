@@ -64,7 +64,7 @@
             :xs="{span:11,offset:1}"
           >
             <div class="rightContent">
-              <Tabs value="Overview" type="card" style="cursor:pointer;font-weight:bold">
+              <Tabs value="Overview" type="card" style="font-weight:bold">
                 <TabPane label="Overview" name="Overview">
                   <Col :lg="{span:22,offset:1}" :md="{span:22,offset:1}" :sm="{span:22,offset:1}">
                     <Card>
@@ -81,7 +81,7 @@
                             <div style="display:flex;justify-content:center">
                               <h3
                                 style="text-align:center;width:80%"
-                              >Sorry,there are no events here.Once you upload or join in some projects,here will list your events timeline.</h3>
+                              >Sorry, there is no event here. After some projects are created or joined, the events of creation or joining will be listed here.</h3>
                             </div>
                           </div>
                         <TimelineItem v-for="(item,index) in memberEventList" :key="index" v-show="memberEventList.length>0">
@@ -181,6 +181,7 @@
   margin-right: 20px;
 }
 .rightContent {
+  margin-top:20px;
   flex: 1;
 }
 img {

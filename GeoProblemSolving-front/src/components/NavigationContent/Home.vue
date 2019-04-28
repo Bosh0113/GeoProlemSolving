@@ -7,7 +7,7 @@
       <div class="content">
         <div>
           <span class="title">Solving complex geo-problems? Collaboration.</span>
-          <span class="sub-title">Build Projects | Build Teams | Communicate Ideas | Explore Solutions</span>
+          <span class="sub-title">Build Projects | Assemble Participants | Communicate Ideas | Explore Solutions</span>
           <span class="desc">The platform is full of vitality, where resesrchers can exchange their views, collide their thoughts,<br/>and establish their collabarations.</span>
           <Button class="home-start-btn" @click="start">Try it now</Button>
         </div>

@@ -359,7 +359,7 @@
                 cancel-text="cancel"
                 @on-ok="createSubProject('createSubProjectForm')"
                 @on-cancel
-                title="Create sub project"
+                title="Create a new subproject"
                 width="800px"
                 :mask-closable="false"
               >
@@ -373,13 +373,13 @@
                     <FormItem label="Title" prop="subProjectTitle">
                       <Input
                         v-model="createSubProjectForm.subProjectTitle"
-                        placeholder="Enter sub project's title"
+                        placeholder="Enter subproject title (less than 60 characters) ..."
                       ></Input>
                     </FormItem>
                     <FormItem label="Description" prop="subProjectDescription">
                       <Input
                         v-model="createSubProjectForm.subProjectDescription"
-                        placeholder="Enter sub project description"
+                        placeholder="Enter subproject description..."
                         :rows="4"
                         type="textarea"
                       ></Input>
@@ -393,7 +393,7 @@
                 <div v-for="(subProject,index) in subProjectList" :key="subProject.index">
                   <Col :lg="{span:6}" :md="24" :sm="24" :xs="24">
                     <div
-                      @click="goWorkspace(subProject.subProjectId,subProject.members,subProject.isManager)"
+                      @click="goWorkspace(subProject)"
                       style="cursor:pointer"
                     >
                       <Card class="subProjectStyle">
@@ -492,7 +492,9 @@
                       <Input v-model="editSubProjectForm.subProjectTitleEdit"></Input>
                     </FormItem>
                     <FormItem label="Description" prop="subProjectDescriptionEdit">
-                      <Input v-model="editSubProjectForm.subProjectDescriptionEdit"></Input>
+                      <Input v-model="editSubProjectForm.subProjectDescriptionEdit" 
+                        :rows="4"
+                        type="textarea"></Input>
                     </FormItem>
                   </Form>
                 </div>
@@ -552,7 +554,7 @@
                   >
                     <Icon type="md-download" :size="20"/>
                   </a>
-                  <span @click="show(index)" style="margin-left:10px"title="Preview">
+                  <span @click="show(index)" style="margin-left:10px" title="Preview">
                     <Icon type="md-eye" :size="20" color="#2d8cf0" style="cursor:pointer"/>
                   </span>
                 </template>
@@ -568,7 +570,7 @@
           :mask-closable="false"
           @on-ok="filesUpload('fileUploadForm')"
           ok-text="Submit"
-          cancel-text="cancel"
+          cancel-text="Cancel"
         >
           <div>
             <Form
@@ -788,7 +790,7 @@ export default {
         introduction: [
           {
             required: true,
-            max: 100,
+            max: 180,
             message: "The project introduction cannot be empty",
             trigger: "blur"
           }
@@ -836,8 +838,9 @@ export default {
         subProjectTitleEdit: [
           {
             required: true,
-            message: "The title can't be empty",
-            trigger: "blur"
+            message: "The title can't be empty and no more than 60 characters",
+            trigger: "blur",
+            max: 60
           },
           {
             required: true,
@@ -862,7 +865,7 @@ export default {
         subProjectTitle: [
           {
             required: true,
-            message: "The title can't be empty and np moren than 60 words",
+            message: "The title can't be empty and no more than 60 characters",
             trigger: "blur",
             type: "string",
             max: 60
@@ -1146,7 +1149,11 @@ export default {
     },
     ok() {},
     //前往工作空间
-    goWorkspace(id, memberList, isManager) {
+    goWorkspace(subProject) {
+      this.$store.commit('setSubProjectInfo',subProject);
+      var id = subProject.subProjectId;
+      var memberList = subProject.members;
+      var isManager = subProject.isManager;
       var isMember;
       if (!isManager && memberList != []) {
         for (let i = 0; i < memberList.length; i++) {
@@ -1445,7 +1452,9 @@ export default {
           this.panel.close();
         }
         let url =
-          "http://172.21.212.7:8012/previewFile?url=http://172.21.212.7:8082" +
+          // "http://172.21.212.7:8012/previewFile?url=http://172.21.212.7:8082" +
+          // this.projectResourceList[index].pathURL;
+          "http://172.21.212.7:8012/previewFile?url=http://localhost:8081" +
           this.projectResourceList[index].pathURL;
         let toolURL =
           "<iframe src=" + url + ' style="width: 100%;height:100%"></iframe>';

@@ -284,7 +284,9 @@ export default {
         this.panel.close();
       }
       let url =
-        "http://172.21.212.7:8012/previewFile?url=http://172.21.212.7:8082" +
+        // "http://172.21.212.7:8012/previewFile?url=http://172.21.212.7:8082" +
+        // this.showList[index].pathURL;
+        "http://172.21.212.7:8012/previewFile?url=http://localhost:8081" +
         this.showList[index].pathURL;
       let toolURL =
         "<iframe src=" + url + ' style="width: 100%;height:100%"></iframe>';

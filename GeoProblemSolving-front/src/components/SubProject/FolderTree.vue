@@ -114,7 +114,7 @@
                   </Card>
               </div>
               <div v-else style="text-align:center">
-                <h1>No file or folder</h1>
+                <div style="color:lightgray;font-size:2em; font-weight:bold">No file or folder</div>
               </div>
           </div>
         </Card>

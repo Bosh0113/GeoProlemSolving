@@ -1076,6 +1076,7 @@ export default {
   margin-right: 20px;
 }
 .rightContent {
+  margin-top:20px;
   flex: 1;
 }
 /* 用户头像 */
