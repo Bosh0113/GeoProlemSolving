@@ -43,17 +43,35 @@
 .subProjectListStyle {
   height: auto;
   align-items: center;
-  width: 90%;
+  width: 100%;
 }
 .subProjectTitle:hover {
   cursor: pointer;
 }
-.subProjectDescription {
-  text-indent: 25px;
-  height: 150px;
-  word-break: break-word;
-  overflow-y: auto;
+.subProjectDescription{
+ text-indent: 25px;
+ overflow:hidden;
+ text-overflow:ellipsis;
+ display:-webkit-box; /* autoprefixer: off */
+-webkit-box-orient:vertical; /* autoprefixer: on */
+-webkit-line-clamp:5;
 }
+/* .subProjectDescription {
+  text-indent: 25px;
+  line-height:20px;
+  height:100px;
+  overflow: hidden;
+  position:relative;
+} */
+/* .subProjectDescription::after{
+  content: "...";
+  font-weight: bold;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  padding: 0 20px 1px 20px;
+  background: url(http://css88.b0.upaiyun.com/css88/2014/09/ellipsis_bg.png) repeat-y;
+} */
 .subProjectCreate button {
   height: 40px;
   display: flex;
@@ -209,6 +227,7 @@
   width: 30%;
   display: flex;
   align-items: center;
+  height: 40px;
 }
 .subProjectTextInfo {
   height: 20px;
@@ -397,7 +416,7 @@
                       style="cursor:pointer"
                     >
                       <Card class="subProjectStyle">
-                        <div style="width:70%" class="subProjectTitle" slot="title" :title="subProject.title">
+                          <div style="width:70%" class="subProjectTitle" slot="title" :title="subProject.title">
                           <span>{{subProject["title"]}}</span>
                         </div>
                         <div slot="extra" class="subProjectTitleOperatePanel">
@@ -434,7 +453,11 @@
                             </span>
                           </div>
                         </div>
-                        <p class="subProjectDescription">{{subProject["description"]}}</p>
+
+                        <div style="height:100px">
+                          <p class="subProjectDescription" :title="subProject['description']">{{subProject["description"]}}</p>
+                        </div>
+
                         <br>
                         <div class="subProjectTextInfo">
                           <Icon type="md-body" :size="20"/>Manager
@@ -1184,6 +1207,7 @@ export default {
             .then(res => {
               if (res.data != "Fail") {
                 this.$Message.info("Create success");
+
                 this.createSubProjectForm.subProjectTitle = "";
                 this.createSubProjectForm.subProjectDescription = "";
                 this.subProjectList.push(res.data);
@@ -1433,7 +1457,7 @@ export default {
     },
     show(index) {
       let name = this.projectResourceList[index].name;
-      
+
       if (/\.(shx)$/.test(name.toLowerCase())) {
         this.$Notice.error({
           title: "Open failed",

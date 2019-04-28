@@ -138,7 +138,9 @@
                         <div slot="title" style="font-size:18px">
                           <strong>Participants</strong>
                         </div>
-                        <div :style="{height:sidebarHeight-150+'px'}">
+                        <!-- <div :style="{height:sidebarHeight-160+'px'}"> -->
+                          <!-- <div :style="{height:sidebarHeight-200+'px'}" style="min-height:400px"> -->
+                          <div :style="{height:sidebarHeight-150+'px'}">
                           <div
                             class="member-desc"
                             v-for="(member,index) in this.participants"
