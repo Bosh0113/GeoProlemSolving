@@ -47,6 +47,7 @@ public class SubProjectDaoImpl implements ISubProjectDao {
             fileStructJson.put("folders",new JSONArray());
             fileStructJson.put("files",new JSONArray());
             fileStructJson.put("uid",subProjectId);
+            fileStructJson.put("name",subProject.getTitle());
             String fileStruct = fileStructJson.toJSONString();
             subProject.setFileStruct(fileStruct);
 
