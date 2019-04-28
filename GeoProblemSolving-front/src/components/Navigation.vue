@@ -311,9 +311,8 @@ export default {
       if (this.noticeSocket != null) {
         this.noticeSocket = null;
       }
-      var noticeSocketURL = "ws://localhost:8081/GeoProblemSolving/NoticeSocket";
-      // var noticeSocketURL = "ws://172.21.213.185:8080/GeoProblemSolving/NoticeSocket";
-      // var noticeSocketURL = "ws://172.21.212.7:8082/GeoProblemSolving/NoticeSocket";
+      // var noticeSocketURL = "ws://localhost:8081/GeoProblemSolving/NoticeSocket";
+      var noticeSocketURL = "ws://"+this.$store.state.IP_Port+"/GeoProblemSolving/NoticeSocket";
       this.noticeSocket = new WebSocket(noticeSocketURL);
       this.noticeSocket.onopen = this.onOpen;
       this.noticeSocket.onmessage = this.onMessage;

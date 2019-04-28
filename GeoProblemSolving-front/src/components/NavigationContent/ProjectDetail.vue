@@ -52,26 +52,12 @@
  text-indent: 25px;
  overflow:hidden;
  text-overflow:ellipsis;
- display:-webkit-box; /* autoprefixer: off */
--webkit-box-orient:vertical; /* autoprefixer: on */
+ display:-webkit-box; 
+ /*! autoprefixer: off */
+-webkit-box-orient:vertical;
+/* autoprefixer: on */
 -webkit-line-clamp:5;
 }
-/* .subProjectDescription {
-  text-indent: 25px;
-  line-height:20px;
-  height:100px;
-  overflow: hidden;
-  position:relative;
-} */
-/* .subProjectDescription::after{
-  content: "...";
-  font-weight: bold;
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  padding: 0 20px 1px 20px;
-  background: url(http://css88.b0.upaiyun.com/css88/2014/09/ellipsis_bg.png) repeat-y;
-} */
 .subProjectCreate button {
   height: 40px;
   display: flex;
@@ -977,7 +963,7 @@ export default {
       //邮件格式
       emailAddStr:
         "\n please click the url and join us: " +
-        "http://172.21.212.7:8082/GeoProblemSolving/join/" +
+        'http://'+this.$store.state.IP_Port+"/GeoProblemSolving/join/" +
         this.$route.params.id +
         "/",
       //上传文件相关的
@@ -1470,7 +1456,7 @@ export default {
           this.panel.close();
         }
         let url =
-          "http://172.21.212.7:8012/previewFile?url=http://172.21.212.7:8082" +
+          "http://172.21.212.7:8012/previewFile?url=" +'http://'+this.$store.state.IP_Port+
           this.projectResourceList[index].pathURL;
         let toolURL =
           '<iframe src=' + url + ' style="width: 100%;height:100%"></iframe>';
@@ -1495,7 +1481,7 @@ export default {
           this.panel.close();
         }
         let url =
-          "http://172.21.212.7:8082" + this.projectResourceList[index].pathURL;
+          'http://'+this.$store.state.IP_Port+ this.projectResourceList[index].pathURL;
         let toolURL =
           '<video src=' + url + ' style="width: 100%;height:100%" controls></video>';
         this.panel = jsPanel.create({
@@ -1519,7 +1505,7 @@ export default {
           this.panel.close();
         }
         let url =
-          "http://172.21.212.7:8082" + this.projectResourceList[index].pathURL;
+          'http://'+this.$store.state.IP_Port+ this.projectResourceList[index].pathURL;
         let toolURL =
           '<iframe src=' + url + ' style="width: 100%;height:100%" controls></iframe>';
         this.panel = jsPanel.create({

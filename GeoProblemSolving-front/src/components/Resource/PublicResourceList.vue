@@ -278,7 +278,7 @@ export default {
           this.panel.close();
         }
         let url =
-          "http://172.21.212.7:8012/previewFile?url=http://172.21.212.7:8082" +
+          "http://172.21.212.7:8012/previewFile?url=" +'http://'+this.$store.state.IP_Port+
           this.showList[index].pathURL;
         let toolURL =
           '<iframe src=' + url + ' style="width: 100%;height:100%"></iframe>';
@@ -303,7 +303,7 @@ export default {
           this.panel.close();
         }
         let url =
-          "http://172.21.212.7:8082" + this.showList[index].pathURL;
+          'http://'+this.$store.state.IP_Port+ this.showList[index].pathURL;
         let toolURL =
           '<video src=' + url + ' style="width: 100%;height:100%" controls></video>';
         this.panel = jsPanel.create({
@@ -327,7 +327,7 @@ export default {
           this.panel.close();
         }
         let url =
-          "http://172.21.212.7:8082" + this.showList[index].pathURL;
+          'http://'+this.$store.state.IP_Port+ this.showList[index].pathURL;
         let toolURL =
           '<iframe src=' + url + ' style="width: 100%;height:100%" controls></iframe>';
         this.panel = jsPanel.create({

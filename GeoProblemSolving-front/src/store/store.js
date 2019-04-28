@@ -15,6 +15,9 @@ export default new Vuex.Store({
         projectImg: '',
         project: {},
         subProject: {},
+        IP_Port:"172.21.213.185:8080",
+        // IP_Port:"localhost:8080",
+        // IP_Port:"172.21.212.7:8082",
     },
     getters: {
         userState: state => {

@@ -129,12 +129,8 @@ export default {
             .post("/GeoProblemSolving/project/picture", formData)
             .then(res => {
               if (res.data != "Fail") {
-                this.pictureUrl = "http://localhost:8080" + res.data;
-                console.log(this.pictureUrl,this.inster_field_name);
-                // let val = "http://localhost:8080" + this.pictureUrl;
+                this.pictureUrl = 'http://'+this.$store.state.IP_Port+ res.data;
                 document.getElementById(this.inster_field_name).value = this.pictureUrl;
-                // http://172.21.212.7:8082/GeoProblemSolving/
-                // document.getElementById(this.inster_field_name).value = "http://localhost:8080" + this.pictureUrl;
               } else {
                 this.$Message.error("upload picture Fail!");
               }

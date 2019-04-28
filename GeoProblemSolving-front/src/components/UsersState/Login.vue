@@ -201,7 +201,7 @@ export default {
       checked: false,
       changePwdEmailStyle:
         "This email is used for help you reset your password,you can click this url ",
-      urlAddress: "http://172.21.212.7:8082/GeoProblemSolving/resetPassword/",
+      urlAddress: 'http://'+this.$store.state.IP_Port+"/GeoProblemSolving/resetPassword/",
       resetModalSHow: false
     };
   },
