@@ -440,11 +440,9 @@
                             </span>
                           </div>
                         </div>
-
                         <div style="height:100px">
                           <p class="subProjectDescription" :title="subProject['description']">{{subProject["description"]}}</p>
                         </div>
-
                         <br>
                         <div class="subProjectTextInfo">
                           <Icon type="md-body" :size="20"/>Manager

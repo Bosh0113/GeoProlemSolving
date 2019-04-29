@@ -134,9 +134,8 @@ img {
           <Table stripe border :columns="columns" :data="projectInfoShow" :show-header="false"></Table>
           <div slot="footer">
             <Alert show-icon style="float: left;width: fit-content;display: inline-block;" v-show="!UserState">If you want to participate in the project, please login.</Alert>
-            <Button @click="projectInfoModal=false" v-show="!UserState">Cancel</Button>
+            <Button v-show="!UserState" type="success" @click="login">Log in</Button>
             <Button type="success" @click="joinApplyModalShow(selectedProjectInfo)" v-show="!selectedProjectInfo.isMember&&!selectedProjectInfo.isManager&&UserState" >Apply</Button>
-            <Button type="primary" @click="goSingleProject()" v-show="UserState&&(selectedProjectInfo.isMember||selectedProjectInfo.isManager)">Enter</Button>
           </div>
         </Modal>
         <Modal
@@ -219,7 +218,10 @@ export default {
     },
     //进入项目详情页面的函数
     projectInfoModalShow(projectInfo) {
-      this.selectedProjectInfo = Object.assign({},projectInfo);
+      if(projectInfo.isMember||projectInfo.isManager){
+        this.$router.push({ path: `project/${projectInfo.projectId}` });
+      }else{
+        this.selectedProjectInfo = Object.assign({},projectInfo);
       var category = "";
       if (projectInfo.category != "Human" && projectInfo.category != "GISRS") {
         category = projectInfo.category;
@@ -272,6 +274,8 @@ export default {
         }
       ];
       this.projectInfoModal = true;
+      }
+
     },
     goSingleProject() {
       var id = this.selectedProjectInfo.projectId;
@@ -383,6 +387,9 @@ export default {
           this.$Message.error("Fail!");
         }
       });
+    },
+    login(){
+      this.$router.push({ name: "Login" });
     }
   }
 };

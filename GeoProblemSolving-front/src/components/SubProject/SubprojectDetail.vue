@@ -564,6 +564,8 @@
       title="Delete Task"
       @on-ok="taskRemove()"
       @on-cancel="cancel()"
+      ok-text="Assure"
+      cancel-text="Cancel"
     >
       <p>Do yout want to delete this task?</p>
     </Modal>
