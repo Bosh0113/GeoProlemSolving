@@ -150,7 +150,7 @@
                       :class="{InputStyle: inputstyle}"
                     ></Input>
                   </FormItem>
-                  <FormItem label="Mobile phone" prop="mobilePhone">
+                  <FormItem label="Phone" prop="mobilePhone">
                     <Input
                       v-model="registerForm.mobilePhone"
                       placeholder="Plase enter your mobilePhone"

@@ -19,7 +19,7 @@
                   v-else
                 ></avatar>
               </div>
-              <div class="single-info" title="User Name">
+              <div class="single-info" title="Name">
                 <Icon type="ios-contact-outline" :size="20"/>
                 <span>{{userDetail.userName}}</span>
               </div>
@@ -27,7 +27,7 @@
                   <Icon type="ios-mail-outline" :size="20"/>
                   <span>{{userDetail.email}}</span>
                 </div>
-                <div class="single-info" title="Mobile Phone">
+                <div class="single-info" title="Phone" v-show="userDetail.mobilePhone!=''">
                   <Icon type="ios-call-outline" :size="20"/>
                   <span>{{userDetail.mobilePhone}}</span>
                 </div>
@@ -35,24 +35,24 @@
                   <Icon type="ios-hammer-outline" :size="20"/>
                   <span>{{userDetail.jobTitle}}</span>
                 </div>
-                <div class="single-info" title="City&Country">
+                <div class="single-info" title="City&Country" v-show="userDetail.city!=''&&userDetail.country!=''">
                   <Icon type="ios-compass-outline" :size="20"/>
                   <span>{{userDetail.city}}&nbsp{{userDetail.country}}</span>
                 </div>
-                <div class="single-info" title="Organization">
+                <div class="single-info" title="Organization" v-show="userDetail.organization!=''">
                   <Icon type="ios-home-outline" :size="20"/>
                   <span>{{userDetail.organization}}</span>
                 </div>
-                <div class="single-info" title="Direction">
+                <div class="single-info" title="Direction" v-show="userDetail.direction!=''">
                   <Icon type="ios-contract" :size="20"/>
                   <span>{{userDetail.direction}}</span>
                 </div>
-                <div class="single-info"  title="Home Page">
+                <div class="single-info"  title="Home Page" v-show="userDetail.homePage!=''">
                   <Icon type="md-link" :size="20"/>
                   <span>{{userDetail.homePage}}</span>
                 </div>
                 <br>
-                <div style="padding:10px;font-size:12px;border:1px dotted lightgray"  title="Introduction">
+                <div style="padding:10px;font-size:12px;border:1px dotted lightgray"  title="Introduction" v-show="userDetail.introduction!=''">
                   {{userDetail.introduction}}
                 </div>
                 <div class="whitespace"></div>
@@ -78,7 +78,7 @@
                           :class="{InputStyle: inputstyle}"
                         ></Input>
                       </FormItem>
-                      <FormItem label="Job Title" prop="jobTitle">
+                      <FormItem label="Job title" prop="jobTitle">
                         <Input
                           v-model="personalInfoItem.jobTitle"
                           :class="{InputStyle: inputstyle}"
@@ -103,19 +103,19 @@
                       <FormItem label="City" prop="city">
                         <Input v-model="personalInfoItem.city" :class="{InputStyle: inputstyle}"></Input>
                       </FormItem>
-                      <FormItem label="Agency" prop="organization">
+                      <FormItem label="Affiliation" prop="organization">
                         <Input
                           v-model="personalInfoItem.organization"
                           :class="{InputStyle: inputstyle}"
                         ></Input>
                       </FormItem>
-                      <FormItem label="Direction" prop="direction">
+                      <FormItem label="Field" prop="direction">
                         <Input
                           v-model="personalInfoItem.direction"
                           :class="{InputStyle: inputstyle}"
                         ></Input>
                       </FormItem>
-                      <FormItem label="Url" prop="homePage">
+                      <FormItem label="Home page" prop="homePage">
                         <Input
                           v-model="personalInfoItem.homePage"
                           :class="{InputStyle: inputstyle}"

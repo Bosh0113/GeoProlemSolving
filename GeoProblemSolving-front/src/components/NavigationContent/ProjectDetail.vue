@@ -56,22 +56,6 @@
 -webkit-box-orient:vertical; /* autoprefixer: on */
 -webkit-line-clamp:5;
 }
-/* .subProjectDescription {
-  text-indent: 25px;
-  line-height:20px;
-  height:100px;
-  overflow: hidden;
-  position:relative;
-} */
-/* .subProjectDescription::after{
-  content: "...";
-  font-weight: bold;
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  padding: 0 20px 1px 20px;
-  background: url(http://css88.b0.upaiyun.com/css88/2014/09/ellipsis_bg.png) repeat-y;
-} */
 .subProjectCreate button {
   height: 40px;
   display: flex;
@@ -633,6 +617,7 @@
               <p>Click or drag files here to upload</p>
             </div>
           </Upload>
+
           <div style="padding:0 10px 0 10px">
             <ul v-for="(list,index) in file" :key="index">
               <li style="display:flex">
@@ -653,6 +638,7 @@
               </li>
             </ul>
           </div>
+          <h6 style="text-align:center;color:red">The file's size must control smaller than 1 GB.</h6>
         </Modal>
         <br>
       </Col>
