@@ -40,10 +40,13 @@
 .memebr-work {
   width: 70%;
   height: 60px;
-  margin: 0 5px;
+  /* padding:10px 2.5px 10px 2.5px;
+  margin-top:5px; */
+  /* margin: 0 5px; */
 }
 .userName {
-  height: 30px;
+  margin-top:10px;
+  height: 20px;
   display: flex;
   align-items: center;
 }
@@ -140,7 +143,7 @@
                         </div>
                         <!-- <div :style="{height:sidebarHeight-160+'px'}"> -->
                           <!-- <div :style="{height:sidebarHeight-200+'px'}" style="min-height:400px"> -->
-                          <div :style="{height:sidebarHeight-150+'px'}">
+                          <div :style="{height:sidebarHeight-150+'px'}" style="max-height:600px;overflow-y:auto">
                           <div
                             class="member-desc"
                             v-for="(member,index) in this.participants"
@@ -151,7 +154,7 @@
                                 <div
                                   class="member-image"
                                   @click="gotoPersonalSpace(member.userId)"
-                                  style="cursor:pointer"
+                                  style="cursor:pointer;display:flex;justify-content:center;align-ittems:center"
                                 >
                                   <img
                                     v-if="member.avatar != '' && member.avatar!='undefined'"
@@ -160,34 +163,35 @@
                                   >
                                   <avatar
                                     :username="member.userName"
-                                    :size="40"
-                                    style="margin-top:10px"
+                                    :size="50"
+                                    style="width:auto;height:100%;margin-top:-10px"
                                     :title="member.userName"
                                     v-else
                                   ></avatar>
                                 </div>
                               </Badge>
                               <div class="memebr-work" style="display:flex;align-items:center">
-                                <div class="userName">
-                                  <span
-                                    v-show="member.organization!=''"
-                                    style="padding:0 2.5px"
-                                  >{{member.userName}}({{member.organization}})</span>
-                                  <span
+                                <div style="height:40px">
+                                  <div>
+                                    <span
+                                    style="padding:0 5px"
+                                  >{{member.userName}}</span>
+                                  </div>
+                                  <!-- <span
                                     v-show="member.organization==''"
                                     style="padding:0 2.5px"
-                                  >{{member.userName}}</span>
-                                </div>
-                                <!-- <div class="organization">
+                                  >{{member.userName}}</span> -->
+                                <div>
                                   <span style="padding:0 5px">{{member.organization}}</span>
-                                </div>-->
+                                </div>
+                                </div>
                               </div>
                             </template>
                             <template v-else style="margin-top:5px">
                               <div
                                 class="member-image"
                                 @click="gotoPersonalSpace(member.userId)"
-                                style="cursor:pointer"
+                                style="cursor:pointer;display:flex;justify-content:center;align-ittems:center"
                               >
                                 <img
                                   v-if="member.avatar != ''"
@@ -196,19 +200,21 @@
                                 >
                                 <avatar
                                   :username="member.userName"
-                                  :size="40"
-                                  style="margin-top:10px"
+                                  :size="50"
                                   :title="member.userName"
                                   v-else
                                 ></avatar>
                               </div>
-                              <div class="memebr-work">
-                                <div class="userName">
+                              <div class="memebr-work" style="display:flex;align-items:center">
+                                <div style="height:40px">
+                                  <div>
                                   <span style="padding:0 5px;float:right">{{member.userName}}</span>
                                 </div>
-                                <div class="organization">
+                                <div>
                                   <span style="padding:0 5px">{{member.organization}}</span>
                                 </div>
+                                </div>
+
                               </div>
                             </template>
                             <div style="line-height:60px" type="default">
@@ -266,8 +272,8 @@
                             width="400px"
                             title="Invite group members join the sub-project"
                             @on-ok="inviteMembers"
-                            ok-text="ok"
-                            cancel-text="cancel"
+                            ok-text="Ok"
+                            cancel-text="Cancel"
                           >
                             <div>
                               <p>Members:</p>
@@ -295,6 +301,7 @@
                         <div slot="title" style="font-size:18px;">
                           <strong>Description</strong>
                         </div>
+                        <!-- 判断是不是管理员 -->
                         <div
                           :style="{height:descHeight-60 +'px'}"
                           class="subProjectDesc"
@@ -305,7 +312,7 @@
                       <div class="resourcePanel" style="padding-top: 20px" >
                         <folder-tree :subProjectId = subProjectInfo.subProjectId></folder-tree>
                       </div>
-                      <div
+                      <!-- <div
                         style="display:flex;align-items:center;justify-content:center;height:60px;margin-left:30px"
                       >
                         <Button
@@ -313,7 +320,7 @@
                           style="margin:auto"
                           v-show="subProjectInfo.managerId == this.$store.getters.userId"
                         >Delete this sub-project ?</Button>
-                      </div>
+                      </div> -->
                     </Col>
                   </Row>
                 </TabPane>
@@ -560,7 +567,7 @@
     >
       <p>Do yout want to delete this task?</p>
     </Modal>
-    <Modal v-model="createTaskModal" title="Create Task" width="800px">
+    <Modal v-model="createTaskModal" title="Create Task" width="800px" :closable="false">
       <Form
         ref="formValidate"
         :model="formValidate"
@@ -619,6 +626,7 @@
       ok-text="Ok"
       cancel-text="Cancel"
       width="800px"
+      :closable="false"
     >
       <Form
         ref="formValidate"
@@ -828,8 +836,8 @@ export default {
         description: [
           { required: true, message: "Please select type...", trigger: "blur" }
         ],
-        startTime: [{ required: true, type: "date", trigger: "change" }],
-        endTime: [{ required: true, type: "date", trigger: "change" }]
+        startTime: [{ required: true, type: "date", trigger: "blur" }],
+        endTime: [{ required: true, type: "date", trigger: "blur" }]
       },
       contentHeight: "",
       // tab栏当前选中的tab,初始化默认为home
@@ -940,7 +948,7 @@ export default {
       //通知栏的属性设置，top表示距离顶部的距离，duration表示持续的时间
       this.$Notice.config({
         top: 50,
-        duration: 2
+        duration: 0
       });
     },
     //初始化函数，作用是控制侧边栏的高度，设置右边通知栏弹出时候的距顶高度以及延迟的时间

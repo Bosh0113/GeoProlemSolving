@@ -52,7 +52,7 @@
  text-indent: 25px;
  overflow:hidden;
  text-overflow:ellipsis;
- display:-webkit-box; 
+ display:-webkit-box;
  /*! autoprefixer: off */
 -webkit-box-orient:vertical;
 /* autoprefixer: on */
@@ -358,8 +358,8 @@
               </Poptip>
               <Modal
                 v-model="subProjectModal"
-                ok-text="create"
-                cancel-text="cancel"
+                ok-text="Create"
+                cancel-text="Cancel"
                 @on-ok="createSubProject('createSubProjectForm')"
                 @on-cancel
                 title="Create a new subproject"
@@ -372,11 +372,14 @@
                     :model="createSubProjectForm"
                     :rules="createSubprojectRuleValidate"
                     :label-width="120"
+                    @submit.native.prevent
                   >
                     <FormItem label="Title" prop="subProjectTitle">
                       <Input
+                        type="text"
                         v-model="createSubProjectForm.subProjectTitle"
                         placeholder="Enter subproject title (less than 60 characters) ..."
+                        @keyup.enter.native=""
                       ></Input>
                     </FormItem>
                     <FormItem label="Description" prop="subProjectDescription">
@@ -459,8 +462,8 @@
               <Modal
                 v-model="handOverSubProjectModal"
                 title="Appoint new manager"
-                ok-text="ok"
-                cancel-text="cancel"
+                ok-text="Ok"
+                cancel-text="Cancel"
                 @on-ok="handOverSubProject()"
                 @on-cancel
                 width="500px"
@@ -480,8 +483,8 @@
               </Modal>
               <Modal
                 v-model="editSubProjectModal"
-                ok-text="submit"
-                cancel-text="cancel"
+                ok-text="Submit"
+                cancel-text="Cancel"
                 @on-ok="editSubProject('editSubProjectForm')"
                 @on-cancel
                 title="Edit the information of this subproject"
@@ -499,7 +502,7 @@
                       <Input v-model="editSubProjectForm.subProjectTitleEdit"></Input>
                     </FormItem>
                     <FormItem label="Description" prop="subProjectDescriptionEdit">
-                      <Input v-model="editSubProjectForm.subProjectDescriptionEdit" 
+                      <Input v-model="editSubProjectForm.subProjectDescriptionEdit"
                         :rows="4"
                         type="textarea"></Input>
                     </FormItem>
@@ -510,7 +513,7 @@
                 v-model="deleteSubProjectModal"
                 title="Delete sub project"
                 ok-text="Confirm"
-                cancel-text="cancel"
+                cancel-text="Cancel"
                 @on-ok="deleteSubProject()"
                 width="800px"
                 :mask-closable="false"
@@ -649,8 +652,8 @@
         title="Delete warning "
         @on-ok="deleteProject"
         @on-cancel
-        ok-text="submit"
-        cancel-text="cancel"
+        ok-text="Submit"
+        cancel-text="Cancel"
       >
         <p>Do you want to delete this project? Please think twice before you choose.</p>
       </Modal>
@@ -662,7 +665,7 @@
       @on-ok="editProjectSubmit('projectEditForm')"
       @on-cancel
       ok-text="Confirm"
-      cancel-text="cancel"
+      cancel-text="Cancel"
       :mask-closable="false"
       width="900px"
     >
@@ -743,8 +746,8 @@
       title="Upload Progress"
       @on-ok
       @on-cancel
-      ok-text="ok"
-      cancel-text="close"
+      ok-text="Ok"
+      cancel-text="Close"
     >
       <Progress :percent="uploadProgress"></Progress>
     </Modal>
@@ -1024,7 +1027,9 @@ export default {
       progressModalShow: false,
       // 上传进度
       uploadProgress: 0,
-      panel: null
+      panel: null,
+      // 上传文件个数限制定时器
+      fileCountTimer:null,
     };
   },
   created() {
@@ -1034,7 +1039,7 @@ export default {
   mounted() {
     this.$Message.config({
       top: 150,
-      duration: 3
+      duration: 2
     });
     this.getProjectDetail();
     this.sidebarHeight = window.innerHeight + "px";
@@ -1199,8 +1204,11 @@ export default {
             .post("/GeoProblemSolving/subProject/create", SubProject)
             .then(res => {
               if (res.data != "Fail") {
-                this.$Message.info("Create success");
-
+                this.$Notice.success({
+                  title:"create result",
+                  desc:"subproject has been created successfully.",
+                  duration:0,
+                });
                 this.createSubProjectForm.subProjectTitle = "";
                 this.createSubProjectForm.subProjectDescription = "";
                 this.subProjectList.push(res.data);
@@ -1450,7 +1458,7 @@ export default {
     },
     show(index) {
       let name = this.projectResourceList[index].name;
-      
+
       if (/\.(pdf|doc|docx|xls|xlsx|ppt|pptx|zip)$/.test(name.toLowerCase())) {
         if (this.panel != null) {
           this.panel.close();
@@ -1689,6 +1697,7 @@ export default {
             ];
     },
     filesUpload(form) {
+      this.uploadProgress = 0;
       this.$refs[form].validate(valid => {
         if (valid) {
           let that = this;
@@ -1699,9 +1708,6 @@ export default {
               if (that.file[i].fileSize < Math.pow(1024, 2)) {
                 formData.append("file", that.file[i]); // 文件对象
               } else {
-                // this.$Message.error(
-                //   "size over, one file size must smaller than 1 GB one time!"
-                // );
               }
               total += that.file[i].fileSize;
             }
@@ -1736,7 +1742,7 @@ export default {
                     this.$Notice.open({
                       title: "Upload notification title",
                       desc: "File uploaded successfully",
-                      duration: 2
+                      duration: 0
                     });
                     //这里重新获取一次该项目下的全部资源
                     this.addUploadEvent(this.currentProjectDetail.projectId);
@@ -1746,10 +1752,10 @@ export default {
                     this.fileUploadForm.privacy = "";
                     this.fileUploadForm.type = "";
                     // 创建一个函数根据pid去后台查询该项目下的资源
-                    this.uploadProgress = 0;
+
                   }
                 })
-                .catch(err => { 
+                .catch(err => {
                   this.uploadProgress = 0;
                 });
             } else {
@@ -1766,7 +1772,11 @@ export default {
     gatherFile(file) {
       let that = this;
       if (that.file.length >= 5) {
-        this.$Message.info("you can upload 5 files one time!");
+        if(this.fileCountTimer!=null){
+          clearTimeout(this.fileCountTimer);
+        }this.fileCountTimer = setTimeout(()=>{
+          this.$Message.info("you can upload 5 files one time!");
+        },500)
       } else {
         that.file.push(file);
         that.file.map(element => {

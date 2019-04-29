@@ -139,7 +139,7 @@ img {
       @on-ok="sendResetEmail"
       @on-cancel
       ok-text="Confirm"
-      cancel-text="cancel"
+      cancel-text="Cancel"
       title="Reset password board"
     >
       <div class="resetReuseDiv">
@@ -208,7 +208,7 @@ export default {
   mounted() {
     this.$Notice.config({
       top: 100,
-      duration: 1
+      duration: 0
     });
     this.contentStyle.height = window.innerHeight - 60 + "px";
     this.loginStyle.marginTop = window.innerHeight / 5 + "px";

@@ -355,7 +355,7 @@ export default {
                 that.$Notice.open({
                   title: "Upload notification title",
                   desc: "File uploaded successfully",
-                  duration: 2
+                  duration: 0
                 });
               }
             })
@@ -406,11 +406,11 @@ export default {
         }
 
         this.isMouseDown = false;
-        
+
         // 执行缓存中的socket操作
         for(let i = 0; i < this.socketLineStore.length; i++){
           this.getSocketConnect(this.socketLineStore[i]);
-        }       
+        }
 
         // 协同
         let line = {

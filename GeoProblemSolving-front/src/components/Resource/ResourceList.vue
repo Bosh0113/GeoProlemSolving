@@ -116,8 +116,8 @@
       v-model="uploadModal"
       title="Upload resource"
       @on-ok="submitFile()"
-      ok-text="submit"
-      cancel-text="cancel"
+      ok-text="Submit"
+      cancel-text="Cancel"
       :mask-closable="false"
       width="600px"
     >
@@ -298,7 +298,7 @@ export default {
             this.$Notice.open({
               title: "Upload notification title",
               desc: "File uploaded successfully",
-              duration: 2
+              duration: 0
             });
             //这里重新获取一次该项目下的全部资源
             this.addUploadEvent(this.currentProjectDetail.projectId);

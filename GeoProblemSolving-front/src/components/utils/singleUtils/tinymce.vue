@@ -104,7 +104,7 @@ export default {
             this.$Notice.open({
               title: "Upload notification title",
               desc: "File uploaded successfully",
-              duration: 2
+              duration: 0
             });
           }
         })

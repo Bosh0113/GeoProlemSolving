@@ -198,7 +198,7 @@ export default {
           {
             type: "string",
             min: 5,
-            message: "Introduce no less than 5 words",
+            message: "Introduction no less than 5 words",
             trigger: "blur"
           }
         ]
@@ -293,7 +293,7 @@ export default {
             title: "No access",
             desc:
               "You need to click + button at the north right corner to apply join the project",
-            duration: 5
+            duration: 0
           });
         }
       } else {
@@ -348,7 +348,7 @@ export default {
                     title: "Apply Successfully",
                     desc:
                       "The project's manager will process your apply in time,you can get a notification later to tell you the result.",
-                    duration: 0
+                    duration: 2
                   });
                   this.$emit("sendNotice", data.managerId);
                   this.haveApplied = true;
