@@ -295,6 +295,16 @@ public class SubProjectDaoImpl implements ISubProjectDao {
         if("Fail".equals(newFileStruct)){
             return "Fail";
         }
+        //从子项目和项目中删除-----此处之后要改
+        Query queryResource = Query.query(Criteria.where("resourceId").is(id));
+        ResourceEntity resourceEntity = mongoTemplate.findOne(queryResource,ResourceEntity.class);
+        JSONObject scope =resourceEntity.getScope();
+        scope.put("projectId","");
+        scope.put("subProjectId","");
+        Update updateResource = new Update();
+        updateResource.set("scope",scope);
+        mongoTemplate.updateFirst(queryResource,updateResource,ResourceEntity.class);
+
         return newFileStruct;
     }
 

@@ -295,6 +295,7 @@ export default {
         ]
       },
       toUploadFiles: [],
+      fileCountTimer:null,
       progressModalShow: false,
       uploadProgress: 0,
       fileInfoModal: false,
@@ -476,6 +477,7 @@ export default {
             if (res.data != "Fail") {
               this.subProjectFileStruct = res.data;
               this.refreshCurrentAll(res.data, this.currentFolder.uid);
+              //此处添加从项目内删除
             } else {
               this.$Message.warning("Delete folder fail.");
             }
@@ -536,7 +538,12 @@ export default {
     gatherFile(file) {
       let that = this;
       if (that.toUploadFiles.length >= 5) {
-        this.$Message.info("最多只能上传5个文件");
+        if(this.fileCountTimer!=null){
+          clearTimeout(this.fileCountTimer);
+        }
+        this.fileCountTimer=setTimeout(()=>{
+          this.$Message.info("最多只能上传5个文件");
+        },500);
       } else {
         var fileSize = file.size;
         if (fileSize < 1024) {
@@ -557,9 +564,9 @@ export default {
     subProjectUpload(name) {
       this.$refs[name].validate(valid => {
         if (valid) {
-          this.uploadModal = false;
           var uploadFiles = this.toUploadFiles;
           if (uploadFiles.length > 0) {
+            this.uploadModal = false;
             var formData = new FormData();
             for (var i = 0; i < uploadFiles.length; i++) {
               formData.append("file", uploadFiles[i]);
@@ -605,6 +612,8 @@ export default {
                 this.$Message.warning("Upload fail.");
                 this.uploadProgress = 0;
               });
+          }else{
+            this.$Message.warning("Upload file is null.");
           }
         }
       });
