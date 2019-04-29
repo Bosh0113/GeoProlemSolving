@@ -348,7 +348,7 @@ export default {
                     title: "Apply Successfully",
                     desc:
                       "The project's manager will process your apply in time,you can get a notification later to tell you the result.",
-                    duration: 5
+                    duration: 0
                   });
                   this.$emit("sendNotice", data.managerId);
                   this.haveApplied = true;

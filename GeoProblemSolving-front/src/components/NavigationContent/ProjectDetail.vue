@@ -619,6 +619,7 @@
               <p>Click or drag files here to upload</p>
             </div>
           </Upload>
+
           <div style="padding:0 10px 0 10px">
             <ul v-for="(list,index) in file" :key="index">
               <li style="display:flex">
@@ -639,6 +640,7 @@
               </li>
             </ul>
           </div>
+          <h6 style="text-align:center;color:red">The file's size must control smaller than 1 GB.</h6>
         </Modal>
         <br>
       </Col>

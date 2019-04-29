@@ -170,8 +170,13 @@
                               <div class="memebr-work" style="display:flex;align-items:center">
                                 <div class="userName">
                                   <span
+                                    v-show="member.organization!=''"
                                     style="padding:0 2.5px"
                                   >{{member.userName}}({{member.organization}})</span>
+                                  <span
+                                    v-show="member.organization==''"
+                                    style="padding:0 2.5px"
+                                  >{{member.userName}}</span>
                                 </div>
                                 <!-- <div class="organization">
                                   <span style="padding:0 5px">{{member.organization}}</span>
@@ -211,11 +216,24 @@
                                 style="cursor:pointer"
                                 title="quit"
                                 v-show="giveDeleteProperty(index)"
-                                @click="removeMember(member.userId,member.userName)"
+                                @click="removeMemberAlert=true"
                               >
+                              <!-- @click="removeMember(member.userId,member.userName)" -->
                                 <Icon type="md-log-out" :size="20"/>
                               </span>
                             </div>
+                            <Modal
+                              v-model="removeMemberAlert"
+                              title="Remove member alert"
+                              ok-text="Assure"
+                              cancel-text="Cancel"
+                              @on-ok="removeMember(participants[index].userId,participants[index].userName)"
+                              @on-cancel=""
+                            >
+                            <h5 style="text-align:center;color:red">
+                              Do you really want to remove this member from this sub-project?
+                            </h5>
+                            </Modal>
                           </div>
                         </div>
                         <div
@@ -866,7 +884,9 @@ export default {
           align: "center"
         }
       ],
-      panel: null
+      panel: null,
+      // 删除成员的提醒
+      removeMemberAlert:false,
     };
   },
   created() {
