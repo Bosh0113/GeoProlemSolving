@@ -1,7 +1,7 @@
 <style scoped>
-img{
-  width:100%;
-  height:auto;
+img {
+  width: 100%;
+  height: auto;
 }
 </style>
 <template>
@@ -27,11 +27,11 @@ export default {
   data() {
     return {
       imageList: [],
-      titleList:[
+      titleList: [
         "Home page",
         "Projects page",
         "Project detail page",
-        "Subproject List",
+        "Subproject list",
         "Subproject home page",
         "Subproject resources",
         "Subproject task page"
@@ -39,9 +39,9 @@ export default {
     };
   },
   methods: {
-    getHelpImg(){
-      for(var i=1;i<8;i++){
-        var imgUrl = require("@/assets/images/Help/"+"help"+i+".png");
+    getHelpImg() {
+      for (var i = 1; i < 8; i++) {
+        var imgUrl = require("@/assets/images/Help/" + "help" + i + ".png");
         this.imageList.push(imgUrl);
       }
     }
