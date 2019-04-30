@@ -1,9 +1,8 @@
 package cn.edu.njnu.geoproblemsolving.Dao.Resource;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Method.EncodeUtil;
-import cn.edu.njnu.geoproblemsolving.Entity.ResourceEntity;
-import cn.edu.njnu.geoproblemsolving.Entity.ResourceUploadInfo;
-import cn.edu.njnu.geoproblemsolving.Entity.UserEntity;
+import cn.edu.njnu.geoproblemsolving.Dao.SubProject.SubProjectDaoImpl;
+import cn.edu.njnu.geoproblemsolving.Entity.*;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
@@ -223,6 +222,7 @@ public class ResourceDaoImpl implements IResourceDao {
     @Override
     public String deleteResource(String key, String value) {
         try {
+            deleteFromSubProject(value);
             Query query = new Query(Criteria.where(key).is(value));
             mongoTemplate.remove(query, ResourceEntity.class);
             return "Success";
@@ -297,5 +297,44 @@ public class ResourceDaoImpl implements IResourceDao {
         }catch (Exception e){
             return "Fail";
         }
+    }
+
+    //删除时改变子项目的文件树结构
+    private void deleteFromSubProject(String resourceId){
+        try {
+            Query queryResource = Query.query(Criteria.where("resourceId").is(resourceId));
+            ResourceEntity resourceEntity = mongoTemplate.findOne(queryResource,ResourceEntity.class);
+            JSONObject scope = resourceEntity.getScope();
+            String subProjectId = scope.getString("subProjectId");
+            if(!subProjectId.equals("")){
+                Query querySubProject = Query.query(Criteria.where("subProjectId").is(subProjectId));
+                SubProjectEntity subProjectEntity = mongoTemplate.findOne(querySubProject,SubProjectEntity.class);
+                String folderStruct = subProjectEntity.getFileStruct();
+                FileStruct fileStruct = JSONObject.parseObject(folderStruct,FileStruct.class);
+                String parentId = findParentId(fileStruct,resourceId);
+                SubProjectDaoImpl subProjectDao = new SubProjectDaoImpl(mongoTemplate);
+                String res=subProjectDao.deleteFile(subProjectId,parentId,resourceId);
+                if(!res.equals("Fail")){
+                    subProjectDao.updateFileStruct(subProjectId,res);
+                }
+            }
+        }catch (Exception ignored){}
+    }
+
+    private String findParentId(FileStruct folderStruct, String resourceId){
+        ArrayList<FileStruct> fileStructs = folderStruct.getFolders();
+        ArrayList<FileNode> fileNodes = folderStruct.getFiles();
+        for(FileNode fileNode:fileNodes){
+            if (fileNode.getUid().equals(resourceId)){
+                return folderStruct.getUid();
+            }
+        }
+        for (FileStruct fileStruct:fileStructs){
+            String parentId =  findParentId(fileStruct,resourceId);
+            if(!parentId.equals("")){
+                return parentId;
+            }
+        }
+        return "";
     }
 }

@@ -141,8 +141,6 @@
                         <div slot="title" style="font-size:18px">
                           <strong>Participants</strong>
                         </div>
-                        <!-- <div :style="{height:sidebarHeight-160+'px'}"> -->
-                          <!-- <div :style="{height:sidebarHeight-200+'px'}" style="min-height:400px"> -->
                           <div :style="{height:sidebarHeight-150+'px'}" style="max-height:600px;overflow-y:auto">
                           <div
                             class="member-desc"
@@ -159,12 +157,12 @@
                                   <img
                                     v-if="member.avatar != '' && member.avatar!='undefined'"
                                     :src="member.avatar"
-                                    style="width:auto;height:100%"
+                                    style="width:100%;height:100%"
                                   >
                                   <avatar
                                     :username="member.userName"
                                     :size="50"
-                                    style="width:auto;height:100%;margin-top:-10px"
+                                    style="width:100%;height:100%"
                                     :title="member.userName"
                                     v-else
                                   ></avatar>
@@ -177,10 +175,6 @@
                                     style="padding:0 5px"
                                   >{{member.userName}}</span>
                                   </div>
-                                  <!-- <span
-                                    v-show="member.organization==''"
-                                    style="padding:0 2.5px"
-                                  >{{member.userName}}</span> -->
                                 <div>
                                   <span style="padding:0 5px">{{member.organization}}</span>
                                 </div>
@@ -196,7 +190,7 @@
                                 <img
                                   v-if="member.avatar != ''"
                                   :src="member.avatar"
-                                  style="width:auto;height:100%"
+                                  style="width:100%;height:100%"
                                 >
                                 <avatar
                                   :username="member.userName"
@@ -208,7 +202,7 @@
                               <div class="memebr-work" style="display:flex;align-items:center">
                                 <div style="height:40px">
                                   <div>
-                                  <span style="padding:0 5px;float:right">{{member.userName}}</span>
+                                  <span style="padding:0 5px;">{{member.userName}}</span>
                                 </div>
                                 <div>
                                   <span style="padding:0 5px">{{member.organization}}</span>
@@ -224,7 +218,6 @@
                                 v-show="giveDeleteProperty(index)"
                                 @click="removeMemberAlert=true"
                               >
-                              <!-- @click="removeMember(member.userId,member.userName)" -->
                                 <Icon type="md-log-out" :size="20"/>
                               </span>
                             </div>
@@ -308,19 +301,9 @@
                           style="overflow-y:auto"
                         >{{subProjectInfo.description}}</div>
                       </Card>
-                        <!-- <div class="title">Description</div> -->
                       <div class="resourcePanel" style="padding-top: 20px" >
                         <folder-tree :subProjectId = subProjectInfo.subProjectId></folder-tree>
                       </div>
-                      <!-- <div
-                        style="display:flex;align-items:center;justify-content:center;height:60px;margin-left:30px"
-                      >
-                        <Button
-                          type="error"
-                          style="margin:auto"
-                          v-show="subProjectInfo.managerId == this.$store.getters.userId"
-                        >Delete this sub-project ?</Button>
-                      </div> -->
                     </Col>
                   </Row>
                 </TabPane>
@@ -1079,8 +1062,8 @@ export default {
         this.subprojectSocket = null;
       }
       let roomId = this.subProjectInfo.subProjectId + "task";
-      var subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + roomId;
-      // var subprojectSocketURL = "ws://"+this.$store.state.IP_Port+"/GeoProblemSolving/Module/" + roomId;
+      // var subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + roomId;
+      var subprojectSocketURL = "ws://"+this.$store.state.IP_Port+"/GeoProblemSolving/Module/" + roomId;
       this.subprojectSocket = new WebSocket(subprojectSocketURL);
       this.subprojectSocket.onopen = this.onOpen;
       this.subprojectSocket.onmessage = this.onMessage;
