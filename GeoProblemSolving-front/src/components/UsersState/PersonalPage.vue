@@ -121,7 +121,7 @@
                           :class="{InputStyle: inputstyle}"
                         ></Input>
                       </FormItem>
-                      <FormItem label="Introduce" prop="introduction">
+                      <FormItem label="Introduction" prop="introduction">
                         <Input
                           style="word-wrap:break-word"
                           v-model="personalInfoItem.introduction"
@@ -350,7 +350,7 @@
       @on-ok="authorize()"
       @on-cancel="cancel()"
       ok-text="Confirm"
-      cancel-text="cancel"
+      cancel-text="Cancel"
     >
       <p style="slot">Hand the project to others</p>
       <div>
@@ -368,8 +368,8 @@
       v-model="quitModal"
       @on-ok="quitProject()"
       @on-cancel="cancel()"
-      ok-text="ok"
-      cancel-text="cancel"
+      ok-text="Ok"
+      cancel-text="Cancel"
     >
       <p>Once you exit the project, you will not be able to participate in the collaborative process, confirm the exit?</p>
     </Modal>
@@ -379,7 +379,7 @@
       @on-ok="processResource()"
       @on-cancel
       ok-text="Confirm"
-      cancel-text="cancel"
+      cancel-text="Cancel"
     >
       <!-- todo:这里需要过滤参与的项目以及管理的项目重新渲染 -->
       <div>
@@ -606,7 +606,7 @@ export default {
           {
             type: "string",
             min: 20,
-            message: "Introduce no less than 20 characters",
+            message: "Introduction no less than 20 characters",
             trigger: "blur"
           }
         ],
@@ -1027,7 +1027,7 @@ export default {
                   "File shared to " +
                   this.selectShareProject +
                   " successfully.",
-                duration: 2
+                duration: 0
               });
               // 保存记录
               this.addUploadEvent(this.selectShareProjectId);

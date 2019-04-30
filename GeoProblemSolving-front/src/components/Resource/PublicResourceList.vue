@@ -117,8 +117,8 @@
       v-model="uploadModal"
       title="Upload resource"
       @on-ok="submitFile()"
-      ok-text="submit"
-      cancel-text="cancel"
+      ok-text="Submit"
+      cancel-text="Cancel"
       :mask-closable="false"
       width="600px"
     >

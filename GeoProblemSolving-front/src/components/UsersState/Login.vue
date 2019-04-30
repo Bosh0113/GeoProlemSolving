@@ -122,14 +122,20 @@ img {
                   v-model="loginForm.State"
                   class="loginBtn"
                 >Log in</Button>
+                <Button
+                  type="default"
+                  @click="register"
+                  class="loginBtn"
+                  style="margin-left:10px"
+                >Sign up</Button>
               </div>
             </FormItem>
-            <div class="reUseDiv">
+            <!-- <div class="reUseDiv">
               <span>
-                If you don't hava an account,click
+                If you don't have an account,click
                 <a @click="goRegister">Here</a> to register.
               </span>
-            </div>
+            </div> -->
           </Form>
         </div>
       </div>
@@ -139,7 +145,7 @@ img {
       @on-ok="sendResetEmail"
       @on-cancel
       ok-text="Confirm"
-      cancel-text="cancel"
+      cancel-text="Cancel"
       title="Reset password board"
     >
       <div class="resetReuseDiv">
@@ -208,7 +214,7 @@ export default {
   mounted() {
     this.$Notice.config({
       top: 100,
-      duration: 1
+      duration: 0
     });
     this.contentStyle.height = window.innerHeight - 60 + "px";
     this.loginStyle.marginTop = window.innerHeight / 5 + "px";
@@ -334,6 +340,9 @@ export default {
         .catch(err => {
           console.log(err.data);
         });
+    },
+    register(){
+      this.$router.push({ name: "Register" });
     }
   }
 };

@@ -404,7 +404,7 @@
                     title="Create a new notice"
                     @on-ok="createNotice"
                     ok-text="Confirm"
-                    cancel-text="cancel"
+                    cancel-text="Cancel"
                   >
                     <Form :model="formItem" :label-width="60">
                       <FormItem label="title">
@@ -425,7 +425,7 @@
                     title="Notice detail update"
                     @on-ok="editNotice()"
                     ok-text="Confirm"
-                    cancel-text="cancel"
+                    cancel-text="Cancel"
                   >
                     <Form :model="editFormItem" :label-width="60">
                       <FormItem label="title">
@@ -914,8 +914,8 @@
     <Modal
       v-model="delModal"
       title="Delete this process"
-      @on-ok="delModule()"
-      @on-cancel="cancel()"
+      @on-ok="delModule"
+      @on-cancel="cancel"
     >
       <p>Do you really want to delete this step?</p>
     </Modal>
@@ -1270,7 +1270,7 @@ export default {
       //通知栏的属性设置，top表示距离顶部的距离，duration表示持续的时间
       this.$Notice.config({
         top: 50,
-        duration: 2
+        duration: 0
       });
     },
     reSize() {
@@ -1965,7 +1965,7 @@ export default {
                   that.$Notice.open({
                     title: "Upload notification title",
                     desc: "File uploaded successfully",
-                    duration: 2
+                    duration: 0
                   });
                   //这里重新获取全部资源
                   that.getAllResource();

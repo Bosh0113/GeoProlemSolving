@@ -134,9 +134,8 @@ img {
           <Table stripe border :columns="columns" :data="projectInfoShow" :show-header="false"></Table>
           <div slot="footer">
             <Alert show-icon style="float: left;width: fit-content;display: inline-block;" v-show="!UserState">If you want to participate in the project, please login.</Alert>
-            <Button @click="projectInfoModal=false" v-show="!UserState">Cancel</Button>
+            <Button v-show="!UserState" type="success" @click="login">Log in</Button>
             <Button type="success" @click="joinApplyModalShow(selectedProjectInfo)" v-show="!selectedProjectInfo.isMember&&!selectedProjectInfo.isManager&&UserState" >Apply</Button>
-            <Button type="primary" @click="goSingleProject()" v-show="UserState&&(selectedProjectInfo.isMember||selectedProjectInfo.isManager)">Enter</Button>
           </div>
         </Modal>
         <Modal
@@ -198,7 +197,7 @@ export default {
           {
             type: "string",
             min: 5,
-            message: "Reason no less than 10 characters",
+            message: "The reason no less than 10 characters",
             trigger: "blur"
           }
         ]
@@ -219,7 +218,10 @@ export default {
     },
     //进入项目详情页面的函数
     projectInfoModalShow(projectInfo) {
-      this.selectedProjectInfo = Object.assign({},projectInfo);
+      if(projectInfo.isMember||projectInfo.isManager){
+        this.$router.push({ path: `project/${projectInfo.projectId}` });
+      }else{
+        this.selectedProjectInfo = Object.assign({},projectInfo);
       var category = "";
       if (projectInfo.category != "Human" && projectInfo.category != "GISRS") {
         category = projectInfo.category;
@@ -272,6 +274,8 @@ export default {
         }
       ];
       this.projectInfoModal = true;
+      }
+
     },
     goSingleProject() {
       var id = this.selectedProjectInfo.projectId;
@@ -293,7 +297,7 @@ export default {
             title: "No access",
             desc:
               "You need to click + button at the north right corner to apply join the project",
-            duration: 5
+            duration: 0
           });
         }
       } else {
@@ -348,7 +352,7 @@ export default {
                     title: "Apply Successfully",
                     desc:
                       "The project's manager will process your apply in time,you can get a notification later to tell you the result.",
-                    duration: 0
+                    duration: 2
                   });
                   this.$emit("sendNotice", data.managerId);
                   this.haveApplied = true;
@@ -383,6 +387,9 @@ export default {
           this.$Message.error("Fail!");
         }
       });
+    },
+    login(){
+      this.$router.push({ name: "Login" });
     }
   }
 };

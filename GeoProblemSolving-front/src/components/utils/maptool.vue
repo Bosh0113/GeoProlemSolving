@@ -382,7 +382,7 @@ export default {
                   that.$Notice.open({
                     title: "Save to resource center",
                     desc: "Data saved successfully",
-                    duration: 2
+                    duration: 0
                   });
 
                   let dataName = res.data[0].fileName;
@@ -693,7 +693,7 @@ export default {
             // this.drawingLayerGroup.addLayer(geoJsonLayer);
             // break;
           }
-          case "uploaddata": {            
+          case "uploaddata": {
             let dataItem = {
               name: socketMsg.name,
               description: socketMsg.description,
@@ -858,7 +858,7 @@ export default {
     },
     selecetResource(url) {
       this.dataUrl = url;
-      
+
       // 协同
       this.send_content = {
         type: "selectdata",
