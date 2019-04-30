@@ -1,10 +1,11 @@
 <style scoped>
-.top,.bottom{
-    text-align: center;
+.top,
+.bottom {
+  text-align: center;
 }
 img {
   width: 100%;
-  height:auto;
+  height: auto;
 }
 .whitespace {
   height: 20px;
@@ -14,18 +15,18 @@ img {
   line-height: 30px;
   font-size: 20px;
   max-width: 200px;
-  padding-left:5px;
+  padding-left: 5px;
   display: inline-block;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.btnCreate{
-  font-size:15px;
-  height:40px;
-  margin:10px
+.btnCreate {
+  font-size: 15px;
+  height: 40px;
+  margin: 10px;
 }
-.btnCreate:hover,{
+.btnCreate:hover {
   background-color: #19be6b;
   color: white;
 }
@@ -50,36 +51,36 @@ img {
             >Create a new project</Button>
           </div>
         <div>
-          <Tabs value="All" type="card">
+          <Tabs value="All" type="card" @on-click="filterProjects">
             <TabPane label="All" name="All" icon="ios-list">
-              <project-list :projectList = currentProjectList projectType="All"></project-list>
+              <project-list :projectList = projectShowList projectType="All"></project-list>
             </TabPane>
             <TabPane label="Terrestrial" name="Terrestrial" icon="md-globe">
-              <project-list :projectList = currentProjectList projectType="Terrestrial"></project-list>
+              <project-list :projectList = projectShowList projectType="Terrestrial"></project-list>
             </TabPane>
             <TabPane label="Coastal" name="Coastal" icon="ios-boat">
-              <project-list :projectList = currentProjectList projectType="Coastal"></project-list>
+              <project-list :projectList = projectShowList projectType="Coastal"></project-list>
             </TabPane>
             <TabPane label="Marine" name="Marine" icon="ios-water">
-              <project-list :projectList = currentProjectList projectType="Marine"></project-list>
+              <project-list :projectList = projectShowList projectType="Marine"></project-list>
             </TabPane>
             <TabPane label="Climate" name="Climate" icon="ios-partly-sunny">
-              <project-list :projectList = currentProjectList projectType="Climate"></project-list>
+              <project-list :projectList = projectShowList projectType="Climate"></project-list>
             </TabPane>
             <TabPane label="Ecological" name="Ecological" icon="ios-leaf">
-              <project-list :projectList = currentProjectList projectType="Ecological"></project-list>
+              <project-list :projectList = projectShowList projectType="Ecological"></project-list>
             </TabPane>
             <TabPane label="Geological" name="Geological" icon="ios-analytics">
-              <project-list :projectList = currentProjectList projectType="Geological"></project-list>
+              <project-list :projectList = projectShowList projectType="Geological"></project-list>
             </TabPane>
             <TabPane label="Human-Activity" name="Human" icon="ios-people">
-              <project-list :projectList = currentProjectList projectType="Human"></project-list>
+              <project-list :projectList = projectShowList projectType="Human"></project-list>
             </TabPane>
             <TabPane label="GIS & RS" name="GISRS" icon="ios-globe">
-              <project-list :projectList = currentProjectList projectType="GISRS"></project-list>
+              <project-list :projectList = projectShowList projectType="GISRS"></project-list>
             </TabPane>
             <TabPane label="General" name="General" icon="ios-grid">
-              <project-list :projectList = currentProjectList projectType="General"></project-list>
+              <project-list :projectList = projectShowList projectType="General"></project-list>
             </TabPane>
           </Tabs>
         </div>
@@ -87,7 +88,7 @@ img {
     </Row>
 </template>
 <script>
-import projectList from "./TabContent.vue"
+import projectList from "./TabContent.vue";
 export default {
   mounted() {
     this.getAllProjects();
@@ -97,16 +98,16 @@ export default {
   },
   data() {
     return {
-      getFinish:false,
-      currentProjectList : [],
+      getFinish: false,
+      currentProjectList: [],
+      projectShowList: []
     };
   },
   methods: {
-    getAllProjects(){
+    getAllProjects() {
       this.getFinish = true;
       this.axios
-        .get(
-          "/GeoProblemSolving/project/inquiryAll")
+        .get("/GeoProblemSolving/project/inquiryAll")
         .then(res => {
           //结束等待
           this.getFinish = false;
@@ -115,10 +116,23 @@ export default {
           } else {
             this.judgeMember(res.data);
           }
+          this.projectShowList = Object.assign([], this.currentProjectList);
         })
         .catch(err => {
           console.log(err.data);
         });
+    },
+    filterProjects(type) {
+      var allProjectList = Object.assign([], this.currentProjectList);
+      if (type != "All") {
+        this.projectShowList = allProjectList.filter(function(project) {
+          if (project.category == type) {
+            return project;
+          }
+        });
+      } else {
+        this.projectShowList = allProjectList;
+      }
     },
     // 判断是不是成员
     judgeMember(list) {
@@ -155,7 +169,7 @@ export default {
       } else {
         this.$router.push({ name: "NewProject" });
       }
-    },
+    }
   }
 };
 </script>

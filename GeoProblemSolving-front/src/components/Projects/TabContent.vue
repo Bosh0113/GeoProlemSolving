@@ -27,10 +27,10 @@ img {
 <template>
     <div>
         <div class="TabContent">
+          <div v-if="projectList.length>0">
             <div class="projectCard"
             v-for="(item,index) in projectList"
-            :key="index"
-            v-show="item.category == projectType||projectType == 'All' "
+            :key="item.index"
             style="width:95%;margin-right:5%">
             <Col
                 :xs="{ span: 21, offset: 1 }"
@@ -107,7 +107,8 @@ img {
                 </div>
             </Col>
             </div>
-            <div v-show="projectList.length <= 0">
+            </div>
+            <div v-else>
                 <Col span="22" offset="1">
                     <Card :bordered="false">
                         <div style="display:flex;justify-content:center">
@@ -210,12 +211,6 @@ export default {
     };
   },
   methods: {
-    ok() {
-      this.$Message.info("Clicked ok");
-    },
-    cancel() {
-      this.$Message.info("Clicked cancel");
-    },
     //进入项目详情页面的函数
     projectInfoModalShow(projectInfo) {
       if(projectInfo.isMember||projectInfo.isManager){
