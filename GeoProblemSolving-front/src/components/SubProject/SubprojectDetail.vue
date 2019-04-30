@@ -191,7 +191,7 @@
                               <div
                                 class="member-image"
                                 @click="gotoPersonalSpace(member.userId)"
-                                style="cursor:pointer;display:flex;justify-content:center;align-ittems:center"
+                                style="cursor:pointer;display:flex;justify-content:center;align-items:center"
                               >
                                 <img
                                   v-if="member.avatar != ''"
@@ -208,7 +208,7 @@
                               <div class="memebr-work" style="display:flex;align-items:center">
                                 <div style="height:40px">
                                   <div>
-                                  <span style="padding:0 5px;float:right">{{member.userName}}</span>
+                                  <span style="padding:0 5px">{{member.userName}}</span>
                                 </div>
                                 <div>
                                   <span style="padding:0 5px">{{member.organization}}</span>
