@@ -59,6 +59,7 @@
   white-space: nowrap;
   height: 16px;
   cursor: pointer;
+  overflow: hidden;
 }
 .fileItemSize{
   width: 10%;
@@ -93,11 +94,11 @@
             </Tooltip>
           </div>
           <div class="folderContent">
-              <div v-if="currentFolder.folders.length>0||currentFileList.length>0">
+              <div v-if="currentFolder.folders.length>0 || currentFileList.length>0">
                   <Card v-for="(folder,index) in currentFolder.folders" :key="folder.index" :padding="5">
                     <div>
                       <Icon type="ios-folder-open" class="itemIcon" size="25"/>
-                      <a @click="enterFolder(folder)" :title="folder.name">{{folder.name}}</a>
+                      <a @click="enterFolder(folder)" class="fileItemName" :title="folder.name">{{folder.name}}</a>
                       <span @click="deleteFolder(folder)" class="folderDeleteBtn"><Icon type="ios-trash-outline" title="Delete" size="25"/></span>
                       <span @click="renameFolderModalShow(folder)" class="folderRenameBtn"><Icon type="ios-create-outline" title="Rename" size="25"/></span>
                     </div>
@@ -591,13 +592,13 @@ export default {
               data: formData
             })
               .then(res => {
-                this.progressModalShow = false;
                 if (res.data != "Fail") {
                   this.subProjectFileStruct = res.data;
                   this.refreshCurrentAll(res.data, this.currentFolder.uid);
                 } else {
                   this.$Message.warning("Upload fail.");
                 }
+                this.progressModalShow = false;
                 this.uploadProgress = 0;
               })
               .catch(err => {
@@ -611,7 +612,7 @@ export default {
     },
     filePreview(fileInfo){
 
-      if (/\.(pdf|doc|docx|xls|xlsx|ppt|pptx|zip)$/.test(fileInfo.name.toLowerCase())) {
+      if (/\.(doc|docx|xls|xlsx|csv|ppt|pptx|zip)$/.test(fileInfo.name.toLowerCase())) {
         if (this.panel != null) {
           this.panel.close();
         }
@@ -660,7 +661,7 @@ export default {
         });
         $(".jsPanel-content").css("font-size", "0");
       }
-      else if(/\.(xml|json|md|gif|jpg|png)$/.test(fileInfo.name.toLowerCase())){
+      else if(/\.(pdf|xml|json|md|gif|jpg|png)$/.test(fileInfo.name.toLowerCase())){
         if (this.panel != null) {
           this.panel.close();
         }

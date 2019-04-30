@@ -29,7 +29,7 @@ img {
         <div class="TabContent">
             <div class="projectCard"
             v-for="(item,index) in projectList"
-            :key="item.index"
+            :key="index"
             v-show="item.category == projectType||projectType == 'All' "
             style="width:95%;margin-right:5%">
             <Col
@@ -107,7 +107,7 @@ img {
                 </div>
             </Col>
             </div>
-            <div v-show="projectType!='All'">
+            <div v-show="projectList.length <= 0">
                 <Col span="22" offset="1">
                     <Card :bordered="false">
                         <div style="display:flex;justify-content:center">
@@ -129,7 +129,7 @@ img {
         </div>
         <Modal
         v-model="projectInfoModal"
-        title="Project Info"
+        title="Project info"
         width="800px">
           <Table stripe border :columns="columns" :data="projectInfoShow" :show-header="false"></Table>
           <div slot="footer">
@@ -198,7 +198,7 @@ export default {
           {
             type: "string",
             min: 5,
-            message: "Introduce no less than 5 words",
+            message: "Reason no less than 10 characters",
             trigger: "blur"
           }
         ]

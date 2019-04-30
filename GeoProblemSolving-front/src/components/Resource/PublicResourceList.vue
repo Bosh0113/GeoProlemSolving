@@ -273,7 +273,7 @@ export default {
     },
     show(index) {
       let name = this.showList[index].name;
-      if (/\.(pdf|doc|docx|xls|xlsx|ppt|pptx|zip)$/.test(name.toLowerCase())) {
+      if (/\.(pdf|doc|docx|xls|xlsx|csv|ppt|pptx|zip)$/.test(name.toLowerCase())) {
         if (this.panel != null) {
           this.panel.close();
         }

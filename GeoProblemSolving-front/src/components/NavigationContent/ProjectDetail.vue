@@ -137,12 +137,12 @@
   height: 40px;
   line-height: 40px;
   font-size: 20px;
-  max-width: 70px;
+  /* max-width: 70px; */
   display: inline-block;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  width: 70%;
+  width: 60%;
 }
 /* 按钮样式统一结束 */
 .projectCardTitle {
@@ -176,10 +176,6 @@
   text-indent: 2em;
   padding: 0 5px;
   word-break: break-word;
-}
-.projectIntroduction,
-.projectIntroduction h3 {
-  margin-left: 5px;
 }
 .projectIntroductionContent {
   height: 196px;
@@ -400,7 +396,7 @@
                       style="cursor:pointer"
                     >
                       <Card class="subProjectStyle">
-                          <div style="width:70%" class="subProjectTitle" slot="title" :title="subProject.title">
+                          <div class="subProjectTitle" slot="title" :title="subProject.title">
                           <span>{{subProject["title"]}}</span>
                         </div>
                         <div slot="extra" class="subProjectTitleOperatePanel">
@@ -741,10 +737,8 @@
     <Modal
       v-model="progressModalShow"
       title="Upload Progress"
-      @on-ok
-      @on-cancel
-      ok-text="ok"
-      cancel-text="close"
+      :mask-closable="false"
+      :closable="false"
     >
       <Progress :percent="uploadProgress"></Progress>
     </Modal>
@@ -1451,7 +1445,7 @@ export default {
     show(index) {
       let name = this.projectResourceList[index].name;
       
-      if (/\.(pdf|doc|docx|xls|xlsx|ppt|pptx|zip)$/.test(name.toLowerCase())) {
+      if (/\.(pdf|doc|docx|xls|xlsx|csv|ppt|pptx|zip)$/.test(name.toLowerCase())) {
         if (this.panel != null) {
           this.panel.close();
         }
@@ -1743,13 +1737,15 @@ export default {
                     this.getAllResource();
                     this.file = [];
                     this.fileUploadForm.description = "";
-                    this.fileUploadForm.privacy = "";
-                    this.fileUploadForm.type = "";
+                    this.fileUploadForm.privacy = "private";
+                    this.fileUploadForm.type = "data";
                     // 创建一个函数根据pid去后台查询该项目下的资源
-                    this.uploadProgress = 0;
                   }
+                  this.progressModalShow = false;
+                  this.uploadProgress = 0;
                 })
                 .catch(err => { 
+                  this.progressModalShow = false;
                   this.uploadProgress = 0;
                 });
             } else {

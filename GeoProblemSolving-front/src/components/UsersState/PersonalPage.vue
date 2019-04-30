@@ -606,7 +606,7 @@ export default {
           {
             type: "string",
             min: 20,
-            message: "Introduce no less than 20 words",
+            message: "Introduce no less than 20 characters",
             trigger: "blur"
           }
         ],

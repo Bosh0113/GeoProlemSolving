@@ -97,7 +97,7 @@ img {
             </FormItem>
             <FormItem prop="password" label="Password" :label-width="100">
               <Input
-                placeholder="please input your password"
+                placeholder="Please input your password"
                 style="width: 90%"
                 v-model="loginForm.password"
                 @keyup.enter.native="login('loginForm')"
@@ -174,20 +174,20 @@ export default {
         user: [
           {
             required: true,
-            message: "username is not allowed null",
+            message: "Username can not be empty",
             trigger: "blur"
           }
         ],
         password: [
           {
             required: true,
-            message: "password is not allowed null",
+            message: "Password can not be empty",
             trigger: "blur"
           },
           {
             type: "string",
             min: 6,
-            message: "The password length cannot be less than 6 bits",
+            message: "The length of password can not be less than 6 characters",
             trigger: "blur"
           }
         ]
@@ -200,7 +200,7 @@ export default {
       },
       checked: false,
       changePwdEmailStyle:
-        "This email is used for help you reset your password,you can click this url ",
+        "This email is used for help you reset your password, you can click this URL ",
       urlAddress: 'http://'+this.$store.state.IP_Port+"/GeoProblemSolving/resetPassword/",
       resetModalSHow: false
     };
