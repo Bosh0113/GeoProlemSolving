@@ -159,12 +159,12 @@
                                   <img
                                     v-if="member.avatar != '' && member.avatar!='undefined'"
                                     :src="member.avatar"
-                                    style="width:auto;height:100%"
+                                    style="width:100%;height:100%"
                                   >
                                   <avatar
                                     :username="member.userName"
                                     :size="50"
-                                    style="width:auto;height:100%;margin-top:-10px"
+
                                     :title="member.userName"
                                     v-else
                                   ></avatar>
@@ -191,12 +191,12 @@
                               <div
                                 class="member-image"
                                 @click="gotoPersonalSpace(member.userId)"
-                                style="cursor:pointer;display:flex;justify-content:center;align-ittems:center"
+                                style="cursor:pointer;display:flex;justify-content:center;align-items:center"
                               >
                                 <img
                                   v-if="member.avatar != ''"
                                   :src="member.avatar"
-                                  style="width:auto;height:100%"
+                                  style="width:100%;height:100%"
                                 >
                                 <avatar
                                   :username="member.userName"
@@ -208,7 +208,7 @@
                               <div class="memebr-work" style="display:flex;align-items:center">
                                 <div style="height:40px">
                                   <div>
-                                  <span style="padding:0 5px;float:right">{{member.userName}}</span>
+                                  <span style="padding:0 5px">{{member.userName}}</span>
                                 </div>
                                 <div>
                                   <span style="padding:0 5px">{{member.organization}}</span>
