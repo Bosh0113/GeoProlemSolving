@@ -1049,8 +1049,8 @@ export default {
         this.subprojectSocket = null;
       }
       let roomId = this.subProjectInfo.subProjectId + "task";
-      // var subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + roomId;
-      var subprojectSocketURL = "ws://"+this.$store.state.IP_Port+"/GeoProblemSolving/Module/" + roomId;
+      var subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + roomId;
+      // var subprojectSocketURL = "ws://"+this.$store.state.IP_Port+"/GeoProblemSolving/Module/" + roomId;
       this.subprojectSocket = new WebSocket(subprojectSocketURL);
       this.subprojectSocket.onopen = this.onOpen;
       this.subprojectSocket.onmessage = this.onMessage;
@@ -1256,7 +1256,7 @@ export default {
               replyNotice["recipientId"] = this.inviteList[i];
               replyNotice["type"] = "notice";
               replyNotice["content"] = {
-                title: "Join subProject",
+                title: "Join subproject",
                 description:
                   "You have been invited by " +
                   this.subProjectInfo.managerName +
@@ -1710,7 +1710,7 @@ export default {
             removeNotice["recipientId"] = uid;
             removeNotice["type"] = "notice";
             removeNotice["content"] = {
-              title: "remove notification",
+              title: "Remove notification",
               description:
                 "You have been expeled from sub project called " +
                 this.subProjectInfo.title +

@@ -1421,8 +1421,8 @@ export default {
         this.subprojectSocket = null;
       }
       let subProjectId = this.subProjectInfo.subProjectId;
-      // var subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + subProjectId;
-      var subprojectSocketURL = "ws://"+this.$store.state.IP_Port+"/GeoProblemSolving/Module/" + subProjectId;
+      var subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + subProjectId;
+      // var subprojectSocketURL = "ws://"+this.$store.state.IP_Port+"/GeoProblemSolving/Module/" + subProjectId;
       this.subprojectSocket = new WebSocket(subprojectSocketURL);
       this.subprojectSocket.onopen = this.onOpen;
       this.subprojectSocket.onmessage = this.onMessage;
@@ -2336,7 +2336,7 @@ export default {
     previewRes(index) {
       let name = this.resourceList[index].name;
 
-      if (/\.(pdf|doc|docx|xls|xlsx|ppt|pptx|zip)$/.test(name.toLowerCase())) {
+      if (/\.(pdf|doc|docx|xls|xlsx|csv|ppt|pptx|zip)$/.test(name.toLowerCase())) {
         if (this.panel != null) {
           this.panel.close();
         }

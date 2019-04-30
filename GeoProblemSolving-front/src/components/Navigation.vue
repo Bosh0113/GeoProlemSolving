@@ -193,7 +193,7 @@ footer {
     </section>
     <footer>
       <h2 class="footerTop"><i>Open Geographic Modeling and Simulation</i></h2>
-      <p class="footerBottom">copyright@2013-2019 OpenGMS.all rights reserved</p>
+      <p class="footerBottom">Copyright © 2013-2019 OpenGMS. All rights reserved.</p>
     </footer>
   </div>
 </template>
@@ -311,8 +311,8 @@ export default {
       if (this.noticeSocket != null) {
         this.noticeSocket = null;
       }
-      // var noticeSocketURL = "ws://localhost:8081/GeoProblemSolving/NoticeSocket";
-      var noticeSocketURL = "ws://"+this.$store.state.IP_Port+"/GeoProblemSolving/NoticeSocket";
+      var noticeSocketURL = "ws://localhost:8081/GeoProblemSolving/NoticeSocket";
+      // var noticeSocketURL = "ws://"+this.$store.state.IP_Port+"/GeoProblemSolving/NoticeSocket";
       this.noticeSocket = new WebSocket(noticeSocketURL);
       this.noticeSocket.onopen = this.onOpen;
       this.noticeSocket.onmessage = this.onMessage;
