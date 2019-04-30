@@ -472,18 +472,18 @@ export default {
           title: "Type",
           key: "type",
           sortable: true,
-          width:90
+          width: 90
         },
         {
           title: "Description",
           key: "description",
-          tooltip:true,
+          tooltip: true,
           sortable: true
         },
         {
           title: "Time",
           key: "uploadTime",
-          width: 160 ,
+          width: 160,
           sortable: true
         },
         {
@@ -661,7 +661,7 @@ export default {
     },
     //获取用户的详细信息
     getUserProfile() {
-      this.userDetail = Object.assign({},this.$store.getters.userInfo);
+      this.userDetail = Object.assign({}, this.$store.getters.userInfo);
       delete this.userDetail.password;
       delete this.userDetail.joinedProjects;
       delete this.userDetail.manageProjects;
@@ -870,7 +870,7 @@ export default {
       this.$Message.info("cancel");
     },
     editModalShow() {
-      this.personalInfoItem = Object.assign({},this.userDetail);
+      this.personalInfoItem = Object.assign({}, this.userDetail);
       this.editProfileModal = true;
     },
     //处理修改用户头像信息相关的函数
@@ -933,7 +933,7 @@ export default {
       });
     },
     resetForm() {
-      this.personalInfoItem = Object.assign({},this.userDetail);
+      this.personalInfoItem = Object.assign({}, this.userDetail);
     },
     //点击跳转到指定项目的函数
     goSingleProject(id) {
@@ -968,6 +968,8 @@ export default {
         .then(res => {
           if (res.data != "None" && res.data != "Fail") {
             this.userResourceList = res.data;
+          } else if (res.data == "None") {
+            this.userResourceList = [];
           }
         })
         .catch(err => {
@@ -1076,7 +1078,7 @@ export default {
   margin-right: 20px;
 }
 .rightContent {
-  margin-top:20px;
+  margin-top: 20px;
   flex: 1;
 }
 /* 用户头像 */
@@ -1203,6 +1205,6 @@ body {
 <style>
 .parent .ivu-tabs-nav-container {
   font-size: 15px !important;
-  font-weight:bold;
+  font-weight: bold;
 }
 </style>
