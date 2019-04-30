@@ -159,12 +159,12 @@
                                   <img
                                     v-if="member.avatar != '' && member.avatar!='undefined'"
                                     :src="member.avatar"
-                                    style="width:auto;height:100%"
+                                    style="width:100%;height:100%"
                                   >
                                   <avatar
                                     :username="member.userName"
                                     :size="50"
-                                    style="width:auto;height:100%;margin-top:-10px"
+
                                     :title="member.userName"
                                     v-else
                                   ></avatar>
@@ -196,7 +196,7 @@
                                 <img
                                   v-if="member.avatar != ''"
                                   :src="member.avatar"
-                                  style="width:auto;height:100%"
+                                  style="width:100%;height:100%"
                                 >
                                 <avatar
                                   :username="member.userName"
