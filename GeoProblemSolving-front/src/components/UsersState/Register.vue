@@ -14,7 +14,7 @@
   margin-left: 2.5%;
 }
 .InputStyle {
-  width: 500px;
+  width: 400px;
 }
 .registerForm {
   padding: 20px;

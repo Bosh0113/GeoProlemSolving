@@ -122,14 +122,20 @@ img {
                   v-model="loginForm.State"
                   class="loginBtn"
                 >Log in</Button>
+                <Button
+                  type="default"
+                  @click="register"
+                  class="loginBtn"
+                  style="margin-left:10px"
+                >Sign up</Button>
               </div>
             </FormItem>
-            <div class="reUseDiv">
+            <!-- <div class="reUseDiv">
               <span>
-                If you don't hava an account,click
+                If you don't have an account,click
                 <a @click="goRegister">Here</a> to register.
               </span>
-            </div>
+            </div> -->
           </Form>
         </div>
       </div>
@@ -334,6 +340,9 @@ export default {
         .catch(err => {
           console.log(err.data);
         });
+    },
+    register(){
+      this.$router.push({ name: "Register" });
     }
   }
 };
