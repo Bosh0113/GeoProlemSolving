@@ -1,11 +1,11 @@
 package cn.edu.njnu.geoproblemsolving.Dao.Project;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Email.EmailDaoImpl;
+import cn.edu.njnu.geoproblemsolving.Dao.Method.CommonMethod;
+import cn.edu.njnu.geoproblemsolving.Dao.Method.EncodeUtil;
 import cn.edu.njnu.geoproblemsolving.Dao.User.UserDaoImpl;
 import cn.edu.njnu.geoproblemsolving.Entity.EmailEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.ProjectEntity;
-import cn.edu.njnu.geoproblemsolving.Dao.Method.CommonMethod;
-import cn.edu.njnu.geoproblemsolving.Dao.Method.EncodeUtil;
 import cn.edu.njnu.geoproblemsolving.Entity.SubProjectEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.UserEntity;
 import com.alibaba.fastjson.JSONArray;
@@ -18,6 +18,8 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.Part;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -26,8 +28,6 @@ import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.Part;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -360,10 +360,6 @@ public class ProjectDaoImpl implements IProjectDao {
             Query queryUser = Query.query(Criteria.where("userId").is(userId));
             UserEntity manager = mongoTemplate.findOne(queryUser, UserEntity.class);
             emailEntity.setRecipient(manager.getEmail());
-            String EmailContent = emailEntity.getMailContent();
-            EmailContent = EmailContent + "You can click this url and enter the site to process this application: " +
-                    "http://172.21.212.7:8082/GeoProblemSolving/home";
-            emailEntity.setMailContent(EmailContent);
             EmailDaoImpl emailDao = new EmailDaoImpl();
             emailDao.sendEmail(emailEntity);
             return "Success";

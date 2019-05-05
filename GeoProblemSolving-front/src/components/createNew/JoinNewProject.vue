@@ -15,6 +15,10 @@
 .content{
   height:auto;
 }
+.menuItem span{
+  font-size: 1.2em;
+  font-weight: bold;
+}
 #logo {
   position: absolute;
   width: 129px;
@@ -40,6 +44,7 @@
   width:100%;
   bottom:0;
 }
+
 </style>
 
 <template>
@@ -58,21 +63,21 @@
           <MenuItem name="home" class="menuItem" style="margin-left:30%">
             <span>Home</span>
           </MenuItem>
-          <MenuItem name="project">
+          <MenuItem name="project" class="menuItem">
             <span>Project</span>
           </MenuItem>
-          <MenuItem name="Public Resource">
+          <MenuItem name="Public Resource" class="menuItem">
             <span>Public Resource</span>
           </MenuItem>
-          <MenuItem name="community">
+          <MenuItem name="community" class="menuItem">
             <span>Community</span>
           </MenuItem>
-          <MenuItem name="help" class="menuItem">
+          <MenuItem name="help" class="menuItem" >
             <span>Help</span>
           </MenuItem>
         </Menu>
         <div class="userState">
-            <Menu mode="horizontal" theme="dark" @on-select="unlogin" style="z-index:0" v-show="!userState">
+            <Menu mode="horizontal" theme="dark" @on-select="unlogin" style="z-index:0" v-show="!userState" class="menuItem">
               <MenuItem name="login">
                 <span>Login</span>
               </MenuItem>
@@ -80,7 +85,7 @@
                  <span>Sign up</span>
               </MenuItem>
             </Menu>
-            <Menu mode="horizontal" theme="dark" @on-select="logged" style="z-index:0"  v-show="userState">
+            <Menu mode="horizontal" theme="dark" @on-select="logged" style="z-index:0"  v-show="userState" class="menuItem">
               <MenuItem name="notification">
                 <Badge :count="unreadNoticeCount" id="noticeBadge">
                   <Icon type="ios-notifications-outline" size="25"></Icon>
@@ -115,7 +120,10 @@
     <Col span="16" offset="4" :style="{height:contentHeight}">
     <div style="display:flex;justify-content:center;height:100%;padding:100px 200px 100px 200px;">
       <Form :label-width="120">
-          <FormItem label="ProjectId">
+        <FormItem label="Project Name">
+          <Input v-model="projectName" disabled style="width:500px"></Input>
+        </FormItem>
+          <FormItem label="ProjectId" style="display:none">
           <Input v-model="projectId" disabled style="width:500px"></Input>
         </FormItem>
         <FormItem label="Email" >
@@ -128,7 +136,7 @@
         </FormItem>
         <div style="display:flex;justify-content:center">
           <Button type="default" @click="joinByMail()">
-            Submit
+            <span style="font-weight:bold;font-size:1.2em">Submit</span>
           </Button>
         </div>
       </Form>
@@ -158,13 +166,18 @@ export default {
       passwordInputShow:false,
       registeredHintShow:false,
       unregisteredHintShow:false,
-      registeredHint:"This email has been registered,you have been a member in our platform, now you need fill the password in the blank and you can join in the project later.",
-      unregisteredHint:"Sorry,you are not a user in our platform,this email will be used to create a new account for you,you only need to set a password for log in,and if you want to enrich your personal information,you can go to userSpace to enrich them.",
+      registeredHint:"This email has been registered, you have been a member in our platform, now you need fill the password in the blank and you can join in the project later.",
+      // unregisteredHint:"Sorry,you are not a user in our platform,this email will be used to create a new account for you,you only need to set a password for log in,and if you want to enrich your personal information,you can go to userSpace to enrich them.",
+      unregisteredHint:"It seems that this email is not a registed user in our platform. If you input your own password here and press Submit button, your own account would be created based on the email presented above and you will join the project at the same time. ",
       // navaigation页面的变量
        //消息机制
       noticeSocket: null,
       unreadNoticeCount: 0,
       timer: null,
+      // 项目信息
+      projectInfo:[],
+      // 项目名
+      projectName:"",
     };
   },
   // created(){
@@ -172,17 +185,19 @@ export default {
   // },
   mounted(){
     // navigation页面的
+    this.getProjectName();
     if (this.$store.getters.userState) {
       this.setTimer();
-      this.initWebSocket();
-      this.getUnreadNoticeCount();
+      // this.initWebSocket();
+      // this.getUnreadNoticeCount();
     }
     //
     this.headerWidth = window.innerWidth + "px";
     this.contentHeight = window.innerHeight - 120 + 'px';
-    this.projectId = this.$route.params.id;;
+    this.projectId = this.$route.params.id;
     this.email = this.$route.params.email;
     this.judgeMailRegiste();
+
   },
   updated() {
     $(".userState sup").css("margin-top", "20px");
@@ -202,6 +217,19 @@ export default {
     }
   },
   methods:{
+      getProjectName(){
+        this.axios.get("/GeoProblemSolving/project/inquiry?key=projectId&&value=" + this.$route.params.id)
+        .then(res=> {
+          if(res.data!="None"){
+            this.projectInfo = res.data;
+            this.projectName = this.projectInfo[0].title;
+            console.log(this.projectName);
+          }
+        })
+        .catch(err=>{
+
+        })
+      },
       judgeMailRegiste(){
         this.axios
         .get(

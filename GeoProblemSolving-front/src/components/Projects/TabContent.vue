@@ -359,7 +359,7 @@ export default {
               let emailObject = {
                 recipient: joinForm.recipientId,
                 mailTitle: "Group application",
-                mailContent: joinForm.content.description + "<br>"
+                mailContent: joinForm.content.description + "<br>"+"You can click this url and enter the site to process this application: "+"http://"+this.$store.state.IP_Port+"/GeoProblemSolving/home"
               };
               this.axios
                 .post("/GeoProblemSolving/project/applyByMail", emailObject)
