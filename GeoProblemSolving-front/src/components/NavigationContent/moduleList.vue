@@ -159,12 +159,24 @@
   text-overflow: ellipsis;
   max-width: 120px;
 }
+.operatePanel{
+  display:flex;
+  justify-content: flex-end
+}
 .operatePanel button {
   margin-right: 2.5%;
 }
 .noModule h1 {
   color: darkgray;
   text-align: center;
+}
+.moduleShow{
+    width: 30px;
+    height: 36px;
+    border: white;
+    cursor: pointer;
+    background-color: white;
+    opacity: 0.3;
 }
 </style>
 <template>
@@ -173,17 +185,17 @@
       <Col span="22" offset="1">
         <Card>
           <Row>
-            <Col span="7" style="height:20px">
+            <Col span="6" style="height:20px">
               <Breadcrumb>
                 <BreadcrumbItem :to="toProjectPage">Project</BreadcrumbItem>
                 <BreadcrumbItem :to="toSubProjectPage">Subproject</BreadcrumbItem>
                 <BreadcrumbItem>Working panel</BreadcrumbItem>
               </Breadcrumb>
             </Col>
-            <Col span="10" style="text-align:center;font-size:1.5rem;height:20px;;margin-top:-10px">
+            <Col span="12" style="text-align:center;font-size:1.5rem;height:20px;;margin-top:-10px">
               <strong>{{subProjectInfo.title}}</strong>
             </Col>
-            <Col span="6" offset="1" style="height:20px;display:flex;align-items:center" class="operatePanel">
+            <Col span="5" offset="1" style="height:20px;display:flex;align-items:center" class="operatePanel">
               <template v-if="this.$store.getters.userInfo.userId == this.subProjectInfo.managerId">
                 <template v-if="this.moduleList.length == 0">
                   <Button
@@ -232,11 +244,14 @@
             </Col>
           </Row>
           <Row>
-            <Col span="22" offset="1" style="background-color:white;">
+            <Col span="1" style="background-color:white;margin-top:20px">
+              <button class="moduleShow" @click="moudelMove('back')" v-if="moduleLeftMove"><Icon type="ios-arrow-back" style="font-size: 2rem;font-weight: 700"/></button>
+            </Col>
+            <Col span="22" style="background-color:white;margin-top:20px">
               <template v-if="this.$store.getters.userInfo.userId == this.subProjectInfo.managerId">
                 <Steps :current="order">
                   <Step
-                    v-for="(list,index) in moduleList"
+                    v-for="(list,index) in showedModules"
                     :key="index"
                     @click.native="showDetail(index)"
                     :title="list.type"
@@ -248,7 +263,7 @@
               <template v-else>
                 <Steps :current="order">
                   <Step
-                    v-for="(list,index) in moduleList"
+                    v-for="(list,index) in showedModules"
                     :key="index"
                     @click.native="showDetail(index)"
                     :title="list.type"
@@ -257,6 +272,9 @@
                   ></Step>
                 </Steps>
               </template>
+            </Col>
+            <Col span="1" style="background-color:white;margin-top:20px">
+              <button class="moduleShow" @click="moudelMove('forward')"  v-if="moduleRightMove"><Icon type="ios-arrow-forward" style="font-size: 2rem;font-weight: 700"/></button>
             </Col>
           </Row>
         </Card>
@@ -363,21 +381,21 @@
                       <span
                         @click="noticeModalShow=true"
                         style="cursor:pointer"
-                        title="add a notice"
+                        title="Add a notice"
                       >
                         <Icon type="md-add"/>
                       </span>
                       <span
                         @click="noticeDetailShow()"
                         style="cursor:pointer;margin-left:10px"
-                        title="edit"
+                        title="Edit"
                       >
                         <Icon type="ios-create"/>
                       </span>
                       <span
                         @click="deleteNotice()"
                         style="cursor:pointer;margin-left:10px"
-                        title="remove"
+                        title="Remove"
                       >
                         <Icon type="ios-trash"/>
                       </span>
@@ -407,10 +425,10 @@
                     cancel-text="Cancel"
                   >
                     <Form :model="formItem" :label-width="60">
-                      <FormItem label="title">
+                      <FormItem label="Title">
                         <Input v-model="formItem.title" placeholder="Enter bulletin title"></Input>
                       </FormItem>
-                      <FormItem label="content">
+                      <FormItem label="Content">
                         <Input
                           v-model="formItem.content"
                           placeholder="Enter bulletin content"
@@ -1155,8 +1173,12 @@ export default {
       taskList: [],
       // 后台拿到的Module集合，渲染成一条轴用的
       moduleList: [],
+      showedModules:[],
+      moduleRightMove:false,
+      moduleLeftMove:false,
       // 当前模块的索引
       currentModuleIndex: 0,
+      showedModuleLevel: 0,
       // web socket for module
       subprojectSocket: null,
       timer: null,
@@ -1365,10 +1387,9 @@ export default {
     },
     showDetail(item) {
       let oldId = this.currentModule.moduleId;
-
-      this.currentModuleIndex = item;
-      this.order = item;
+      this.currentModuleIndex = this.showedModuleLevel*5 + item;
       this.currentModule = this.moduleList[this.currentModuleIndex];
+
       sessionStorage.setItem("moduleId", this.currentModule.moduleId);
       sessionStorage.setItem("moduleName", this.currentModule.title);
 
@@ -1376,6 +1397,7 @@ export default {
         //查询公告
         this.inquiryNotice();
         this.getAllResource();
+        this.showModules('init');
         let records = [];
         if (!this.currentModule.activeStatus) {
           for (let i = 0; i < this.allHistRecords.length; i++) {
@@ -1410,6 +1432,69 @@ export default {
         }
       }
     },
+    moudelMove(direction){
+      if(direction == 'back'){
+        this.showModules('back');
+      }
+      else if(direction == 'forward'){
+        this.showModules('forward');
+      }
+    },
+    showModules(type){
+      
+      this.showedModules = [];
+      if(this.moduleList.length > 5){
+        if(type == 'init'){
+          this.order = Math.round(((this.currentModuleIndex/5) - Math.floor(this.currentModuleIndex/5))*5);
+          this.showedModuleLevel = Math.floor(this.currentModuleIndex/5);          
+        }
+        else if(type == 'back'){
+          this.showedModuleLevel--;
+          if(this.showedModuleLevel == Math.floor(this.currentModuleIndex/5)){
+            this.order = Math.round(((this.currentModuleIndex/5) - Math.floor(this.currentModuleIndex/5))*5);
+          }
+          else{
+            this.order = -1;
+          }
+        }
+        else if(type == 'forward'){
+          this.showedModuleLevel++;
+          if(this.showedModuleLevel == Math.floor(this.currentModuleIndex/5)){
+            this.order = Math.round(((this.currentModuleIndex/5) - Math.floor(this.currentModuleIndex/5))*5);
+          }
+          else{
+            this.order = -1;
+          }       
+        }
+        
+        for(let i =  this.showedModuleLevel*5; i < (this.showedModuleLevel+1)*5; i++){
+          if(i == this.moduleList.length){
+            break;
+          }
+          this.showedModules.push(this.moduleList[i]);
+        }   
+        
+        if(this.showedModuleLevel>0){
+          this.moduleLeftMove = type;
+        }
+        else{
+          this.moduleLeftMove = false;
+        }
+        if(this.showedModuleLevel <  Math.floor((this.moduleList.length-1)/5)){
+          this.moduleRightMove = true;
+        }
+        else{
+          this.moduleRightMove = false;
+        }
+      }
+      else{
+        this.showedModules = this.moduleList;
+        this.moduleRightMove = false;
+        this.moduleLeftMove = false;
+        this.showedModuleLevel = 0;
+        this.order = this.currentModuleIndex;
+      }
+    },
     closeModuleSocket() {
       if (this.subprojectSocket != null) {
         this.removeTimer();
@@ -1421,8 +1506,8 @@ export default {
         this.subprojectSocket = null;
       }
       let subProjectId = this.subProjectInfo.subProjectId;
-      // var subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + subProjectId;
-      var subprojectSocketURL = "ws://"+this.$store.state.IP_Port+"/GeoProblemSolving/Module/" + subProjectId;
+      var subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + subProjectId;
+      // var subprojectSocketURL = "ws://"+this.$store.state.IP_Port+"/GeoProblemSolving/Module/" + subProjectId;
       this.subprojectSocket = new WebSocket(subprojectSocketURL);
       this.subprojectSocket.onopen = this.onOpen;
       this.subprojectSocket.onmessage = this.onMessage;
@@ -1679,6 +1764,7 @@ export default {
 
             if (state == "init") {
               let index = this.getActiveModule();
+              this.showedModuleLevel = 0;
               this.showDetail(index);
             } else if (state == "update") {
               this.allRecords = [];
@@ -1736,7 +1822,7 @@ export default {
                     this1.axios
                       .post("/GeoProblemSolving/module/update", updateObject)
                       .then(res => {
-                        this2.getAllModules("update");
+                        this2.getAllModules("init");
 
                         let socketMsg = { type: "module", operate: "update" };
                         this2.subprojectSocket.send(JSON.stringify(socketMsg));
@@ -1745,12 +1831,15 @@ export default {
                         console.log(err.data);
                       });
                   } else {
-                    this1.getAllModules("update");
+                    this1.getAllModules("init");
                   }
 
                   this1.createModuleSuccess(Module["title"]);
-                  this1.moduleList.push(Module);
-                  this1.showDetail(this.moduleList.length - 1);
+                  
+                  // this1.moduleList.push(Module);
+                  // this1.showedModuleLevel = 0;
+                  // this1.showDetail(this.moduleList.length - 1);
+
                   this1.formValidate1.moduleTitle = "";
                   this1.moduleDescription = "";
                   this1.formValidate1.moduleType = "";
@@ -2074,7 +2163,7 @@ export default {
       this.$Notice.success({
         title: "Create Notification",
         desc:
-          "The module" +
+          "The process module" +
           `<span style="color:lightblue"><strong>` +
           "&nbsp" +
           title +
