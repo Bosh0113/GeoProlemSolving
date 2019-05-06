@@ -7,7 +7,7 @@
   z-index: 1;
   margin-top: 5px;
   margin-left: 2.5%;
-  cursor:pointer
+  cursor: pointer;
 }
 .header span {
   font-size: 15px;
@@ -24,10 +24,13 @@ header {
   position: absolute;
   width: 100%;
   flex: 0 0 auto;
+  position: absolute;
+  overflow: hidden;
+  min-width: 1200px;
 }
 .content {
   flex: 1 0 auto;
-  margin-top:60px;
+  margin-top: 60px;
 }
 footer {
   background-color: #515a6e;
@@ -50,24 +53,24 @@ footer {
   font-size: 1.2em;
   font-weight: bold;
 }
-.menuItem:first-child{
-  margin-left:25%
+.menuItem:first-child {
+  margin-left: 25%;
 }
-.userImg{
-  width:40px;
-  height:40px;
-  vertical-align:middle;
+.userImg {
+  width: 40px;
+  height: 40px;
+  vertical-align: middle;
 }
-.footerTop{
-  text-align:center;
-  color:white;
-  font-weight:bold;
-  margin-top:10px
+.footerTop {
+  text-align: center;
+  color: white;
+  font-weight: bold;
+  margin-top: 10px;
 }
-.footerBottom{
-  text-align:center;
-  color:white;
-  font-size:.8em
+.footerBottom {
+  text-align: center;
+  color: white;
+  font-size: 0.8em;
 }
 </style>
 <template>
@@ -188,8 +191,14 @@ footer {
         </div>
       </div>
     </header>
-    <section class="content" :style="{minHeight:contentHeight}">
-     <router-view @sendNotice="sendMessage" @readNotification="readNotification"></router-view>
+    <section
+      class="content"
+      :style="{minHeight:contentHeight}"
+    >
+      <router-view
+        @sendNotice="sendMessage"
+        @readNotification="readNotification"
+      ></router-view>
     </section>
     <footer>
       <h2 class="footerTop"><i>Open Geographic Modeling and Simulation</i></h2>
@@ -209,11 +218,11 @@ export default {
       timer: null,
       //导航栏宽度
       headerWidth: "",
-      contentHeight: window.innerHeight-120+'px',
+      contentHeight: window.innerHeight - 120 + "px"
     };
   },
   mounted() {
-    this.contentHeight = window.innerHeight-120+'px';
+    this.contentHeight = window.innerHeight - 120 + "px";
     if (this.$store.getters.userState) {
       this.setTimer();
       this.initWebSocket();
@@ -245,12 +254,14 @@ export default {
       return this.$route.name === "Home" ? "none" : "";
     },
     absoluteStyle() {
-      return this.$route.name === "Home" ? "position:absolute" : "position:fixed";
+      return this.$route.name === "Home"
+        ? "position:absolute"
+        : "position:fixed";
     }
   },
   methods: {
     reSize() {
-      this.contentHeight = window.innerHeight-120+'px';
+      this.contentHeight = window.innerHeight - 120 + "px";
     },
     turnContent(name) {
       if (name === "home") {
@@ -312,7 +323,8 @@ export default {
         this.noticeSocket = null;
       }
       // var noticeSocketURL = "ws://localhost:8081/GeoProblemSolving/NoticeSocket";
-      var noticeSocketURL = "ws://"+this.$store.state.IP_Port+"/GeoProblemSolving/NoticeSocket";
+      var noticeSocketURL =
+        "ws://" + this.$store.state.IP_Port + "/GeoProblemSolving/NoticeSocket";
       this.noticeSocket = new WebSocket(noticeSocketURL);
       this.noticeSocket.onopen = this.onOpen;
       this.noticeSocket.onmessage = this.onMessage;

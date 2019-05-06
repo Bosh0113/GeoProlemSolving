@@ -8,8 +8,11 @@
         <div>
           <span class="title">Solving complex geo-problems? Collaboration.</span>
           <span class="sub-title">Build Projects | Assemble Participants | Communicate Ideas | Explore Solutions</span>
-          <span class="desc">The platform is full of vitality, where resesrchers can exchange their views, collide their thoughts,<br/>and establish their collabarations.</span>
-          <Button class="home-start-btn" @click="start">Try it now</Button>
+          <span class="desc">The platform is full of vitality, where resesrchers can exchange their views, collide their thoughts,<br />and establish their collabarations.</span>
+          <Button
+            class="home-start-btn"
+            @click="start"
+          >Try it now</Button>
         </div>
       </div>
     </div>
@@ -69,7 +72,7 @@
           <div class="mask">
             <div class="bg"></div>
             <div class="case-text">
-              <Icon type="md-planet"/>
+              <Icon type="md-planet" />
               <div>Planet</div>
             </div>
           </div>
@@ -168,15 +171,13 @@
 <script>
 export default {
   data() {
-    return {
-    };
+    return {};
   },
-  methods:{
-    start(){
-      if(this.$store.getters.userState){
+  methods: {
+    start() {
+      if (this.$store.getters.userState) {
         this.$router.push({ name: "Projects" });
-      }
-      else{
+      } else {
         this.$router.push({ name: "Login" });
       }
     }
@@ -324,8 +325,8 @@ $firstHeight: 700px;
           padding: 0.5rem 1rem;
         }
         a {
-          display: block;
-          padding: 2rem 1rem;
+          display: inline-block;
+          margin: 2rem 1rem;
         }
       }
     }
@@ -403,9 +404,9 @@ $firstHeight: 700px;
     }
   }
   .flow {
-    margin: 5rem auto 0 auto;
+    margin: 5rem auto;
     width: 80%;
-    min-height: 500px;
+  
     // .color-cover {
     //   position: absolute;
     //   width: 50%;
@@ -448,16 +449,14 @@ $firstHeight: 700px;
         height: 0.4rem;
       }
       .flow-item-container {
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        transform: translate3d(-50%, -50%, 0);
-        width: 100%;
+        margin: 5rem 0 0;
+        display: flex;
+        justify-content: space-around;
 
         .flow-item {
           z-index: 10;
           display: inline-block;
-          margin: 0 5rem;
+         
           vertical-align: middle;
           color: #161a1dc0;
           .flow-item-icon {
