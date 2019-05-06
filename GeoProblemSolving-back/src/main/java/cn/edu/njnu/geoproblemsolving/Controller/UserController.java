@@ -3,14 +3,13 @@ package cn.edu.njnu.geoproblemsolving.Controller;
 import cn.edu.njnu.geoproblemsolving.Dao.User.UserDaoImpl;
 import cn.edu.njnu.geoproblemsolving.Entity.UserEntity;
 import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.util.*;
+import java.util.UUID;
 
 @CrossOrigin(origins = "http://localhost:8080",allowCredentials = "true")
 @RestController
@@ -124,9 +123,4 @@ public class UserController {
         return userDao.isRegistered(email);
     }
 
-    @RequestMapping(value = "/updateKey", method = RequestMethod.GET)
-    public String updateKey(){
-        UserDaoImpl userDao = new UserDaoImpl(mongoTemplate);
-        return userDao.updateKey();
-    }
 }
