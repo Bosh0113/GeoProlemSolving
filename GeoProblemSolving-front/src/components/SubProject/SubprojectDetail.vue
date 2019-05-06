@@ -45,7 +45,7 @@
   /* margin: 0 5px; */
 }
 .userName {
-  margin-top:10px;
+  margin-top: 10px;
   height: 20px;
   display: flex;
   align-items: center;
@@ -91,6 +91,14 @@
 }
 .operatePanel button {
   margin-right: 2.5%;
+}
+.memberOrganization {
+  height: 40px;
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 60%;
 }
 </style>
 <template>
@@ -141,7 +149,7 @@
                         <div slot="title" style="font-size:18px">
                           <strong>Participants</strong>
                         </div>
-                          <div :style="{height:sidebarHeight-150+'px'}" style="max-height:600px;overflow-y:auto">
+                          <div :style="{height:sidebarHeight-150+'px'}" style="max-height:600px;overflow-y:auto;overflow-x:hidden">
                           <div
                             class="member-desc"
                             v-for="(member,index) in this.participants"
@@ -172,11 +180,12 @@
                                 <div style="height:40px">
                                   <div>
                                     <span
-                                    style="padding:0 5px"
+                                    style="padding:0 5px;"
+                                    :title="member.userName"
                                   >{{member.userName}}</span>
                                   </div>
                                 <div>
-                                  <span style="padding:0 5px">{{member.organization}}</span>
+                                  <span style="padding:0 5px;" class="memberOrganization" :title="member.organization">{{member.organization}}</span>
                                 </div>
                                 </div>
                               </div>
@@ -202,10 +211,10 @@
                               <div class="memebr-work" style="display:flex;align-items:center">
                                 <div style="height:40px">
                                   <div>
-                                  <span style="padding:0 5px;">{{member.userName}}</span>
+                                  <span style="padding:0 5px;" :title="member.userName">{{member.userName}}</span>
                                 </div>
                                 <div>
-                                  <span style="padding:0 5px">{{member.organization}}</span>
+                                  <span style="padding:0 5px;" class="memberOrganization" :title="member.organization">{{member.organization}}</span>
                                 </div>
                                 </div>
 
@@ -715,7 +724,7 @@
 import { VueFlowy, FlowChart } from "vue-flowy";
 import draggable from "vuedraggable";
 import Avatar from "vue-avatar";
-import folderTree from "./FolderTree.vue"
+import folderTree from "./FolderTree.vue";
 export default {
   updated() {
     $(".userAvatar sup").css("margin", "15px 15px 0 0");
@@ -733,7 +742,11 @@ export default {
   },
   data() {
     return {
-      subProjectFileUploadForm: { privacy: "private", type: "data", description: "" },
+      subProjectFileUploadForm: {
+        privacy: "private",
+        type: "data",
+        description: ""
+      },
       subProjectFileUploadFormRuleValidate: {
         privacy: [
           {
@@ -879,7 +892,7 @@ export default {
       ],
       panel: null,
       // 删除成员的提醒
-      removeMemberAlert:false,
+      removeMemberAlert: false
     };
   },
   created() {
@@ -1063,7 +1076,11 @@ export default {
       }
       let roomId = this.subProjectInfo.subProjectId + "task";
       // var subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + roomId;
-      var subprojectSocketURL = "ws://"+this.$store.state.IP_Port+"/GeoProblemSolving/Module/" + roomId;
+      var subprojectSocketURL =
+        "ws://" +
+        this.$store.state.IP_Port +
+        "/GeoProblemSolving/Module/" +
+        roomId;
       this.subprojectSocket = new WebSocket(subprojectSocketURL);
       this.subprojectSocket.onopen = this.onOpen;
       this.subprojectSocket.onmessage = this.onMessage;
@@ -1758,9 +1775,9 @@ export default {
         }
       }
     },
-    gotoWorkingPanel(){
+    gotoWorkingPanel() {
       this.$router.push(`./workspace`);
-    },
+    }
   }
 };
 </script>

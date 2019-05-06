@@ -25,7 +25,6 @@ header {
   width: 100%;
   flex: 0 0 auto;
   position: absolute;
-  overflow: hidden;
   min-width: 1200px;
 }
 .content {

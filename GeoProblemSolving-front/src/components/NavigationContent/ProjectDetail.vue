@@ -276,6 +276,9 @@
   border-style: dashed;
   border-color: lightslategray;
 }
+.inline_style {
+  display: flex;
+}
 /* 图片修改的样式结束 */
 </style>
 <template>
@@ -760,7 +763,7 @@
     </Row>
     <Modal
       v-model="editProjectModal"
-      title="Edit Project"
+      title="Edit project"
       @on-ok="editProjectSubmit('projectEditForm')"
       @on-cancel
       ok-text="Confirm"
@@ -839,9 +842,9 @@
           <!-- 加入img -->
           <FormItem prop="image" label="Image" :label-width="100">
             <div class="inline_style">
-              <div class="demo-upload-list" v-show="projectEditForm.picture!=''">
+              <div class="demo-upload-list" v-show="pictureUrl!=''">
                 <template>
-                  <img v-bind:src="projectEditForm.picture">
+                  <img v-bind:src="pictureUrl">
                   <div class="demo-upload-list-cover">
                     <Icon type="ios-eye-outline" @click.native="handleView()"></Icon>
                     <Icon type="ios-trash-outline" @click.native="handleRemove()"></Icon>
@@ -1580,7 +1583,6 @@ export default {
         .then(res => {
           //写渲染函数，取到所有资源
           if (res.data !== "None") {
-            consol.log(res.data);
             this.$set(this, "projectResourceList", res.data);
           } else {
             this.projectResourceList = [];
@@ -1694,12 +1696,13 @@ export default {
     editModalShow(id) {
       this.editProjectModal = true;
       let editProjectInfo = this.currentProjectDetail;
-      console.table(editProjectInfo);
       this.projectEditForm.title = editProjectInfo.title;
       this.projectEditForm.introduction = editProjectInfo.introduction;
       this.projectEditForm.description = editProjectInfo.description;
       this.projectEditForm.category = editProjectInfo.category;
       this.projectEditForm.privacy = editProjectInfo.privacy;
+      this.pictureUrl = editProjectInfo.picture;
+
       var tags = editProjectInfo["tag"].split(",");
       if (tags[0] == "") {
         this.projectEditForm.editTags = [];
@@ -1943,7 +1946,6 @@ export default {
     },
     removeMember() {
       let quitProjectId = sessionStorage.getItem("projectId");
-      console.log('id:', quitProjectId);
       this.axios
         .get(
           "/GeoProblemSolving/project/quit" +
@@ -1967,7 +1969,14 @@ export default {
                 "The member has been removed from the project successfully.",
               duration: 0
             });
-            this.getProjectDetail();
+            var members = this.currentProjectDetail.members;
+            for(var i=0;i<members.length;i++){
+              if(members[i].userId==this.removeMemberId){
+                this.currentProjectDetail.members.splice(i,1);
+                break;
+              }
+            }
+            this.$store.commit("setProjectInfo", this.currentProjectDetail);
           }
         })
         .catch(err => {});
@@ -1998,7 +2007,6 @@ export default {
           .then(res=>{
             if(res.data!="Fail"){
               this.pictureUrl=res.data;
-              consoleo.log("新图片地址为："+ this.pictureUrl);
               var imgcode = e.target.result;
               this.img = imgcode;
             }

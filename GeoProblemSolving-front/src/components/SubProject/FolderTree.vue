@@ -94,8 +94,8 @@
             </Tooltip>
           </div>
           <div class="folderContent">
-                  <Card v-if="folderNameStack.length>1" :padding="5">
-                    <Breadcrumb>
+                  <Card v-if="folderNameStack.length>0" :padding="5">
+                    <Breadcrumb style="margin-left:5px">
                       <BreadcrumbItem v-for="(folderName,index) in folderNameStack" :key="index">{{folderName}}</BreadcrumbItem>
                     </Breadcrumb>
                   </Card>
