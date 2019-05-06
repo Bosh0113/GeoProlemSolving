@@ -197,7 +197,7 @@
                                 style="cursor:pointer;display:flex;justify-content:center;align-items:center"
                               >
                                 <img
-                                  v-if="member.avatar != ''"
+                                  v-if="member.avatar != '' && member.avatar!='undefined' && member.avatar!='null'"
                                   :src="member.avatar"
                                   style="width:100%;height:100%"
                                 >

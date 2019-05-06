@@ -2,9 +2,7 @@ package cn.edu.njnu.geoproblemsolving.Dao.Method;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Update;
-import org.springframework.util.DigestUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Enumeration;
@@ -17,7 +15,9 @@ public class CommonMethod {
         while (parameters.hasMoreElements()) {
             String key = (String) parameters.nextElement();
             String value = request.getParameter(key);
-            update.set(key, value);
+            if(!key.equals("userState")){
+                update.set(key, value);
+            }
         }
         return update;
     }

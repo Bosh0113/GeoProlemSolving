@@ -82,7 +82,7 @@ img {
     <div class="header">
       <img src="@/assets/images/OGMS.png" id="logo" @click="goHome">
     </div>
-    <div class="content" ref="homePage" v-if="Userstate===false" v-bind:style="contentStyle">
+    <div class="content" ref="homePage" v-if="UserState===false" v-bind:style="contentStyle">
       <div class="loginDiv" v-bind:style="loginStyle">
         <div class="login_title">Log in</div>
         <div class="login-content">
@@ -157,11 +157,13 @@ img {
 export default {
   components: {},
   computed: {
-    Userstate() {
+    UserState() {
       return this.$store.getters.userState;
     },
-    Username() {
-      return this.$store.getters.userName;
+  },
+  created(){
+    if(this.$store.getters.userState){
+      this.$router.replace({ name: "PersonalPage" });
     }
   },
   data() {
@@ -174,7 +176,7 @@ export default {
         user: [
           {
             required: true,
-            message: "Username can not be empty",
+            message: "User name can not be empty",
             trigger: "blur"
           }
         ],
