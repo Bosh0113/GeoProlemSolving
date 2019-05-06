@@ -2,15 +2,17 @@ package cn.edu.njnu.geoproblemsolving.Dao.User;
 
 
 import cn.edu.njnu.geoproblemsolving.Dao.Method.AESUtils;
-import cn.edu.njnu.geoproblemsolving.Entity.ProjectEntity;
-import cn.edu.njnu.geoproblemsolving.Entity.UserEntity;
 import cn.edu.njnu.geoproblemsolving.Dao.Method.CommonMethod;
+import cn.edu.njnu.geoproblemsolving.Entity.ProjectEntity;
+import cn.edu.njnu.geoproblemsolving.Entity.ResourceEntity;
+import cn.edu.njnu.geoproblemsolving.Entity.SubProjectEntity;
+import cn.edu.njnu.geoproblemsolving.Entity.UserEntity;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
@@ -65,12 +67,17 @@ public class UserDaoImpl implements IUserDao {
     @Override
     public Object updateUser(HttpServletRequest request) {
         try {
-            Query query = new Query(Criteria.where("userId").is(request.getParameter("userId")));
+            String userId = request.getParameter("userId");
+            Query query = new Query(Criteria.where("userId").is(userId));
             CommonMethod method = new CommonMethod();
             Update update = method.setUpdate(request);
             mongoTemplate.updateFirst(query, update, UserEntity.class);
             UserEntity newUser = mongoTemplate.findOne(query, UserEntity.class);
             newUser.setPassword("");
+            try {
+                String newUserName = request.getParameter("userName");
+                updateAllAboutUserWithUserName(newUser,newUserName);
+            }catch (Exception ignored){}
             return newUser;
         } catch (Exception e) {
             return "Fail";
@@ -124,28 +131,78 @@ public class UserDaoImpl implements IUserDao {
         return !mongoTemplate.find(query, UserEntity.class).isEmpty();
     }
 
-    public String updateKey() {
-        try {
-            List<UserEntity> userList = mongoTemplate.findAll(UserEntity.class);
-            for (UserEntity user : userList) {
-                String userId = user.getUserId();
-                Query queryUser = Query.query(Criteria.where("userId").is(userId));
-                JSONArray manageProjects = new JSONArray();
-                Query queryProject = Query.query(Criteria.where("managerId").is(userId));
-                List<ProjectEntity> projectEntityList = mongoTemplate.find(queryProject, ProjectEntity.class);
-                for (ProjectEntity projectEntity : projectEntityList) {
-                    JSONObject projectInfo = new JSONObject();
-                    projectInfo.put("title", projectEntity.getTitle());
-                    projectInfo.put("projectId", projectEntity.getProjectId());
-                    manageProjects.add(projectInfo);
+    private void updateAllAboutUserWithUserName(UserEntity userEntity,String newUserName){
+        String userId = userEntity.getUserId();
+        JSONArray joinedProjects = userEntity.getJoinedProjects();
+        for (int i=0;i<joinedProjects.size();i++){
+            JSONObject joinedProject = joinedProjects.getJSONObject(i);
+            String projectId = joinedProject.getString("projectId");
+            Query queryProject = Query.query(Criteria.where("projectId").is(projectId));
+            ProjectEntity projectEntity = mongoTemplate.findOne(queryProject,ProjectEntity.class);
+            JSONArray members = projectEntity.getMembers();
+            for (int j=0;j<members.size();j++){
+                JSONObject member = members.getJSONObject(j);
+                if(member.getString("userId").equals(userId)){
+                    member.put("userName",newUserName);
+                    members.remove(j);
+                    members.add(j,member);
+                    Update updateProject = new Update();
+                    updateProject.set("members",members);
+                    mongoTemplate.updateFirst(queryProject,updateProject,ProjectEntity.class);
+                    break;
                 }
-                Update updateUser = new Update();
-                updateUser.set("manageProjects", manageProjects);
-                mongoTemplate.updateFirst(queryUser, updateUser, UserEntity.class);
             }
-            return "Success";
-        } catch (Exception e) {
-            return "Fail";
+            updateAllSubProjectForUserName(projectId,userId,newUserName);
+        }
+
+        JSONArray manageProjects = userEntity.getManageProjects();
+        for (int i=0;i<manageProjects.size();i++){
+            JSONObject manageProject = manageProjects.getJSONObject(i);
+            String projectId = manageProject.getString("projectId");
+            Query queryProject = Query.query(Criteria.where("projectId").is(projectId));
+            Update updateProject = new Update();
+            updateProject.set("managerName",newUserName);
+            mongoTemplate.updateFirst(queryProject,updateProject,ProjectEntity.class);
+            updateAllSubProjectForUserName(projectId,userId,newUserName);
+        }
+
+        Query queryResource = Query.query(Criteria.where("uploaderId").is(userId));
+        List<ResourceEntity> resourceEntities = mongoTemplate.find(queryResource,ResourceEntity.class);
+        for (ResourceEntity resourceEntity:resourceEntities){
+            String resourceId = resourceEntity.getResourceId();
+            Query query = Query.query(Criteria.where("resourceId").is(resourceId));
+            Update update = new Update();
+            update.set("uploaderName",newUserName);
+            mongoTemplate.updateFirst(query,update,ResourceEntity.class);
+        }
+    }
+
+    private void updateAllSubProjectForUserName(String projectId,String userId,String newUserName){
+        Query querySubProjects =Query.query(Criteria.where("projectId").is(projectId));
+        List<SubProjectEntity> subProjectEntities = mongoTemplate.find(querySubProjects,SubProjectEntity.class);
+        for (SubProjectEntity subProjectEntity:subProjectEntities){
+            String subProjectId = subProjectEntity.getSubProjectId();
+            Query querySubProject = Query.query(Criteria.where("subProjectId").is(subProjectId));
+            String managerId = subProjectEntity.getManagerId();
+            if (managerId.equals(userId)){
+                Update update = new Update();
+                update.set("managerName",newUserName);
+                mongoTemplate.updateFirst(querySubProject,update,SubProjectEntity.class);
+            }else {
+                JSONArray members = subProjectEntity.getMembers();
+                for (int i=0;i<members.size();i++){
+                    JSONObject member = members.getJSONObject(i);
+                    if (member.getString("userId").equals(userId)){
+                        member.put("userName",newUserName);
+                        members.remove(i);
+                        members.add(i,member);
+                        Update update = new Update();
+                        update.set("members",members);
+                        mongoTemplate.updateFirst(querySubProject,update,SubProjectEntity.class);
+                        break;
+                    }
+                }
+            }
         }
     }
 }

@@ -1,11 +1,11 @@
 package cn.edu.njnu.geoproblemsolving.Dao.Project;
 
 import cn.edu.njnu.geoproblemsolving.Dao.Email.EmailDaoImpl;
+import cn.edu.njnu.geoproblemsolving.Dao.Method.CommonMethod;
+import cn.edu.njnu.geoproblemsolving.Dao.Method.EncodeUtil;
 import cn.edu.njnu.geoproblemsolving.Dao.User.UserDaoImpl;
 import cn.edu.njnu.geoproblemsolving.Entity.EmailEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.ProjectEntity;
-import cn.edu.njnu.geoproblemsolving.Dao.Method.CommonMethod;
-import cn.edu.njnu.geoproblemsolving.Dao.Method.EncodeUtil;
 import cn.edu.njnu.geoproblemsolving.Entity.SubProjectEntity;
 import cn.edu.njnu.geoproblemsolving.Entity.UserEntity;
 import com.alibaba.fastjson.JSONArray;
@@ -18,6 +18,8 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.Part;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -26,8 +28,6 @@ import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.Part;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -175,7 +175,48 @@ public class ProjectDaoImpl implements IProjectDao {
             Update update = method.setUpdate(request);
             update.set("projectId", projectId);
             mongoTemplate.updateFirst(query, update, ProjectEntity.class);
-            return mongoTemplate.findOne(query, ProjectEntity.class);
+            ProjectEntity projectEntity = mongoTemplate.findOne(query, ProjectEntity.class);
+            try {
+                String newTitle = request.getParameter("title");
+
+                Query queryManager = Query.query(Criteria.where("userId").is(projectEntity.getManagerId()));
+                UserEntity manager = mongoTemplate.findOne(queryManager,UserEntity.class);
+                JSONArray manageProjects = manager.getManageProjects();
+                for (int i=0;i<manageProjects.size();i++){
+                    JSONObject manageProject = manageProjects.getJSONObject(i);
+                    if(manageProject.getString("projectId").equals(projectId)){
+                        manageProject.put("title",newTitle);
+                        manageProjects.remove(i);
+                        manageProjects.add(i,manageProject);
+                        Update updateUser = new Update();
+                        updateUser.set("manageProjects",manageProjects);
+                        mongoTemplate.updateFirst(queryManager,updateUser,UserEntity.class);
+                        break;
+                    }
+                }
+
+                JSONArray members = projectEntity.getMembers();
+                for (int i=0;i<members.size();i++){
+                    JSONObject member = members.getJSONObject(i);
+                    String memberId = member.getString("userId");
+                    Query queryUser = Query.query(Criteria.where("userId").is(memberId));
+                    UserEntity memberObject = mongoTemplate.findOne(queryUser,UserEntity.class);
+                    JSONArray joinedProjects = memberObject.getJoinedProjects();
+                    for (int j=0;j<joinedProjects.size();j++){
+                        JSONObject joinedProject = joinedProjects.getJSONObject(j);
+                        if (joinedProject.getString("projectId").equals(projectId)){
+                            joinedProject.put("title",newTitle);
+                            joinedProjects.remove(j);
+                            joinedProjects.add(j,joinedProject);
+                            Update updateUser = new Update();
+                            updateUser.set("joinedProjects",joinedProjects);
+                            mongoTemplate.updateFirst(queryUser,updateUser,UserEntity.class);
+                            break;
+                        }
+                    }
+                }
+            }catch (Exception ignored){}
+            return projectEntity;
         } catch (Exception e) {
             return "Fail";
         }
@@ -339,7 +380,17 @@ public class ProjectDaoImpl implements IProjectDao {
                 userEntity.setUserName(email);
                 userEntity.setEmail(email);
                 userEntity.setPassword(password);
+                userEntity.setMobilePhone("");
+                userEntity.setJobTitle("");
                 userEntity.setJoinedProjects(new JSONArray());
+                userEntity.setManageProjects(new JSONArray());
+                userEntity.setAvatar("");
+                userEntity.setCity("");
+                userEntity.setCountry("");
+                userEntity.setDirection("");
+                userEntity.setGender("");
+                userEntity.setHomePage("");
+                userEntity.setIntroduction("");
                 userDao.saveUser(userEntity);
             }
             String userId = userEntity.getUserId();
@@ -360,10 +411,6 @@ public class ProjectDaoImpl implements IProjectDao {
             Query queryUser = Query.query(Criteria.where("userId").is(userId));
             UserEntity manager = mongoTemplate.findOne(queryUser, UserEntity.class);
             emailEntity.setRecipient(manager.getEmail());
-            String EmailContent = emailEntity.getMailContent();
-            EmailContent = EmailContent + "You can click this url and enter the site to process this application: " +
-                    "http://172.21.212.7:8082/GeoProblemSolving/home";
-            emailEntity.setMailContent(EmailContent);
             EmailDaoImpl emailDao = new EmailDaoImpl();
             emailDao.sendEmail(emailEntity);
             return "Success";

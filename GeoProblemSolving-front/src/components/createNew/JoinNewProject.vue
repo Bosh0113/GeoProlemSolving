@@ -227,7 +227,6 @@ export default {
           if(res.data!="None"){
             this.projectInfo = res.data;
             this.projectName = this.projectInfo[0].title;
-            console.log(this.projectName);
           }
         })
         .catch(err=>{
