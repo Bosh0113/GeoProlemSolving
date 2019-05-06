@@ -57,7 +57,7 @@
   display: inline-block;
   text-overflow: ellipsis;
   white-space: nowrap;
-  height: 16px;
+  vertical-align: top;
   cursor: pointer;
   overflow: hidden;
 }
@@ -94,7 +94,7 @@
             </Tooltip>
           </div>
           <div class="folderContent">
-                  <Card v-if="folderNameStack.length>0" :padding="5">
+                  <Card v-if="folderNameStack.length>0" :padding="5" dis-hover>
                     <Breadcrumb style="margin-left:5px">
                       <BreadcrumbItem v-for="(folderName,index) in folderNameStack" :key="index">{{folderName}}</BreadcrumbItem>
                     </Breadcrumb>

@@ -98,7 +98,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  width: 60%;
+  width: 100%;
 }
 </style>
 <template>
@@ -177,7 +177,7 @@
                                 </div>
                               </Badge>
                               <div class="memebr-work" style="display:flex;align-items:center">
-                                <div style="height:40px">
+                                <div style="height:40px;width:100%">
                                   <div>
                                     <span
                                     style="padding:0 5px;"
@@ -209,7 +209,7 @@
                                 ></avatar>
                               </div>
                               <div class="memebr-work" style="display:flex;align-items:center">
-                                <div style="height:40px">
+                                <div style="height:40px;width:100%">
                                   <div>
                                   <span style="padding:0 5px;" :title="member.userName">{{member.userName}}</span>
                                 </div>
