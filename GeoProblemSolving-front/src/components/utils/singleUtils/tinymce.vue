@@ -57,7 +57,8 @@ export default {
           this.inster_field_name = field_name;
           if (type == "image")
           $("#my_form input").click();
-        }
+        },
+        convert_urls: false //这个参数加上去就可以了
       },
       Editor: null,
       pictureUrl: ""
