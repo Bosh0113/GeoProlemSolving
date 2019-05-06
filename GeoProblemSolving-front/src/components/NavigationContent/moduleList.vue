@@ -915,7 +915,7 @@
       v-model="delModal"
       title="Delete this process"
       @on-ok="delModule"
-      @on-cancel="cancel"
+      @on-cancel=""
     >
       <p>Do you really want to delete this step?</p>
     </Modal>
@@ -924,7 +924,7 @@
       v-model="editModal"
       title="Update this process"
       @on-ok="updateModule('formValidate2')"
-      @on-cancel="cancel()"
+      @on-cancel=""
     >
       <Form
         ref="formValidate2"
@@ -965,7 +965,7 @@
       v-model="addModal"
       title="Start a new process"
       @on-ok="addModule('formValidate1')"
-      @on-cancel="cancel()"
+      @on-cancel=""
     >
       <Form
         ref="formValidate1"
@@ -1000,7 +1000,7 @@
       v-model="inheritData"
       title="Choose data to next process"
       @on-ok="createModule()"
-      @on-cancel="cancel()"
+      @on-cancel=""
     >
       <Transfer
         :data="inheritResource"
@@ -1019,7 +1019,7 @@
       v-model="activateModal"
       title="Activate this process"
       @on-ok="activateModule()"
-      @on-cancel="cancel()"
+      @on-cancel=""
     >
       <p>Do you want to activate this process?</p>
     </Modal>

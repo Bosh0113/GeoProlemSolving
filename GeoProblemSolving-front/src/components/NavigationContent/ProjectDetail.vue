@@ -48,15 +48,15 @@
 .subProjectTitle:hover {
   cursor: pointer;
 }
-.subProjectDescription{
- text-indent: 25px;
- overflow:hidden;
- text-overflow:ellipsis;
- display:-webkit-box;
- /*! autoprefixer: off */
--webkit-box-orient:vertical;
-/* autoprefixer: on */
--webkit-line-clamp:5;
+.subProjectDescription {
+  text-indent: 25px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  /*! autoprefixer: off */
+  -webkit-box-orient: vertical;
+  /* autoprefixer: on */
+  -webkit-line-clamp: 5;
 }
 .subProjectCreate button {
   height: 40px;
@@ -220,6 +220,63 @@
   height: 20px;
   margin-left: 5%;
 }
+/* 图片修改的样式 */
+.demo-upload-list{
+        display: inline-block;
+        width: 60px;
+        height: 60px;
+        text-align: center;
+        line-height: 60px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        overflow: hidden;
+        background: #fff;
+        position: relative;
+        box-shadow: 0 1px 1px rgba(0,0,0,.2);
+        margin-right: 4px;
+    }
+    .demo-upload-list img{
+        width: 100%;
+        height: 100%;
+    }
+    .demo-upload-list-cover{
+        display: none;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(0,0,0,.6);
+    }
+    .demo-upload-list:hover .demo-upload-list-cover{
+        display: block;
+    }
+    .demo-upload-list-cover i{
+        color: #fff;
+        font-size: 20px;
+        cursor: pointer;
+        margin: 0 2px;
+    }
+    .uploadAvatar {
+  position: relative;
+  width: 58px;
+  height: 58px;
+  top: 0;
+  left: 0;
+  outline: none;
+  background-color: transparent;
+  opacity: 0;
+}
+.uploadBox {
+  display: inline-block;
+  width: 58px;
+  height: 58px;
+  line-height: 58px;
+  border-width: 0.75px;
+  border-style: dashed;
+  border-color: lightslategray;
+}
+/* 图片修改的样式结束 */
 </style>
 <template>
   <div class="main">
@@ -287,6 +344,13 @@
                 >
                   <Icon type="md-person-add" size="20"/>
                 </Button>
+                <Button
+                  type="default"
+                  v-show="this.currentProjectDetail.isManager"
+                  @click="deleteMemberModal = true"
+                >
+                  <Icon type="md-remove" size="20"/>
+                </Button>
               </Poptip>
             </div>
             <div class="memberList">
@@ -305,11 +369,43 @@
             </div>
           </Card>
         </div>
+        <!-- 关于删除成员的modal -->
+        <Modal
+          v-model="deleteMemberModal"
+          title="Remove members from project"
+          @on-ok="removeAlertShow(removeMemberId)"
+          @on-cancel
+          ok-text="ok"
+          cancel-text="cancel"
+          width="600"
+        >
+          <div>
+            <RadioGroup v-model="removeMemberName">
+              <span
+                v-for="(member,index) in currentProjectDetail.members"
+                @click="getRemoveMemberId(member.userId)"
+              >
+                <Radio :key="member.index" :label="member.userName"></Radio>
+              </span>
+            </RadioGroup>
+            <!-- <Tag v-for="member in currentProjectDetail.members" :key="member.index">{{member.userName}}</Tag> -->
+          </div>
+        </Modal>
+        <Modal
+          v-model="alertModalShow"
+          title="alert window"
+          @on-ok="removeMember"
+          @on-cancel
+          ok-text="assure"
+          cancel-text="cancel"
+        >
+          <p>Do you really want to delete this member form your project?</p>
+        </Modal>
         <!-- 关于邀请其他成员的modal,禁用点击其他空白处误关模态框 -->
         <Modal
           v-model="inviteModal"
           @on-ok="invite('emailInfo')"
-          @on-cancel="cancel()"
+          @on-cancel
           ok-text="Assure"
           cancel-text="Cancel"
           title="Invite others join in the Project"
@@ -375,7 +471,7 @@
                         type="text"
                         v-model="createSubProjectForm.subProjectTitle"
                         placeholder="Enter subproject title (less than 60 characters) ..."
-                        @keyup.enter.native=""
+                        @keyup.enter.native
                       ></Input>
                     </FormItem>
                     <FormItem label="Description" prop="subProjectDescription">
@@ -394,12 +490,9 @@
               <div class="subProjectListStyle">
                 <div v-for="(subProject,index) in subProjectList" :key="subProject.index">
                   <Col :lg="{span:6}" :md="24" :sm="24" :xs="24">
-                    <div
-                      @click="goWorkspace(subProject)"
-                      style="cursor:pointer"
-                    >
+                    <div @click="goWorkspace(subProject)" style="cursor:pointer">
                       <Card class="subProjectStyle">
-                          <div class="subProjectTitle" slot="title" :title="subProject.title">
+                        <div class="subProjectTitle" slot="title" :title="subProject.title">
                           <span>{{subProject["title"]}}</span>
                         </div>
                         <div slot="extra" class="subProjectTitleOperatePanel">
@@ -437,7 +530,10 @@
                           </div>
                         </div>
                         <div style="height:100px">
-                          <p class="subProjectDescription" :title="subProject['description']">{{subProject["description"]}}</p>
+                          <p
+                            class="subProjectDescription"
+                            :title="subProject['description']"
+                          >{{subProject["description"]}}</p>
                         </div>
                         <br>
                         <div class="subProjectTextInfo">
@@ -496,9 +592,11 @@
                       <Input v-model="editSubProjectForm.subProjectTitleEdit"></Input>
                     </FormItem>
                     <FormItem label="Description" prop="subProjectDescriptionEdit">
-                      <Input v-model="editSubProjectForm.subProjectDescriptionEdit"
+                      <Input
+                        v-model="editSubProjectForm.subProjectDescriptionEdit"
                         :rows="4"
-                        type="textarea"></Input>
+                        type="textarea"
+                      ></Input>
                     </FormItem>
                   </Form>
                 </div>
@@ -621,11 +719,18 @@
             <ul v-for="(list,index) in file" :key="index">
               <li style="display:flex">
                 File name:
-                <span style="font-size:10px;margin: 0 5px 0 5px" :title="list.name">{{ list.name }}</span>
+                <span
+                  style="font-size:10px;margin: 0 5px 0 5px"
+                  :title="list.name"
+                >{{ list.name }}</span>
                 (Size:
-                <span v-if="list.size<(1024*1024)" style="font-size:10px;margin-right:10px"
+                <span
+                  v-if="list.size<(1024*1024)"
+                  style="font-size:10px;margin-right:10px"
                 >{{(list.size/1024).toFixed(2)}}KB)</span>
-                <span v-else style="font-size:10px;margin-right:10px"
+                <span
+                  v-else
+                  style="font-size:10px;margin-right:10px"
                 >{{(list.size/1024/1024).toFixed(2)}}MB)</span>
                 <Icon
                   type="ios-close"
@@ -731,6 +836,29 @@
               <Radio label="Private" title="Other users can not find this group."></Radio>
             </RadioGroup>
           </FormItem>
+          <!-- 加入img -->
+          <FormItem prop="image" label="Image" :label-width="100">
+            <div class="inline_style">
+              <div class="demo-upload-list" v-show="projectEditForm.picture!=''">
+                <template>
+                  <img v-bind:src="projectEditForm.picture">
+                  <div class="demo-upload-list-cover">
+                    <Icon type="ios-eye-outline" @click.native="handleView()"></Icon>
+                    <Icon type="ios-trash-outline" @click.native="handleRemove()"></Icon>
+                  </div>
+                </template>
+              </div>
+              <div class="uploadBox">
+                <Icon type="ios-camera" size="20" style="position:absolute;margin:18px;"></Icon>
+                <input @change="uploadPhoto($event)" type="file" class="uploadAvatar" accept="image/*">
+              </div>
+              <br>
+              <Modal title="View Image" v-model="visible">
+                <img :src="projectEditForm.picture" v-if="visible" style="width: 100%">
+              </Modal>
+            </div>
+          </FormItem>
+          <!-- img结束 -->
         </Form>
       </div>
       <div style="flex"></div>
@@ -957,8 +1085,10 @@ export default {
       },
       //邮件格式
       emailAddStr:
-        "\n please click the url and join us: " +
-        'http://'+this.$store.state.IP_Port+"/GeoProblemSolving/join/" +
+        "<br>Please copy the url and access it to join us: <br>" +
+        "http://" +
+        this.$store.state.IP_Port +
+        "/GeoProblemSolving/join/" +
         this.$route.params.id +
         "/",
       //上传文件相关的
@@ -970,7 +1100,7 @@ export default {
         {
           title: "Name",
           key: "name",
-          tooltip:true,
+          tooltip: true,
           sortable: true
         },
         {
@@ -988,7 +1118,7 @@ export default {
         {
           title: "Description",
           key: "description",
-          tooltip:true,
+          tooltip: true,
           sortable: true
         },
         {
@@ -1021,7 +1151,19 @@ export default {
       uploadProgress: 0,
       panel: null,
       // 上传文件个数限制定时器
-      fileCountTimer:null,
+      fileCountTimer: null,
+      // 删除成员的模态框显示
+      deleteMemberModal: false,
+      // 删除成员的警告模态框
+      alertModalShow: false,
+      // 删除成员的ID
+      removeMemberId: "",
+      removeMemberName: "",
+      //修改项目图片
+      visible: false,
+      //表示图片
+      img: "",
+      pictureUrl:"",
     };
   },
   created() {
@@ -1156,7 +1298,7 @@ export default {
     ok() {},
     //前往工作空间
     goWorkspace(subProject) {
-      this.$store.commit('setSubProjectInfo',subProject);
+      this.$store.commit("setSubProjectInfo", subProject);
       var id = subProject.subProjectId;
       var memberList = subProject.members;
       var isManager = subProject.isManager;
@@ -1197,9 +1339,9 @@ export default {
             .then(res => {
               if (res.data != "Fail") {
                 this.$Notice.success({
-                  title:"create result",
-                  desc:"subproject has been created successfully.",
-                  duration:0,
+                  title: "create result",
+                  desc: "subproject has been created successfully.",
+                  duration: 0
                 });
                 this.createSubProjectForm.subProjectTitle = "";
                 this.createSubProjectForm.subProjectDescription = "";
@@ -1332,10 +1474,10 @@ export default {
                     break;
                   }
                 }
-            this.identity(this.subProjectList);
-          }else{
-            this.$Message.error("Update sub-project failed.");
-          };
+                this.identity(this.subProjectList);
+              } else {
+                this.$Message.error("Update sub-project failed.");
+              }
             })
             .catch(err => {
               console.log(err.data);
@@ -1438,6 +1580,7 @@ export default {
         .then(res => {
           //写渲染函数，取到所有资源
           if (res.data !== "None") {
+            consol.log(res.data);
             this.$set(this, "projectResourceList", res.data);
           } else {
             this.projectResourceList = [];
@@ -1451,15 +1594,19 @@ export default {
     show(index) {
       let name = this.projectResourceList[index].name;
 
-      if (/\.(pdf|doc|docx|xls|xlsx|csv|ppt|pptx|zip)$/.test(name.toLowerCase())) {
+      if (
+        /\.(pdf|doc|docx|xls|xlsx|csv|ppt|pptx|zip)$/.test(name.toLowerCase())
+      ) {
         if (this.panel != null) {
           this.panel.close();
         }
         var url =
-          "http://172.21.212.7:8012/previewFile?url=" +'http://'+this.$store.state.IP_Port+
+          "http://172.21.212.7:8012/previewFile?url=" +
+          "http://" +
+          this.$store.state.IP_Port +
           this.projectResourceList[index].pathURL;
         var toolURL =
-          '<iframe src=' + url + ' style="width: 100%;height:100%"></iframe>';
+          "<iframe src=" + url + ' style="width: 100%;height:100%"></iframe>';
         this.panel = jsPanel.create({
           headerControls: {
             smallify: "remove"
@@ -1475,15 +1622,18 @@ export default {
           closeOnEscape: true
         });
         $(".jsPanel-content").css("font-size", "0");
-      }
-      else if(/\.(mp4)$/.test(name.toLowerCase())) {
+      } else if (/\.(mp4)$/.test(name.toLowerCase())) {
         if (this.panel != null) {
           this.panel.close();
         }
         var url =
-          'http://'+this.$store.state.IP_Port+ this.projectResourceList[index].pathURL;
+          "http://" +
+          this.$store.state.IP_Port +
+          this.projectResourceList[index].pathURL;
         var toolURL =
-          '<video src=' + url + ' style="width: 100%;height:100%" controls></video>';
+          "<video src=" +
+          url +
+          ' style="width: 100%;height:100%" controls></video>';
         this.panel = jsPanel.create({
           headerControls: {
             smallify: "remove"
@@ -1499,15 +1649,18 @@ export default {
           closeOnEscape: true
         });
         $(".jsPanel-content").css("font-size", "0");
-      }
-      else if(/\.(xml|json|md|gif|jpg|png)$/.test(name.toLowerCase())){
+      } else if (/\.(xml|json|md|gif|jpg|png)$/.test(name.toLowerCase())) {
         if (this.panel != null) {
           this.panel.close();
         }
         var url =
-          'http://'+this.$store.state.IP_Port+ this.projectResourceList[index].pathURL;
+          "http://" +
+          this.$store.state.IP_Port +
+          this.projectResourceList[index].pathURL;
         var toolURL =
-          '<iframe src=' + url + ' style="width: 100%;height:100%" controls></iframe>';
+          "<iframe src=" +
+          url +
+          ' style="width: 100%;height:100%" controls></iframe>';
         this.panel = jsPanel.create({
           headerControls: {
             smallify: "remove"
@@ -1523,8 +1676,7 @@ export default {
           closeOnEscape: true
         });
         $(".jsPanel-content").css("font-size", "0");
-      }
-      else {
+      } else {
         this.$Notice.error({
           title: "Open failed",
           desc: "Not supported file format."
@@ -1542,6 +1694,7 @@ export default {
     editModalShow(id) {
       this.editProjectModal = true;
       let editProjectInfo = this.currentProjectDetail;
+      console.table(editProjectInfo);
       this.projectEditForm.title = editProjectInfo.title;
       this.projectEditForm.introduction = editProjectInfo.introduction;
       this.projectEditForm.description = editProjectInfo.description;
@@ -1567,6 +1720,7 @@ export default {
           form.append("privacy", this.projectEditForm.privacy);
           form.append("projectId", this.editProjectId);
           form.append("managerId", this.$store.getters.userId);
+          form.append("picture", this.pictureUrl);
           this.axios
             .post("/GeoProblemSolving/project/update ", form)
             .then(res => {
@@ -1766,11 +1920,12 @@ export default {
     gatherFile(file) {
       let that = this;
       if (that.file.length >= 5) {
-        if(this.fileCountTimer!=null){
+        if (this.fileCountTimer != null) {
           clearTimeout(this.fileCountTimer);
-        }this.fileCountTimer = setTimeout(()=>{
+        }
+        this.fileCountTimer = setTimeout(() => {
           this.$Message.info("you can upload 5 files one time!");
-        },500)
+        }, 500);
       } else {
         that.file.push(file);
         that.file.map(element => {
@@ -1782,6 +1937,85 @@ export default {
     delFileList(index) {
       let that = this;
       that.file.splice(index, 1);
+    },
+    removeAlertShow(id) {
+      this.alertModalShow = true;
+    },
+    removeMember() {
+      let quitProjectId = sessionStorage.getItem("projectId");
+      console.log('id:', quitProjectId);
+      this.axios
+        .get(
+          "/GeoProblemSolving/project/quit" +
+            "?projectId=" +
+            quitProjectId +
+            "&userId=" +
+            this.removeMemberId
+        )
+        .then(res => {
+          if (res == "None") {
+            this.$Notice.warning({
+              title: "Operate result",
+              desc:
+                "The project doesn't exist.",
+              duration: 0
+            });
+          }else {
+            this.$Notice.success({
+              title: "Operate result",
+              desc:
+                "The member has been removed from the project successfully.",
+              duration: 0
+            });
+            this.getProjectDetail();
+          }
+        })
+        .catch(err => {});
+      // 删除成员即可
+    },
+    getRemoveMemberId(id) {
+      this.removeMemberId = id;
+    },
+    // 处理更换项目图片
+    uploadPhoto(e) {
+      // 利用fileReader对象获取file
+      var file = e.target.files[0];
+      var filesize = file.size;
+      // 2,621,440   2M
+      if (filesize > 2101440) {
+        // 图片大于2MB
+        this.$Message.error("size > 2MB");
+      }
+      else{
+        var reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = e => {
+          // 读取到的图片base64 数据编码 将此编码字符串传给后台即可
+          let formData = new FormData();
+          formData.append("picture", file);
+          this.axios
+          .post("/GeoProblemSolving/project/picture", formData)
+          .then(res=>{
+            if(res.data!="Fail"){
+              this.pictureUrl=res.data;
+              consoleo.log("新图片地址为："+ this.pictureUrl);
+              var imgcode = e.target.result;
+              this.img = imgcode;
+            }
+            else{
+              this.$Message.error("upload picture Fail!");
+            }
+          })
+          .catch();
+        };
+      }
+    },
+    handleView() {
+      this.visible = true;
+    },
+    handleRemove() {
+      this.img = "";
+      this.pictureUrl="";
     }
   }
 };
