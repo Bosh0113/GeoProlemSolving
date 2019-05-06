@@ -94,6 +94,11 @@
             </Tooltip>
           </div>
           <div class="folderContent">
+                  <Card v-if="folderNameStack.length>1" :padding="5">
+                    <Breadcrumb>
+                      <BreadcrumbItem v-for="(folderName,index) in folderNameStack" :key="index">{{folderName}}</BreadcrumbItem>
+                    </Breadcrumb>
+                  </Card>
               <div v-if="currentFolder.folders.length>0 || currentFileList.length>0">
                   <Card v-for="(folder,index) in currentFolder.folders" :key="folder.index" :padding="5">
                     <div>
@@ -238,6 +243,7 @@ export default {
       },
       currentFileList: [],
       folderUIDStack: [],
+      folderNameStack: [],
       newFolderModal: false,
       setFolderName: "",
       newValidate: {
@@ -338,8 +344,9 @@ export default {
         });
     },
     enterFolder(folder) {
-      this.folderUIDStack.push(this.currentFolder.uid);
       this.currentFolder = folder;
+      this.folderUIDStack.push(this.currentFolder.uid);
+      this.folderNameStack.push(this.currentFolder.name);
       this.getCurrentFilesInfo();
     },
     getCurrentFilesInfo() {
@@ -379,7 +386,8 @@ export default {
     backforeFolder() {
       if (this.folderUIDStack.length > 1) {
         var foreFolderUid = this.folderUIDStack.pop();
-        this.refreshCurrentAll(this.subProjectFileStruct, foreFolderUid);
+        var foreForlderName = this.folderNameStack.pop();
+        this.refreshCurrentAll(this.subProjectFileStruct, this.folderUIDStack[this.folderUIDStack.length-1]);
       } else {
         this.$Message.warning("This is the root folder.");
       }
