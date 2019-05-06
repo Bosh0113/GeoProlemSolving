@@ -88,8 +88,8 @@ export default {
       formData.append("uploaderId", this.$store.getters.userInfo.userId);
       formData.append("belong", this.$store.getters.userInfo.userName);
       let scopeObject = {
-        projectId: sessionStorage.getItem("projectId"),
-        subProjectId: sessionStorage.getItem("subProjectId"),
+        projectId: "",
+        subProjectId: "",
         moduleId: sessionStorage.getItem("moduleId")
       };
       formData.append("scope", JSON.stringify(scopeObject));
