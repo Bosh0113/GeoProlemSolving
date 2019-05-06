@@ -341,8 +341,8 @@ export default {
           imageForm.append("uploaderId", userInfo.userId);
           imageForm.append("belong", userInfo.userName);
           let scopeObject = {
-            projectId: sessionStorage.getItem("projectId"),
-            subProjectId: sessionStorage.getItem("subProjectId"),
+            projectId: "",
+            subProjectId: "",
             moduleId: sessionStorage.getItem("moduleId")
           };
           imageForm.append("scope", JSON.stringify(scopeObject));

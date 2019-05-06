@@ -1915,6 +1915,7 @@ export default {
                 that.moduleList.splice(that.currentModuleIndex, 1);
 
                 let index = that.getActiveModule();
+                this.showedModuleLevel = 0;
                 that.showDetail(index);
 
                 let socketMsg = { type: "module", operate: "update" };
@@ -1975,8 +1976,8 @@ export default {
             shareForm.append("pathURL", resourceInfo.pathURL);
             shareForm.append("uploaderId", resourceInfo.uploaderId);
             let scopeObject = {
-              projectId: resourceInfo.scope.projectId,
-              subProjectId: resourceInfo.scope.subProjectId,
+              projectId: "",
+              subProjectId: "",
               moduleId: newModuleId
             };
             shareForm.append("scope", JSON.stringify(scopeObject));
@@ -2040,8 +2041,8 @@ export default {
           }
           this.sleep(1000).then(() => {
             let scopeObject = {
-              projectId: sessionStorage.getItem("projectId"),
-              subProjectId: sessionStorage.getItem("subProjectId"),
+              projectId: "",
+              subProjectId: "",
               moduleId: this.currentModule.moduleId
             };
             formData.append("scope", JSON.stringify(scopeObject));
@@ -2101,10 +2102,10 @@ export default {
           if (res.data !== "None") {
             this.$set(this, "resourceList", res.data);
             //存入store
-            sessionStorage.setItem("resources", JSON.stringify(res.data));
           } else {
             this.resourceList = [];
           }
+          sessionStorage.setItem("resources", JSON.stringify(res.data));
         })
         .catch(err => {
           console.log(err.data);
