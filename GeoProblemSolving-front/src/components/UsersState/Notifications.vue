@@ -410,7 +410,7 @@ export default {
                   this.$Message.error("Join fail.");
                 } else if (res.data === "Exist") {
                   this.$Message.info(
-                    "he/her have already be a member in project."
+                    "He/she is already a member of the "+ apply.content.scope +"."
                   );
                 }
               })
@@ -424,7 +424,7 @@ export default {
             replyNotice["content"] = {
               title: "Result for application",
               description:
-                "Congratulations for joining the project: " +
+                "Congratulations for joining the "+apply.content.scope+": " +
                 apply.content.projectTitle +
                 " ."
             };
