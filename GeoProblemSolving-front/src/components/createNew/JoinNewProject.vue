@@ -97,7 +97,7 @@
                 <Dropdown @on-click="changeSelect" placement="bottom-start">
                   <img
                     v-bind:src="avatar"
-                    v-if="avatar!=''&&avatar!='undefined'"
+                    v-if="avatar!=''&&avatar!=undefined&&avatar!=null"
                     :title="userName"
                     style="width:40px;height:40px;vertical-align:middle;"
                   >

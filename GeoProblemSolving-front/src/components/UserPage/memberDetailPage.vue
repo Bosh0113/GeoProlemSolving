@@ -7,7 +7,7 @@
             <div class="detailSidebar" :style="{height:detailSidebarHeight}">
               <div class="user-img">
                 <img v-bind:src="userDetail.avatar" class="u_img"
-                  v-if="userDetail.avatar!=''&&userDetail.avatar!='undefined'">
+                  v-if="userDetail.avatar!=''&&userDetail.avatar!='undefined'&&userDetail.avatar!='null'">
                 <avatar
                   style="width:100%"
                   :username="userDetail.userName"
