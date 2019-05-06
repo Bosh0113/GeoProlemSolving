@@ -347,6 +347,8 @@
                 >
                   <Icon type="md-person-add" size="20"/>
                 </Button>
+              </Poptip>
+              <Poptip trigger="hover" content="Remove members" placement="right">
                 <Button
                   type="default"
                   v-show="this.currentProjectDetail.isManager"
@@ -378,8 +380,8 @@
           title="Remove members from project"
           @on-ok="removeAlertShow(removeMemberId)"
           @on-cancel
-          ok-text="ok"
-          cancel-text="cancel"
+          ok-text="Ok"
+          cancel-text="Cancel"
           width="600"
         >
           <div>
@@ -396,7 +398,7 @@
         </Modal>
         <Modal
           v-model="alertModalShow"
-          title="alert window"
+          title="Alert"
           @on-ok="removeMember"
           @on-cancel
           ok-text="assure"
@@ -1942,7 +1944,9 @@ export default {
       that.file.splice(index, 1);
     },
     removeAlertShow(id) {
-      this.alertModalShow = true;
+      if(this.removeMemberName!=""){
+        this.alertModalShow = true;
+      }
     },
     removeMember() {
       let quitProjectId = sessionStorage.getItem("projectId");

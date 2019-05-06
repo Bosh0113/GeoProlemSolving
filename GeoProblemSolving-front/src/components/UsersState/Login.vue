@@ -148,7 +148,7 @@ img {
       </div>
       <div class="resetReuseDiv">
         <Icon type="ios-information-circle-outline" :size="20" color="lightblue"/>
-        <p>We will send you an email with a url you can visit it and reset your password,if you agree,you can click the Confirm button and you will get an email soon.</p>
+        <p>We will send you an email with a url you can visit it and reset your password, if you agree, you can click the Confirm button and you will get an email soon.</p>
       </div>
     </Modal>
   </div>
