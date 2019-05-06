@@ -577,7 +577,7 @@ export default {
             formData.append("uploaderId", this.$store.getters.userInfo.userId);
             formData.append("belong", sessionStorage.getItem("subProjectName"));
             let scopeObject = {
-              projectId: sessionStorage.getItem("projectId"),
+              projectId: "",
               subProjectId: this.$store.getters.subProject.subProjectId,
               moduleId: ""
             };

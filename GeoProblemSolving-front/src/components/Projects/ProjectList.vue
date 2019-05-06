@@ -45,7 +45,7 @@ img {
           <div style="text-align:right;">
             <Button
               @click="newProject"
-              type="default"
+              type="success"
               class="btnCreate"
               icon="md-add"
             >Create a new project</Button>

@@ -9,7 +9,8 @@
                 <img
                   v-bind:src="userDetail.avatar"
                   class="u_img"
-                  v-if="userDetail.avatar!=''&&userDetail.avatar!='undefined'"
+                  v-if="userDetail.avatar!=''&&userDetail.avatar!='undefined'
+                  &&userDetail.avatar!='null'"
                 >
                 <avatar
                   class="avatarStyle"
@@ -348,7 +349,7 @@
     <Modal
       v-model="authorizeProjectModal"
       @on-ok="authorize()"
-      @on-cancel="cancel()"
+      @on-cancel=""
       ok-text="Confirm"
       cancel-text="Cancel"
     >
@@ -367,7 +368,7 @@
       title="Quit Project"
       v-model="quitModal"
       @on-ok="quitProject()"
-      @on-cancel="cancel()"
+      @on-cancel=""
       ok-text="Ok"
       cancel-text="Cancel"
     >

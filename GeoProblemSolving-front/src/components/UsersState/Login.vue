@@ -130,12 +130,6 @@ img {
                 >Sign up</Button>
               </div>
             </FormItem>
-            <!-- <div class="reUseDiv">
-              <span>
-                If you don't have an account,click
-                <a @click="goRegister">Here</a> to register.
-              </span>
-            </div> -->
           </Form>
         </div>
       </div>
@@ -254,7 +248,8 @@ export default {
                 this.$Message.error("Invalid account or password.");
               } else {
                 this.$store.commit("userLogin", res.data);
-                setTimeout(this.goBack, 100);
+                // setTimeout(this.goBack, 100);
+                this.$router.push({ name: "Home" });
               }
             });
         } else {
@@ -265,7 +260,7 @@ export default {
       });
     },
     goBack() {
-      this.$router.go(-1);
+      this.$router.push({ name: "Home" });
     },
     register() {
       this.$router.push({ name: "Register" });

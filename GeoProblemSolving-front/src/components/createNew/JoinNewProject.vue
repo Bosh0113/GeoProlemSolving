@@ -3,7 +3,9 @@
   height:60px;
   background:#515a6e;
   width:100%;
-  color:white;top:0;
+  color:white;
+  top:0;
+  position:fixed;
 }
 .footer{
   background:#515a6e;
@@ -14,6 +16,10 @@
 }
 .content{
   height:auto;
+}
+.menuItem span{
+  font-size: 1.2em;
+  font-weight: bold;
 }
 #logo {
   position: absolute;
@@ -40,6 +46,7 @@
   width:100%;
   bottom:0;
 }
+
 </style>
 
 <template>
@@ -58,21 +65,21 @@
           <MenuItem name="home" class="menuItem" style="margin-left:30%">
             <span>Home</span>
           </MenuItem>
-          <MenuItem name="project">
+          <MenuItem name="project" class="menuItem">
             <span>Project</span>
           </MenuItem>
-          <MenuItem name="Public Resource">
+          <MenuItem name="Public Resource" class="menuItem">
             <span>Public Resource</span>
           </MenuItem>
-          <MenuItem name="community">
+          <MenuItem name="community" class="menuItem">
             <span>Community</span>
           </MenuItem>
-          <MenuItem name="help" class="menuItem">
+          <MenuItem name="help" class="menuItem" >
             <span>Help</span>
           </MenuItem>
         </Menu>
         <div class="userState">
-            <Menu mode="horizontal" theme="dark" @on-select="unlogin" style="z-index:0" v-show="!userState">
+            <Menu mode="horizontal" theme="dark" @on-select="unlogin" style="z-index:0" v-show="!userState" class="menuItem">
               <MenuItem name="login">
                 <span>Login</span>
               </MenuItem>
@@ -80,7 +87,7 @@
                  <span>Sign up</span>
               </MenuItem>
             </Menu>
-            <Menu mode="horizontal" theme="dark" @on-select="logged" style="z-index:0"  v-show="userState">
+            <Menu mode="horizontal" theme="dark" @on-select="logged" style="z-index:0"  v-show="userState" class="menuItem">
               <MenuItem name="notification">
                 <Badge :count="unreadNoticeCount" id="noticeBadge">
                   <Icon type="ios-notifications-outline" size="25"></Icon>
@@ -112,30 +119,34 @@
       </div>
   </div>
   <Row>
-    <Col span="16" offset="4" :style="{height:contentHeight}">
-    <div style="display:flex;justify-content:center;height:100%;padding:100px 200px 100px 200px;">
+    <Col span="18" offset="3" :style="{height:contentHeight}">
+    <div style="display:flex;justify-content:center;margin-top:100px;height:100%;padding:100px">
       <Form :label-width="120">
-          <FormItem label="ProjectId">
-          <Input v-model="projectId" disabled style="width:500px"></Input>
+        <FormItem label="ProjectName">
+          <Input v-model="projectName" disabled style="width:600px"></Input>
+        </FormItem>
+        <br>
+          <FormItem label="ProjectId" style="display:none">
+          <Input v-model="projectId" disabled style="width:600px"></Input>
         </FormItem>
         <FormItem label="Email" >
-          <Input v-model="email" disabled style="width:500px"></Input>
+          <Input v-model="email" disabled style="width:600px"></Input>
         </FormItem>
-        <div v-show="registeredHintShow==true" style="margin-left:120px;display:flex;align-items:center;width:500px"><Icon type="ios-information-circle-outline" :size="25" color="yellowGreen"/><span style="font-size:10px;">{{this.registeredHint}}</span></div>
-          <div v-show="unregisteredHintShow==true" style="margin-left:120px;display:flex;align-items:center;width:500px"><Icon type="ios-information-circle-outline" :size="25" color="red"/><span style="font-size:10px;">{{this.unregisteredHint}}</span></div>
+        <br>
+        <div v-show="registeredHintShow==true" style="margin-left:120px;display:flex;align-items:center;width:600px"><Icon type="ios-information-circle-outline" :size="30" color="yellowGreen"/><span style="font-size:10px;">{{this.registeredHint}}<br>Now you need to fill the password in the blank and then click the <strong style="font-weight:bold;color:blue">Join</strong> button later you will be a member of the project.</span></div>
+        <div v-show="unregisteredHintShow==true" style="margin-left:120px;display:flex;align-items:center;width:600px"><Icon type="ios-information-circle-outline" :size="30" color="red"/><span style="font-size:10px;">{{this.unregisteredHint}}<br>If you input your own password here and press <strong style="font-weight:bold;color:blue">Sign up and Join</strong> button, your own account would be created based on the email presented above and you will join the project at the same time.</span></div>
         <FormItem label="Password" v-show="passwordInputShow" style="margin-top:20px">
-          <Input v-model="password" type="password" style="width:500px"></Input>
+          <Input v-model="password" type="password" style="width:600px"></Input>
         </FormItem>
+        <br>
         <div style="display:flex;justify-content:center">
           <Button type="default" @click="joinByMail()">
-            Submit
+            <span style="font-weight:bold;font-size:1.2em" v-show="unregisteredHintShow==true">Sign up and Join</span>
+            <span style="font-weight:bold;font-size:1.2em" v-show="registeredHintShow==true">Join</span>
           </Button>
         </div>
       </Form>
     </div>
-      <!-- <div style="margin-top:100px;bcakground-color:lightblue;height:500px;display:flex;justify-content:center" class="content">
-
-      </div> -->
     </Col>
   </Row>
   <div class="footer">
@@ -158,13 +169,19 @@ export default {
       passwordInputShow:false,
       registeredHintShow:false,
       unregisteredHintShow:false,
-      registeredHint:"This email has been registered,you have been a member in our platform, now you need fill the password in the blank and you can join in the project later.",
-      unregisteredHint:"Sorry,you are not a user in our platform,this email will be used to create a new account for you,you only need to set a password for log in,and if you want to enrich your personal information,you can go to userSpace to enrich them.",
+      registeredHint:"This email has been registered,you have been a member in our platform.",
+      // unregisteredHint:"Sorry,you are not a user in our platform,this email will be used to create a new account for you,you only need to set a password for log in,and if you want to enrich your personal information,you can go to userSpace to enrich them.",
+      unregisteredHint:"It seems that this email is not a registed user in our platform.",
+      unregisteredOperate:"If you input your own password here and press Submit button,your own account would be created based on the email presented above and you will join the project at the same time.",
       // navaigation页面的变量
        //消息机制
       noticeSocket: null,
       unreadNoticeCount: 0,
       timer: null,
+      // 项目信息
+      projectInfo:[],
+      // 项目名
+      projectName:"",
     };
   },
   // created(){
@@ -172,17 +189,19 @@ export default {
   // },
   mounted(){
     // navigation页面的
+    this.getProjectName();
     if (this.$store.getters.userState) {
       this.setTimer();
-      this.initWebSocket();
-      this.getUnreadNoticeCount();
+      // this.initWebSocket();
+      // this.getUnreadNoticeCount();
     }
     //
     this.headerWidth = window.innerWidth + "px";
     this.contentHeight = window.innerHeight - 120 + 'px';
-    this.projectId = this.$route.params.id;;
+    this.projectId = this.$route.params.id;
     this.email = this.$route.params.email;
     this.judgeMailRegiste();
+
   },
   updated() {
     $(".userState sup").css("margin-top", "20px");
@@ -202,6 +221,19 @@ export default {
     }
   },
   methods:{
+      getProjectName(){
+        this.axios.get("/GeoProblemSolving/project/inquiry?key=projectId&&value=" + this.$route.params.id)
+        .then(res=> {
+          if(res.data!="None"){
+            this.projectInfo = res.data;
+            this.projectName = this.projectInfo[0].title;
+            console.log(this.projectName);
+          }
+        })
+        .catch(err=>{
+
+        })
+      },
       judgeMailRegiste(){
         this.axios
         .get(

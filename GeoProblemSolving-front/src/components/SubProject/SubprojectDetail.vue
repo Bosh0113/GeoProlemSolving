@@ -563,7 +563,7 @@
       v-model="taskDeleteModal"
       title="Delete Task"
       @on-ok="taskRemove()"
-      @on-cancel="cancel()"
+      @on-cancel=""
       ok-text="Assure"
       cancel-text="Cancel"
     >
@@ -624,7 +624,7 @@
       v-model="editTaskModal"
       title="Edit Task"
       @on-ok="updateTask('formValidate')"
-      @on-cancel="cancel()"
+      @on-cancel=""
       ok-text="Ok"
       cancel-text="Cancel"
       width="800px"
