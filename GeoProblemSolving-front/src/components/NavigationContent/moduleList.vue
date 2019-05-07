@@ -1259,7 +1259,7 @@ export default {
         next("/login");
       } else {
         if (!(vm.subProjectInfo.isManager || vm.subProjectInfo.isMember)) {
-          alert("No access");
+          this.$Message.error('You have no property to access it');
           // next(`/project/${vm.$store.getters.currentProjectId}`);
           vm.$router.go(-1);
         }
@@ -1441,12 +1441,12 @@ export default {
       }
     },
     showModules(type){
-      
+
       this.showedModules = [];
       if(this.moduleList.length > 5){
         if(type == 'init'){
           this.order = Math.round(((this.currentModuleIndex/5) - Math.floor(this.currentModuleIndex/5))*5);
-          this.showedModuleLevel = Math.floor(this.currentModuleIndex/5);          
+          this.showedModuleLevel = Math.floor(this.currentModuleIndex/5);
         }
         else if(type == 'back'){
           this.showedModuleLevel--;
@@ -1464,16 +1464,16 @@ export default {
           }
           else{
             this.order = -1;
-          }       
+          }
         }
-        
+
         for(let i =  this.showedModuleLevel*5; i < (this.showedModuleLevel+1)*5; i++){
           if(i == this.moduleList.length){
             break;
           }
           this.showedModules.push(this.moduleList[i]);
-        }   
-        
+        }
+
         if(this.showedModuleLevel>0){
           this.moduleLeftMove = type;
         }
@@ -1835,7 +1835,7 @@ export default {
                   }
 
                   this1.createModuleSuccess(Module["title"]);
-                  
+
                   // this1.moduleList.push(Module);
                   // this1.showedModuleLevel = 0;
                   // this1.showDetail(this.moduleList.length - 1);

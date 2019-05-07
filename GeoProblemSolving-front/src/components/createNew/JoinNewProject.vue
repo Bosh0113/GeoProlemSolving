@@ -243,6 +243,10 @@ export default {
         .then(res => {
           if (res.data === true) {
             this.registeredHintShow = true;
+            // this.$Notice.info({
+            //   desc: "This email has been registerd",
+            //   top:200,
+            // });
             this.$Message.info("This email has been registerd");
             this.passwordInputShow = true;
           } else if (res.data === false) {

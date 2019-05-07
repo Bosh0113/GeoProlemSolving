@@ -239,7 +239,6 @@ export default {
       this.axios
         .get("/GeoProblemSolving/user/newPassword?email="+this.formValidate.email+"&password="+this.formValidate.newPassword)
         .then(res => {
-          // alert(res.data);
           if (res.data !== "Fail") {
             this.$Notice.success({
               title: "notification",

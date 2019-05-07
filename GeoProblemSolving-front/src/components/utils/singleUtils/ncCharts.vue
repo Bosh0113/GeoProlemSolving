@@ -159,7 +159,7 @@ export default {
         }
       };
       fileReader.onerror = function() {
-        alert("Input data error.");
+        this.$Message.error('Input data error.');
         that.showFile = false;
         that.uploadGeoJson = null;
       };
@@ -226,7 +226,7 @@ export default {
     back2Table() {
       this.visulization = false;
     },
-    showCharts() {      
+    showCharts() {
       this.visulization = true;
 
       //数据标准化
@@ -331,7 +331,7 @@ export default {
       if (this.DataX.length == 0 || this.DataY.length == 0) {
         return;
       }
-      this.showCharts();      
+      this.showCharts();
     }
   },
   beforeDestroy() {

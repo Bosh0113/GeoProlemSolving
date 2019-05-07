@@ -863,13 +863,11 @@ export default {
             this.$set(this, "userManagerProjectList", newManageProjects);
           })
           .catch(err => {
-            alert(err.data);
+            console.log(err.data);
           });
       }
     },
-    cancel() {
-      this.$Message.info("cancel");
-    },
+
     editModalShow() {
       this.personalInfoItem = Object.assign({}, this.userDetail);
       this.editProfileModal = true;
@@ -1040,7 +1038,6 @@ export default {
       }
       // uploaderId
     },
-    cancel() {},
     addUploadEvent(scopeId) {
       let form = {};
       let description =

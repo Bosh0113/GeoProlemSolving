@@ -47,13 +47,13 @@
   border-bottom:1px solid lightgray;
   cursor: pointer;
 }
-#export-data{  
+#export-data{
   background-color:white;
   width:30px;
   height:30px;
   cursor: pointer;
 }
-#export-data:hover{  
+#export-data:hover{
   background-color:#f3f3f3;
   width:30px;
   height:30px;
@@ -102,13 +102,13 @@ export default {
         zoom:13
       });
     },
-    initLayer() {      
+    initLayer() {
       this.drawingLayerGroup = L.layerGroup([]);
       this.drawingLayerGroup.addTo(this.map);
     },
     initControl() {
-      // 图层控件 
-      var vectorMap = L.tileLayer(this.tdtVectorMap, { 
+      // 图层控件
+      var vectorMap = L.tileLayer(this.tdtVectorMap, {
         maxZoom: 18,
         attribution:
             '&copy; <a href="http://map.tianditu.gov.cn/">tianditu</a> contributors'
@@ -116,15 +116,15 @@ export default {
       var vectorAno = L.tileLayer(this.tdtVectorAno, { maxZoom: 18 });
       var vector = L.layerGroup([vectorMap,vectorAno]);
 
-      var satelliteMap = L.tileLayer(this.tdtImgMap, { 
+      var satelliteMap = L.tileLayer(this.tdtImgMap, {
         maxZoom: 18,
         attribution:
             '&copy; <a href="http://map.tianditu.gov.cn/">tianditu</a> contributors'
-        });      
+        });
       var satelliteAno = L.tileLayer(this.tdtImgAno, { maxZoom: 18 } );
       var satellite = L.layerGroup([satelliteMap,satelliteAno]);
 
-      var terrainMap = L.tileLayer(this.tdtTerrMap, { 
+      var terrainMap = L.tileLayer(this.tdtTerrMap, {
         maxZoom: 18,
         attribution:
             '&copy; <a href="http://map.tianditu.gov.cn/">tianditu</a> contributors'
@@ -177,7 +177,7 @@ export default {
     diyDataControl(){
       var that = this;
       L.Control.Data = L.Control.extend({
-          //在此定义参数    
+          //在此定义参数
           options: {
             position: 'topright'
           },
@@ -196,7 +196,7 @@ export default {
               iconImport.src = imIcon;
               iconImport.style='margin-left: 3.5px;margin-top: 3px';
               importData.appendChild(iconImport);
-      
+
               let exportData = document.createElement('div');
               exportData.id = 'export-data';
               exportData.title = 'Export GeoJSON';
@@ -229,7 +229,7 @@ export default {
           _importData(){
             that.modalImport = true;
           },
-          
+
       });
       L.control.data = function(){
         return new L.Control.Data();
@@ -252,7 +252,7 @@ export default {
       }
     },
     handleUpload (file) {
-      var that = this;   
+      var that = this;
       var reader = new FileReader();
       this.uploadDataName = file.name;
       reader.readAsText(file, "UTF-8");
@@ -265,11 +265,11 @@ export default {
         catch(e) {
           that.showFile = false;
           that.uploadGeoJson = null;
-          alert("Data format error.");
+          this.$Message.error('Data format error.');
         }
       };
       reader.onerror = function () {
-        alert("Input data error.");
+        this.$Message.error('Input data error.');
         that.showFile = false;
         that.uploadGeoJson = null;
       };
@@ -282,8 +282,8 @@ export default {
         }
       }).bindPopup(function (layer) {
           return layer.feature.properties.description;
-      });      
-      this.drawingLayerGroup.addLayer(geoJsonLayer);      
+      });
+      this.drawingLayerGroup.addLayer(geoJsonLayer);
 
       this.showFile = false;
       this.uploadGeoJson = null;
@@ -314,7 +314,7 @@ export default {
       windowHeight:800,
       modalExport:false,
       modalImport:false,
-      map: null,   
+      map: null,
       baseLayers: null,
       traces: {},
       send_content: {},

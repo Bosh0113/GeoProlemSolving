@@ -662,7 +662,7 @@ export default {
       }
     },
     send(msg) {
-       
+
       this.message = msg;
       let myDate = new Date();
       let current_time = myDate.toLocaleString(); //获取日期与时间
@@ -691,7 +691,7 @@ export default {
           .replace("[", "")
           .replace("]", "")
           .replace(/\s/g, "")
-          .split(",");        
+          .split(",");
         this.olParticipants = members;
         if(this.seletRoom == "module") {
           this.olParticipantChange();
@@ -726,7 +726,8 @@ export default {
     },
     find(date) {
       let q_date = date.toLocaleDateString();
-      alert(q_date);
+      console.log(q_date);
+      // alert(q_date);
     },
     initSize() {
       //侧边栏的高度随着屏幕的高度自适应

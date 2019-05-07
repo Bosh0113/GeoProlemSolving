@@ -1157,7 +1157,7 @@ export default {
           vm.currentProjectDetail.isManager = true;
         }
         if (!(isMember || vm.currentProjectDetail.isManager)) {
-          alert("No access");
+          this.$Message.error('You have no property to access it');
           next("/projectlist");
           // vm.$router.go(-1);
         }
@@ -1437,7 +1437,7 @@ export default {
               console.log(err.data);
             });
         } else {
-          alert("please check your form again!");
+          this.$Message.warning("please check your form again!");
         }
       });
     },
@@ -1674,7 +1674,7 @@ export default {
               console.log(err.data);
             });
         } else {
-          alert("please check your form again!");
+          this.$Message.warning("please check your form again!");
         }
       });
       // 将项目变更的信息进行提交
@@ -1857,7 +1857,7 @@ export default {
             }
           }
         } else {
-          alert("please check your form!");
+          this.$Message.warning("please check your form!");
         }
       });
     },

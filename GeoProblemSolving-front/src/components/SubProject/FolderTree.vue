@@ -126,6 +126,8 @@
         <Modal
             v-model="renameFolderModal"
             title="Rename folder"
+            ok-text="Assure"
+            cancel-text="Cancel"
         >
             <Form ref="renameValidate" :model="renameValidate" :rules="renameRuleValidate" :label-width="80">
                 <FormItem label="New name" prop="newName">

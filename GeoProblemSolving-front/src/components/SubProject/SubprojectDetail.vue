@@ -8,12 +8,8 @@
   margin-left: 5%;
   height: 100%;
 }
-.editBtn .createTaskBtn {
+.createTaskBtn {
   font-size: 10px;
-}
-.editBtn:hover {
-  color: white;
-  background: #2d8cf0;
 }
 .createTaskBtn:hover {
   color: white;
@@ -55,16 +51,10 @@
   display: flex;
   align-items: center;
 }
-.member-panel {
-  transition: all 1s;
-}
 .subProjectDesc {
   text-indent: 2em;
   padding: 10px;
   word-break: break-all;
-}
-.resource {
-  transition: all 1s;
 }
 .taskFormItem {
   display: flex;
@@ -266,6 +256,8 @@
                             width="400px"
                             title="Quit Sub-Project"
                             @on-ok="quitSubProject()"
+                            ok-text="Ok"
+                            cancel-text="Cancel"
                           >
                             <h2>Are you sure to quit this subproject?</h2>
                           </Modal>
@@ -920,7 +912,7 @@ export default {
           }
         }
         if (!(vm.subProjectInfo.managerId == userId || isMember)) {
-          alert("No access");
+          this.$Message.error('You have no property to access it');
           // next(`/project/${vm.$store.getters.currentProjectId}`);
           vm.$router.go(-1);
         }

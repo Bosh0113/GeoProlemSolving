@@ -167,7 +167,7 @@ export default {
         }
       };
       fileReader.onerror = function() {
-        alert("Input data error.");
+        this.$Message.error("Input data error.");
         that.showFile = false;
         that.uploadGeoJson = null;
       };
@@ -238,7 +238,7 @@ export default {
     back2Table() {
       this.visulization = false;
     },
-    showCharts() {      
+    showCharts() {
       this.visulization = true;
 
       //数据标准化
@@ -348,13 +348,13 @@ export default {
       this.socketApi.sendSock(this.socket_content, this.getSocketConnect);
       this.socket_content = {};
 
-      this.showCharts();      
+      this.showCharts();
     },
     getSocketConnect(data) {
       let socketData = data;
 
       if (socketData.from === "Test") {
-         
+
       } else if (socketData.type === "members") {
       } else {
         if (socketData.operate === "visualize") {
@@ -386,18 +386,18 @@ export default {
               (parseInt(socketData.endY[1]) + 1);
             this.SelectY = start + "->" + end;
             this.DataY = this.getData(socketData.startY, socketData.endY);
-          } 
+          }
           catch (e) {}
-          this.showCharts();  
-          
+          this.showCharts();
+
         } else if (socketData.operate === "dataupload") {
           var that = this;
-          var xhr = new XMLHttpRequest(); 
+          var xhr = new XMLHttpRequest();
           xhr.open("GET", "/GeoProblemSolving/resource/upload/" + socketData.dataName, true);
           xhr.responseType = "blob";
           xhr.onload = function(e) {
             if (this.status == 200) {
-              var file = this.response;              
+              var file = this.response;
               that.fillTable(file);
             }
           };
