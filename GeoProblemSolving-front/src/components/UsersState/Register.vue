@@ -259,10 +259,8 @@
                     </FormItem>
                   </div>
                   <div class="formStyle">
-                    <FormItem>
-                      <Button type="primary" @click="handleSubmit('registerForm')">Submit</Button>
+                      <Button type="primary" @click="handleSubmit('registerForm')" style="float:left">Submit</Button>
                       <Button @click="handleReset('registerForm')" style="margin-left: 8px">Reset</Button>
-                    </FormItem>
                   </div>
                 </Form>
                 <!-- 注册样式结束 -->
