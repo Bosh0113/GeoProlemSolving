@@ -185,15 +185,21 @@ export default {
           tooltip: true
         },
         {
+          title:"Provider",
+          key:"uploaderName",
+          width: 150,
+          align: "center"
+        },
+        {
           title: "Upload time",
           key: "uploadTime",
-          width: 160,
+          width: 130,
           sortable: true
         },
         {
           title: "Action",
           slot: "action",
-          width: 150,
+          width: 120,
           align: "center"
         }
       ],
