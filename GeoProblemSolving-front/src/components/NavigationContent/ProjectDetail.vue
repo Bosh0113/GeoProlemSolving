@@ -20,18 +20,6 @@
   padding: 20px;
   max-height: auto;
 }
-.projectEditPanel {
-  display: block;
-  align-items: center;
-  text-align: center;
-  height: 60px;
-  padding-right: 20px;
-}
-.projectEditPanel button {
-  margin-top: 5px;
-  height: 40px;
-  float: right;
-}
 .memberPanel {
   padding: 20px;
 }
@@ -58,81 +46,33 @@
   /* autoprefixer: on */
   -webkit-line-clamp: 5;
 }
-.subProjectCreate button {
-  height: 40px;
-  display: flex;
-  align-items: center;
-  line-height: 20px;
-  font-size: 20px;
-}
-.createSubProjectPanel {
-  display: flex;
-}
-.createSubProjectPanelInput {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
 .subProjectStyle {
   height: auto;
   margin: 10px;
 }
-/* 邀请其他人的邮件表单样式 */
-.form_style {
-  display: flex;
-  align-items: center;
-  /* justify-content: center; */
-}
-.form_style span {
-  min-width: 20%;
-  text-align: center;
-}
-/* 按钮样式 */
+/* 按钮旋浮样式，创建子项目、邀请成员、上传文件的按钮悬浮时的效果 */
 .subProjectBtn:hover,
 .inviteBtn:hover,
 .uploadBtn:hover {
   background-color: #47cb89;
   color: white;
 }
+/* 移除成员时鼠标悬浮的效果 */
 .deleteBtn:hover {
   background-color: #ed4014;
   color: white;
 }
-
 .subProjectBtn,
 .uploadBtn,
 .inviteBtn {
   color: black;
 }
-/* 编辑项目用到的样式 */
-.editStyle {
-  display: flex;
-  align-items: center;
-  margin-top: 5px;
-  /* justify-content: center; */
-}
-.editStyle span {
-  width: 20%;
-  text-align: left;
-}
-
-/* 按钮样式统一 */
-.authorBtn:hover {
-  background-color: #57a3f3;
-  color: white;
-}
-.editBtn:hover {
-  background-color: #19be6b;
-  color: white;
-}
-.deleteBtn:hover {
-  background-color: #ed4014;
-  color: white;
-}
+/* 资源上传more按钮的悬浮样式 */
 .moreBtn:hover {
   background-color: #57a3f3;
   color: white;
 }
+/* 子项目标题的样式 */
 .subProjectTitle {
   height: 40px;
   line-height: 40px;
@@ -144,13 +84,14 @@
   white-space: nowrap;
   width: 60%;
 }
-/* 按钮样式统一结束 */
+/* 子项目卡片的标题样式 */
 .projectCardTitle {
   font-size: 25px;
   height: 40px;
   line-height: 40px;
   max-width: 50%;
 }
+/* 子项目卡片操作界面按钮的样式 */
 .projectCardTitleExtra {
   height: 40px;
   line-height: 40px;
@@ -170,6 +111,7 @@
   height: 220px;
   padding-top: 10px;
 }
+/* 项目描述的内容显示样式 */
 .projectDescriptionContent {
   height: 56px;
   overflow-y: auto;
@@ -177,6 +119,7 @@
   padding: 0 5px;
   word-break: break-word;
 }
+/* 项目介绍的内容样式 */
 .projectIntroductionContent {
   height: 196px;
   overflow-y: auto;
@@ -221,43 +164,43 @@
   margin-left: 5%;
 }
 /* 图片修改的样式 */
-.demo-upload-list{
-        display: inline-block;
-        width: 60px;
-        height: 60px;
-        text-align: center;
-        line-height: 60px;
-        border: 1px solid transparent;
-        border-radius: 4px;
-        overflow: hidden;
-        background: #fff;
-        position: relative;
-        box-shadow: 0 1px 1px rgba(0,0,0,.2);
-        margin-right: 4px;
-    }
-    .demo-upload-list img{
-        width: 100%;
-        height: 100%;
-    }
-    .demo-upload-list-cover{
-        display: none;
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: rgba(0,0,0,.6);
-    }
-    .demo-upload-list:hover .demo-upload-list-cover{
-        display: block;
-    }
-    .demo-upload-list-cover i{
-        color: #fff;
-        font-size: 20px;
-        cursor: pointer;
-        margin: 0 2px;
-    }
-    .uploadAvatar {
+.demo-upload-list {
+  display: inline-block;
+  width: 60px;
+  height: 60px;
+  text-align: center;
+  line-height: 60px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #fff;
+  position: relative;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+  margin-right: 4px;
+}
+.demo-upload-list img {
+  width: 100%;
+  height: 100%;
+}
+.demo-upload-list-cover {
+  display: none;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.6);
+}
+.demo-upload-list:hover .demo-upload-list-cover {
+  display: block;
+}
+.demo-upload-list-cover i {
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+  margin: 0 2px;
+}
+.uploadAvatar {
   position: relative;
   width: 58px;
   height: 58px;
@@ -350,6 +293,7 @@
               </Poptip>
               <Poptip trigger="hover" content="Remove members" placement="right">
                 <Button
+                  class="deleteBtn"
                   type="default"
                   v-show="this.currentProjectDetail.isManager"
                   @click="deleteMemberModal = true"
@@ -421,7 +365,7 @@
             <FormItem label="Recipient" prop="inputEmail" style="width:100%">
               <AutoComplete
                 v-model="emailInfo.inputEmail"
-                @on-search="handleSearch2"
+                @on-search="emialAutoFill"
                 placeholder="input email and press enter button the email will be added below"
                 style="width:70%"
               >
@@ -645,7 +589,7 @@
             </div>
             <div style="height:300px;overflow-y:scroll">
               <Table
-                :columns="projectTableColName"
+                :columns="resourceTableColName"
                 :data="this.projectResourceList"
                 v-show="this.projectResourceList!=[]&&this.projectResourceList!='None'"
               >
@@ -774,8 +718,6 @@
       width="900px"
     >
       <div>
-        <!-- editProjectForm -->
-        <!-- editProjectFormRuleValidate -->
         <Form
           ref="projectEditForm"
           :model="projectEditForm"
@@ -783,7 +725,6 @@
           :label-width="100"
         >
           <FormItem label="Category" prop="category">
-            <!-- <Input v-model="formValidate.name" placeholder="Enter your name"></Input> -->
             <RadioGroup v-model="projectEditForm.category">
               <Radio label="Terrestrial">Terrestrial System</Radio>
               <Radio label="Coastal">Coastal System</Radio>
@@ -855,7 +796,12 @@
               </div>
               <div class="uploadBox">
                 <Icon type="ios-camera" size="20" style="position:absolute;margin:18px;"></Icon>
-                <input @change="uploadPhoto($event)" type="file" class="uploadAvatar" accept="image/*">
+                <input
+                  @change="uploadPhoto($event)"
+                  type="file"
+                  class="uploadAvatar"
+                  accept="image/*"
+                >
               </div>
               <br>
               <Modal title="View Image" v-model="visible">
@@ -1039,27 +985,35 @@ export default {
       currentProjectDetail: {},
       //移交权限给新的管理者
       handOverSubProjectModal: false,
+      // 新管理者的Id
       newManagerId: "",
-      //子项目的列表
+      // 子项目的列表
       subProjectList: [],
-      //创建子项目的模态框
+      // 创建子项目的模态框
       subProjectModal: false,
+      // 子项目标题
       subProjectTitle: "",
+      // 子项目描述
       subProjectDescription: "",
+      // 子项目标题的编辑值
       subProjectTitleEdit: "",
+      // 子项目描述的编辑值
       subProjectDescriptionEdit: "",
-      //编辑子项目按钮的模态框
+      // 点击编辑子项目按钮的模态框
       editSubProjectModal: false,
-      //删除子项目按钮的模态框
+      // 点击删除子项目按钮的模态框
       deleteSubProjectModal: false,
+      // 编辑的子项目再子项目列表的索引值
       editSubProjectindex: 0,
-      //邀请的modal
+      // 点击邀请他人加入时的模态框
       inviteModal: false,
+      // 发送邮件邀请时需要填写的对象（email，邮件标题，邮件内容）
       emailInfo: {
         inputEmail: "",
         emailTitle: "",
         emailContent: ""
       },
+      // 填写邮件表单时验证的规则
       emailInfoRule: {
         inputEmail: [
           {
@@ -1088,7 +1042,7 @@ export default {
           }
         ]
       },
-      //邮件格式
+      // 发送邮件的格式
       emailAddStr:
         "<br>Please copy the url and access it to join us: <br>" +
         "http://" +
@@ -1096,12 +1050,14 @@ export default {
         "/GeoProblemSolving/join/" +
         this.$route.params.id +
         "/",
-      //上传文件相关的
+      // 点击上传文件按钮时弹出的模态框
       uploadFileModal: false,
+      // 上传的文件数组（支持多文件）
       file: [],
-      //获取的资源的列表
+      // 获取的项目下已上传的资源的列表
       projectResourceList: [],
-      projectTableColName: [
+      // 项目下资源表格的表头信息
+      resourceTableColName: [
         {
           title: "Name",
           key: "name",
@@ -1139,49 +1095,47 @@ export default {
           align: "center"
         }
       ],
-      // 关于控制项目编辑的模态框
+      // 点击项目编辑按钮弹出的模态框
       editProjectModal: false,
+      // 点击删除项目按钮弹出的模态框
       removeProjectModal: false,
-      // 邮箱验证
-      authorizeModal: false,
-      // 子项目成员数组
+      // 子项目成员数组（用于子项目权限转移时使用）
       subProjectMembers: [],
-      //关于邮箱提示的
+      // 邮箱输入尾缀格式自动补全的提示变量
       prompt: [],
-      //侧边tab栏的高度
-      sidebarHeight: "",
-      // 进度条模态框
+      // 显示进度条的模态框
       progressModalShow: false,
-      // 上传进度
+      // 文件上传的进度
       uploadProgress: 0,
+      // 本页面使用的jspanel预览工具的控制变量
       panel: null,
       // 上传文件个数限制定时器
       fileCountTimer: null,
-      // 删除成员的模态框显示
+      // 点击删除成员按钮时弹出的模态框
       deleteMemberModal: false,
-      // 删除成员的警告模态框
+      // 点击assure后弹出的删除警告模态框
       alertModalShow: false,
       // 删除成员的ID
       removeMemberId: "",
+      // 选中的要删除的成员的名字
       removeMemberName: "",
-      //修改项目图片
+      // 控制编辑项目时显示项目原图片显示的变量
       visible: false,
-      //表示图片
+      // 项目的图片
       img: "",
-      pictureUrl:"",
+      // 更换项目图片后后台返回的新图片的文件地址
+      pictureUrl: ""
     };
   },
-  created() {
+  mounted() {
     this.getAllSubProject();
     this.getAllResource();
-  },
-  mounted() {
+    this.getProjectDetail();
+    // 配置本页通知触发时距离顶部的高度，以及持续的时间
     this.$Message.config({
       top: 150,
       duration: 2
     });
-    this.getProjectDetail();
-    this.sidebarHeight = window.innerHeight + "px";
   },
   // add by mzy for navigation guards
   beforeRouteEnter: (to, from, next) => {
@@ -1274,6 +1228,7 @@ export default {
       sessionStorage.setItem("projectName", that.currentProjectDetail.title);
       //将tag进行分割
     },
+    // identify the manager of project
     managerIdentity(managerId) {
       if (managerId === this.$store.getters.userId) {
         return true;
@@ -1295,12 +1250,6 @@ export default {
         return false;
       }
     },
-    // 修改项目的按钮
-    submit() {
-      // 提交要修改的信息即可
-      this.$Message.info("ok");
-    },
-    ok() {},
     //前往工作空间
     goWorkspace(subProject) {
       this.$store.commit("setSubProjectInfo", subProject);
@@ -1556,16 +1505,6 @@ export default {
       }
       this.$set(this, "subProjectList", list);
     },
-    isMemberJudge(data) {
-      data.forEach(item => {
-        if (item.userId === this.$store.getters.userId) {
-          return true;
-        } else {
-          return false;
-        }
-      });
-    },
-
     //上传文件的模态框打开
     uploadFileModalShow() {
       this.uploadFileModal = true;
@@ -1835,7 +1774,7 @@ export default {
           console.log("申请失败的原因是：" + err.data);
         });
     },
-    handleSearch2(value) {
+    emialAutoFill(value) {
       this.prompt =
         !value || value.indexOf("@") >= 0
           ? []
@@ -1944,7 +1883,7 @@ export default {
       that.file.splice(index, 1);
     },
     removeAlertShow(id) {
-      if(this.removeMemberName!=""){
+      if (this.removeMemberName != "") {
         this.alertModalShow = true;
       }
     },
@@ -1962,11 +1901,10 @@ export default {
           if (res == "None") {
             this.$Notice.warning({
               title: "Operate result",
-              desc:
-                "The project doesn't exist.",
+              desc: "The project doesn't exist.",
               duration: 0
             });
-          }else {
+          } else {
             this.$Notice.success({
               title: "Operate result",
               desc:
@@ -1974,9 +1912,9 @@ export default {
               duration: 0
             });
             var members = this.currentProjectDetail.members;
-            for(var i=0;i<members.length;i++){
-              if(members[i].userId==this.removeMemberId){
-                this.currentProjectDetail.members.splice(i,1);
+            for (var i = 0; i < members.length; i++) {
+              if (members[i].userId == this.removeMemberId) {
+                this.currentProjectDetail.members.splice(i, 1);
                 break;
               }
             }
@@ -1998,8 +1936,7 @@ export default {
       if (filesize > 2101440) {
         // 图片大于2MB
         this.$Message.error("size > 2MB");
-      }
-      else{
+      } else {
         var reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onload = e => {
@@ -2007,18 +1944,17 @@ export default {
           let formData = new FormData();
           formData.append("picture", file);
           this.axios
-          .post("/GeoProblemSolving/project/picture", formData)
-          .then(res=>{
-            if(res.data!="Fail"){
-              this.pictureUrl=res.data;
-              var imgcode = e.target.result;
-              this.img = imgcode;
-            }
-            else{
-              this.$Message.error("upload picture Fail!");
-            }
-          })
-          .catch();
+            .post("/GeoProblemSolving/project/picture", formData)
+            .then(res => {
+              if (res.data != "Fail") {
+                this.pictureUrl = res.data;
+                var imgcode = e.target.result;
+                this.img = imgcode;
+              } else {
+                this.$Message.error("upload picture Fail!");
+              }
+            })
+            .catch();
         };
       }
     },
@@ -2027,7 +1963,7 @@ export default {
     },
     handleRemove() {
       this.img = "";
-      this.pictureUrl="";
+      this.pictureUrl = "";
     }
   }
 };
