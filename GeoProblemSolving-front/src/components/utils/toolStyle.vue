@@ -1,5 +1,5 @@
 <template>
-    <div class="sidebar" :style="{height:bodyHeight}" style="width:60px;float:left">
+    <div class="sidebar" style="width:60px;float:left">
       <div id="toolMembers" style="display:flex;justify-content:center;margin-top:20px" title="Online participants">
         <span @click="membersDrawer=true" style="cursor:pointer"><Icon type="ios-contacts" :size="40" color="white"/>
         </span>
@@ -41,7 +41,6 @@ export default {
   },
   data(){
     return{
-      bodyHeight:window.innerHeight +'px',
       membersDrawer:false,
       resourceDrawer:false,
       // olParticipants: this.participants,
@@ -49,15 +48,10 @@ export default {
     }
   },
   mounted() {
-    window.addEventListener("resize", this.reSize);
   },
   beforeDestroy: function() {
-    window.removeEventListener("resize", this.reSize);
   },
   methods:{
-    reSize() {
-      this.bodyHeight = window.innerHeight +'px';
-    },
     selectResource(url){
       this.$emit("resourceUrl",url);
     }

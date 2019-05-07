@@ -196,7 +196,7 @@
               <strong>{{subProjectInfo.title}}</strong>
             </Col>
             <Col span="5" offset="1" style="height:20px;display:flex;align-items:center" class="operatePanel">
-              <template v-if="this.$store.getters.userInfo.userId == this.subProjectInfo.managerId">
+              <template v-if="$store.getters.userInfo.userId == this.subProjectInfo.managerId">
                 <template v-if="this.moduleList.length == 0">
                   <Button
                     type="default"
@@ -248,7 +248,7 @@
               <button class="moduleShow" @click="moudelMove('back')" v-if="moduleLeftMove"><Icon type="ios-arrow-back" style="font-size: 2rem;font-weight: 700"/></button>
             </Col>
             <Col span="22" style="background-color:white;margin-top:20px">
-              <template v-if="this.$store.getters.userInfo.userId == this.subProjectInfo.managerId">
+              <template v-if="$store.getters.userInfo.userId == this.subProjectInfo.managerId">
                 <Steps :current="order">
                   <Step
                     v-for="(list,index) in showedModules"
@@ -287,7 +287,7 @@
             <div
               @click="addModal = true"
               style="cursor:pointer"
-              v-if="this.$store.getters.userInfo.userId == this.subProjectInfo.managerId"
+              v-if="$store.getters.userInfo.userId == this.subProjectInfo.managerId"
             >
               <h1>Start your work!</h1>
             </div>
@@ -376,7 +376,7 @@
                     <div
                       slot="extra"
                       style="display:flex;align-items:center"
-                      v-if="this.$store.getters.userInfo.userId == this.subProjectInfo.managerId"
+                      v-if="$store.getters.userInfo.userId == this.subProjectInfo.managerId"
                     >
                       <span
                         @click="noticeModalShow=true"
@@ -492,7 +492,7 @@
                             >{{item.content}}</span>
                             <a
                               style="cursor:pointer;color:green;margin-left:5px"
-                              :href="'http://'+this.$store.state.IP_Port+'/GeoProblemSolving/resource/upload/'+item.file"
+                              :href="'http://'+$store.state.IP_Port+'/GeoProblemSolving/resource/upload/'+item.file"
                               target="_blank"
                             >download</a>
                           </template>
@@ -840,7 +840,7 @@
                             >{{item.content}}</span>
                             <a
                               style="cursor:pointer;color:green;margin-left:5px"
-                              :href="'http://'+this.$store.state.IP_Port+'/GeoProblemSolving/resource/upload/'+item.file"
+                              :href="'http://'+$store.state.IP_Port+'/GeoProblemSolving/resource/upload/'+item.file"
                               target="_blank"
                             >download</a>
                           </template>
@@ -1257,6 +1257,7 @@ export default {
     next(vm => {
       if (!vm.$store.getters.userState) {
         next("/login");
+        // vm.$router.push({ name: "Login" });
       } else {
         if (!(vm.subProjectInfo.isManager || vm.subProjectInfo.isMember)) {
           alert("No access");

@@ -410,7 +410,7 @@ export default {
                   this.$Message.error("Join fail.");
                 } else if (res.data === "Exist") {
                   this.$Message.info(
-                    "he/her have already be a member in project."
+                    "He/She has already been a member in project."
                   );
                 }
               })
