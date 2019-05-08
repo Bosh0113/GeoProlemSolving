@@ -5,7 +5,7 @@
     </div>
     <div
       id="main"
-      style="flex:4;z-index:10;margin-left:40px;overflow:hidden"
+      style="flex:4;z-index:10;margin-left:60px;overflow:hidden"
       :style="{height:toolHeight}"
     >
       <tinymce id="d1" v-model="data" style="min-height:600px" :other_options="options"></tinymce>
@@ -20,7 +20,7 @@
       >
         <input name="image" type="file" @change="uploadPhoto($event)" accept="image/*">
       </form>
-      <Button type="primary" @click="saveModalShow" style="margin-top:20px">save</Button>
+      <Button type="primary" @click="saveModalShow" style="margin-top:20px;margin-left:10px">Save</Button>
     </div>
     <Modal v-model="saveModal" title="Upload txt file" @on-ok="uploadFile" @on-cancel>
       <Form :model="mdFile" :label-width="80">
