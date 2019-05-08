@@ -3,10 +3,14 @@
 </style>
 <template>
   <Row>
-    <Col span="24">
-      <Col span="4" style="padding:30px" :style="{height:sidebarHeight}">
-        <Upload :before-upload="handleUpload" action="-">
-          <Button icon="ios-cloud-upload-outline">Upload data</Button>
+    <toolStyle :style="{height:sidebarHeight}"
+      :participants="participants"
+      :resources="resources"
+      v-on:resourceUrl="selecetResource"
+    ></toolStyle>
+      <Col span="4" style="padding:30px;margin-left:60px">
+        <Upload :before-upload="handleUpload" action="-" accept=".csv, .xls, .xlsx">
+          <Button icon="ios-cloud-upload-outline">Upload to resource center</Button>
         </Upload>
         <RadioGroup v-model="SelectAxis">
           <Radio label="X-Axis" style="padding:20px 0 10px 0"></Radio>
@@ -23,18 +27,17 @@
           <Option v-for="item in normalChart" :value="item.value" :key="item.value">{{ item.label }}</Option>
         </Select>
         <Button @click="Visualize" style="margin-top:30px">Visualization</Button>
-        <Button v-if="visulization" @click="back2Table" style="margin-top:30px">Select data</Button>
+        <Button v-if="visualization" @click="back2Table" style="margin-top:30px">Select data</Button>
       </Col>
-      <Col span="19" offset="1" style="padding-top:30px" :style="{height:sidebarHeight}">
-        <div v-if="visulization" title="Data visulization" style="padding-right:20px">
+      <Col span="17" offset="1" style="padding-top:30px">
+        <div v-if="visualization" title="Data visualization" style="padding-right:20px">
           <ve-scatter v-if="chooseType == 'scatter'" :data="chartData"></ve-scatter>
           <ve-chart v-else :data="chartData" :settings="chartSettings"></ve-chart>
         </div>
-        <div v-show="!visulization">
+        <div v-show="!visualization">
           <div id="mytable" style="height:400px"></div>
         </div>
       </Col>
-    </Col>
   </Row>
 </template>
 <script>
@@ -43,11 +46,13 @@ import csv from "../../../static/js/jquery.csv.min.js";
 import jexcel from "../../../static/js/jquery.jexcel.js";
 import XLSX from "xlsx";
 import VCharts from "./../../utils/VCharts";
+import toolStyle from "./toolStyle";
 export default {
+  components: { toolStyle },
   data() {
     return {
-      sidebarHeight: "",
-      visulization: false,
+      sidebarHeight: 0,
+      visualization: false,
       testData: [],
       columnHeader: [],
       excelData: [],
@@ -75,12 +80,16 @@ export default {
       chooseType: "",
       chartSettings: {},
       //协同消息
-      socket_content: {}
+      socket_content: {},
+      participants: [],
+      olParticipants: [],
+      resources: [],
+      dataUrl: "",
     };
   },
   methods: {
     init() {
-      // this.sidebarHeight = window.innerHeight - 100 + "px";
+      this.sidebarHeight = window.innerHeight+ "px";
       $("#mytable").jexcel({
         data: this.testData,
         minDimensions: [20, 20],
@@ -89,7 +98,7 @@ export default {
     },
     handleUpload(file) {
       if (!/\.(xls|xlsx|csv)$/.test(file.name.toLowerCase())) {
-        this.$Message.error("上传格式不正确，请上传xls或者xlsx格式");
+        this.$Message.error("Wrong format");
         return false;
       }
 
@@ -107,16 +116,28 @@ export default {
         moduleId: sessionStorage.getItem("moduleId")
       };
       formData.append("scope", JSON.stringify(scopeObject));
+      formData.append("privacy", "private");
       this.axios
         .post("/GeoProblemSolving/resource/upload", formData)
         .then(res => {
           if (res.data != "Size over" && res.data.length > 0) {
             let dataName = res.data[0].fileName;
+            
+            this.dataUrl = "/GeoProblemSolving/resource/upload/" + dataName;
 
-            this.socket_content["dataName"] = dataName;
+            this.socket_content["name"] = file.name;
             this.socket_content["operate"] = "dataupload";
+            this.socket_content["pathURL"] = this.dataUrl;
+            this.socket_content["description"] = "charts tool data";
             this.socketApi.sendSock(this.socket_content, this.getSocketConnect);
             this.socket_content = {};
+
+            let dataItem = {
+              name: file.name,
+              description: "charts tool data",
+              pathURL: "/GeoProblemSolving/resource/upload/" + dataName
+            };
+            this.resources.push(dataItem);
           }
         })
         .catch(err => {});
@@ -236,10 +257,10 @@ export default {
       return data;
     },
     back2Table() {
-      this.visulization = false;
+      this.visualization = false;
     },
-    showCharts() {
-      this.visulization = true;
+    showCharts() {      
+      this.visualization = true;
 
       //数据标准化
       let dimension = [],
@@ -356,6 +377,13 @@ export default {
       if (socketData.from === "Test") {
 
       } else if (socketData.type === "members") {
+        let members = data.message
+          .replace("[", "")
+          .replace("]", "")
+          .replace(/\s/g, "")
+          .split(",");
+        this.olParticipants = members;
+        this.olParticipantChange();
       } else {
         if (socketData.operate === "visualize") {
 
@@ -391,9 +419,17 @@ export default {
           this.showCharts();
 
         } else if (socketData.operate === "dataupload") {
+          
+          let dataItem = {
+            name: socketData.name,
+            description: socketData.description,
+            pathURL:socketData.pathURL
+          };
+          this.resources.push(dataItem);
+
           var that = this;
-          var xhr = new XMLHttpRequest();
-          xhr.open("GET", "/GeoProblemSolving/resource/upload/" + socketData.dataName, true);
+          var xhr = new XMLHttpRequest(); 
+          xhr.open("GET", socketData.pathURL, true);
           xhr.responseType = "blob";
           xhr.onload = function(e) {
             if (this.status == 200) {
@@ -401,7 +437,10 @@ export default {
               that.fillTable(file);
             }
           };
-          xhr.send();
+          xhr.send();          
+        } else if (socketData.operate === "selectdata") {
+          this.dataUrl = socketData.pathURL;     
+          this.viewData();       
         }
       }
     },
@@ -416,6 +455,145 @@ export default {
       };
       this.socketApi.sendSock(this.send_msg, this.getSocketConnect);
       this.socket_content = {};
+    },
+    getResources() {
+      this.resources = [];
+      let resources = JSON.parse(sessionStorage.getItem("resources"));
+      if(resources.length > 0){
+        for (let i = 0; i < resources.length; i++) {
+              if (resources[i].type == "data"  && /\.(xls|xlsx|csv)$/.test(resources[i].name.toLowerCase())) {
+                this.resources.push(resources[i]);
+              }
+            }
+      }
+      else {
+      var that = this;
+      this.axios
+        .get(
+          "/GeoProblemSolving/resource/inquiry" +
+            "?key=scope.moduleId" +
+            "&value=" +
+            sessionStorage.getItem("moduleId")
+        )
+        .then(res => {
+          // 写渲染函数，取到所有资源
+          if (res.data !== "None") {
+            for (let i = 0; i < res.data.length; i++) {
+              if (res.data[i].type == "data"  && /\.(xls|xlsx|csv)$/.test(res.data[i].name.toLowerCase())) {
+                that.resources.push(res.data[i]);
+              }
+            }
+          } else {
+            that.resources = [];
+          }
+        })
+        .catch(err => {
+          console.log(err.data);
+        });
+      }
+    },
+    selecetResource(url) {
+      this.dataUrl = url;
+
+      // 协同
+      this.send_content = {
+        operate: "selectdata",
+        pathURL: this.dataUrl
+      };
+      this.socketApi.sendSock(this.send_content, this.getSocketConnect);
+
+      this.viewData();
+    },
+    viewData() {
+      if(/\.(csv|xls|xlsx)$/.test(this.dataUrl.toLowerCase())) {
+        var that = this;
+        var xhr = new XMLHttpRequest(); 
+        xhr.open("GET", this.dataUrl, true);
+        xhr.responseType = "blob";
+        xhr.onload = function(e) {
+          if (this.status == 200) {
+            var file = this.response;              
+            that.fillTable(file);
+          }
+        };
+        xhr.send(); 
+      }
+      else{
+        this.$Message.error("Worry data format!");
+      }
+
+      this.showFile = false;
+    },
+    olParticipantChange() {
+      let userIndex = -1;
+
+      // 自己刚上线，olParticipants空
+      if (this.participants.length == 0) {
+        var that = this;
+        for (let i = 0; i < this.olParticipants.length; i++) {
+          this.axios
+            .get(
+              "/GeoProblemSolving/user/inquiry" +
+                "?key=" +
+                "userId" +
+                "&value=" +
+                this.olParticipants[i]
+            )
+            .then(res => {
+              if (res.data != "None" && res.data != "Fail") {
+                that.participants.push(res.data);
+              } else if (res.data == "None") {
+              }
+            });
+        }
+      } else {
+        // members大于olParticipants，有人上线；小于olParticipants，离线
+        if (this.olParticipants.length > this.participants.length) {
+          for (var i = 0; i < this.olParticipants.length; i++) {
+            for (var j = 0; j < this.participants.length; j++) {
+              if (this.olParticipants[i] == this.participants[j].userId) {
+                break;
+              }
+            }
+            if (j == this.participants.length) {
+              userIndex = i;
+              break;
+            }
+          }
+
+          // 人员渲染
+          var that = this;
+          this.axios
+            .get(
+              "/GeoProblemSolving/user/inquiry" +
+                "?key=" +
+                "userId" +
+                "&value=" +
+                this.olParticipants[userIndex]
+            )
+            .then(res => {
+              if (res.data != "None" && res.data != "Fail") {
+                that.participants.push(res.data);
+                if (userIndex != -1) {
+                }
+              } else if (res.data == "None") {
+              }
+            });
+        } else if (this.olParticipants.length < this.participants.length) {
+          for (var i = 0; i < this.participants.length; i++) {
+            for (var j = 0; j < this.olParticipants.length; j++) {
+              if (this.participants[i].userId == this.olParticipants[j]) {
+                break;
+              }
+            }
+            if (j == this.olParticipants.length) {
+              userIndex = i;
+              break;
+            }
+          }
+          this.participants.splice(userIndex, 1);
+        }
+      }
     }
   },
   beforeDestroy() {
@@ -423,6 +601,7 @@ export default {
   },
   mounted() {
     this.init();
+    this.getResources();
     this.startWebSocket();
   }
 };

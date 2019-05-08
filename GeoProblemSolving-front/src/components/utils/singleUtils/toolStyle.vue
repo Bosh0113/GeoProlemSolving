@@ -1,24 +1,6 @@
 <template>
   <div style="display:flex" :style="{height:bodyHeight}">
-    <div class="sidebar">
-      <div style="display:flex;justify-content:center;margin-top:20px">
-        <span @click="membersDrawer=true" style="cursor:pointer"><Icon type="ios-contacts" :size="40" color="white"/>
-        </span>
-        <Drawer title="Group members" :closable="false" v-model="membersDrawer" placement="center">
-          <div class="memberList">
-            <span style="font-size:1rem">Lyc</span>
-          </div>
-          <div class="memberList">
-            <span style="font-size:1rem">Mzy</span>
-          </div>
-          <div class="memberList">
-            <span style="font-size:1rem">Zbc</span>
-          </div>
-          <div class="memberList">
-            <span style="font-size:1rem">Xdw</span>
-          </div>
-        </Drawer>
-      </div>
+    <div class="sidebar">      
       <div style="display:flex;justify-content:center;margin-top:20px">
         <span @click="resourceDrawer=true" style="cursor:pointer"><Icon type="md-folder" :size="40" color="white"/></span>
         </span>

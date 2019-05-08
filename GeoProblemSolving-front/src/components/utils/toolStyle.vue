@@ -55,22 +55,15 @@
         <Icon type="md-folder" :size="40" color="white"/>
       </span>
       <Drawer title="Resources" :closable="false" v-model="resourceDrawer" placement="left">
-        <!-- <div class="resourcePanel" v-for="(resource,index) in resources" :key="index" @click="selectResource(resource.pathURL)" style="cursor:pointer" :title="resource.description">
-          {{resource.name}}
-        </div>-->
         <Card
           v-for="(resource,index) in resources"
           :key="index"
           @click="selectResource(resource.pathURL)"
           style="cursor:pointer"
-          :title="resource.description"
           :padding="5"
         >
-          <div class="resourcePanel"><span>{{resource.name}}</span></div>
+          <div class="resourcePanel" :title="resource.description"><span>{{resource.name}}</span></div>
         </Card>
-        <!-- <ul>
-          <li v-for="(resource,index) in resources" :key="index" @click="selectResource(resource.pathURL)" style="cursor:pointer" :title="resource.description">{{resource.name}}</li>
-        </ul>-->
       </Drawer>
     </div>
   </div>
@@ -111,10 +104,6 @@
   height: 20px;
   padding: 0px 10px;
   width: 100%;
-  /* display: inline-block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap; */
 }
 .memberOrganization {
   height: 20px;
@@ -132,7 +121,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width:50%;
+  max-width:100%;
 }
 .resourcePanel {
   height: 40px;
@@ -164,23 +153,15 @@ export default {
       bodyHeight: window.innerHeight + "px",
       membersDrawer: false,
       resourceDrawer: false
-      // olParticipants: this.participants,
-      // resources: this.resource,
     };
   },
   mounted() {
-    window.addEventListener("resize", this.reSize);
-    console.log(this.resources);
   },
   beforeDestroy: function() {
-    window.removeEventListener("resize", this.reSize);
   },
-  methods: {
-    reSize() {
-      this.bodyHeight = window.innerHeight + "px";
-    },
-    selectResource(url) {
-      this.$emit("resourceUrl", url);
+  methods:{
+    selectResource(url){
+      this.$emit("resourceUrl",url);
     }
   }
 };
