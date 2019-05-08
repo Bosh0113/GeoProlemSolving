@@ -413,6 +413,12 @@ export default {
                     pathURL: "/GeoProblemSolving/resource/upload/" + dataName
                   };
                   that.socketApi.sendSock(that.send_content, that.getSocketConnect);
+
+                  // 初始化formValidation
+                  that.formValidate = {
+                    fileName: "",
+                    fileDescription: ""
+                  };
                 }
               })
               .catch(err => {});

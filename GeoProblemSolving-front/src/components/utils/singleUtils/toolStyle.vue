@@ -12,11 +12,10 @@
         <Card
           v-for="(resource,index) in resources"
           :key="index"
-          @click="selectResource(resource.pathURL)"
           style="cursor:pointer"
           :padding="5"
         >
-          <div class="resourcePanel" :title="resource.description"><span>{{resource.name}}</span></div>
+          <div class="resourcePanel" :title="resource.description" @click="selectResource(resource.pathURL)"><span>{{resource.name}}</span></div>
         </Card>
       </Drawer>
     </div>
