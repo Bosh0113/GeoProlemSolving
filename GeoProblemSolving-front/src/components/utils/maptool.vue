@@ -382,7 +382,7 @@ export default {
                   that.$Notice.open({
                     title: "Save to resource center",
                     desc: "Data saved successfully",
-                    duration: 0
+                    // duration: 0
                   });
 
                   let dataName = res.data[0].fileName;

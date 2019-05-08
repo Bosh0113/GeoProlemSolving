@@ -1290,14 +1290,9 @@ export default {
       this.sidebarHeight = window.innerHeight - 227;
       this.resourceHeight = this.sidebarHeight - 358;
       //通知栏的属性设置，top表示距离顶部的距离，duration表示持续的时间
-      this.$Notice.config({
-        top: 50,
-        duration: 0
-      });
     },
     reSize() {
       this.initSize();
-
       this.toolContainerLeft = window.innerWidth - 60;
       this.toolContainerTop = window.innerHeight - 140;
       document.getElementsByClassName("util-panel")[0].style.left = 0 + "px";

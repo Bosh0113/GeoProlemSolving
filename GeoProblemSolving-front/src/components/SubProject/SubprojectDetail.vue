@@ -108,7 +108,7 @@
             </Col>
             <Col span="5" style="height:40px;" class="operatePanel">
               <Button
-                type="default"
+                type="success"
                 @click="gotoWorkingPanel()"
                 icon="ios-git-network"
                 title="Back to project page"

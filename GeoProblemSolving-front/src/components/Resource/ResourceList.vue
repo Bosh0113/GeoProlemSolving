@@ -83,11 +83,11 @@
                       <Icon type="md-eye" :size="20" color="orange"/>
                     </span>
                     <span
-                      @click="deleteResource(index)"
-                      :disabled="judgeDelete(index)"
+                      @click="deleteModalShow(index)"
+                      v-show="judgeDelete(index)"
                       style="margin-left: 10px"
                     >
-                      <Icon type="md-close" :size="20" color="red"/>
+                      <Icon type="md-close" :size="20" color="red" />
                     </span>
                   </template>
                 </Table>
@@ -142,6 +142,15 @@
       </div>
       <br>
       <input type="file" @change="getFile($event)" style="margin-left:20%" multiple="multiple">
+    </Modal>
+    <Modal
+      v-model="deleteModal"
+      @on-ok="deleteResource"
+      @on-cancel=""
+      ok-text="Assure"
+      cancel-text="Cancel"
+    >
+    <h3>Do you really want to delete this resource?</h3>
     </Modal>
   </Row>
 </template>
@@ -211,7 +220,11 @@ export default {
       allSelectedList: [],
       showList: [],
       dataCount: 0,
-      pageSize: 10
+      pageSize: 10,
+      // 控制删除资源按钮的模态框
+      deleteModal:false,
+      // 删除资源的Id
+      deleteResourceId:'',
     };
   },
   mounted() {
@@ -298,7 +311,6 @@ export default {
             this.$Notice.open({
               title: "Upload notification title",
               desc: "File uploaded successfully",
-              duration: 0
             });
             //这里重新获取一次该项目下的全部资源
             this.addUploadEvent(this.currentProjectDetail.projectId);
@@ -316,9 +328,9 @@ export default {
         this.specifiedResourceList[index].uploaderId ==
         this.$store.getters.userId
       ) {
-        return false;
-      } else {
         return true;
+      } else {
+        return false;
       }
     },
     show(index) {
@@ -405,14 +417,21 @@ export default {
         return false;
       }
     },
+    // 删除资源的模态框提醒
+    deleteModalShow(index){
+      this.deleteModal = true;
+      this.deleteResourceId = this.specifiedResourceList[index].resourceId;
+    },
     deleteResource(index) {
-      if (this.specifiedResourceList[index].resourceId != "") {
-        let id = this.specifiedResourceList[index].resourceId;
+      if (this.deleteResourceId != "") {
         this.axios
-          .get("/GeoProblemSolving/resource/delete?" + "resourceId=" + id)
+          .get("/GeoProblemSolving/resource/delete?" + "resourceId=" + this.deleteResourceId)
           .then(res => {
             if (res.data == "Success") {
-              this.$Message.info("Delete successfully");
+              this.$Notice.success({
+              title: "Notification title",
+              desc: "Delete successfully"
+            });
               this.specifiedResourceList.splice(index, 1);
             } else if (res.data == "Fail") {
               this.$Message.info("Failure");
