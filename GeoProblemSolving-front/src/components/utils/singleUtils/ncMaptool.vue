@@ -300,7 +300,6 @@ export default {
     window.removeEventListener("resize", this.initSize);
   },
   beforeRouteEnter: (to, from, next) => {
-    // alert(this.isSubProjectMember);
     next(vm => {
       if (!vm.$store.getters.userState || vm.$store.getters.userId == "") {
         vm.$router.push({name:"Login"});

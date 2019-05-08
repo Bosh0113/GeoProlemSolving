@@ -2216,7 +2216,8 @@ export default {
       let toolName = "";
 
       if (type == "map") {
-        toolURL = '<iframe src="'+'http://'+this.$store.state.IP_Port+'/GeoProblemSolving/map" style="width: 100%;height:100%"></iframe>';
+        // toolURL = '<iframe src="'+'http://'+this.$store.state.IP_Port+'/GeoProblemSolving/map" style="width: 100%;height:100%"></iframe>';
+        toolURL = '<iframe src="'+'http://'+this.$store.state.IP_Port+'/map" style="width: 100%;height:100%"></iframe>';
         toolName = "Map";
       } else if (type == "draw") {
         toolURL =  '<iframe src="'+'http://'+this.$store.state.IP_Port+'/GeoProblemSolving/draw" style="width: 100%;height:100%"></iframe>';

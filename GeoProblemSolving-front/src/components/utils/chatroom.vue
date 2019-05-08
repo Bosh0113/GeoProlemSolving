@@ -727,7 +727,6 @@ export default {
     find(date) {
       let q_date = date.toLocaleDateString();
       console.log(q_date);
-      // alert(q_date);
     },
     initSize() {
       //侧边栏的高度随着屏幕的高度自适应
@@ -749,7 +748,6 @@ export default {
     this.socketApi.close();
   },
   beforeRouteEnter: (to, from, next) => {
-    // alert(this.isSubProjectMember);
     next(vm => {
       if (!vm.$store.getters.userState || vm.$store.getters.userId == "") {
         vm.$router.push({ name: "Login" });

@@ -10,8 +10,8 @@ function getWebIP() {
 }
 
 function initWebSocket(para) { //初始化websocket
-    var wsurl = "ws://"+this.$store.state.IP_Port+"/GeoProblemSolving/" + para;
-    // var wsurl = "ws://localhost:8081/GeoProblemSolving/" + para;
+    // var wsurl = "ws://"+this.$store.state.IP_Port+"/GeoProblemSolving/" + para;
+    var wsurl = "ws://localhost:8081/GeoProblemSolving/" + para;
     //switch 使用时提供一个参数type
     websock = new WebSocket(wsurl);
     websock.onmessage = function (e) {
@@ -22,7 +22,7 @@ function initWebSocket(para) { //初始化websocket
         removeTimer();
     }
     websock.onopen = function () {
-        websocketOpen();        
+        websocketOpen();
         setTimer();
     }
 
@@ -43,7 +43,7 @@ function sendSock(agentData, callback) {
     global_callback = callback;
     if (websock.readyState === websock.OPEN) {
         // 若是ws开启状态
-        websocketsend(agentData)        
+        websocketsend(agentData)
     } else if (websock.readyState === websock.CONNECTING) {
         // 若是 正在开启状态，则等待1s后重新调用
         setTimeout(function () {
@@ -64,7 +64,7 @@ function websocketonmessage(e) {
         if (global_callback != null && global_callback != "" && global_callback != undefined) {
             global_callback(data);
         }
-    } 
+    }
 }
 
 //数据发送
