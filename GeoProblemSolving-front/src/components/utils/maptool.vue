@@ -110,7 +110,6 @@ L.Icon.Default.mergeOptions({
   shadowUrl: require("leaflet/dist/images/marker-shadow.png")
 });
 export default {
-  // name: "toolDrawer",
   components: { toolStyle },
   data() {
     return {
@@ -382,6 +381,7 @@ export default {
               moduleId: sessionStorage.getItem("moduleId")
             };
             formData.append("scope", JSON.stringify(scopeObject));
+            formData.append("privacy", "private");
             let that = this;
             this.axios
               .post("/GeoProblemSolving/resource/upload", formData)
@@ -396,16 +396,23 @@ export default {
                     duration: 0
                   });
 
+                  // 文件列表更新
                   let dataName = res.data[0].fileName;
-                  that.dataUrl =
-                    "/GeoProblemSolving/resource/upload/" + dataName;
-
                   let dataItem = {
                     name: filename,
                     description: "map tool data",
                     pathURL: "/GeoProblemSolving/resource/upload/" + dataName
                   };
                   that.resources.push(dataItem);
+
+                  //文件列表协同
+                  that.send_content = {
+                    type: "resourcesSave",
+                    name: filename,
+                    description: "map tool data",
+                    pathURL: "/GeoProblemSolving/resource/upload/" + dataName
+                  };
+                  that.socketApi.sendSock(that.send_content, that.getSocketConnect);
                 }
               })
               .catch(err => {});
@@ -433,6 +440,7 @@ export default {
         moduleId: sessionStorage.getItem("moduleId")
       };
       formData.append("scope", JSON.stringify(scopeObject));
+      formData.append("privacy", "private");
       let that = this;
       this.axios
         .post("/GeoProblemSolving/resource/upload", formData)
@@ -759,6 +767,15 @@ export default {
           case "selectdata":{
             this.dataUrl = socketMsg.pathURL;
             this.viewData();
+            break;
+          }
+          case "resourcesSave":{
+             let dataItem = {
+                  name: socketMsg.name,
+                  description: socketMsg.description,
+                  pathURL: socketMsg.pathURL
+                };
+                this.resources.push(dataItem);
             break;
           }
         }

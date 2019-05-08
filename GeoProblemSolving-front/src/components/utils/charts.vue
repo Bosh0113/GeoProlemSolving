@@ -116,6 +116,7 @@ export default {
         moduleId: sessionStorage.getItem("moduleId")
       };
       formData.append("scope", JSON.stringify(scopeObject));
+      formData.append("privacy", "private");
       this.axios
         .post("/GeoProblemSolving/resource/upload", formData)
         .then(res => {

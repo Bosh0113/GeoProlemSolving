@@ -45,6 +45,7 @@ public class DrawServerSocket {
                 e.printStackTrace();
             }
         }
+        broadcastMembersToRoom(roomId);
 
     }
     //接收消息后所调用的方法
@@ -90,7 +91,7 @@ public class DrawServerSocket {
             drawingJson.put(roomId, drawingArray.toString());
         }
 
-        // broadcastMembersToRoom(roomId);
+         broadcastMembersToRoom(roomId);
     }
     @OnError
     public void onError(@PathParam("roomId") String roomId,Throwable error)
@@ -102,7 +103,7 @@ public class DrawServerSocket {
             }
         }
 
-        // broadcastMembersToRoom(roomId);
+         broadcastMembersToRoom(roomId);
     }
 
 
