@@ -750,7 +750,7 @@
                           color="gray"
                         />
                       </div>
-                      <a class="singl_tool_style" href="http://172.21.212.72:8888/tree?" target="_blank">
+                      <a class="singl_tool_style" href="http://172.21.212.7:8888/tree?" target="_blank">
                         <Icon
                           type="md-code"
                           size="60"
@@ -1570,8 +1570,8 @@ export default {
         this.subprojectSocket = null;
       }
       let subProjectId = this.subProjectInfo.subProjectId;
-      var subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + subProjectId;
-      // var subprojectSocketURL = "ws://" + this.$store.state.IP_Port + "/GeoProblemSolving/Module/" + subProjectId;
+      // var subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + subProjectId;
+      var subprojectSocketURL = "ws://" + this.$store.state.IP_Port + "/GeoProblemSolving/Module/" + subProjectId;
       this.subprojectSocket = new WebSocket(subprojectSocketURL);
       this.subprojectSocket.onopen = this.onOpen;
       this.subprojectSocket.onmessage = this.onMessage;
