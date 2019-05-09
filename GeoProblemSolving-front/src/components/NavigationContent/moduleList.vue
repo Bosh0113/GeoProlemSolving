@@ -741,11 +741,19 @@
                         <Icon
                           type="logo-youtube"
                           size="60"
-                          @click.native="toolPanel('video Tool')"
-                          title="video Tool"
+                          @click.native="toolPanel('Video Tool')"
+                          title="Video Tool"
                           color="gray"
                         />
                       </div>
+                      <a class="singl_tool_style" href="http://172.21.212.72:8888/tree?" target="_blank">
+                        <Icon
+                          type="md-code"
+                          size="60"
+                          title="Jupyter Notebook"
+                          color="gray"
+                        />
+                      </a>
                     </div>
                   </TabPane>
                   <TabPane label="Special tools" name="Special">
@@ -2122,12 +2130,6 @@ export default {
       this.formValidate2.updateModuleType = this.moduleList[order].type;
       this.updateModuleDescription = this.moduleList[order].description;
     },
-    // 返回项目页
-    backProject() {
-      this.getProjectInfo();
-      let id = this.projectInfo.projectId;
-      this.$router.push(`../${id}`);
-    },
     ok() {
       this.$Message.info("Clicked ok");
     },
@@ -2305,11 +2307,12 @@ export default {
         toolURL =
           '<iframe src="'+'http://'+this.$store.state.IP_Port+'/GeoProblemSolving/tinymce" style="width: 100%;height:100%"></iframe>';
         toolName = "Text editor";
-      } else if (type == "video Tool") {
+      } else if (type == "Video Tool") {
         toolURL =
           '<iframe src="/GeoProblemSolving/Collaborative/vedioChat/WebRtcTest.html" style="width: 100%;height:100%"></iframe>';
         toolName = "Video Tool";
-      }
+      } 
+
 
       let panel = jsPanel.create({
         theme: "primary",
