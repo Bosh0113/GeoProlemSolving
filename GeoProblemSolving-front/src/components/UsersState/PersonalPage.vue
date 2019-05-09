@@ -907,7 +907,7 @@ export default {
               var newManageProjects = [];
               var oldManageProjects = this.userManagerProjectList;
               for (var i = 0; i < oldManageProjects.length; i++) {
-                if (oldManageProjects[i].projectId != pid) {
+                if (oldManageProjects[i].projectId != this.deleteProjectId) {
                   newManageProjects.push(oldManageProjects[i]);
                 }
               }

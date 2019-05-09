@@ -298,10 +298,9 @@ export default {
                 this.$router.push({ name: "Login" });
               }
               else if (res.data === "Fail") {
-                this.$Message.success("Fail");
+                this.$Message.error("Create project fail.");
               } else {
                 this.createProjectId = res.data;
-                this.$Message.success("Success");
                 this.addHistoryEvent(this.createProjectId);
                 this.$router.push({ path: `project/${res.data}` });
               }

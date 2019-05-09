@@ -4,7 +4,7 @@
 }
 .sidebarTree {
   padding-top: 20px;
-  /* background-color: lightgreen; */
+  height: 420px;
   min-width: 250px;
   margin-right: 20px;
 }
@@ -31,10 +31,10 @@
         <div class="sidebarTree">
           <Menu
             :theme="sidebarTheme"
-            active-name="1"
+            active-name="image"
             width="auto"
             class="menuClass"
-            :style="{height:sidebarTreeHeight}"
+            style="height:100%"
             @on-select="onMenuSelect"
           >
             <MenuGroup title="Resource type">
@@ -84,13 +84,13 @@
                     >
                       <Icon type="md-download" :size="20" color="yellowgreen"/>
                     </a>
-                    <span @click="show(index)" style="margin-left: 10px" title="Preview">
+                    <span @click="show(index)" style="margin-left: 10px;cursor:pointer" title="Preview">
                       <Icon type="md-eye" :size="20" color="orange"/>
                     </span>
                     <span
                       @click="deleteModalShow(index)"
                       v-show="judgeDelete(index)"
-                      style="margin-left: 10px"
+                      style="margin-left: 10px;cursor:pointer"
                     >
                       <Icon type="md-close" :size="20" color="red"/>
                     </span>
@@ -218,7 +218,6 @@
 export default {
   data() {
     return {
-      sidebarTreeHeight: "",
       searchResourceInput: "",
       // 侧边栏的颜色主题
       sidebarTheme: "light",
@@ -327,10 +326,10 @@ export default {
   },
   methods: {
     initLayout() {
-      this.sidebarTreeHeight = window.innerHeight - 260 + "px";
       this.contentHeight = window.innerHeight - 120;
     },
     onMenuSelect(name) {
+      this.resourceValidate.fileType = name;
       this.uploaderArray = [];
       this.justSelectedItem = name;
       this.specifiedResourceList = [];
@@ -346,7 +345,6 @@ export default {
             });
             this.dataCount = specifiedResourceListPre.length;
             this.$set(this, "specifiedResourceList", specifiedResourceListPre);
-            console.table(this.specifiedResourceList);
             this.sliceList();
           }
         });
