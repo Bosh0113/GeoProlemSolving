@@ -292,7 +292,6 @@ export default {
             title: "No access",
             desc:
               "You need to click + button at the north right corner to apply join the project",
-            duration: 0
           });
         }
       } else {
