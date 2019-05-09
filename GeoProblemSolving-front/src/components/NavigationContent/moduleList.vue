@@ -2345,11 +2345,16 @@ export default {
           '/GeoProblemSolving/charts" style="width: 100%;height:100%"></iframe>';
         toolName = "Chart";
       } else if (type == "chat") {
+        // toolURL =
+        //   '<iframe src="' +
+        //   "http://" +
+        //   this.$store.state.IP_Port +
+        //   '/GeoProblemSolving/chat" style="width: 100%;height:100%"></iframe>';
         toolURL =
           '<iframe src="' +
           "http://" +
           this.$store.state.IP_Port +
-          '/GeoProblemSolving/chat" style="width: 100%;height:100%"></iframe>';
+          '/chat" style="width: 100%;height:100%"></iframe>';
         toolName = "Chatroom";
       } else if (type == "graphEditor") {
         toolURL =
