@@ -96,7 +96,8 @@
           <div class="folderContent">
                   <Card v-if="folderNameStack.length>0" :padding="5" dis-hover>
                     <Breadcrumb style="margin-left:5px">
-                      <BreadcrumbItem v-for="(folderName,index) in folderNameStack" :key="index">{{folderName}}</BreadcrumbItem>
+                      <BreadcrumbItem><Icon type="md-folder" /></BreadcrumbItem>
+                      <BreadcrumbItem v-for="(folderName,index) in folderNameStack" :key="index" v-if="index!=0">{{folderName}}</BreadcrumbItem>
                     </Breadcrumb>
                   </Card>
               <div v-if="currentFolder.folders.length>0 || currentFileList.length>0">
