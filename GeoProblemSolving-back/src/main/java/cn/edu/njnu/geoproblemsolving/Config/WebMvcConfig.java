@@ -27,6 +27,7 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
                         "/project/delete",
                         "/project/update",
                         "/project/quit",
+                        "/project/manager",
                         "/task/save",
                         "/task/update",
                         "/notice/read",
@@ -34,7 +35,8 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
                         "/notice/delete",
                         "/bulletin/save",
                         "/bulletin/update",
-                        "/bulletin/delete")//拦截的请求
+                        "/bulletin/delete",
+                        "/history/inquiry")//拦截的请求
                 .excludePathPatterns();//不拦截的请求
     }
 }

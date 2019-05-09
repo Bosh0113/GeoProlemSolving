@@ -429,7 +429,7 @@ export default {
     });
   },
   mounted() {
-    // 获取用户资源
+    // 获取用户信息
     this.getUserProfile();
     //获取用户资源
     this.getUserResource();
@@ -814,7 +814,11 @@ export default {
             this.selectManagerId
         )
         .then(res => {
-          if (res.data != "Fail") {
+          if(res.data == "Offline"){
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          }
+          else if (res.data != "Fail") {
             let projectInfo = res.data;
             projectInfo.projectId = this.currentProject.projectId;
             this.projectManageToJoin(projectInfo);
@@ -968,7 +972,11 @@ export default {
             this.$store.getters.userId
         )
         .then(res => {
-          if (res.data != "None") {
+          if(res.data == "Offline"){
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          }
+          else if(res.data !="None"&&res.data !="Fail"){
             this.userEventList = res.data;
           }
         })

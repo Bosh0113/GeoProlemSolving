@@ -1684,7 +1684,11 @@ export default {
             this.subProjectInfo.subProjectId
         )
         .then(res => {
-          if (res.data != "None") {
+          if(res.data == "Offline"){
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          }
+          else if(res.data !="None"&&res.data !="Fail"){
             for (let i = 0; i < res.data.length; i++) {
               let record = JSON.parse(res.data[i].description);
               that.allHistRecords.push(record);
