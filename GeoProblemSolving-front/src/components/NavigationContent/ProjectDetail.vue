@@ -1832,7 +1832,6 @@ export default {
                     this.$Notice.open({
                       title: "Upload notification title",
                       desc: "File uploaded successfully",
-                      duration: 0
                     });
                     //这里重新获取一次该项目下的全部资源
                     this.addUploadEvent(this.currentProjectDetail.projectId);
