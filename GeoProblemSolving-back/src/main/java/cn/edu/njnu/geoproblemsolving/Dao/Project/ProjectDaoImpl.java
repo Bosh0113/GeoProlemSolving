@@ -17,15 +17,15 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.Part;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.InetAddress;
 import java.text.SimpleDateFormat;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -429,11 +429,12 @@ public class ProjectDaoImpl implements IProjectDao {
                 System.out.println("File is not multimedia.");
                 return "Fail";
             }
-            Collection<Part> parts = request.getParts();
             String pathURL = "Fail";
-            for (Part part : parts) {
+            MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
+            List<MultipartFile> files = multipartRequest.getFiles("picture");
+            for (MultipartFile part:files) {
                 if (part.getName().equals("picture")) {
-                    String fileNames = part.getSubmittedFileName();
+                    String fileNames = part.getOriginalFilename();
                     String fileName = fileNames.substring(0, fileNames.lastIndexOf("."));
                     String suffix = fileNames.substring(fileNames.lastIndexOf(".") + 1);
                     String regexp = "[^A-Za-z_0-9\\u4E00-\\u9FA5]";

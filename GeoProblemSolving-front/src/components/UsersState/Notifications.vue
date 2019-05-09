@@ -271,7 +271,11 @@ export default {
       this.axios
         .get("/GeoProblemSolving/notice/delete" + "?noticeId=" + notice.noticeId)
         .then(res => {
-          if (res.data == "Success") {
+          if(res.data == "Offline"){
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          }
+          else if (res.data == "Success") {
             this.$Message.success("delete notification success.");
             if(notice.state=="unread"){
               this.$emit("readNotification");
@@ -296,7 +300,11 @@ export default {
         this.axios
         .get("/GeoProblemSolving/notice/read" + "?noticeId=" + unreadList[i].noticeId)
         .then(res => {
-          if (res.data == "Success") {
+          if(res.data == "Offline"){
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          }
+          else if (res.data == "Success") {
             this.$emit("readNotification");
             this.$store.commit("getUserInfo");
             if(--unreadCount==0){
@@ -315,7 +323,11 @@ export default {
       this.axios
         .get("/GeoProblemSolving/notice/read" + "?noticeId=" + noticeId)
         .then(res => {
-          if (res.data == "Success") {
+          if(res.data == "Offline"){
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          }
+          else if (res.data == "Success") {
             this.$emit("readNotification");
             this.$store.commit("getUserInfo");
             this.loadNotifications();
@@ -327,11 +339,16 @@ export default {
           this.$Message.error("update notification fail.");
         });
     },
-    gotoWork(noticeId,subProjectId){      
+    gotoWork(noticeId,subProjectId){
+      //路由跳转好像和回调的关系有点问题，这样在回调之前就已经跳转了，回调的内容好像没啥用      
       this.axios
         .get("/GeoProblemSolving/notice/read" + "?noticeId=" + noticeId)
         .then(res => {
-          if (res.data == "Success") {
+          if(res.data == "Offline"){
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          }
+          else if (res.data == "Success") {
             this.$emit("readNotification");
             this.loadNotifications();
           } else {
@@ -352,7 +369,11 @@ export default {
       this.axios
         .post("/GeoProblemSolving/notice/update", updateApply)
         .then(res => {
-          if (res.data == "Success") {
+          if(res.data == "Offline"){
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          }
+          else if (res.data == "Success") {
             this.$emit("readNotification");
             this.loadNotifications();
             let replyNotice = {};
@@ -393,7 +414,11 @@ export default {
       this.axios
         .post("/GeoProblemSolving/notice/update", updateApply)
         .then(res => {
-          if (res.data == "Success") {
+          if(res.data == "Offline"){
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          }
+          else if (res.data == "Success") {
             this.$emit("readNotification");
             this.loadNotifications();
             //update project members

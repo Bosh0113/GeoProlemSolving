@@ -94,14 +94,17 @@ export default {
         moduleId: sessionStorage.getItem("moduleId")
       };
       formData.append("scope", JSON.stringify(scopeObject));
-      formData.append("privacy", "Public");
+      formData.append("privacy", "private");
       this.axios.defaults.headers = {
         "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
       };
       this.axios
         .post("/GeoProblemSolving/resource/upload", formData)
         .then(res => {
-          if (res.data != "Size over" && res.data.length > 0) {
+          if(res.data == "Size over"||res.data == "Fail"||res.data == "Offline"){
+            console.log(res.data);
+          }
+          else if (res.data.length > 0) {
             this.$Notice.open({
               title: "Upload notification title",
               desc: "File uploaded successfully",

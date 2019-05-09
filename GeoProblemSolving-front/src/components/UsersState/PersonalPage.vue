@@ -752,7 +752,11 @@ export default {
             this.$store.getters.userId
         )
         .then(res => {
-          if (res.data === "Success") {
+          if(res.data == "Offline"){
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          }
+          else if (res.data != "Fail" && res.data != "None") {
             this.$Message.success("Quit Success");
             this.removeQuitProject(quitProjectId);
             let notice = {};
@@ -778,7 +782,9 @@ export default {
               .catch(err => {
                 console.log("申请失败的原因是：" + err.data);
               });
-          } else if (res.data === "Fail") {
+          } else{
+            this.$Message.error("Quit Fail.");
+            console.log("Quit fail: "+res.data);
           }
         })
         .catch(err => {});
@@ -853,14 +859,26 @@ export default {
         this.axios
           .get("/GeoProblemSolving/project/delete?" + "projectId=" + pid)
           .then(res => {
-            var newManageProjects = [];
-            var oldManageProjects = this.userManagerProjectList;
-            for (var i = 0; i < oldManageProjects.length; i++) {
-              if (oldManageProjects[i].projectId != pid) {
-                newManageProjects.push(oldManageProjects[i]);
-              }
+            if(res.data == "Offline"){
+              this.$store.commit("userLogout");
+              this.$router.push({ name: "Login" });
             }
-            this.$set(this, "userManagerProjectList", newManageProjects);
+            else if(res.data=="Success"){
+              var newManageProjects = [];
+              var oldManageProjects = this.userManagerProjectList;
+              for (var i = 0; i < oldManageProjects.length; i++) {
+                if (oldManageProjects[i].projectId != pid) {
+                  newManageProjects.push(oldManageProjects[i]);
+                }
+              }
+              this.$set(this, "userManagerProjectList", newManageProjects);
+            }
+            else{
+              this.$Notice.error({
+                title: "Error",
+                desc: "Delete project fail."
+              });
+            }
           })
           .catch(err => {
             alert(err.data);

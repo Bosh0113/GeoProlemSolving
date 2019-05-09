@@ -9,11 +9,11 @@
 }
 .panelHeader {
   height: 40px;
-  margin-top:10px;
+  margin-top: 10px;
 }
 .participants {
   height: auto;
-  margin-top:10px;
+  margin-top: 10px;
 }
 .participants h4,
 .panelHeader h4 {
@@ -75,7 +75,7 @@
   font-size: 15px;
   text-align: center;
 }
-.searchmessageList{
+.searchmessageList {
   overflow: auto;
 }
 .message_record_board {
@@ -99,7 +99,7 @@
 /* 信息主题列表显示窗口 */
 .contentBody {
   flex: 1;
-  padding:25px;
+  padding: 25px;
   overflow-y: auto;
 }
 .chat-bubble-r {
@@ -134,7 +134,7 @@
 }
 .u_name {
   height: 20px;
-  margin-top:5px;
+  margin-top: 5px;
   /* margin-left: 10px; */
   text-align: center;
   font-size: 10px;
@@ -191,7 +191,7 @@
 }
 .message_bar {
   display: flex;
-  height:52px;
+  height: 52px;
 }
 .send_panel {
   display: flex;
@@ -230,12 +230,12 @@
   height: 60px;
   padding: 10px;
   display: flex;
-  align-items:center;
+  align-items: center;
   justify-content: center;
   width: 90%;
 }
-.s_name{
-  font-size:20px;
+.s_name {
+  font-size: 20px;
   text-align: center;
 }
 .chatOperate {
@@ -400,7 +400,7 @@ export default {
       olParticipants: [],
       groups: [],
       select_group: "",
-      select_groupId:"",
+      select_groupId: "",
       message: "",
       my_msglist: [],
       other_msglist: [],
@@ -410,9 +410,9 @@ export default {
       query_date: "",
       thisUserName: this.$store.getters.userName,
       thisUserId: this.$store.getters.userId,
-      panelHeight:'',
-      messageListPanelHeight:'',
-      seletRoom:"module"
+      panelHeight: "",
+      messageListPanelHeight: "",
+      seletRoom: "module"
     };
   },
   methods: {
@@ -487,7 +487,7 @@ export default {
             that.subProjectId,
           type: "GET",
           success: data => {
-            if (data != "None") {
+            if (data != "None" && data != "Fail" && data != "Offline") {
               let subProjectInfo = data[0];
               let membersList = subProjectInfo["members"];
               let manager = { userId: subProjectInfo["managerId"] };
@@ -531,7 +531,7 @@ export default {
               if (data != "None" && data != "Fail") {
                 let projectInfo = data[0];
                 let membersList = projectInfo["members"];
-                let manager =  { userId: projectInfo["managerId"] };
+                let manager = { userId: projectInfo["managerId"] };
 
                 membersList.unshift(manager);
                 let participantsTemp = [];
@@ -566,81 +566,81 @@ export default {
       }
     },
     olParticipantChange() {
-        let userIndex = -1;
+      let userIndex = -1;
 
-        // 自己刚上线，olParticipants空
-        if (this.participants.length == 0) {
-          var that = this;
-          for (let i = 0; i < this.olParticipants.length; i++) {
-            this.axios
-              .get(
-                "/GeoProblemSolving/user/inquiry" +
-                  "?key=" +
-                  "userId" +
-                  "&value=" +
-                  this.olParticipants[i]
-              )
-              .then(res => {
-                if (res.data != "None" && res.data != "Fail") {
-                  that.participants.push(res.data);
-                } else if (res.data == "None") {
-                }
-              });
-          }
-        } else {
-          // members大于olParticipants，有人上线；小于olParticipants，离线
-          if (this.olParticipants.length > this.participants.length) {
-            for (var i = 0; i < this.olParticipants.length; i++) {
-              for (var j = 0; j < this.participants.length; j++) {
-                if (this.olParticipants[i] == this.participants[j].userId) {
-                  break;
-                }
+      // 自己刚上线，olParticipants空
+      if (this.participants.length == 0) {
+        var that = this;
+        for (let i = 0; i < this.olParticipants.length; i++) {
+          this.axios
+            .get(
+              "/GeoProblemSolving/user/inquiry" +
+                "?key=" +
+                "userId" +
+                "&value=" +
+                this.olParticipants[i]
+            )
+            .then(res => {
+              if (res.data != "None" && res.data != "Fail") {
+                that.participants.push(res.data);
+              } else if (res.data == "None") {
               }
-              if (j == this.participants.length) {
-                userIndex = i;
-                break;
-              }
-            }
-
-            // 人员渲染
-            var that = this;
-            this.axios
-              .get(
-                "/GeoProblemSolving/user/inquiry" +
-                  "?key=" +
-                  "userId" +
-                  "&value=" +
-                  this.olParticipants[userIndex]
-              )
-              .then(res => {
-                if (res.data != "None" && res.data != "Fail") {
-                  that.participants.push(res.data);
-                  if (userIndex != -1) {
-                  }
-                } else if (res.data == "None") {
-                }
-              });
-          } else if (this.olParticipants.length < this.participants.length) {
-            for (var i = 0; i < this.participants.length; i++) {
-              for (var j = 0; j < this.olParticipants.length; j++) {
-                if (this.participants[i].userId == this.olParticipants[j]) {
-                  break;
-                }
-              }
-              if (j == this.olParticipants.length) {
-                userIndex = i;
-                break;
-              }
-            }
-            this.participants.splice(userIndex, 1);
-          }
+            });
         }
+      } else {
+        // members大于olParticipants，有人上线；小于olParticipants，离线
+        if (this.olParticipants.length > this.participants.length) {
+          for (var i = 0; i < this.olParticipants.length; i++) {
+            for (var j = 0; j < this.participants.length; j++) {
+              if (this.olParticipants[i] == this.participants[j].userId) {
+                break;
+              }
+            }
+            if (j == this.participants.length) {
+              userIndex = i;
+              break;
+            }
+          }
+
+          // 人员渲染
+          var that = this;
+          this.axios
+            .get(
+              "/GeoProblemSolving/user/inquiry" +
+                "?key=" +
+                "userId" +
+                "&value=" +
+                this.olParticipants[userIndex]
+            )
+            .then(res => {
+              if (res.data != "None" && res.data != "Fail") {
+                that.participants.push(res.data);
+                if (userIndex != -1) {
+                }
+              } else if (res.data == "None") {
+              }
+            });
+        } else if (this.olParticipants.length < this.participants.length) {
+          for (var i = 0; i < this.participants.length; i++) {
+            for (var j = 0; j < this.olParticipants.length; j++) {
+              if (this.participants[i].userId == this.olParticipants[j]) {
+                break;
+              }
+            }
+            if (j == this.olParticipants.length) {
+              userIndex = i;
+              break;
+            }
+          }
+          this.participants.splice(userIndex, 1);
+        }
+      }
     },
     showRecords() {
       this.searchPanelShow = !this.searchPanelShow;
       this.message_panelObj["right"] = 0;
 
-      if(this.searchPanelShow) {
+      if (this.searchPanelShow) {
         this.msgRecords = [];
         let that = this;
         this.axios
@@ -662,7 +662,6 @@ export default {
       }
     },
     send(msg) {
-       
       this.message = msg;
       let myDate = new Date();
       let current_time = myDate.toLocaleString(); //获取日期与时间
@@ -691,22 +690,21 @@ export default {
           .replace("[", "")
           .replace("]", "")
           .replace(/\s/g, "")
-          .split(",");        
+          .split(",");
         this.olParticipants = members;
-        if(this.seletRoom == "module") {
+        if (this.seletRoom == "module") {
           this.olParticipantChange();
         }
       } else if (data.type === "message") {
         //判断消息的发出者
-        if(chatMsg.content != "") {
+        if (chatMsg.content != "") {
           this.other_msglist.push(chatMsg);
           this.msglist.push(chatMsg);
           this.msgRecords.push(chatMsg);
         }
-      }
-      else if(chatMsg.type == undefined && chatMsg.length > 0){
-        for(let i = 0;i < chatMsg.length;i++) {
-          if(chatMsg[i].content != "") {
+      } else if (chatMsg.type == undefined && chatMsg.length > 0) {
+        for (let i = 0; i < chatMsg.length; i++) {
+          if (chatMsg[i].content != "") {
             this.other_msglist.push(chatMsg[i]);
             this.msglist.push(chatMsg[i]);
             this.msgRecords.push(chatMsg[i]);
@@ -730,19 +728,19 @@ export default {
     },
     initSize() {
       //侧边栏的高度随着屏幕的高度自适应
-      this.panelHeight = window.innerHeight + 'px';
-      this.messageListPanelHeight = window.innerHeight - 144  + 'px';
-    },
+      this.panelHeight = window.innerHeight + "px";
+      this.messageListPanelHeight = window.innerHeight - 144 + "px";
+    }
   },
   mounted() {
     window.addEventListener("resize", this.initSize);
     this.init();
-      //init module
-      this.participants = [];
-      this.select_group = this.moduleName;
-      this.select_groupId = this.moduleId;
-      this.startWebSocket(this.moduleId);
-      this.seletRoom = "module";
+    //init module
+    this.participants = [];
+    this.select_group = this.moduleName;
+    this.select_groupId = this.moduleId;
+    this.startWebSocket(this.moduleId);
+    this.seletRoom = "module";
   },
   beforeDestroy() {
     this.socketApi.close();
@@ -756,13 +754,13 @@ export default {
       }
     });
   },
-  updated:function(){
-    this.$nextTick(function(){
-      var div = document.getElementById('contentBody');
-      var div2 = document.getElementById('searchmessageList');
-      div.scrollTop = div.scrollHeight-60;
+  updated: function() {
+    this.$nextTick(function() {
+      var div = document.getElementById("contentBody");
+      var div2 = document.getElementById("searchmessageList");
+      div.scrollTop = div.scrollHeight - 60;
       div2.scrollTop = div.scrollHeight;
-    })
+    });
   }
 };
 </script>

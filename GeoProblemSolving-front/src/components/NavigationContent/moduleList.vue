@@ -1248,9 +1248,6 @@ export default {
     this.openModuleSocket();
     this.getHistoryRecords();
     this.getAllModules("init");
-    this.toProjectPage = "/project/" + sessionStorage.getItem("projectId");
-    this.toSubProjectPage =
-      "/project/" + sessionStorage.getItem("subProjectId") + "/subproject";
   },
   // add by mzy for navigation guards
   beforeRouteEnter: (to, from, next) => {
@@ -1258,7 +1255,22 @@ export default {
       if (!vm.$store.getters.userState) {
         next("/login");
       } else {
-        if (!(vm.subProjectInfo.isManager || vm.subProjectInfo.isMember)) {
+        var isManager=false;
+        var isMember=false;
+        var subProjectInfo= vm.subProjectInfo;
+        if(subProjectInfo.managerId == vm.$store.getters.userId){
+          isManager = true;
+        }
+        else{
+          var members = subProjectInfo.members;
+          for(var i=0;i<members.length;i++){
+            if(members[i].userId==vm.$store.getters.userId){
+              isMember = true;
+              break;
+            }
+          }
+        }
+        if (!(isManager || isMember)) {
           alert("No access");
           // next(`/project/${vm.$store.getters.currentProjectId}`);
           vm.$router.go(-1);
@@ -1314,32 +1326,40 @@ export default {
         subProjectInfo.subProjectId == subProjectId
       ) {
         this.$set(this, "subProjectInfo", subProjectInfo);
+        this.toProjectPage = "/project/" + subProjectInfo.projectId;
+        this.toSubProjectPage = "/project/" + subProjectInfo.subProjectId + "/subproject";
       } else {
-      }
-      $.ajax({
-        url:
-          "/GeoProblemSolving/subProject/inquiry" +
-          "?key=subProjectId" +
-          "&value=" +
-          subProjectId,
-        type: "GET",
-        async: false,
-        success: data => {
-          if (data != "None") {
-            subProjectInfo = data[0];
-            this.$set(this, "subProjectInfo", subProjectInfo);
-            sessionStorage.setItem("subProjectId", subProjectInfo.subProjectId);
-            sessionStorage.setItem("subProjectName", subProjectInfo.title);
+        $.ajax({
+          url:
+            "/GeoProblemSolving/subProject/inquiry" +
+            "?key=subProjectId" +
+            "&value=" +
+            subProjectId,
+          type: "GET",
+          async: false,
+          success: data => {
+            if(data == "Offline"){
+              this.$store.commit("userLogout");
+              this.$router.push({ name: "Login" });
+            }
+            else if (data != "None"&&data != "Fail") {
+              subProjectInfo = data[0];
+              this.$set(this, "subProjectInfo", subProjectInfo);
+              sessionStorage.setItem("subProjectId", subProjectInfo.subProjectId);
+              sessionStorage.setItem("subProjectName", subProjectInfo.title);
 
-            this.managerIdentity(subProjectInfo.managerId);
-            this.memberIdentity(subProjectInfo.members);
-            this.$store.commit("setSubProjectInfo", subProjectInfo);
+              this.managerIdentity(subProjectInfo.managerId);
+              this.memberIdentity(subProjectInfo.members);
+              this.$store.commit("setSubProjectInfo", subProjectInfo);
+              this.toProjectPage = "/project/" + subProjectInfo.projectId;
+              this.toSubProjectPage = "/project/" + subProjectInfo.subProjectId + "/subproject";
+            }
+          },
+          error: function(err) {
+            console.log("Get manager name fail.");
           }
-        },
-        error: function(err) {
-          console.log("Get manager name fail.");
-        }
-      });
+        });
+      }
     },
     managerIdentity(managerId) {
       if (managerId === this.$store.getters.userId) {
@@ -1352,37 +1372,6 @@ export default {
           this.subProjectInfo.isMember = true;
           break;
         }
-      }
-    },
-    getProjectInfo() {
-      let projectInfo = this.$store.getters.project;
-      if (
-        JSON.stringify(projectInfo) != "{}" &&
-        projectInfo.projectId == this.subProjectInfo.projectId
-      ) {
-        this.projectInfo = projectInfo;
-      } else {
-        let _this = this;
-        this.axios
-          .get(
-            "/GeoProblemSolving/project/inquiry" +
-              "?key=projectId" +
-              "&value=" +
-              this.subProjectInfo.projectId
-          )
-          .then(res => {
-            if (res.data != "None" && res.data != "Fail") {
-              _this.projectInfo = res.data[0];
-
-              sessionStorage.setItem("projectId", _this.projectInfo.projectId);
-              sessionStorage.setItem("projectName", _this.projectInfo.title);
-            } else {
-              console.log(res.data);
-            }
-          })
-          .catch(err => {
-            console.log(err.data);
-          });
       }
     },
     showDetail(item) {
@@ -1759,7 +1748,10 @@ export default {
             subProjectId
         )
         .then(res => {
-          if (res.data != "None") {
+          if(res.data == "Offline"){
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          }else if (res.data != "None" && res.data != "Fail") {
             this.moduleList = res.data;
 
             if (state == "init") {
@@ -1797,7 +1789,6 @@ export default {
               Module["foreModuleId"] = "";
             }
             let this1 = this;
-            let this2 = this;
             this.axios
               .post("/GeoProblemSolving/module/create", Module)
               .then(res => {
@@ -1822,10 +1813,10 @@ export default {
                     this1.axios
                       .post("/GeoProblemSolving/module/update", updateObject)
                       .then(res => {
-                        this2.getAllModules("init");
+                        this1.getAllModules("init");
 
                         let socketMsg = { type: "module", operate: "update" };
-                        this2.subprojectSocket.send(JSON.stringify(socketMsg));
+                        this1.subprojectSocket.send(JSON.stringify(socketMsg));
                       })
                       .catch(err => {
                         console.log(err.data);
@@ -1856,7 +1847,6 @@ export default {
     },
     activateModule() {
       var this1 = this;
-      var this2 = this;
       if (
         this.$store.getters.userInfo.userId == this.subProjectInfo.managerId
       ) {
@@ -1878,10 +1868,10 @@ export default {
                 this.axios
                   .post("/GeoProblemSolving/module/update", updateObject)
                   .then(res => {
-                    this2.getAllModules("update");
+                    this1.getAllModules("update");
 
                     let socketMsg = { type: "module", operate: "update" };
-                    this2.subprojectSocket.send(JSON.stringify(socketMsg));
+                    this1.subprojectSocket.send(JSON.stringify(socketMsg));
                   })
                   .catch(err => {
                     console.log(err.data);
@@ -2031,56 +2021,49 @@ export default {
           // currentModule.moduleId
           // 添加字段属于那个项目
           formData.append("belong", this.currentModule.title);
+          let scopeObject = {
+            projectId: "",
+            subProjectId: "",
+            moduleId: this.currentModule.moduleId
+          };
+          formData.append("scope", JSON.stringify(scopeObject));
+          //这里还要添加其他的字段
+          let that = this;
+          this.axios
+            .post("/GeoProblemSolving/resource/upload", formData)
+            .then(res => {
+              if(res.data == "Offline"){
+                that.$store.commit("userLogout");
+                that.$router.push({ name: "Login" });
+              }else if (res.data != "Size over" && res.data.length > 0) {
+                that.$Notice.open({
+                  title: "Upload notification title",
+                  desc: "File uploaded successfully",
+                  duration: 0
+                });
+                //这里重新获取全部资源
+                that.getAllResource();
 
-          if (
-            sessionStorage.getItem("projectId") == "" ||
-            sessionStorage.getItem("projectId") == undefined ||
-            sessionStorage.getItem("projectId") == null
-          ) {
-            this.getProjectInfo();
-          }
-          this.sleep(1000).then(() => {
-            let scopeObject = {
-              projectId: "",
-              subProjectId: "",
-              moduleId: this.currentModule.moduleId
-            };
-            formData.append("scope", JSON.stringify(scopeObject));
-            //这里还要添加其他的字段
-            let that = this;
-            this.axios
-              .post("/GeoProblemSolving/resource/upload", formData)
-              .then(res => {
-                if (res.data != "Size over" && res.data.length > 0) {
-                  that.$Notice.open({
-                    title: "Upload notification title",
-                    desc: "File uploaded successfully",
-                    duration: 0
-                  });
-                  //这里重新获取全部资源
-                  that.getAllResource();
-
-                  // 同步
-                  let record = {
-                    who: that.$store.getters.userName,
-                    whoid: that.$store.getters.userId,
-                    type: "resource",
-                    content:
-                      "upload a/an " +
-                      that.formValidate3.fileType +
-                      " : " +
-                      that.file.name,
-                    moduleId: this.currentModule.moduleId,
-                    time: new Date().toLocaleString(),
-                    file: res.data[0].fileName
-                  };
-                  that.subprojectSocket.send(JSON.stringify(record));
-                  // that.allRecords.push(record);
-                }
-                // console.log(res.data);
-              })
-              .catch(err => {});
-          });
+                // 同步
+                let record = {
+                  who: that.$store.getters.userName,
+                  whoid: that.$store.getters.userId,
+                  type: "resource",
+                  content:
+                    "upload a/an " +
+                    that.formValidate3.fileType +
+                    " : " +
+                    that.file.name,
+                  moduleId: this.currentModule.moduleId,
+                  time: new Date().toLocaleString(),
+                  file: res.data[0].fileName
+                };
+                that.subprojectSocket.send(JSON.stringify(record));
+                // that.allRecords.push(record);
+              }
+              // console.log(res.data);
+            })
+            .catch(err => {});
         } else {
           this.$Message.error("Please enter the resource type!");
         }
@@ -2120,12 +2103,6 @@ export default {
       this.formValidate2.updateModuleTitle = this.moduleList[order].title;
       this.formValidate2.updateModuleType = this.moduleList[order].type;
       this.updateModuleDescription = this.moduleList[order].description;
-    },
-    // 返回项目页
-    backProject() {
-      this.getProjectInfo();
-      let id = this.projectInfo.projectId;
-      this.$router.push(`../${id}`);
     },
     ok() {
       this.$Message.info("Clicked ok");
@@ -2212,132 +2189,144 @@ export default {
     },
     // jspanel工具
     toolPanel(type) {
-      var toolURL = "";
-      let toolName = "";
+      this.axios
+      .get("/GeoProblemSolving/user/state")
+      .then(res=>{
+        if (!res.data) {
+          this.$store.commit("userLogout");
+          this.$router.push({ name: "Login" });
+        }else{
+          var toolURL = "";
+          let toolName = "";
 
-      if (type == "map") {
-        toolURL = '<iframe src="'+'http://'+this.$store.state.IP_Port+'/GeoProblemSolving/map" style="width: 100%;height:100%"></iframe>';
-        toolName = "Map";
-      } else if (type == "draw") {
-        toolURL =  '<iframe src="'+'http://'+this.$store.state.IP_Port+'/GeoProblemSolving/draw" style="width: 100%;height:100%"></iframe>';
-        toolName = "Drawing";
-      } else if (type == "chart") {
-        toolURL = '<iframe src="'+'http://'+this.$store.state.IP_Port+'/GeoProblemSolving/charts" style="width: 100%;height:100%"></iframe>';
-        toolName = "Chart";
-      } else if (type == "chat") {
-        toolURL = '<iframe src="'+'http://'+this.$store.state.IP_Port+'/GeoProblemSolving/chat" style="width: 100%;height:100%"></iframe>';
-        toolName = "Chatroom";
-      } else if (type == "graphEditor") {
-        toolURL =
-          '<iframe src="/GeoProblemSolving/Collaborative/GraphEditor/index.html' +
-          "?groupID=" +
-          this.currentModule.moduleId +
-          '" style="width: 100%;height:100%"></iframe>';
-        toolName = "Sketchpad";
-      } else if (type == "3DmodelViewer") {
-        toolURL =
-          '<iframe src="/GeoProblemSolving/Collaborative/3DmodelViewer/index.html' +
-          "?groupID=" +
-          this.currentModule.moduleId +
-          '" style="width: 100%;height:100%"></iframe>';
-        toolName = "3D model viewer";
-      } else if (type == "LogicalModel") {
-        toolURL =
-          '<iframe src="/GeoProblemSolving/Collaborative/LogicalModel/index.html' +
-          "?groupID=" +
-          this.currentModule.moduleId +
-          '" style="width: 100%;height:100%"></iframe>';
-        toolName = "Logical modeling";
-      } else if (type == "ConceptualModel") {
-        toolURL =
-          '<iframe src="/GeoProblemSolving/Collaborative/ConceptualModel/index.html' +
-          "?groupID=" +
-          this.currentModule.moduleId +
-          '" style="width: 100%;height:100%"></iframe>';
-        toolName = "Conceptual modeling";
-      } else if (type == "ComputationalModel") {
-        toolURL =
-          '<iframe src="/GeoProblemSolving/Collaborative/ComputationalModel/index.html' +
-          "?groupID=" +
-          this.currentModule.moduleId +
-          '" style="width: 100%;height:100%"></iframe>';
-        toolName = "Computational modeling";
-      } else if (type == "tableEditor") {
-        toolURL =
-          '<iframe src="/GeoProblemSolving/Collaborative/jexcelTool/excelTool.html' +
-          "?groupID=" +
-          this.currentModule.moduleId +
-          '" style="width: 100%;height:100%"></iframe>';
-        toolName = "Table editor";
-      } else if (type == "nc-map") {
-        toolURL =
-          '<iframe src="'+'http://'+this.$store.state.IP_Port+'/GeoProblemSolving/nc/map" style="width: 100%;height:100%"></iframe>';
-        toolName = "Map";
-      } else if (type == "nc-draw") {
-        toolURL =
-          '<iframe src="'+'http://'+this.$store.state.IP_Port+'/GeoProblemSolving/nc/draw" style="width: 100%;height:100%"></iframe>';
-        toolName = "Drawing";
-      } else if (type == "nc-chart") {
-        toolURL =
-          '<iframe src="'+'http://'+this.$store.state.IP_Port+'/GeoProblemSolving/nc/charts" style="width: 100%;height:100%"></iframe>';
-        toolName = "Chart";
-      } else if (type == "cn-tableEditor") {
-        toolURL =
-          '<iframe src="/GeoProblemSolving/Collaborative/jexcelTool/excelToolSingle.html' +
-          '" style="width: 100%;height:100%"></iframe>';
-        toolName = "Table editor";
-      } else if (type == "nc-3DmodelViewer") {
-        toolURL =
-          '<iframe src="/GeoProblemSolving/Collaborative/3DmodelViewer/indexSingle.html' +
-          '" style="width: 100%;height:100%"></iframe>';
-        toolName = "3D model viewer";
-      } else if (type == "nc-video") {
-        toolURL =
-          '<iframe src="'+'http://'+this.$store.state.IP_Port+'/GeoProblemSolving/video" style="width: 100%;height:100%"></iframe>';
-        toolName = "Video player";
-      } else if (type == "nc-pdf") {
-        toolURL =
-          '<iframe src="'+'http://'+this.$store.state.IP_Port+'/GeoProblemSolving/pdfview" style="width: 100%;height:100%"></iframe>';
-        toolName = "Pdf viewer";
-      } else if (type == "Doc Edit") {
-        toolURL =
-          '<iframe src="'+'http://'+this.$store.state.IP_Port+'/GeoProblemSolving/tinymce" style="width: 100%;height:100%"></iframe>';
-        toolName = "Text editor";
-      } else if (type == "video Tool") {
-        toolURL =
-          '<iframe src="/GeoProblemSolving/Collaborative/vedioChat/WebRtcTest.html" style="width: 100%;height:100%"></iframe>';
-        toolName = "Video Tool";
-      }
+          if (type == "map") {
+            toolURL = '<iframe src="'+'http://'+this.$store.state.IP_Port+'/GeoProblemSolving/map" style="width: 100%;height:100%"></iframe>';
+            toolName = "Map";
+          } else if (type == "draw") {
+            toolURL =  '<iframe src="'+'http://'+this.$store.state.IP_Port+'/GeoProblemSolving/draw" style="width: 100%;height:100%"></iframe>';
+            toolName = "Drawing";
+          } else if (type == "chart") {
+            toolURL = '<iframe src="'+'http://'+this.$store.state.IP_Port+'/GeoProblemSolving/charts" style="width: 100%;height:100%"></iframe>';
+            toolName = "Chart";
+          } else if (type == "chat") {
+            toolURL = '<iframe src="'+'http://'+this.$store.state.IP_Port+'/GeoProblemSolving/chat" style="width: 100%;height:100%"></iframe>';
+            toolName = "Chatroom";
+          } else if (type == "graphEditor") {
+            toolURL =
+              '<iframe src="/GeoProblemSolving/Collaborative/GraphEditor/index.html' +
+              "?groupID=" +
+              this.currentModule.moduleId +
+              '" style="width: 100%;height:100%"></iframe>';
+            toolName = "Sketchpad";
+          } else if (type == "3DmodelViewer") {
+            toolURL =
+              '<iframe src="/GeoProblemSolving/Collaborative/3DmodelViewer/index.html' +
+              "?groupID=" +
+              this.currentModule.moduleId +
+              '" style="width: 100%;height:100%"></iframe>';
+            toolName = "3D model viewer";
+          } else if (type == "LogicalModel") {
+            toolURL =
+              '<iframe src="/GeoProblemSolving/Collaborative/LogicalModel/index.html' +
+              "?groupID=" +
+              this.currentModule.moduleId +
+              '" style="width: 100%;height:100%"></iframe>';
+            toolName = "Logical modeling";
+          } else if (type == "ConceptualModel") {
+            toolURL =
+              '<iframe src="/GeoProblemSolving/Collaborative/ConceptualModel/index.html' +
+              "?groupID=" +
+              this.currentModule.moduleId +
+              '" style="width: 100%;height:100%"></iframe>';
+            toolName = "Conceptual modeling";
+          } else if (type == "ComputationalModel") {
+            toolURL =
+              '<iframe src="/GeoProblemSolving/Collaborative/ComputationalModel/index.html' +
+              "?groupID=" +
+              this.currentModule.moduleId +
+              '" style="width: 100%;height:100%"></iframe>';
+            toolName = "Computational modeling";
+          } else if (type == "tableEditor") {
+            toolURL =
+              '<iframe src="/GeoProblemSolving/Collaborative/jexcelTool/excelTool.html' +
+              "?groupID=" +
+              this.currentModule.moduleId +
+              '" style="width: 100%;height:100%"></iframe>';
+            toolName = "Table editor";
+          } else if (type == "nc-map") {
+            toolURL =
+              '<iframe src="'+'http://'+this.$store.state.IP_Port+'/GeoProblemSolving/nc/map" style="width: 100%;height:100%"></iframe>';
+            toolName = "Map";
+          } else if (type == "nc-draw") {
+            toolURL =
+              '<iframe src="'+'http://'+this.$store.state.IP_Port+'/GeoProblemSolving/nc/draw" style="width: 100%;height:100%"></iframe>';
+            toolName = "Drawing";
+          } else if (type == "nc-chart") {
+            toolURL =
+              '<iframe src="'+'http://'+this.$store.state.IP_Port+'/GeoProblemSolving/nc/charts" style="width: 100%;height:100%"></iframe>';
+            toolName = "Chart";
+          } else if (type == "cn-tableEditor") {
+            toolURL =
+              '<iframe src="/GeoProblemSolving/Collaborative/jexcelTool/excelToolSingle.html' +
+              '" style="width: 100%;height:100%"></iframe>';
+            toolName = "Table editor";
+          } else if (type == "nc-3DmodelViewer") {
+            toolURL =
+              '<iframe src="/GeoProblemSolving/Collaborative/3DmodelViewer/indexSingle.html' +
+              '" style="width: 100%;height:100%"></iframe>';
+            toolName = "3D model viewer";
+          } else if (type == "nc-video") {
+            toolURL =
+              '<iframe src="'+'http://'+this.$store.state.IP_Port+'/GeoProblemSolving/video" style="width: 100%;height:100%"></iframe>';
+            toolName = "Video player";
+          } else if (type == "nc-pdf") {
+            toolURL =
+              '<iframe src="'+'http://'+this.$store.state.IP_Port+'/GeoProblemSolving/pdfview" style="width: 100%;height:100%"></iframe>';
+            toolName = "Pdf viewer";
+          } else if (type == "Doc Edit") {
+            toolURL =
+              '<iframe src="'+'http://'+this.$store.state.IP_Port+'/GeoProblemSolving/tinymce" style="width: 100%;height:100%"></iframe>';
+            toolName = "Text editor";
+          } else if (type == "video Tool") {
+            toolURL =
+              '<iframe src="/GeoProblemSolving/Collaborative/vedioChat/WebRtcTest.html" style="width: 100%;height:100%"></iframe>';
+            toolName = "Video Tool";
+          }
 
-      let panel = jsPanel.create({
-        theme: "primary",
-        headerTitle: toolName,
-        contentSize: "1000 600",
-        content: toolURL,
-        disableOnMaximized: true,
-        dragit: {
-          containment: 5
-        },
-        callback: function() {
-          // this.content.style.padding = "20px";
+          let panel = jsPanel.create({
+            theme: "primary",
+            headerTitle: toolName,
+            contentSize: "1000 600",
+            content: toolURL,
+            disableOnMaximized: true,
+            dragit: {
+              containment: 5
+            },
+            callback: function() {
+              // this.content.style.padding = "20px";
+            }
+          });
+          // panel.resizeit("disable");
+          $(".jsPanel-content").css("font-size", "0");
+          this.panelList.push(panel);
+
+          // 生成records, 同步
+          let record = {
+            who: this.$store.getters.userName,
+            whoid: this.$store.getters.userId,
+            type: "tools",
+            toolType: type,
+            content: "used a tool: " + type,
+            moduleId: this.currentModule.moduleId,
+            time: new Date().toLocaleString()
+          };
+          this.subprojectSocket.send(JSON.stringify(record));
+          // this.allRecords.push(record);
         }
+      })
+      .catch(err=>{
+        console.log("Get user info fail.");
       });
-      // panel.resizeit("disable");
-      $(".jsPanel-content").css("font-size", "0");
-      this.panelList.push(panel);
-
-      // 生成records, 同步
-      let record = {
-        who: this.$store.getters.userName,
-        whoid: this.$store.getters.userId,
-        type: "tools",
-        toolType: type,
-        content: "used a tool: " + type,
-        moduleId: this.currentModule.moduleId,
-        time: new Date().toLocaleString()
-      };
-      this.subprojectSocket.send(JSON.stringify(record));
-      // this.allRecords.push(record);
     },
     closePanel() {
       for (let i = 0; i < this.panelList.length; i++) {
@@ -2356,7 +2345,10 @@ export default {
       this.axios
         .post("/GeoProblemSolving/bulletin/save", noticeForm)
         .then(res => {
-          if (res.data != "Fail") {
+          if(res.data == "Offline"){
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          }else if (res.data != "Fail") {
             this.$Notice.success({
               title: "Create notice result",
               desc: "The notice has been created successfully!"
@@ -2389,7 +2381,10 @@ export default {
       this.axios
         .post("/GeoProblemSolving/bulletin/update", updateForm)
         .then(res => {
-          if (res.data != "Fail") {
+          if(res.data == "Offline"){
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          }else if (res.data != "Fail") {
             this.$Notice.info({
               title: "update result",
               desc: "update announcement successfully!"
@@ -2405,7 +2400,10 @@ export default {
       this.axios
         .get("/GeoProblemSolving/bulletin/delete" + "?bulletinId=" + bulletinId)
         .then(res => {
-          if (res.data != "Fail") {
+          if(res.data == "Offline"){
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          }else if (res.data != "Fail") {
             this.$Notice.info({
               title: "delete result",
               desc: "delete announcement successfully!"

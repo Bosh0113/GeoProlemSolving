@@ -300,7 +300,10 @@ export default {
       this.axios
         .post("/GeoProblemSolving/resource/upload", formData)
         .then(res => {
-          if (res.data != "Size over" && res.data.length > 0) {
+          if(res.data == "Offline"){
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          }else if (res.data != "Size over" && res.data.length > 0) {
             this.$Notice.open({
               title: "Upload notification title",
               desc: "File uploaded successfully",

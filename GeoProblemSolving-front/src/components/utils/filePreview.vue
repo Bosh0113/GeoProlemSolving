@@ -170,7 +170,10 @@ export default {
       this.axios
         .post("/GeoProblemSolving/resource/upload", formData)
         .then(res => {
-          if (res.data != "Size over" && res.data.length > 0) {
+          if(res.data == "Size over"||res.data == "Fail"||res.data == "Offline"){
+            console.log(res.data);
+          }
+          else if (res.data.length > 0) {
             let fileName = res.data[0].fileName;
             that.fileURL = "/GeoProblemSolving/resource/upload/" + fileName;
 
