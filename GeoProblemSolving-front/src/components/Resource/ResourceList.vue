@@ -305,6 +305,8 @@ export default {
       deleteResourceId: "",
       // 删除资源的位置索引
       deletePosition:"",
+      // 侧边栏刚才选中的选项卡
+      justSelectedItem:"image"
     };
   },
   mounted() {
@@ -324,6 +326,7 @@ export default {
     },
     onMenuSelect(name) {
       this.uploaderArray = [];
+      this.justSelectedItem = name;
       this.specifiedResourceList = [];
       this.axios
         .get(
@@ -436,7 +439,7 @@ export default {
                       title: "Upload notification title",
                       desc: "File uploaded successfully",
                     });
-                    this.onMenuSelect("image");
+                    this.onMenuSelect(this.justSelectedItem);
                     this.file = [];
                     this.resourceValidate.fileDescription = "";
                     this.resourceValidate.filePrivacy = "private";
