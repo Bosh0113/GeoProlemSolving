@@ -745,11 +745,19 @@
                         <Icon
                           type="logo-youtube"
                           size="60"
-                          @click.native="toolPanel('video Tool')"
-                          title="video Tool"
+                          @click.native="toolPanel('Video Tool')"
+                          title="Video Tool"
                           color="gray"
                         />
                       </div>
+                      <a class="singl_tool_style" href="http://172.21.212.72:8888/tree?" target="_blank">
+                        <Icon
+                          type="md-code"
+                          size="60"
+                          title="Jupyter Notebook"
+                          color="gray"
+                        />
+                      </a>
                     </div>
                   </TabPane>
                   <TabPane label="Special tools" name="Special">
