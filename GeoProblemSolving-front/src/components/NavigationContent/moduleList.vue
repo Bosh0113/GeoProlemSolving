@@ -159,9 +159,9 @@
   text-overflow: ellipsis;
   max-width: 120px;
 }
-.operatePanel{
-  display:flex;
-  justify-content: flex-end
+.operatePanel {
+  display: flex;
+  justify-content: flex-end;
 }
 .operatePanel button {
   margin-right: 2.5%;
@@ -170,13 +170,13 @@
   color: darkgray;
   text-align: center;
 }
-.moduleShow{
-    width: 30px;
-    height: 36px;
-    border: white;
-    cursor: pointer;
-    background-color: white;
-    opacity: 0.3;
+.moduleShow {
+  width: 30px;
+  height: 36px;
+  border: white;
+  cursor: pointer;
+  background-color: white;
+  opacity: 0.3;
 }
 </style>
 <template>
@@ -195,7 +195,12 @@
             <Col span="12" style="text-align:center;font-size:1.5rem;height:20px;;margin-top:-10px">
               <strong>{{subProjectInfo.title}}</strong>
             </Col>
-            <Col span="5" offset="1" style="height:20px;display:flex;align-items:center" class="operatePanel">
+            <Col
+              span="5"
+              offset="1"
+              style="height:20px;display:flex;align-items:center"
+              class="operatePanel"
+            >
               <template v-if="this.$store.getters.userInfo.userId == this.subProjectInfo.managerId">
                 <template v-if="this.moduleList.length == 0">
                   <Button
@@ -245,7 +250,9 @@
           </Row>
           <Row>
             <Col span="1" style="background-color:white;margin-top:20px">
-              <button class="moduleShow" @click="moudelMove('back')" v-if="moduleLeftMove"><Icon type="ios-arrow-back" style="font-size: 2rem;font-weight: 700"/></button>
+              <button class="moduleShow" @click="moudelMove('back')" v-if="moduleLeftMove">
+                <Icon type="ios-arrow-back" style="font-size: 2rem;font-weight: 700"/>
+              </button>
             </Col>
             <Col span="22" style="background-color:white;margin-top:20px">
               <template v-if="this.$store.getters.userInfo.userId == this.subProjectInfo.managerId">
@@ -274,7 +281,9 @@
               </template>
             </Col>
             <Col span="1" style="background-color:white;margin-top:20px">
-              <button class="moduleShow" @click="moudelMove('forward')"  v-if="moduleRightMove"><Icon type="ios-arrow-forward" style="font-size: 2rem;font-weight: 700"/></button>
+              <button class="moduleShow" @click="moudelMove('forward')" v-if="moduleRightMove">
+                <Icon type="ios-arrow-forward" style="font-size: 2rem;font-weight: 700"/>
+              </button>
             </Col>
           </Row>
         </Card>
@@ -929,12 +938,7 @@
         </Row>
       </template>
     </div>
-    <Modal
-      v-model="delModal"
-      title="Delete this process"
-      @on-ok="delModule"
-      @on-cancel=""
-    >
+    <Modal v-model="delModal" title="Delete this process" @on-ok="delModule" @on-cancel>
       <p>Do you really want to delete this step?</p>
     </Modal>
     <Modal
@@ -942,7 +946,7 @@
       v-model="editModal"
       title="Update this process"
       @on-ok="updateModule('formValidate2')"
-      @on-cancel=""
+      @on-cancel
     >
       <Form
         ref="formValidate2"
@@ -983,7 +987,7 @@
       v-model="addModal"
       title="Start a new process"
       @on-ok="addModule('formValidate1')"
-      @on-cancel=""
+      @on-cancel
     >
       <Form
         ref="formValidate1"
@@ -1018,7 +1022,7 @@
       v-model="inheritData"
       title="Choose data to next process"
       @on-ok="createModule()"
-      @on-cancel=""
+      @on-cancel
     >
       <Transfer
         :data="inheritResource"
@@ -1037,7 +1041,7 @@
       v-model="activateModal"
       title="Activate this process"
       @on-ok="activateModule()"
-      @on-cancel=""
+      @on-cancel
     >
       <p>Do you want to activate this process?</p>
     </Modal>
@@ -1047,7 +1051,7 @@
       @on-ok="submitFile('formValidate3')"
       ok-text="Submit"
       cancel-text="Cancel"
-      width="600px"
+      width="800px"
       :mask-closable="false"
     >
       <Form
@@ -1057,6 +1061,12 @@
         :label-width="80"
         style="margin-left:20px"
       >
+        <FormItem label="Privacy" prop="filePrivacy">
+          <RadioGroup v-model="formValidate3.filePrivacy">
+            <Radio label="private">Private</Radio>
+            <Radio label="public">Public</Radio>
+          </RadioGroup>
+        </FormItem>
         <FormItem label="File type: " prop="fileType">
           <RadioGroup v-model="formValidate3.fileType">
             <Radio label="data">Data</Radio>
@@ -1074,7 +1084,48 @@
         <Input type="textarea" :rows="2" v-model="fileDescription"/>
       </div>
       <br>
-      <input type="file" @change="getFile($event)" style="margin-left:20px" multiple="multiple">
+      <Upload :max-size="1024*1024" multiple type="drag" :before-upload="gatherFile" action="-">
+        <div style="padding: 20px 0">
+          <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
+          <p>Click or drag files here to upload</p>
+        </div>
+      </Upload>
+      <div style="padding:0 10px 0 10px">
+        <ul v-for="(list,index) in file" :key="index">
+          <li style="display:flex">
+            File name:
+            <span
+              style="font-size:10px;margin: 0 5px 0 5px"
+              :title="list.name"
+            >{{ list.name }}</span>
+            (Size:
+            <span
+              v-if="list.size<(1024*1024)"
+              style="font-size:10px;margin-right:10px"
+            >{{(list.size/1024).toFixed(2)}}KB)</span>
+            <span
+              v-else
+              style="font-size:10px;margin-right:10px"
+            >{{(list.size/1024/1024).toFixed(2)}}MB)</span>
+            <Icon
+              type="ios-close"
+              size="20"
+              @click="delFileList(index)"
+              style="display:flex;justify-content:flex-end;cursor:pointer"
+              title="Cancel"
+            ></Icon>
+          </li>
+        </ul>
+      </div>
+      <h6 style="text-align:center;color:red">The file's size must control smaller than 1 GB.</h6>
+    </Modal>
+    <Modal
+      v-model="progressModalShow"
+      title="Upload Progress"
+      :mask-closable="false"
+      :closable="false"
+    >
+      <Progress :percent="uploadProgress"></Progress>
     </Modal>
   </div>
 </template>
@@ -1157,11 +1208,15 @@ export default {
         ]
       },
       formValidate3: {
-        fileType: "data"
+        fileType: "data",
+        filePrivacy: "private"
       },
       ruleValidate3: {
         fileType: [
           { required: true, message: "Please select type...", trigger: "blur" }
+        ],
+        filePrivacy: [
+          { required: true, message: "Please set privacy...", trigger: "blur" }
         ]
       },
       // moduleDescription指的是节点的详情信息
@@ -1173,9 +1228,9 @@ export default {
       taskList: [],
       // 后台拿到的Module集合，渲染成一条轴用的
       moduleList: [],
-      showedModules:[],
-      moduleRightMove:false,
-      moduleLeftMove:false,
+      showedModules: [],
+      moduleRightMove: false,
+      moduleLeftMove: false,
       // 当前模块的索引
       currentModuleIndex: 0,
       showedModuleLevel: 0,
@@ -1237,7 +1292,15 @@ export default {
       panelList: [],
       panel: null,
       toProjectPage: "",
-      toSubProjectPage: ""
+      toSubProjectPage: "",
+      // 上传的文件
+      file: [],
+      // 上传文件个数限制定时器
+      fileCountTimer: null,
+      // 显示进度条的模态框
+      progressModalShow: false,
+      // 文件上传的进度
+      uploadProgress: 0
     };
   },
   created() {
@@ -1259,7 +1322,7 @@ export default {
         next("/login");
       } else {
         if (!(vm.subProjectInfo.isManager || vm.subProjectInfo.isMember)) {
-          this.$Message.error('You have no property to access it');
+          this.$Message.error("You have no property to access it");
           // next(`/project/${vm.$store.getters.currentProjectId}`);
           vm.$router.go(-1);
         }
@@ -1382,7 +1445,7 @@ export default {
     },
     showDetail(item) {
       let oldId = this.currentModule.moduleId;
-      this.currentModuleIndex = this.showedModuleLevel*5 + item;
+      this.currentModuleIndex = this.showedModuleLevel * 5 + item;
       this.currentModule = this.moduleList[this.currentModuleIndex];
 
       sessionStorage.setItem("moduleId", this.currentModule.moduleId);
@@ -1392,7 +1455,7 @@ export default {
         //查询公告
         this.inquiryNotice();
         this.getAllResource();
-        this.showModules('init');
+        this.showModules("init");
         let records = [];
         if (!this.currentModule.activeStatus) {
           for (let i = 0; i < this.allHistRecords.length; i++) {
@@ -1427,62 +1490,75 @@ export default {
         }
       }
     },
-    moudelMove(direction){
-      if(direction == 'back'){
-        this.showModules('back');
-      }
-      else if(direction == 'forward'){
-        this.showModules('forward');
+    moudelMove(direction) {
+      if (direction == "back") {
+        this.showModules("back");
+      } else if (direction == "forward") {
+        this.showModules("forward");
       }
     },
-    showModules(type){
-
+    showModules(type) {
       this.showedModules = [];
-      if(this.moduleList.length > 5){
-        if(type == 'init'){
-          this.order = Math.round(((this.currentModuleIndex/5) - Math.floor(this.currentModuleIndex/5))*5);
-          this.showedModuleLevel = Math.floor(this.currentModuleIndex/5);
-        }
-        else if(type == 'back'){
+      if (this.moduleList.length > 5) {
+        if (type == "init") {
+          this.order = Math.round(
+            (this.currentModuleIndex / 5 -
+              Math.floor(this.currentModuleIndex / 5)) *
+              5
+          );
+          this.showedModuleLevel = Math.floor(this.currentModuleIndex / 5);
+        } else if (type == "back") {
           this.showedModuleLevel--;
-          if(this.showedModuleLevel == Math.floor(this.currentModuleIndex/5)){
-            this.order = Math.round(((this.currentModuleIndex/5) - Math.floor(this.currentModuleIndex/5))*5);
-          }
-          else{
+          if (
+            this.showedModuleLevel == Math.floor(this.currentModuleIndex / 5)
+          ) {
+            this.order = Math.round(
+              (this.currentModuleIndex / 5 -
+                Math.floor(this.currentModuleIndex / 5)) *
+                5
+            );
+          } else {
             this.order = -1;
           }
-        }
-        else if(type == 'forward'){
+        } else if (type == "forward") {
           this.showedModuleLevel++;
-          if(this.showedModuleLevel == Math.floor(this.currentModuleIndex/5)){
-            this.order = Math.round(((this.currentModuleIndex/5) - Math.floor(this.currentModuleIndex/5))*5);
-          }
-          else{
+          if (
+            this.showedModuleLevel == Math.floor(this.currentModuleIndex / 5)
+          ) {
+            this.order = Math.round(
+              (this.currentModuleIndex / 5 -
+                Math.floor(this.currentModuleIndex / 5)) *
+                5
+            );
+          } else {
             this.order = -1;
           }
         }
 
-        for(let i =  this.showedModuleLevel*5; i < (this.showedModuleLevel+1)*5; i++){
-          if(i == this.moduleList.length){
+        for (
+          let i = this.showedModuleLevel * 5;
+          i < (this.showedModuleLevel + 1) * 5;
+          i++
+        ) {
+          if (i == this.moduleList.length) {
             break;
           }
           this.showedModules.push(this.moduleList[i]);
         }
 
-        if(this.showedModuleLevel>0){
+        if (this.showedModuleLevel > 0) {
           this.moduleLeftMove = type;
-        }
-        else{
+        } else {
           this.moduleLeftMove = false;
         }
-        if(this.showedModuleLevel <  Math.floor((this.moduleList.length-1)/5)){
+        if (
+          this.showedModuleLevel < Math.floor((this.moduleList.length - 1) / 5)
+        ) {
           this.moduleRightMove = true;
-        }
-        else{
+        } else {
           this.moduleRightMove = false;
         }
-      }
-      else{
+      } else {
         this.showedModules = this.moduleList;
         this.moduleRightMove = false;
         this.moduleLeftMove = false;
@@ -1502,7 +1578,11 @@ export default {
       }
       let subProjectId = this.subProjectInfo.subProjectId;
       // var subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + subProjectId;
-      var subprojectSocketURL = "ws://"+this.$store.state.IP_Port+"/GeoProblemSolving/Module/" + subProjectId;
+      var subprojectSocketURL =
+        "ws://" +
+        this.$store.state.IP_Port +
+        "/GeoProblemSolving/Module/" +
+        subProjectId;
       this.subprojectSocket = new WebSocket(subprojectSocketURL);
       this.subprojectSocket.onopen = this.onOpen;
       this.subprojectSocket.onmessage = this.onMessage;
@@ -1828,13 +1908,7 @@ export default {
                   } else {
                     this1.getAllModules("init");
                   }
-
                   this1.createModuleSuccess(Module["title"]);
-
-                  // this1.moduleList.push(Module);
-                  // this1.showedModuleLevel = 0;
-                  // this1.showDetail(this.moduleList.length - 1);
-
                   this1.formValidate1.moduleTitle = "";
                   this1.moduleDescription = "";
                   this1.formValidate1.moduleType = "";
@@ -1894,8 +1968,6 @@ export default {
       if (
         this.$store.getters.userInfo.userId == this.subProjectInfo.managerId
       ) {
-        // let foreModuleId = this.currentModule.foreModuleId;
-        // let nextModuleId = this.currentModule.nextModuleId;
         this.axios
           .get(
             "/GeoProblemSolving/module/delete" +
@@ -2014,73 +2086,113 @@ export default {
     getFile(event) {
       this.file = event.target.files[0];
     },
+    // 这里模仿项目层面上传文件的写法
+    // gatherFile
+    gatherFile(file) {
+      let that = this;
+      if (that.file.length >= 5) {
+        if (this.fileCountTimer != null) {
+          clearTimeout(this.fileCountTimer);
+        }
+        this.fileCountTimer = setTimeout(() => {
+          this.$Message.info("you can upload 5 files one time!");
+        }, 500);
+      } else {
+        that.file.push(file);
+        that.file.map(element => {
+          element["fileSize"] = Math.round((element.size / 1024) * 100) / 100;
+        });
+      }
+      return false;
+    },
+    delFileList(index) {
+      let that = this;
+      that.file.splice(index, 1);
+    },
     submitFile(name) {
+      this.uploadProgress = 0;
       this.$refs[name].validate(valid => {
         if (valid) {
-          let formData = new FormData();
-          formData.append("file", this.file);
-          formData.append("description", "");
-          formData.append("type", this.formValidate3.fileType);
-          formData.append("uploaderId", this.$store.getters.userId);
-          // currentModule.title;
-          // currentModule.moduleId
-          // 添加字段属于那个项目
-          formData.append("belong", this.currentModule.title);
+          let that = this;
+          if (that.file.length != 0) {
+            var formData = new FormData();
+            var total = 0;
+            for (var i = 0; i < that.file.length; i++) {
+              if (that.file[i].fileSize < Math.pow(1024, 2)) {
+                formData.append("file", that.file[i]); // 文件对象
+              } else {
+              }
+              total += that.file[i].fileSize;
+            }
+            if (total < Math.pow(1024, 2)) {
+              let userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
+              formData.append("description", this.fileDescription);
+              formData.append("type", this.formValidate3.fileType);
+              formData.append("uploaderId", this.$store.getters.userId);
+              formData.append("belong", this.currentModule.title);
+              let scopeObject = {
+                  projectId: "",
+                  subProjectId: "",
+                  moduleId: this.currentModule.moduleId
+                };
+              formData.append("scope", JSON.stringify(scopeObject));
+                this.progressModalShow = true;
+                this.axios({
+                  url: "/GeoProblemSolving/resource/upload",
+                  method: "post",
+                  onUploadProgress: progressEvent => {
+                    this.uploadProgress =
+                      ((progressEvent.loaded / progressEvent.total) * 100) | 0;
+                  },
+                  data: formData
+                })
+                  .then(res => {
+                    if (res.data != "Size over" && res.data.length > 0) {
+                      this.$Notice.open({
+                        title: "Upload notification title",
+                        desc: "File uploaded successfully",
+                      });
+                      that.progressModalShow = false;
+                    that.uploadProgress = 0;
+                    that.getAllResource();
+                    that.file = [];
+                    that.fileDescription = "";
+                    that.filePrivacy = "private";
+                    that.fileType = "data";
+                      // 同步
+                      let record = {
+                        who: that.$store.getters.userName,
+                        whoid: that.$store.getters.userId,
+                        type: "resource",
+                        content:
+                          "upload a/an " +
+                          that.formValidate3.fileType +
+                          " : " +
+                          that.file.name,
+                        moduleId: this.currentModule.moduleId,
+                        time: new Date().toLocaleString(),
+                        file: res.data[0].fileName
+                      };
+                      that.subprojectSocket.send(JSON.stringify(record));
 
-          if (
-            sessionStorage.getItem("projectId") == "" ||
-            sessionStorage.getItem("projectId") == undefined ||
-            sessionStorage.getItem("projectId") == null
-          ) {
-            this.getProjectInfo();
-          }
-          this.sleep(1000).then(() => {
-            let scopeObject = {
-              projectId: "",
-              subProjectId: "",
-              moduleId: this.currentModule.moduleId
-            };
-            formData.append("scope", JSON.stringify(scopeObject));
-            //这里还要添加其他的字段
-            let that = this;
-            this.axios
-              .post("/GeoProblemSolving/resource/upload", formData)
-              .then(res => {
-                if (res.data != "Size over" && res.data.length > 0) {
-                  that.$Notice.open({
-                    title: "Upload notification title",
-                    desc: "File uploaded successfully",
-                    duration: 0
+                      // 创建一个函数根据pid去后台查询该项目下的资源
+                    }
+
+                  })
+                  .catch(err => {
+                    this.progressModalShow = false;
+                    this.uploadProgress = 0;
                   });
-                  //这里重新获取全部资源
-                  that.getAllResource();
-
-                  // 同步
-                  let record = {
-                    who: that.$store.getters.userName,
-                    whoid: that.$store.getters.userId,
-                    type: "resource",
-                    content:
-                      "upload a/an " +
-                      that.formValidate3.fileType +
-                      " : " +
-                      that.file.name,
-                    moduleId: this.currentModule.moduleId,
-                    time: new Date().toLocaleString(),
-                    file: res.data[0].fileName
-                  };
-                  that.subprojectSocket.send(JSON.stringify(record));
-                  // that.allRecords.push(record);
-                }
-                // console.log(res.data);
-              })
-              .catch(err => {});
-          });
+              };
+          }
         } else {
-          this.$Message.error("Please enter the resource type!");
+          this.$Message.error(
+            "size over,all the file size must smaller than 1 GB one time!"
+          );
         }
       });
     },
+
     sleep(time) {
       return new Promise(resolve => setTimeout(resolve, time));
     },
@@ -2212,16 +2324,32 @@ export default {
 
       if (type == "map") {
         // toolURL = '<iframe src="'+'http://'+this.$store.state.IP_Port+'/GeoProblemSolving/map" style="width: 100%;height:100%"></iframe>';
-        toolURL = '<iframe src="'+'http://'+this.$store.state.IP_Port+'/map" style="width: 100%;height:100%"></iframe>';
+        toolURL =
+          '<iframe src="' +
+          "http://" +
+          this.$store.state.IP_Port +
+          '/map" style="width: 100%;height:100%"></iframe>';
         toolName = "Map";
       } else if (type == "draw") {
-        toolURL =  '<iframe src="'+'http://'+this.$store.state.IP_Port+'/GeoProblemSolving/draw" style="width: 100%;height:100%"></iframe>';
+        toolURL =
+          '<iframe src="' +
+          "http://" +
+          this.$store.state.IP_Port +
+          '/GeoProblemSolving/draw" style="width: 100%;height:100%"></iframe>';
         toolName = "Drawing";
       } else if (type == "chart") {
-        toolURL = '<iframe src="'+'http://'+this.$store.state.IP_Port+'/GeoProblemSolving/charts" style="width: 100%;height:100%"></iframe>';
+        toolURL =
+          '<iframe src="' +
+          "http://" +
+          this.$store.state.IP_Port +
+          '/GeoProblemSolving/charts" style="width: 100%;height:100%"></iframe>';
         toolName = "Chart";
       } else if (type == "chat") {
-        toolURL = '<iframe src="'+'http://'+this.$store.state.IP_Port+'/GeoProblemSolving/chat" style="width: 100%;height:100%"></iframe>';
+        toolURL =
+          '<iframe src="' +
+          "http://" +
+          this.$store.state.IP_Port +
+          '/GeoProblemSolving/chat" style="width: 100%;height:100%"></iframe>';
         toolName = "Chatroom";
       } else if (type == "graphEditor") {
         toolURL =
@@ -2267,15 +2395,24 @@ export default {
         toolName = "Table editor";
       } else if (type == "nc-map") {
         toolURL =
-          '<iframe src="'+'http://'+this.$store.state.IP_Port+'/GeoProblemSolving/nc/map" style="width: 100%;height:100%"></iframe>';
+          '<iframe src="' +
+          "http://" +
+          this.$store.state.IP_Port +
+          '/GeoProblemSolving/nc/map" style="width: 100%;height:100%"></iframe>';
         toolName = "Map";
       } else if (type == "nc-draw") {
         toolURL =
-          '<iframe src="'+'http://'+this.$store.state.IP_Port+'/GeoProblemSolving/nc/draw" style="width: 100%;height:100%"></iframe>';
+          '<iframe src="' +
+          "http://" +
+          this.$store.state.IP_Port +
+          '/GeoProblemSolving/nc/draw" style="width: 100%;height:100%"></iframe>';
         toolName = "Drawing";
       } else if (type == "nc-chart") {
         toolURL =
-          '<iframe src="'+'http://'+this.$store.state.IP_Port+'/GeoProblemSolving/nc/charts" style="width: 100%;height:100%"></iframe>';
+          '<iframe src="' +
+          "http://" +
+          this.$store.state.IP_Port +
+          '/GeoProblemSolving/nc/charts" style="width: 100%;height:100%"></iframe>';
         toolName = "Chart";
       } else if (type == "cn-tableEditor") {
         toolURL =
@@ -2289,15 +2426,24 @@ export default {
         toolName = "3D model viewer";
       } else if (type == "nc-video") {
         toolURL =
-          '<iframe src="'+'http://'+this.$store.state.IP_Port+'/GeoProblemSolving/video" style="width: 100%;height:100%"></iframe>';
+          '<iframe src="' +
+          "http://" +
+          this.$store.state.IP_Port +
+          '/GeoProblemSolving/video" style="width: 100%;height:100%"></iframe>';
         toolName = "Video player";
       } else if (type == "nc-pdf") {
         toolURL =
-          '<iframe src="'+'http://'+this.$store.state.IP_Port+'/GeoProblemSolving/pdfview" style="width: 100%;height:100%"></iframe>';
+          '<iframe src="' +
+          "http://" +
+          this.$store.state.IP_Port +
+          '/GeoProblemSolving/pdfview" style="width: 100%;height:100%"></iframe>';
         toolName = "Pdf viewer";
       } else if (type == "Doc Edit") {
         toolURL =
-          '<iframe src="'+'http://'+this.$store.state.IP_Port+'/GeoProblemSolving/tinymce" style="width: 100%;height:100%"></iframe>';
+          '<iframe src="' +
+          "http://" +
+          this.$store.state.IP_Port +
+          '/GeoProblemSolving/tinymce" style="width: 100%;height:100%"></iframe>';
         toolName = "Text editor";
       } else if (type == "video Tool") {
         toolURL =
@@ -2422,15 +2568,19 @@ export default {
     previewRes(index) {
       let name = this.resourceList[index].name;
 
-      if (/\.(pdf|doc|docx|xls|xlsx|csv|ppt|pptx|zip)$/.test(name.toLowerCase())) {
+      if (
+        /\.(pdf|doc|docx|xls|xlsx|csv|ppt|pptx|zip)$/.test(name.toLowerCase())
+      ) {
         if (this.panel != null) {
           this.panel.close();
         }
         var url =
-          "http://172.21.212.7:8012/previewFile?url=" +'http://'+this.$store.state.IP_Port+
+          "http://172.21.212.7:8012/previewFile?url=" +
+          "http://" +
+          this.$store.state.IP_Port +
           this.resourceList[index].pathURL;
         var toolURL =
-          '<iframe src=' + url + ' style="width: 100%;height:100%"></iframe>';
+          "<iframe src=" + url + ' style="width: 100%;height:100%"></iframe>';
         this.panel = jsPanel.create({
           headerControls: {
             smallify: "remove"
@@ -2446,15 +2596,18 @@ export default {
           closeOnEscape: true
         });
         $(".jsPanel-content").css("font-size", "0");
-      }
-      else if(/\.(mp4)$/.test(name.toLowerCase())) {
+      } else if (/\.(mp4)$/.test(name.toLowerCase())) {
         if (this.panel != null) {
           this.panel.close();
         }
         var url =
-          'http://'+this.$store.state.IP_Port+ this.resourceList[index].pathURL;
+          "http://" +
+          this.$store.state.IP_Port +
+          this.resourceList[index].pathURL;
         var toolURL =
-          '<video src=' + url + ' style="width: 100%;height:100%" controls></video>';
+          "<video src=" +
+          url +
+          ' style="width: 100%;height:100%" controls></video>';
         this.panel = jsPanel.create({
           headerControls: {
             smallify: "remove"
@@ -2470,15 +2623,18 @@ export default {
           closeOnEscape: true
         });
         $(".jsPanel-content").css("font-size", "0");
-      }
-      else if(/\.(xml|json|md|gif|jpg|png)$/.test(name.toLowerCase())){
+      } else if (/\.(xml|json|md|gif|jpg|png)$/.test(name.toLowerCase())) {
         if (this.panel != null) {
           this.panel.close();
         }
         var url =
-          'http://'+this.$store.state.IP_Port+ this.resourceList[index].pathURL;
+          "http://" +
+          this.$store.state.IP_Port +
+          this.resourceList[index].pathURL;
         var toolURL =
-          '<iframe src=' + url + ' style="width: 100%;height:100%" controls></iframe>';
+          "<iframe src=" +
+          url +
+          ' style="width: 100%;height:100%" controls></iframe>';
         this.panel = jsPanel.create({
           headerControls: {
             smallify: "remove"
@@ -2494,8 +2650,7 @@ export default {
           closeOnEscape: true
         });
         $(".jsPanel-content").css("font-size", "0");
-      }
-      else {
+      } else {
         this.$Notice.error({
           title: "Open failed",
           desc: "Not supported file format."

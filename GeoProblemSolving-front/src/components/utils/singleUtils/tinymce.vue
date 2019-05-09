@@ -94,7 +94,7 @@ export default {
         moduleId: sessionStorage.getItem("moduleId")
       };
       formData.append("scope", JSON.stringify(scopeObject));
-      formData.append("privacy", "Public");
+      formData.append("privacy", "private");
       this.axios.defaults.headers = {
         "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
       };
