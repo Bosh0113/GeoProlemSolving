@@ -61,6 +61,11 @@
               </MenuItem>
             </MenuGroup>
           </Menu>
+          <div style="display:flex;margin-top:20px;justify-content:center">
+              <Button type="success" title="upload resource" @click="fileUploadModalShow()">
+                <Icon type="ios-cloud-upload-outline" :size="20"/>
+              </Button>
+            </div>
         </div>
         <div class="resourcePanel">
           <div style="height:20px"></div>
@@ -73,8 +78,8 @@
                   </template>
                   <template slot-scope="{ row, index }" slot="action">
                     <a
-                      :href="specifiedResourceList[index].pathURL"
-                      :download="specifiedResourceList[index].name"
+                      :href="showList[index].pathURL"
+                      :download="showList[index].name"
                       title="Download"
                     >
                       <Icon type="md-download" :size="20" color="yellowgreen"/>
@@ -83,19 +88,14 @@
                       <Icon type="md-eye" :size="20" color="orange"/>
                     </span>
                     <span
-                      @click="deleteResource(index)"
-                      :disabled="judgeDelete(index)"
+                      @click="deleteModalShow(index)"
+                      v-show="judgeDelete(index)"
                       style="margin-left: 10px"
                     >
                       <Icon type="md-close" :size="20" color="red"/>
                     </span>
                   </template>
                 </Table>
-                <div style="display:flex;margin-top:20px;justify-content:right">
-                  <Button type="primary" title="upload resource" @click="fileUploadModalShow()">
-                    <Icon type="ios-cloud-upload-outline" :size="20"/>
-                  </Button>
-                </div>
               </Col>
             </Row>
             <div style="display:flex;justify-content:center">
@@ -115,33 +115,102 @@
     <Modal
       v-model="uploadModal"
       title="Upload resource"
-      @on-ok="submitFile()"
+      @on-ok="resourceUpload('resourceValidate')"
       ok-text="Submit"
       cancel-text="Cancel"
       :mask-closable="false"
       width="600px"
     >
-      <div style="display:flex;text-align:center;align-items:center;justify-content:center">
-        <!-- 这里定义上传的几种资源类型供用户选择 -->
-        <span style="width:20%">Type</span>
-        <RadioGroup v-model="fileType" style="width:80%">
-          <Radio label="data">Data</Radio>
-          <Radio label="image">Images</Radio>
-          <Radio label="video">Videos</Radio>
-          <Radio label="paper">Papers</Radio>
-          <Radio label="document">Documents</Radio>
-          <Radio label="model">Models</Radio>
-          <Radio label="others">Others</Radio>
-        </RadioGroup>
-        <!-- 结束 -->
+      <div style="display:flex;justify-content:center">
+        <Form
+          ref="resourceValidate"
+          :model="resourceValidate"
+          :rules="resourceValidateRule"
+          :label-width="80"
+        >
+          <FormItem label="Privacy" prop="filePrivacy">
+            <RadioGroup v-model="resourceValidate.filePrivacy">
+              <Radio label="private">Private</Radio>
+              <Radio label="public">Public</Radio>
+            </RadioGroup>
+          </FormItem>
+          <FormItem label="Type" prop="fileType">
+            <RadioGroup v-model="resourceValidate.fileType">
+              <Radio label="image">Images</Radio>
+              <Radio label="video">Videos</Radio>
+              <Radio label="data">Data</Radio>
+              <Radio label="paper">Papers</Radio>
+              <Radio label="document">Documents</Radio>
+              <Radio label="model">Models</Radio>
+              <Radio label="others">Others</Radio>
+            </RadioGroup>
+          </FormItem>
+          <div style="display:flex;align-items:center;justify-content:center">
+            <span style="width:20%">Description</span>
+            <Input type="textarea" :rows="2" v-model="resourceValidate.fileDescription"/>
+          </div>
+          <Upload
+            style="margin-top:10px"
+            :max-size="1024*1024"
+            multiple
+            type="drag"
+            :show-upload-list="false"
+            :before-upload="gatherFile"
+            action="-"
+          >
+            <div style="padding: 20px 0">
+              <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
+              <p>Click or drag files here to upload</p>
+            </div>
+          </Upload>
+          <div style="padding:0 10px 0 10px">
+            <ul v-for="(list,index) in file" :key="index">
+              <li style="display:flex">
+                File name:
+                <span
+                  style="font-size:10px;margin: 0 5px 0 5px"
+                  :title="list.name"
+                >{{ list.name }}</span>
+                (Size:
+                <span
+                  v-if="list.size<(1024*1024)"
+                  style="font-size:10px;margin-right:10px"
+                >{{(list.size/1024).toFixed(2)}}KB)</span>
+                <span
+                  v-else
+                  style="font-size:10px;margin-right:10px"
+                >{{(list.size/1024/1024).toFixed(2)}}MB)</span>
+                <Icon
+                  type="ios-close"
+                  size="20"
+                  @click="delFileList(index)"
+                  style="display:flex;justify-content:flex-end;cursor:pointer"
+                  title="Cancel"
+                ></Icon>
+              </li>
+            </ul>
+          </div>
+          <h6 style="text-align:center;color:red">The file's size must control smaller than 1 GB.</h6>
+        </Form>
       </div>
-      <br>
-      <div style="display:flex;text-align:center;align-items:center;justify-content:center">
-        <span style="width:20%">Description</span>
-        <Input type="textarea" :rows="2" v-model="fileDescription"/>
-      </div>
-      <br>
-      <input type="file" @change="getFile($event)" style="margin-left:20%" multiple="multiple">
+      <!-- <input type="file" @change="getFile($event)" style="margin-left:20%" multiple="multiple"> -->
+    </Modal>
+    <Modal
+      v-model="deleteModal"
+      @on-ok="deleteResource"
+      @on-cancel
+      ok-text="Assure"
+      cancel-text="Cancel"
+    >
+      <h3>Do you really want to delete this resource?</h3>
+    </Modal>
+    <Modal
+      v-model="progressModalShow"
+      title="Upload Progress"
+      :mask-closable="false"
+      :closable="false"
+    >
+      <Progress :percent="uploadProgress"></Progress>
     </Modal>
   </Row>
 </template>
@@ -193,7 +262,7 @@ export default {
         {
           title: "Action",
           slot: "action",
-          width: 150,
+          width: 125,
           align: "center"
         }
       ],
@@ -201,9 +270,27 @@ export default {
       specifiedResourceList: [],
       // 上传文件的模态框
       uploadModal: false,
-      file: "",
-      fileDescription: "",
-      fileType: "data",
+      resourceValidate: {
+        fileType: "image",
+        filePrivacy: "private",
+        resourceValidate:"",
+      },
+      resourceValidateRule: {
+        fileType: [
+          { required: true, message: "Please select type...", trigger: "blur" }
+        ],
+        filePrivacy: [
+          { required: true, message: "Please set privacy...", trigger: "blur" }
+        ]
+      },
+      // 上传的文件
+      file: [],
+      // 上传文件个数控制器
+      fileCountTimer: null,
+      // 上传文件的进度
+      uploadProgress: 0,
+      // 显示进度条的模态框
+      progressModalShow: false,
       contentHeight: "",
       panel: null,
       // 分页
@@ -211,7 +298,15 @@ export default {
       allSelectedList: [],
       showList: [],
       dataCount: 0,
-      pageSize: 10
+      pageSize: 10,
+      // 控制删除资源按钮的模态框
+      deleteModal: false,
+      // 删除资源的Id
+      deleteResourceId: "",
+      // 删除资源的位置索引
+      deletePosition:"",
+      // 侧边栏刚才选中的选项卡
+      justSelectedItem:"image"
     };
   },
   mounted() {
@@ -226,11 +321,12 @@ export default {
   },
   methods: {
     initLayout() {
-      this.sidebarTreeHeight = window.innerHeight - 200 + "px";
+      this.sidebarTreeHeight = window.innerHeight - 260 + "px";
       this.contentHeight = window.innerHeight - 120;
     },
     onMenuSelect(name) {
       this.uploaderArray = [];
+      this.justSelectedItem = name;
       this.specifiedResourceList = [];
       this.axios
         .get(
@@ -244,6 +340,7 @@ export default {
             });
             this.dataCount = specifiedResourceListPre.length;
             this.$set(this, "specifiedResourceList", specifiedResourceListPre);
+            console.table(this.specifiedResourceList);
             this.sliceList();
           }
         });
@@ -274,65 +371,125 @@ export default {
         });
       }
     },
-    //上传文件
-    submitFile() {
-      let formData = new FormData();
-      // 向 formData 对象中添加文件
-      formData.append("file", this.file);
-      formData.append("description", this.fileDescription);
-      formData.append("type", this.fileType);
-      formData.append("uploaderId", this.$store.getters.userId);
-      // 添加字段属于那个项目
-      formData.append("belong", this.$store.getters.userName);
-      let scopeObject = {
-        projectId: "",
-        subProjectId: "",
-        moduleId: ""
-      };
-      formData.append("scope", JSON.stringify(scopeObject));
-      //这里还要添加其他的字段
-      this.axios
-        .post("/GeoProblemSolving/resource/upload", formData)
-        .then(res => {
-          if (res.data != "Size over" && res.data.length > 0) {
-            this.$Notice.open({
-              title: "Upload notification title",
-              desc: "File uploaded successfully",
-              duration: 0
-            });
-            //这里重新获取一次该项目下的全部资源
-            this.addUploadEvent(this.currentProjectDetail.projectId);
-            this.getAllResource();
-            // 创建一个函数根据pid去后台查询该项目下的资源
-          }
-        })
-        .catch(err => {});
+    // 阻止iview默认上传的方法
+    gatherFile(file) {
+      let that = this;
+      if (that.file.length >= 5) {
+        if (this.fileCountTimer != null) {
+          clearTimeout(this.fileCountTimer);
+        }
+        this.fileCountTimer = setTimeout(() => {
+          this.$Message.info("you can upload 5 files one time!");
+        }, 500);
+      } else {
+        that.file.push(file);
+        that.file.map(element => {
+          element["fileSize"] = Math.round((element.size / 1024) * 100) / 100;
+        });
+      }
     },
-    getFile(event) {
-      this.file = event.target.files[0];
+    delFileList(index) {
+      let that = this;
+      that.file.splice(index, 1);
+    },
+    resourceUpload(form) {
+      this.uploadProgress = 0;
+      this.$refs[form].validate(valid => {
+        if (valid) {
+          let that = this;
+          if (that.file.length != 0) {
+            var formData = new FormData();
+            var total = 0;
+            for (var i = 0; i < that.file.length; i++) {
+              if (that.file[i].fileSize < Math.pow(1024, 2)) {
+                formData.append("file", that.file[i]); // 文件对象
+              } else {
+              }
+              total += that.file[i].fileSize;
+            }
+            if (total < Math.pow(1024, 2)) {
+              let userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
+              formData.append("description", this.resourceValidate.fileDescription);
+              formData.append("type", this.resourceValidate.fileType);
+              formData.append(
+                "uploaderId",
+                this.$store.getters.userInfo.userId
+              );
+              formData.append("belong", this.$store.getters.userName);
+              let scopeObject = {
+                projectId: "",
+                subprojectId: "",
+                moduleId: ""
+              };
+              formData.append("scope", JSON.stringify(scopeObject));
+              formData.append("privacy", this.resourceValidate.filePrivacy);
+              this.progressModalShow = true;
+              this.axios({
+                url: "/GeoProblemSolving/resource/upload",
+                method: "post",
+                onUploadProgress: progressEvent => {
+                  this.uploadProgress =
+                    ((progressEvent.loaded / progressEvent.total) * 100) | 0;
+                },
+                data: formData
+              })
+                .then(res => {
+                  if (res.data != "Size over" && res.data.length > 0) {
+                    this.$Notice.open({
+                      title: "Upload notification title",
+                      desc: "File uploaded successfully",
+                    });
+                    this.onMenuSelect(this.justSelectedItem);
+                    this.file = [];
+                    this.resourceValidate.fileDescription = "";
+                    this.resourceValidate.filePrivacy = "private";
+                    this.resourceValidate.fileType = "data";
+                    // 创建一个函数根据pid去后台查询该项目下的资源
+                  }
+                  this.progressModalShow = false;
+                  this.uploadProgress = 0;
+                })
+                .catch(err => {
+                  this.progressModalShow = false;
+                  this.uploadProgress = 0;
+                });
+            } else {
+              this.$Message.error(
+                "size over,all the file size must smaller than 1 GB one time!"
+              );
+            }
+          }
+        } else {
+           this.$Message.error("Please check your form again!");
+        }
+      });
     },
     judgeDelete(index) {
       if (
-        this.specifiedResourceList[index].uploaderId ==
+        this.showList[index].uploaderId ==
         this.$store.getters.userId
       ) {
-        return false;
-      } else {
         return true;
+      } else {
+        return false;
       }
     },
     show(index) {
-      let name = this.specifiedResourceList[index].name;
+      let name = this.showList[index].name;
 
-      if (/\.(pdf|doc|docx|xls|xlsx|csv|ppt|pptx|zip)$/.test(name.toLowerCase())) {
+      if (
+        /\.(pdf|doc|docx|xls|xlsx|csv|ppt|pptx|zip)$/.test(name.toLowerCase())
+      ) {
         if (this.panel != null) {
           this.panel.close();
         }
         var url =
-          "http://172.21.212.7:8012/previewFile?url=" +'http://'+this.$store.state.IP_Port+
+          "http://172.21.212.7:8012/previewFile?url=" +
+          "http://" +
+          this.$store.state.IP_Port +
           this.specifiedResourceList[index].pathURL;
         var toolURL =
-          '<iframe src=' + url + ' style="width: 100%;height:100%"></iframe>';
+          "<iframe src=" + url + ' style="width: 100%;height:100%"></iframe>';
         this.panel = jsPanel.create({
           headerControls: {
             smallify: "remove"
@@ -348,15 +505,18 @@ export default {
           closeOnEscape: true
         });
         $(".jsPanel-content").css("font-size", "0");
-      }
-      else if(/\.(mp4)$/.test(name.toLowerCase())) {
+      } else if (/\.(mp4)$/.test(name.toLowerCase())) {
         if (this.panel != null) {
           this.panel.close();
         }
         var url =
-          'http://'+this.$store.state.IP_Port+this.specifiedResourceList[index].pathURL;
+          "http://" +
+          this.$store.state.IP_Port +
+          this.specifiedResourceList[index].pathURL;
         var toolURL =
-          '<video src=' + url + ' style="width: 100%;height:100%" controls></video>';
+          "<video src=" +
+          url +
+          ' style="width: 100%;height:100%" controls></video>';
         this.panel = jsPanel.create({
           headerControls: {
             smallify: "remove"
@@ -372,15 +532,18 @@ export default {
           closeOnEscape: true
         });
         $(".jsPanel-content").css("font-size", "0");
-      }
-      else if(/\.(xml|json|md|gif|jpg|png)$/.test(name.toLowerCase())){
+      } else if (/\.(xml|json|md|gif|jpg|png)$/.test(name.toLowerCase())) {
         if (this.panel != null) {
           this.panel.close();
         }
         var url =
-          'http://'+this.$store.state.IP_Port+ this.specifiedResourceList[index].pathURL;
+          "http://" +
+          this.$store.state.IP_Port +
+          this.specifiedResourceList[index].pathURL;
         var toolURL =
-          '<iframe src=' + url + ' style="width: 100%;height:100%" controls></iframe>';
+          "<iframe src=" +
+          url +
+          ' style="width: 100%;height:100%" controls></iframe>';
         this.panel = jsPanel.create({
           headerControls: {
             smallify: "remove"
@@ -396,8 +559,7 @@ export default {
           closeOnEscape: true
         });
         $(".jsPanel-content").css("font-size", "0");
-      }
-      else {
+      } else {
         this.$Notice.error({
           title: "Open failed",
           desc: "Not supported file format."
@@ -405,15 +567,27 @@ export default {
         return false;
       }
     },
-    deleteResource(index) {
-      if (this.specifiedResourceList[index].resourceId != "") {
-        let id = this.specifiedResourceList[index].resourceId;
+    // 删除资源的模态框提醒
+    deleteModalShow(index) {
+      this.deleteModal = true;
+      this.deletePosition = index;
+      this.deleteResourceId = this.showList[index].resourceId;
+    },
+    deleteResource() {
+      if (this.deleteResourceId != "") {
         this.axios
-          .get("/GeoProblemSolving/resource/delete?" + "resourceId=" + id)
+          .get(
+            "/GeoProblemSolving/resource/delete?" +
+              "resourceId=" +
+              this.deleteResourceId
+          )
           .then(res => {
             if (res.data == "Success") {
-              this.$Message.info("Delete successfully");
-              this.specifiedResourceList.splice(index, 1);
+              this.$Notice.success({
+                title: "Notification title",
+                desc: "Delete successfully"
+              });
+              this.showList.splice(this.deletePosition, 1);
             } else if (res.data == "Fail") {
               this.$Message.info("Failure");
             }

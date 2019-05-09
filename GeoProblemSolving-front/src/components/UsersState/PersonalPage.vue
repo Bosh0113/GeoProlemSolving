@@ -231,10 +231,12 @@
                                 <Button
                                   type="error"
                                   size="small"
-                                  @click="deleteResource(userResourceList[index].resourceId)"
+                                  @click="deleteResourceModalShow(userResourceList[index].resourceId)"
                                 >
+                                <!-- @click="deleteResource(userResourceList[index].resourceId)" -->
                                   <Icon type="md-close"/>
                                 </Button>
+
                               </template>
                             </Table>
                           </div>
@@ -318,10 +320,12 @@
                               type="default"
                               slot="extra"
                               style="margin:-5px 5px 0 5px"
+
                               @click.stop="deleteProjectModalShow(mProject.projectId)"
                               icon="md-close"
                               title="remove"
                             ></Button>
+                            <!--  @click.stop="deleteProjectModalShow(mProject.projectId)" -->
                             <!-- 表头结束 -->
                             <p
                               style="height:200px;text-indent:2em;overflow-y:auto;word-break:break-word"
@@ -350,7 +354,7 @@
       v-model="authorizeProjectModal"
       @on-ok="authorize()"
       @on-cancel=""
-      ok-text="Confirm"
+      ok-text="Assure"
       cancel-text="Cancel"
     >
       <p style="slot">Hand the project to others</p>
@@ -378,7 +382,7 @@
       v-model="processResourceModal"
       title="share resource in other projects"
       @on-ok="processResource()"
-      @on-cancel
+      @on-cancel=""
       ok-text="Confirm"
       cancel-text="Cancel"
     >
@@ -413,6 +417,26 @@
         <Icon type="ios-information-circle-outline" color="lightblue"/>
         <span>the resource will be shared in the project you choosed.</span>
       </div>
+    </Modal>
+    <!-- 删除资源的模态框 -->
+    <!-- deleteResourceModal -->
+    <Modal v-model="deleteResourceModal"
+      @on-ok="deleteResource"
+      @on-cancel=""
+      ok-text="Assure"
+      cancel-text="Cancel"
+    >
+    <h3>Do you really want to delete this resource?</h3>
+    </Modal>
+    <!-- 退出子项目的modal -->
+    <Modal
+      v-model="deleteProjectModal"
+      @on-ok="deleteProject"
+      @on-cancel=""
+      ok-text="Assure"
+      cancel-text="Cancel"
+    >
+      <h3>Do you really want to delete this project?</h3>
     </Modal>
   </div>
 </template>
@@ -652,7 +676,15 @@ export default {
       // 选中的将要分享资源的项目名
       selectShareProject: "",
       selectShareProjectId: "",
-      selectShareProjectName: ""
+      selectShareProjectName: "",
+      // 删除资源的的模态框
+      deleteResourceModal:false,
+      // 要删除的资源的id
+      deleteResourceId: '',
+      // 要删除管理的项目的模态框
+      deleteProjectModal:false,
+      // 要删除的项目的Id
+      deleteProjectId:''
     };
   },
   methods: {
@@ -848,15 +880,19 @@ export default {
       }
       this.$set(this, "userManagerProjectList", newManageProjects);
     },
-    deleteProjectModalShow(pid) {
-      if (confirm("Are you sure to delete this project?")) {
+    deleteProjectModalShow(pid){
+      this.deleteProjectId = pid;
+      this.deleteProjectModal = true;
+    },
+    deleteProject(){
+      if(this.deleteProjectId!=''){
         this.axios
-          .get("/GeoProblemSolving/project/delete?" + "projectId=" + pid)
+          .get("/GeoProblemSolving/project/delete?" + "projectId=" + this.deleteProjectId)
           .then(res => {
             var newManageProjects = [];
             var oldManageProjects = this.userManagerProjectList;
             for (var i = 0; i < oldManageProjects.length; i++) {
-              if (oldManageProjects[i].projectId != pid) {
+              if (oldManageProjects[i].projectId != this.deleteProjectId) {
                 newManageProjects.push(oldManageProjects[i]);
               }
             }
@@ -867,7 +903,6 @@ export default {
           });
       }
     },
-
     editModalShow() {
       this.personalInfoItem = Object.assign({}, this.userDetail);
       this.editProfileModal = true;
@@ -978,13 +1013,20 @@ export default {
     download(index) {
       window.open(this.userResourceList[index].pathURL);
     },
-    deleteResource(id) {
-      if (id != "") {
+    deleteResourceModalShow(id){
+      this.deleteResourceModal = true;
+      this.deleteResourceId = id;
+    },
+    deleteResource() {
+      if (this.deleteResourceId != "") {
         this.axios
-          .get("/GeoProblemSolving/resource/delete?" + "resourceId=" + id)
+          .get("/GeoProblemSolving/resource/delete?" + "resourceId=" + this.deleteResourceId)
           .then(res => {
             if (res.data == "Success") {
-              this.$Message.info("Delete successfully");
+              this.$Notice.success({
+              title: "Notification title",
+              desc: "Delete successfully"
+            });
               this.getUserResource();
             } else if (res.data == "Fail") {
               this.$Message.info("Failure");
@@ -1028,7 +1070,6 @@ export default {
                   "File shared to " +
                   this.selectShareProject +
                   " successfully.",
-                duration: 0
               });
               // 保存记录
               this.addUploadEvent(this.selectShareProjectId);
@@ -1173,10 +1214,6 @@ body {
 /* 新定义的样式 */
 .authorBtn:hover {
   background-color: #57a3f3;
-  color: white;
-}
-.editBtn:hover {
-  background-color: #19be6b;
   color: white;
 }
 .deleteBtn:hover {

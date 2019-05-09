@@ -393,7 +393,7 @@ export default {
                   that.$Notice.open({
                     title: "Save to resource center",
                     desc: "Data saved successfully",
-                    duration: 0
+                    // duration: 0
                   });
 
                   // 文件列表更新

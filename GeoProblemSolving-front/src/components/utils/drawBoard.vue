@@ -384,7 +384,7 @@ export default {
                 that.$Notice.open({
                   title: "Upload notification title",
                   desc: "File uploaded successfully",
-                  duration: 0
+                  // duration: 0
                 });
 
                 // 文件列表更新

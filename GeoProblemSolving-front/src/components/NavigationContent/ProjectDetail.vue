@@ -1295,7 +1295,6 @@ export default {
                 this.$Notice.success({
                   title: "create result",
                   desc: "subproject has been created successfully.",
-                  duration: 0
                 });
                 this.createSubProjectForm.subProjectTitle = "";
                 this.createSubProjectForm.subProjectDescription = "";
@@ -1740,7 +1739,8 @@ export default {
               title: "Notification title",
               desc: "Delete successfully"
             });
-            this.$router.push({ name: "Project" });
+            // 删除项目后回退到主页面
+            this.$router.push({ name: "Home" });
           }
         })
         .catch(err => {});
@@ -1832,7 +1832,6 @@ export default {
                     this.$Notice.open({
                       title: "Upload notification title",
                       desc: "File uploaded successfully",
-                      duration: 0
                     });
                     //这里重新获取一次该项目下的全部资源
                     this.addUploadEvent(this.currentProjectDetail.projectId);

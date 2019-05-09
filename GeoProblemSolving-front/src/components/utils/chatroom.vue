@@ -1,6 +1,7 @@
 <style scoped>
 .chatPanel {
   display: flex;
+  overflow-y:hidden
 }
 /* member部分样式 */
 .memberPanel {
@@ -9,11 +10,11 @@
 }
 .panelHeader {
   height: 40px;
-  margin-top:10px;
+  margin-top: 10px;
 }
 .participants {
   height: auto;
-  margin-top:10px;
+  margin-top: 10px;
 }
 .participants h4,
 .panelHeader h4 {
@@ -75,7 +76,7 @@
   font-size: 15px;
   text-align: center;
 }
-.searchmessageList{
+.searchmessageList {
   overflow: auto;
 }
 .message_record_board {
@@ -92,14 +93,15 @@
   flex: auto;
 }
 .contentHeader {
-  background-color: lightgray;
+  /* background-color: lightgray; */
+  border-bottom: 1px solid lightgray;
   height: 60px;
   display: flex;
 }
 /* 信息主题列表显示窗口 */
 .contentBody {
   flex: 1;
-  padding:25px;
+  padding: 25px;
   overflow-y: auto;
 }
 .chat-bubble-r {
@@ -134,7 +136,7 @@
 }
 .u_name {
   height: 20px;
-  margin-top:5px;
+  margin-top: 5px;
   /* margin-left: 10px; */
   text-align: center;
   font-size: 10px;
@@ -191,7 +193,7 @@
 }
 .message_bar {
   display: flex;
-  height:52px;
+  height: 52px;
 }
 .send_panel {
   display: flex;
@@ -230,12 +232,12 @@
   height: 60px;
   padding: 10px;
   display: flex;
-  align-items:center;
+  align-items: center;
   justify-content: center;
   width: 90%;
 }
-.s_name{
-  font-size:20px;
+.s_name {
+  font-size: 20px;
   text-align: center;
 }
 .chatOperate {
@@ -251,18 +253,65 @@
   padding: 5px 10px 10px 5px;
   /* float:right; */
 }
+.memberImg{
+  width: 40px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.memberName {
+  height: 20px;
+  padding: 0px 10px;
+  width: 100%;
+  /* display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap; */
+}
+.memberDetail {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+.memberOrganization {
+  height: 20px;
+  padding: 0px 10px;
+  width: 100%;
+}
+.memberName span{
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.memberOrganization span {
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width:50%;
+}
 </style>
 <template>
   <Row>
     <Col span="24">
-      <div class="chatPanel" :style="{height:panelHeight}">
+      <div class="chatPanel" :style="{height:panelHeight,width:panelWidth}">
         <div class="memberPanel">
           <div class="panelHeader">
             <h4>Groups</h4>
           </div>
-          <div v-for="(group,index) in groups" :key="index" class="f_list">
+          <Select v-model="selectItem" style="width:195px;margin-left:2.5px;margin-right:2.5px">
+            <Option v-for="(item,index) in itemList" :value="item.value" :key="item.index" @click.native="changeChatroom(index)">{{ item.label }}</Option>
+          </Select>
+          <!-- <div v-for="(group,index) in groups" :key="index" class="f_list">
             <div>
-              <avatar :username="group.scope" :size="35" :rounded="false" :title="group.title +': '+ group.name"></avatar>
+              <avatar
+                :username="group.scope"
+                :size="35"
+                :rounded="false"
+                :title="group.title +': '+ group.name"
+              ></avatar>
             </div>
             <div
               class="name"
@@ -270,10 +319,31 @@
               style="cursor:pointer"
               @click="changeChatroom(index)"
             >{{group.scope}}</div>
-          </div>
+          </div> -->
           <div class="participants">
             <h4>Participants</h4>
-            <div v-for="(participant,index) in participants" :key="index" class="f_list">
+            <Card v-for="(participant,index) in participants" :key="index" style="margin:2.5%" :padding="5">
+              <div style="display:flex;align-items:center">
+                <div class="memberImg">
+                  <img
+                  v-if="participant.avatar != '' && participant.avatar!='undefined'"
+                  :src="participant.avatar"
+                  style="width:40px;height:40px"
+                >
+                <avatar v-else :username="participant.userName" :size="40" :rounded="false"></avatar>
+                </div>
+                <div class="memberDetail">
+                  <div class="memberName">
+                    <span>{{participant.userName}}</span>
+                  </div>
+                  <div class="memberOrganization">
+                    <span>{{participant.organization}}</span>
+                  </div>
+                </div>
+              </div>
+            </Card>
+
+            <!-- <div v-for="(participant,index) in participants" :key="index" class="f_list">
               <div>
                 <img
                   v-if="participant.avatar != '' && participant.avatar!='undefined'"
@@ -283,14 +353,14 @@
                 <avatar v-else :username="participant.userName" :size="35" :rounded="false"></avatar>
               </div>
               <div class="name">{{participant.userName}}</div>
-            </div>
+            </div> -->
           </div>
         </div>
         <div class="contentPanel">
           <div class="contentHeader">
             <div class="chatObject">
-                <div class="s_name" v-show="this.select_group!==''">{{this.select_group}}</div>
-              </div>
+              <div class="s_name" v-show="this.select_group!==''">{{this.select_group}}</div>
+            </div>
             <div class="chatOperate">
               <Button type="default" class="recordsButton" @click="showRecords">Records</Button>
             </div>
@@ -358,18 +428,21 @@
           <div class="search_msg">
             <Input search placeholder="Enter something..."/>
           </div>
-          <div class="searchmessageList" :style="{height:messageListPanelHeight}" id="searchmessageList">
+          <div
+            class="searchmessageList"
+            :style="{height:messageListPanelHeight}"
+            id="searchmessageList"
+          >
             <div class="message_record_board">
-            <div style="display:flex" v-for="(list,index) in msgRecords" :key="index">
-              <div class="single_record">
-                <span style="color:#2d8cf0; margin-right:2%">{{list.from}}:</span>
-                <span style="color:lightgray; margin-right:2%">{{list.time}}</span>
-                <div style="color:gray">{{list.content}}</div>
+              <div style="display:flex" v-for="(list,index) in msgRecords" :key="index">
+                <div class="single_record">
+                  <span style="color:#2d8cf0; margin-right:2%">{{list.from}}:</span>
+                  <span style="color:lightgray; margin-right:2%">{{list.time}}</span>
+                  <div style="color:gray">{{list.content}}</div>
+                </div>
               </div>
             </div>
           </div>
-          </div>
-
         </div>
       </div>
     </Col>
@@ -400,7 +473,7 @@ export default {
       olParticipants: [],
       groups: [],
       select_group: "",
-      select_groupId:"",
+      select_groupId: "",
       message: "",
       my_msglist: [],
       other_msglist: [],
@@ -410,9 +483,26 @@ export default {
       query_date: "",
       thisUserName: this.$store.getters.userName,
       thisUserId: this.$store.getters.userId,
-      panelHeight:'',
-      messageListPanelHeight:'',
-      seletRoom:"module"
+      panelHeight: "",
+      panelWidth:"",
+      messageListPanelHeight: "",
+      seletRoom: "module",
+      // 下拉框的测试数据
+      itemList: [
+        {
+          value:"Module",
+          label:"Module"
+        },
+        {
+          value:"Subproject",
+          label:"Subproject"
+        },
+        {
+          value:"Project",
+          label:"Project"
+        },
+      ],
+      selectItem: ""
     };
   },
   methods: {
@@ -531,7 +621,7 @@ export default {
               if (data != "None" && data != "Fail") {
                 let projectInfo = data[0];
                 let membersList = projectInfo["members"];
-                let manager =  { userId: projectInfo["managerId"] };
+                let manager = { userId: projectInfo["managerId"] };
 
                 membersList.unshift(manager);
                 let participantsTemp = [];
@@ -566,81 +656,81 @@ export default {
       }
     },
     olParticipantChange() {
-        let userIndex = -1;
+      let userIndex = -1;
 
-        // 自己刚上线，olParticipants空
-        if (this.participants.length == 0) {
-          var that = this;
-          for (let i = 0; i < this.olParticipants.length; i++) {
-            this.axios
-              .get(
-                "/GeoProblemSolving/user/inquiry" +
-                  "?key=" +
-                  "userId" +
-                  "&value=" +
-                  this.olParticipants[i]
-              )
-              .then(res => {
-                if (res.data != "None" && res.data != "Fail") {
-                  that.participants.push(res.data);
-                } else if (res.data == "None") {
-                }
-              });
-          }
-        } else {
-          // members大于olParticipants，有人上线；小于olParticipants，离线
-          if (this.olParticipants.length > this.participants.length) {
-            for (var i = 0; i < this.olParticipants.length; i++) {
-              for (var j = 0; j < this.participants.length; j++) {
-                if (this.olParticipants[i] == this.participants[j].userId) {
-                  break;
-                }
+      // 自己刚上线，olParticipants空
+      if (this.participants.length == 0) {
+        var that = this;
+        for (let i = 0; i < this.olParticipants.length; i++) {
+          this.axios
+            .get(
+              "/GeoProblemSolving/user/inquiry" +
+                "?key=" +
+                "userId" +
+                "&value=" +
+                this.olParticipants[i]
+            )
+            .then(res => {
+              if (res.data != "None" && res.data != "Fail") {
+                that.participants.push(res.data);
+              } else if (res.data == "None") {
               }
-              if (j == this.participants.length) {
-                userIndex = i;
-                break;
-              }
-            }
-
-            // 人员渲染
-            var that = this;
-            this.axios
-              .get(
-                "/GeoProblemSolving/user/inquiry" +
-                  "?key=" +
-                  "userId" +
-                  "&value=" +
-                  this.olParticipants[userIndex]
-              )
-              .then(res => {
-                if (res.data != "None" && res.data != "Fail") {
-                  that.participants.push(res.data);
-                  if (userIndex != -1) {
-                  }
-                } else if (res.data == "None") {
-                }
-              });
-          } else if (this.olParticipants.length < this.participants.length) {
-            for (var i = 0; i < this.participants.length; i++) {
-              for (var j = 0; j < this.olParticipants.length; j++) {
-                if (this.participants[i].userId == this.olParticipants[j]) {
-                  break;
-                }
-              }
-              if (j == this.olParticipants.length) {
-                userIndex = i;
-                break;
-              }
-            }
-            this.participants.splice(userIndex, 1);
-          }
+            });
         }
+      } else {
+        // members大于olParticipants，有人上线；小于olParticipants，离线
+        if (this.olParticipants.length > this.participants.length) {
+          for (var i = 0; i < this.olParticipants.length; i++) {
+            for (var j = 0; j < this.participants.length; j++) {
+              if (this.olParticipants[i] == this.participants[j].userId) {
+                break;
+              }
+            }
+            if (j == this.participants.length) {
+              userIndex = i;
+              break;
+            }
+          }
+
+          // 人员渲染
+          var that = this;
+          this.axios
+            .get(
+              "/GeoProblemSolving/user/inquiry" +
+                "?key=" +
+                "userId" +
+                "&value=" +
+                this.olParticipants[userIndex]
+            )
+            .then(res => {
+              if (res.data != "None" && res.data != "Fail") {
+                that.participants.push(res.data);
+                if (userIndex != -1) {
+                }
+              } else if (res.data == "None") {
+              }
+            });
+        } else if (this.olParticipants.length < this.participants.length) {
+          for (var i = 0; i < this.participants.length; i++) {
+            for (var j = 0; j < this.olParticipants.length; j++) {
+              if (this.participants[i].userId == this.olParticipants[j]) {
+                break;
+              }
+            }
+            if (j == this.olParticipants.length) {
+              userIndex = i;
+              break;
+            }
+          }
+          this.participants.splice(userIndex, 1);
+        }
+      }
     },
     showRecords() {
       this.searchPanelShow = !this.searchPanelShow;
       this.message_panelObj["right"] = 0;
 
-      if(this.searchPanelShow) {
+      if (this.searchPanelShow) {
         this.msgRecords = [];
         let that = this;
         this.axios
@@ -662,7 +752,6 @@ export default {
       }
     },
     send(msg) {
-
       this.message = msg;
       let myDate = new Date();
       let current_time = myDate.toLocaleString(); //获取日期与时间
@@ -693,20 +782,19 @@ export default {
           .replace(/\s/g, "")
           .split(",");
         this.olParticipants = members;
-        if(this.seletRoom == "module") {
+        if (this.seletRoom == "module") {
           this.olParticipantChange();
         }
       } else if (data.type === "message") {
         //判断消息的发出者
-        if(chatMsg.content != "") {
+        if (chatMsg.content != "") {
           this.other_msglist.push(chatMsg);
           this.msglist.push(chatMsg);
           this.msgRecords.push(chatMsg);
         }
-      }
-      else if(chatMsg.type == undefined && chatMsg.length > 0){
-        for(let i = 0;i < chatMsg.length;i++) {
-          if(chatMsg[i].content != "") {
+      } else if (chatMsg.type == undefined && chatMsg.length > 0) {
+        for (let i = 0; i < chatMsg.length; i++) {
+          if (chatMsg[i].content != "") {
             this.other_msglist.push(chatMsg[i]);
             this.msglist.push(chatMsg[i]);
             this.msgRecords.push(chatMsg[i]);
@@ -730,22 +818,36 @@ export default {
     },
     initSize() {
       //侧边栏的高度随着屏幕的高度自适应
-      this.panelHeight = window.innerHeight + 'px';
-      this.messageListPanelHeight = window.innerHeight - 144  + 'px';
-    },
+      // this.panelHeight = window.innerHeight + "px";
+
+      if(window.innerHeight > 600) {
+        this.panelHeight = window.innerHeight + "px";
+      }
+      else{
+        this.panelHeight = 580 + "px";
+      }
+      if(window.innerWidth > 1000){
+        this.panelWidth = window.innerWidth + "px";
+      }
+      else{
+        this.panelWidth = 980 + 'px';
+      }
+      this.messageListPanelHeight = this.panelHeight - 144 + "px";
+    }
   },
   mounted() {
     window.addEventListener("resize", this.initSize);
     this.init();
-      //init module
-      this.participants = [];
-      this.select_group = this.moduleName;
-      this.select_groupId = this.moduleId;
-      this.startWebSocket(this.moduleId);
-      this.seletRoom = "module";
+    //init module
+    this.participants = [];
+    this.select_group = this.moduleName;
+    this.select_groupId = this.moduleId;
+    this.startWebSocket(this.moduleId);
+    this.seletRoom = "module";
   },
   beforeDestroy() {
     this.socketApi.close();
+    window.removeEventListener("resize", this.initSize);
   },
   beforeRouteEnter: (to, from, next) => {
     next(vm => {
@@ -755,13 +857,13 @@ export default {
       }
     });
   },
-  updated:function(){
-    this.$nextTick(function(){
-      var div = document.getElementById('contentBody');
-      var div2 = document.getElementById('searchmessageList');
-      div.scrollTop = div.scrollHeight-60;
+  updated: function() {
+    this.$nextTick(function() {
+      var div = document.getElementById("contentBody");
+      var div2 = document.getElementById("searchmessageList");
+      div.scrollTop = div.scrollHeight - 60;
       div2.scrollTop = div.scrollHeight;
-    })
+    });
   }
 };
 </script>
