@@ -12,11 +12,10 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Part;
 import java.io.*;
 import java.net.InetAddress;
 import java.text.DecimalFormat;
@@ -53,108 +52,112 @@ public class ResourceDaoImpl implements IResourceDao {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
             String uploadTime = dateFormat.format(date);
 
-            //加了拦截器的写法
-            Map<String,String[]> parameterMap = request.getParameterMap();
-            MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
-            List<MultipartFile> files = multipartRequest.getFiles("file");
-            for(MultipartFile singleFile:files){
-                ResourceUploadInfo uploadInfo = new ResourceUploadInfo();
-                String fileNames = singleFile.getOriginalFilename();
-                String fileName = fileNames.substring(0, fileNames.lastIndexOf("."));
-                String suffix = fileNames.substring(fileNames.lastIndexOf(".") + 1);
-                String regexp = "[^A-Za-z_0-9\\u4E00-\\u9FA5]";
-                String saveName = fileName.replaceAll(regexp, "");
-                String folderPath = servicePath + "resource\\"+folderName;
-                File temp = new File(folderPath);
-                if (!temp.exists()) {
-                    temp.mkdirs();
-                }
-
-                int randomNum = (int) (Math.random() * 10 + 1);
-                for (int i = 0; i < 5; i++) {
-                    randomNum = randomNum * 10 + (int) (Math.random() * 10 + 1);
-                }
-                String newFileTitle=saveName + randomNum + "." + suffix;
-                String localPath = temp + "\\" + newFileTitle;
-                System.out.println("资源上传到本地路径："+localPath);
-                File file = new File(localPath);
-                FileOutputStream fileOutputStream = new FileOutputStream(file);
-                InputStream inputStream = singleFile.getInputStream();
-                byte[] buffer = new byte[1024 * 1024];
-                int byteRead;
-                while ((byteRead = inputStream.read(buffer)) != -1) {
-                    fileOutputStream.write(buffer, 0, byteRead);
-                }
-                fileOutputStream.close();
-                inputStream.close();
-
-                String reqPath = request.getRequestURL().toString();
-                String pathURL = reqPath.replaceAll("localhost", ip) + "/" + newFileTitle;
-                String regexGetUrl="(/GeoProblemSolving[\\S]*)";
-                Pattern regexPattern=Pattern.compile(regexGetUrl);
-                Matcher matcher=regexPattern.matcher(pathURL);
-                if (matcher.find()){
-                    pathURL=matcher.group(1);
-                }
-                uploadInfo.setFileName(newFileTitle);
-
-                // 如果是zip文件
-                if(suffix.equals("zip")){
-                    try {
-                        ArrayList<String> fileInZip = new ArrayList<>();
-                        ZipFile zipFile = new ZipFile(localPath);
-                        Enumeration enumeration = zipFile.entries();
-                        while (enumeration.hasMoreElements()){
-                            ZipEntry zipEntry = (ZipEntry) enumeration.nextElement();
-                            String fn = zipEntry.getName();
-                            String[] nameArray = fn.split("\\\\");
-                            fn = nameArray[nameArray.length - 1];
-                            fileInZip.add(fn);
+            Collection<Part> parts = request.getParts();
+            for (Part part : parts) {
+                if (part.getName().equals("file")) {
+                    if (part.getSize() < 1024 * 1024 * 1024) {
+                        ResourceUploadInfo uploadInfo = new ResourceUploadInfo();
+                        String fileNames = part.getSubmittedFileName();
+                        String fileName = fileNames.substring(0, fileNames.lastIndexOf("."));
+                        String suffix = fileNames.substring(fileNames.lastIndexOf(".") + 1);
+                        String regexp = "[^A-Za-z_0-9\\u4E00-\\u9FA5]";
+                        String saveName = fileName.replaceAll(regexp, "");
+                        String folderPath = servicePath + "resource\\"+folderName;
+                        File temp = new File(folderPath);
+                        if (!temp.exists()) {
+                            temp.mkdirs();
                         }
-                        uploadInfo.setZipFiles(fileInZip);
+
+                        int randomNum = (int) (Math.random() * 10 + 1);
+                        for (int i = 0; i < 5; i++) {
+                            randomNum = randomNum * 10 + (int) (Math.random() * 10 + 1);
+                        }
+                        String newFileTitle=saveName + randomNum + "." + suffix;
+                        String localPath = temp + "\\" + newFileTitle;
+                        System.out.println("资源上传到本地路径："+localPath);
+                        File file = new File(localPath);
+                        FileOutputStream fileOutputStream = new FileOutputStream(file);
+                        InputStream inputStream = part.getInputStream();
+                        byte[] buffer = new byte[1024 * 1024];
+                        int byteRead;
+                        while ((byteRead = inputStream.read(buffer)) != -1) {
+                            fileOutputStream.write(buffer, 0, byteRead);
+                        }
+                        fileOutputStream.close();
+                        inputStream.close();
+
+                        String reqPath = request.getRequestURL().toString();
+                        String pathURL = reqPath.replaceAll("localhost", ip) + "/" + newFileTitle;
+                        String regexGetUrl="(/GeoProblemSolving[\\S]*)";
+                        Pattern regexPattern=Pattern.compile(regexGetUrl);
+                        Matcher matcher=regexPattern.matcher(pathURL);
+                        if (matcher.find()){
+                            pathURL=matcher.group(1);
+                        }
+                        uploadInfo.setFileName(newFileTitle);
+
+                        // 如果是zip文件
+                        if(suffix.equals("zip")){
+                            try {
+                                ArrayList<String> fileInZip = new ArrayList<>();
+                                ZipFile zipFile = new ZipFile(localPath);
+                                Enumeration enumeration = zipFile.entries();
+                                while (enumeration.hasMoreElements()){
+                                    ZipEntry zipEntry = (ZipEntry) enumeration.nextElement();
+                                        String fn = zipEntry.getName();
+                                        String[] nameArray = fn.split("\\\\");
+                                        fn = nameArray[nameArray.length - 1];
+                                        fileInZip.add(fn);
+                                }
+                                uploadInfo.setZipFiles(fileInZip);
+                            }
+                            catch (Exception ex) {
+                                ex.printStackTrace();
+                            }
+                        }
+
+                        String resourceId = UUID.randomUUID().toString();
+                        uploadInfo.setResourceId(resourceId);
+                        String fileSize;
+                        DecimalFormat df = new DecimalFormat("##0.00");
+                        if (part.getSize() > 1024 * 1024) {
+                            fileSize = df.format((float) part.getSize() / (float) (1024 * 1024)) + "MB";
+                        } else {
+                            fileSize = df.format((float) part.getSize() / (float) (1024)) + "KB";
+                        }
+                        ResourceEntity resourceEntity = new ResourceEntity();
+                        resourceEntity.setResourceId(resourceId);
+
+                        JSONObject scope = JSON.parseObject(request.getParameter("scope"));
+                        // decode projectId
+                        String projectId = scope.getString("projectId");
+                        if (projectId.length() > 36) {
+                            String sid = new String(EncodeUtil.decode(projectId));
+                            projectId = sid.substring(0, sid.length() - 2);
+                        }
+                        Query queryUser=Query.query(Criteria.where("userId").is(request.getParameter("uploaderId")));
+                        UserEntity uploader=mongoTemplate.findOne(queryUser,UserEntity.class);
+                        scope.put("projectId", projectId);
+
+                        resourceEntity.setScope(scope);
+                        resourceEntity.setName(fileNames);
+                        resourceEntity.setDescription(request.getParameter("description"));
+                        resourceEntity.setBelong(request.getParameter("belong"));
+                        resourceEntity.setPrivacy(request.getParameter("privacy"));
+                        resourceEntity.setType(request.getParameter("type"));
+                        resourceEntity.setFileSize(fileSize);
+                        resourceEntity.setPathURL(pathURL);
+                        resourceEntity.setUploaderId(uploader.getUserId());
+                        resourceEntity.setUploaderName(uploader.getUserName());
+                        resourceEntity.setOrganization(uploader.getOrganization());
+                        resourceEntity.setUploadTime(uploadTime);
+                        mongoTemplate.save(resourceEntity);
+                        uploadInfos.add(uploadInfo);
+
+                    } else {
+                        return "Size over";
                     }
-                    catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
                 }
-
-                String resourceId = UUID.randomUUID().toString();
-                uploadInfo.setResourceId(resourceId);
-                String fileSize;
-                DecimalFormat df = new DecimalFormat("##0.00");
-                if (singleFile.getSize() > 1024 * 1024) {
-                    fileSize = df.format((float) singleFile.getSize() / (float) (1024 * 1024)) + "MB";
-                } else {
-                    fileSize = df.format((float) singleFile.getSize() / (float) (1024)) + "KB";
-                }
-                ResourceEntity resourceEntity = new ResourceEntity();
-                resourceEntity.setResourceId(resourceId);
-
-                JSONObject scope = JSON.parseObject(parameterMap.get("scope")[0]);
-                // decode projectId
-                String projectId = scope.getString("projectId");
-                if (projectId.length() > 36) {
-                    String sid = new String(EncodeUtil.decode(projectId));
-                    projectId = sid.substring(0, sid.length() - 2);
-                }
-                Query queryUser=Query.query(Criteria.where("userId").is(parameterMap.get("uploaderId")[0]));
-                UserEntity uploader=mongoTemplate.findOne(queryUser,UserEntity.class);
-                scope.put("projectId", projectId);
-
-                resourceEntity.setScope(scope);
-                resourceEntity.setName(fileNames);
-                resourceEntity.setDescription(parameterMap.get("description")[0]);
-                resourceEntity.setBelong(parameterMap.get("belong")[0]);
-                resourceEntity.setPrivacy(parameterMap.get("privacy")[0]);
-                resourceEntity.setType(parameterMap.get("type")[0]);
-                resourceEntity.setFileSize(fileSize);
-                resourceEntity.setPathURL(pathURL);
-                resourceEntity.setUploaderId(uploader.getUserId());
-                resourceEntity.setUploaderName(uploader.getUserName());
-                resourceEntity.setOrganization(uploader.getOrganization());
-                resourceEntity.setUploadTime(uploadTime);
-                mongoTemplate.save(resourceEntity);
-                uploadInfos.add(uploadInfo);
             }
             return uploadInfos;
         } catch (Exception e) {
