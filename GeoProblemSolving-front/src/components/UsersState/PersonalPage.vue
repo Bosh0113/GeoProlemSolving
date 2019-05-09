@@ -453,7 +453,7 @@ export default {
     });
   },
   mounted() {
-    // 获取用户资源
+    // 获取用户信息
     this.getUserProfile();
     //获取用户资源
     this.getUserResource();
@@ -784,7 +784,11 @@ export default {
             this.$store.getters.userId
         )
         .then(res => {
-          if (res.data === "Success") {
+          if(res.data == "Offline"){
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          }
+          else if (res.data != "Fail" && res.data != "None") {
             this.$Message.success("Quit Success");
             this.removeQuitProject(quitProjectId);
             let notice = {};
@@ -810,7 +814,9 @@ export default {
               .catch(err => {
                 console.log("申请失败的原因是：" + err.data);
               });
-          } else if (res.data === "Fail") {
+          } else{
+            this.$Message.error("Quit Fail.");
+            console.log("Quit fail: "+res.data);
           }
         })
         .catch(err => {});
@@ -840,7 +846,11 @@ export default {
             this.selectManagerId
         )
         .then(res => {
-          if (res.data != "Fail") {
+          if(res.data == "Offline"){
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          }
+          else if (res.data != "Fail") {
             let projectInfo = res.data;
             projectInfo.projectId = this.currentProject.projectId;
             this.projectManageToJoin(projectInfo);
@@ -889,14 +899,26 @@ export default {
         this.axios
           .get("/GeoProblemSolving/project/delete?" + "projectId=" + this.deleteProjectId)
           .then(res => {
-            var newManageProjects = [];
-            var oldManageProjects = this.userManagerProjectList;
-            for (var i = 0; i < oldManageProjects.length; i++) {
-              if (oldManageProjects[i].projectId != this.deleteProjectId) {
-                newManageProjects.push(oldManageProjects[i]);
-              }
+            if(res.data == "Offline"){
+              this.$store.commit("userLogout");
+              this.$router.push({ name: "Login" });
             }
-            this.$set(this, "userManagerProjectList", newManageProjects);
+            else if(res.data=="Success"){
+              var newManageProjects = [];
+              var oldManageProjects = this.userManagerProjectList;
+              for (var i = 0; i < oldManageProjects.length; i++) {
+                if (oldManageProjects[i].projectId != pid) {
+                  newManageProjects.push(oldManageProjects[i]);
+                }
+              }
+              this.$set(this, "userManagerProjectList", newManageProjects);
+            }
+            else{
+              this.$Notice.error({
+                title: "Error",
+                desc: "Delete project fail."
+              });
+            }
           })
           .catch(err => {
             console.log(err.data);
@@ -983,7 +1005,11 @@ export default {
             this.$store.getters.userId
         )
         .then(res => {
-          if (res.data != "None") {
+          if(res.data == "Offline"){
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          }
+          else if(res.data !="None"&&res.data !="Fail"){
             this.userEventList = res.data;
           }
         })

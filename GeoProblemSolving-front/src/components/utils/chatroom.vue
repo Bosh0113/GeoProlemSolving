@@ -577,7 +577,7 @@ export default {
             that.subProjectId,
           type: "GET",
           success: data => {
-            if (data != "None") {
+            if (data != "None" && data != "Fail" && data != "Offline") {
               let subProjectInfo = data[0];
               let membersList = subProjectInfo["members"];
               let manager = { userId: subProjectInfo["managerId"] };

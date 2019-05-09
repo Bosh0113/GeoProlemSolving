@@ -161,12 +161,12 @@ footer {
             <MenuItem
               name="personal"
               style="width:100px"
-              to="/personalPage"
             >
             <Dropdown
               @on-click="changeSelect"
               placement="bottom-start"
             >
+            <div @click="toPersonalPage">
               <img
                 v-bind:src="avatar"
                 v-if="avatar!=''&&avatar!=undefined&&avatar!=null"
@@ -180,6 +180,7 @@ footer {
                 :title="userName"
                 v-else
               ></avatar>
+            </div>
               <DropdownMenu slot="list">
                 <!-- <DropdownItem name="personalPage">User Space</DropdownItem> -->
                 <DropdownItem name="logout">Log out</DropdownItem>
@@ -290,6 +291,9 @@ export default {
         this.$router.push({ name: "Notifications" });
       } else if (name === "personal") {
       }
+    },
+    toPersonalPage(){
+      this.$router.push({ name: "PersonalPage" });
     },
     // 获取到通知的数量
     getUnreadNoticeCount() {

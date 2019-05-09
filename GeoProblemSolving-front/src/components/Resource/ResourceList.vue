@@ -254,9 +254,15 @@ export default {
           tooltip: true
         },
         {
+          title:"Provider",
+          key:"uploaderName",
+          width: 150,
+          align: "center"
+        },
+        {
           title: "Upload time",
           key: "uploadTime",
-          width: 160,
+          width: 130,
           sortable: true
         },
         {
@@ -434,7 +440,10 @@ export default {
                 data: formData
               })
                 .then(res => {
-                  if (res.data != "Size over" && res.data.length > 0) {
+                  if(res.data == "Offline"){
+                    this.$store.commit("userLogout");
+                    this.$router.push({ name: "Login" });
+                  }else if (res.data != "Size over" && res.data.length > 0) {
                     this.$Notice.open({
                       title: "Upload notification title",
                       desc: "File uploaded successfully",
