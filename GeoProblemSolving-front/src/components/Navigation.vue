@@ -261,7 +261,12 @@ export default {
   },
   methods: {
     reSize() {
-      this.contentHeight = window.innerHeight - 120 + "px";
+      if(window.innerHeight > 675) {
+        this.contentHeight = window.innerHeight - 120 + "px";
+      }
+      else{
+        this.contentHeight = 675;
+      }
     },
     turnContent(name) {
       if (name === "home") {
