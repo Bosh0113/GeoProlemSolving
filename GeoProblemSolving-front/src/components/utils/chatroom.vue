@@ -803,7 +803,7 @@ export default {
       }
     },
     startWebSocket(id) {
-      this.socketApi.initWebSocket("ChatServer/" + id);
+      this.socketApi.initWebSocket("ChatServer/" + id,this.$store.state.IP_Port);
 
       this.send_msg = {
         type: "test",

@@ -866,7 +866,7 @@ export default {
     },
     startWebSocket() {
       let roomId = sessionStorage.getItem("moduleId");
-      this.socketApi.initWebSocket("MapServer/" + roomId);
+      this.socketApi.initWebSocket("MapServer/" + roomId,this.$store.state.IP_Port);
 
       this.send_content = {
         type: "test",
