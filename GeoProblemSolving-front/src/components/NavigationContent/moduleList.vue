@@ -750,7 +750,7 @@
                           color="gray"
                         />
                       </div>
-                      <a class="singl_tool_style" href="http://172.21.212.7:8888/tree?" target="_blank">
+                      <a class="singl_tool_style" href="http://172.21.212.72:8888/tree?" target="_blank">
                         <Icon
                           type="md-code"
                           size="60"
@@ -1570,8 +1570,8 @@ export default {
         this.subprojectSocket = null;
       }
       let subProjectId = this.subProjectInfo.subProjectId;
-      // var subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + subProjectId;
-      var subprojectSocketURL = "ws://" + this.$store.state.IP_Port + "/GeoProblemSolving/Module/" + subProjectId;
+      var subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + subProjectId;
+      // var subprojectSocketURL = "ws://" + this.$store.state.IP_Port + "/GeoProblemSolving/Module/" + subProjectId;
       this.subprojectSocket = new WebSocket(subprojectSocketURL);
       this.subprojectSocket.onopen = this.onOpen;
       this.subprojectSocket.onmessage = this.onMessage;
@@ -2370,7 +2370,7 @@ export default {
             toolName = "Computational modeling";
           } else if (type == "tableEditor") {
             toolURL =
-              '<iframe src="/GeoProblemSolving/Collaborative/jexcelTool/excelTool.html' +
+              '<iframe src="/GeoProblemSolving/Collaborative/jexcelTool/index.html' +
               "?groupID=" +
               this.currentModule.moduleId +
               '" style="width: 100%;height:100%"></iframe>';
@@ -2409,7 +2409,7 @@ export default {
             toolURL =
               '<iframe src="'+'http://'+this.$store.state.IP_Port+'/GeoProblemSolving/tinymce" style="width: 100%;height:100%"></iframe>';
             toolName = "Text editor";
-          } else if (type == "video Tool") {
+          } else if (type == "Video Tool") {
             toolURL =
               '<iframe src="/GeoProblemSolving/Collaborative/vedioChat/WebRtcTest.html" style="width: 100%;height:100%"></iframe>';
             toolName = "Video Tool";

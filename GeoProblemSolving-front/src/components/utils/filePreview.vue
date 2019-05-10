@@ -119,7 +119,7 @@ export default {
       this.paperList = [];
       this.documentList = [];
       let resources = JSON.parse(sessionStorage.getItem("resources"));
-      if (resources.length > 0) {
+      if (resources != null && resources != undefined && resources.length > 0) {
         for (let i = 0; i < resources.length; i++) {
           if (resources[i].type == "paper") {
             this.paperList.push(resources[i]);
