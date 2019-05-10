@@ -86,7 +86,7 @@ export default {
     getVideoResource() {
       this.videoList = [];
       let resources = JSON.parse(sessionStorage.getItem("resources"));
-      if (resources.length > 0) {
+      if (resources != null && resources != undefined && resources.length > 0) {
         for (let i = 0; i < resources.length; i++) {
           if (resources[i].type == "video") {
             this.videoList.push(resources[i]);
