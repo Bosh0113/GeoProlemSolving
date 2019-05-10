@@ -960,7 +960,7 @@ export default {
     },
     startWebSocket() {
       let roomId = sessionStorage.getItem("moduleId");
-      this.socketApi.initWebSocket("DrawServer/" + roomId);
+      this.socketApi.initWebSocket("DrawServer/" + roomId,this.$store.state.IP_Port);
 
       this.send_msg = {
         type: "test",
