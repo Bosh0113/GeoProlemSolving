@@ -77,7 +77,7 @@
   text-align: center;
 }
 .searchmessageList {
-  overflow: auto;
+  overflow-y: auto;
 }
 .message_record_board {
   margin-left: 5%;
@@ -296,7 +296,7 @@
 <template>
   <Row>
     <Col span="24">
-      <div class="chatPanel" :style="{height:panelHeight,width:panelWidth}">
+      <div class="chatPanel" :style="{height:panelHeight+'px',width:panelWidth+'px'}">
         <div class="memberPanel">
           <div class="panelHeader">
             <h4>Groups</h4>
@@ -304,22 +304,6 @@
           <Select v-model="selectItem" style="width:195px;margin-left:2.5px;margin-right:2.5px">
             <Option v-for="(item,index) in itemList" :value="item.value" :key="item.index" @click.native="changeChatroom(index)">{{ item.label }}</Option>
           </Select>
-          <!-- <div v-for="(group,index) in groups" :key="index" class="f_list">
-            <div>
-              <avatar
-                :username="group.scope"
-                :size="35"
-                :rounded="false"
-                :title="group.title +': '+ group.name"
-              ></avatar>
-            </div>
-            <div
-              class="name"
-              :title="group.title +': '+ group.name"
-              style="cursor:pointer"
-              @click="changeChatroom(index)"
-            >{{group.scope}}</div>
-          </div> -->
           <div class="participants">
             <h4>Participants</h4>
             <Card v-for="(participant,index) in participants" :key="index" style="margin:2.5%" :padding="5">
@@ -404,6 +388,7 @@
                   icon="ios-link"
                   class="message_input"
                   v-model="message"
+                  @keyup.enter.native="send(message)"
                 />
               </div>
               <div class="send_panel">
@@ -502,7 +487,7 @@ export default {
           label:"Project"
         },
       ],
-      selectItem: ""
+      selectItem: "Module"
     };
   },
   methods: {
@@ -539,6 +524,12 @@ export default {
     changeChatroom(index) {
       this.socketApi.close();
       if (index == 0) {
+        if(this.moduleId == null || this.moduleId == undefined || this.moduleId == ""){
+          this.$Notice.open({
+            desc: "No information about this module",
+          });
+          return;
+        }
         this.participants = [];
         this.msglist = [];
         this.msgRecords = [];
@@ -547,6 +538,12 @@ export default {
         this.startWebSocket(this.moduleId);
         this.seletRoom = "module";
       } else if (index == 1) {
+        if(this.subProjectId == null || this.subProjectId == undefined || this.subProjectId == ""){
+          this.$Notice.open({
+            desc: "No information about this subproject",
+          });
+          return;
+        }
         this.participants = [];
         this.msglist = [];
         this.msgRecords = [];
@@ -556,6 +553,12 @@ export default {
         this.startWebSocket(this.subProjectId);
         this.seletRoom = "subproject";
       } else if (index == 2) {
+        if(this.projectId == null || this.projectId == undefined || this.projectId == ""){
+          this.$Notice.open({
+            desc: "No information about this project",
+          });
+          return;
+        }
         this.participants = [];
         this.msglist = [];
         this.msgRecords = [];
@@ -817,20 +820,17 @@ export default {
       console.log(q_date);
     },
     initSize() {
-      //侧边栏的高度随着屏幕的高度自适应
-      // this.panelHeight = window.innerHeight + "px";
-
       if(window.innerHeight > 600) {
-        this.panelHeight = window.innerHeight + "px";
+        this.panelHeight = window.innerHeight;
       }
       else{
-        this.panelHeight = 580 + "px";
+        this.panelHeight = 580 ;
       }
       if(window.innerWidth > 1000){
-        this.panelWidth = window.innerWidth + "px";
+        this.panelWidth = window.innerWidth;
       }
       else{
-        this.panelWidth = 980 + 'px';
+        this.panelWidth = 980;
       }
       this.messageListPanelHeight = this.panelHeight - 144 + "px";
     }
