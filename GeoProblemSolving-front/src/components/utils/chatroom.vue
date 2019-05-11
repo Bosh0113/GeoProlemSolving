@@ -250,7 +250,7 @@
   height: 40px;
   line-height: 15px;
   font-size: 15px;
-  padding: 5px 10px 10px 5px;
+  padding: 5px 5px 5px 5px;
   /* float:right; */
 }
 .memberImg{
@@ -820,17 +820,17 @@ export default {
       console.log(q_date);
     },
     initSize() {
-      if(window.innerHeight > 600) {
+      if(window.innerHeight > 675) {
         this.panelHeight = window.innerHeight;
       }
       else{
-        this.panelHeight = 580 ;
+        this.panelHeight = 675 ;
       }
-      if(window.innerWidth > 1000){
+      if(window.innerWidth > 1200){
         this.panelWidth = window.innerWidth;
       }
       else{
-        this.panelWidth = 980;
+        this.panelWidth = 1200;
       }
       this.messageListPanelHeight = this.panelHeight - 144 + "px";
     }

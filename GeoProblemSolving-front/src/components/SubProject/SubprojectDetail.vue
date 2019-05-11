@@ -891,6 +891,7 @@ export default {
     this.contentHeight = window.innerHeight + "px";
     this.toProjectPage = "/project/" + sessionStorage.getItem("projectId");
     this.inquiryTask();
+    this.getProjectInfo();
     window.addEventListener("resize", this.initSize);
   },
   // add by mzy for navigation guards
@@ -960,6 +961,8 @@ export default {
         this.$set(this, "subProjectInfo", subProjectInfo);
         this.inviteAble = false;
         this.showMembers();
+        sessionStorage.setItem("subProjectId",subProjectInfo.subProjectId);
+        sessionStorage.setItem("subProjectName", subProjectInfo.title);
       } else {
         $.ajax({
           url:
@@ -976,10 +979,7 @@ export default {
             }else if (data != "None"&&data!="Fail") {
               subProjectInfo = data[0];
               this.$set(this, "subProjectInfo", subProjectInfo);
-              sessionStorage.setItem(
-                "subProjectId",
-                subProjectInfo.subProjectId
-              );
+              sessionStorage.setItem("subProjectId",subProjectInfo.subProjectId);
               sessionStorage.setItem("subProjectName", subProjectInfo.title);
 
               // this.managerIdentity(subProjectInfo.managerId);
@@ -1067,8 +1067,8 @@ export default {
         this.subprojectSocket = null;
       }
       let roomId = this.subProjectInfo.subProjectId + "task";
-      // var subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + roomId;
-      var subprojectSocketURL = "ws://"+this.$store.state.IP_Port+"/GeoProblemSolving/Module/" + roomId;
+      var subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + roomId;
+      // var subprojectSocketURL = "ws://"+this.$store.state.IP_Port+"/GeoProblemSolving/Module/" + roomId;
       this.subprojectSocket = new WebSocket(subprojectSocketURL);
       this.subprojectSocket.onopen = this.onOpen;
       this.subprojectSocket.onmessage = this.onMessage;
@@ -1130,26 +1130,34 @@ export default {
         if (this.participants[i].userId != this.$store.getters.userId) {
           let notice = {};
           notice["recipientId"] = this.participants[i].userId;
-          notice["type"] = "Work"; //其他的类型都是小写，当然如果用的地方也同样用大写来判断也没问题
+          notice["type"] = "work";
           notice["content"] = {
             subProjectId: this.subProjectInfo.subProjectId,
             title: "Work Notice",
             description:
-              "The sub-project " +
+              "The manager of" +
+              " the sub-project " +
               this.subProjectInfo.title +
               " of project " +
               this.projectInfo.title +
-              " in which you participate has new progress!"
+              " informs you to start working!"
           };
           this.axios
             .post("/GeoProblemSolving/notice/save", notice)
             .then(res => {
-              //这个地方是不是应该加个回执判断比较好
-              this.$Message.info("Apply Successfully"); //这个提示是不是有点不对应情景？
-              this.$emit("sendNotice", data.managerId); //这个地方是拿不到managerId的
+              if(res.data == "Success") {
+                this.$Notice.success({
+                  desc: "Inform Successfully"
+                });
+              }
+              else{                
+                this.$Notice.info({
+                  desc: "Inform failed"
+                });
+              }
             })
             .catch(err => {
-              console.log("申请失败的原因是：" + err.data); //这也不对应情景
+              console.log(err.data);
             });
         }
       }
@@ -1160,34 +1168,36 @@ export default {
     cancel() {},
     //加载并打开成员邀请Modal
     inviteMembersModalShow() {
-      let that = this;
       this.candidates = [];
-      this.inviteList = [];
-      let projectInfo = this.$store.getters.project;
+      this.inviteList = [];  
 
+        let allMembers = this.projectInfo.members;
+              let manager = {
+                userName: this.projectInfo.managerName,
+                userId: this.projectInfo.managerId
+              };
+              allMembers.unshift(manager);
+              for (let i = 0; i < allMembers.length; i++) {
+                let exist = false;
+                for (let j = 0; j < this.participants.length; j++) {
+                  if (allMembers[i].userId === this.participants[j].userId) {
+                    exist = true;
+                  }
+                }
+                if (!exist) {
+                  this.candidates.push(allMembers[i]);
+                }
+              }
+      this.inviteModal = true;
+    },
+    getProjectInfo(){      
+      let that = this;
+      let projectInfo = this.$store.getters.project;
       if (
         JSON.stringify(projectInfo) != "{}" &&
         projectInfo.projectId == this.subProjectInfo.projectId
       ) {
-        let allMembers = projectInfo.members;
-        let manager = {
-          userName: projectInfo.managerName,
-          userId: projectInfo.managerId
-        };
-        if(allMembers[0].userId!=manager.userId){
-          allMembers.unshift(manager);
-        }
-        for (let i = 0; i < allMembers.length; i++) {
-          let exist = false;
-          for (let j = 0; j < that.participants.length; j++) {
-            if (allMembers[i].userId === that.participants[j].userId) {
-              exist = true;
-            }
-          }
-          if (!exist) {
-            that.candidates.push(allMembers[i]);
-          }
-        }
+        this.projectInfo = projectInfo;        
       } else {
         this.axios
           .get(
@@ -1198,26 +1208,8 @@ export default {
           )
           .then(res => {
             if (res.data != "None" && res.data != "Fail") {
-              this.projectInfo = res.data[0];
-              this.$store.commit("setProjectInfo", res.data[0]);
-
-              let allMembers = this.projectInfo.members;
-              let manager = {
-                userName: this.projectInfo.managerName,
-                userId: this.projectInfo.managerId
-              };
-              allMembers.unshift(manager);
-              for (let i = 0; i < allMembers.length; i++) {
-                let exist = false;
-                for (let j = 0; j < that.participants.length; j++) {
-                  if (allMembers[i].userId === that.participants[j].userId) {
-                    exist = true;
-                  }
-                }
-                if (!exist) {
-                  that.candidates.push(allMembers[i]);
-                }
-              }
+              that.projectInfo = res.data[0];
+              that.$store.commit("setProjectInfo", res.data[0]);              
             } else {
               console.log(res.data);
             }
@@ -1226,7 +1218,6 @@ export default {
             console.log(err.data);
           });
       }
-      this.inviteModal = true;
     },
     inviteMembers() {
       var that = this;
