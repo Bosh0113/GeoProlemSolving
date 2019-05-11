@@ -1592,7 +1592,8 @@ export default {
           headerControls: {
             smallify: "remove"
           },
-          theme: "light",
+          theme: "primary",
+          footerToolbar: '<p style="height:10px"></p>',
           headerTitle: "Preview",
           contentSize: "800 600",
           content: toolURL,
@@ -1619,7 +1620,8 @@ export default {
           headerControls: {
             smallify: "remove"
           },
-          theme: "light",
+          theme: "primary",
+          footerToolbar: '<p style="height:10px"></p>',
           headerTitle: "Preview",
           contentSize: "800 600",
           content: toolURL,
@@ -1646,7 +1648,8 @@ export default {
           headerControls: {
             smallify: "remove"
           },
-          theme: "light",
+          theme: "primary",
+          footerToolbar: '<p style="height:10px"></p>',
           headerTitle: "Preview",
           contentSize: "800 600",
           content: toolURL,

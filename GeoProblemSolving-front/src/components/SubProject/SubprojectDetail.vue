@@ -300,7 +300,7 @@
                         >{{subProjectInfo.description}}</div>
                       </Card>
                       <div class="resourcePanel" style="padding-top: 20px" >
-                        <folder-tree :subProjectId = subProjectInfo.subProjectId></folder-tree>
+                        <folder-tree :subProjectId = subProjectInfo.subProjectId ref="folderTreeEle"></folder-tree>
                       </div>
                     </Col>
                   </Row>
@@ -918,9 +918,7 @@ export default {
   },
   beforeRouteLeave(to, from, next) {
     this.removeTimer();
-    if (this.panel != null) {
-      this.panel.close();
-    }
+    this.$refs.folderTreeEle.closePanel();
     next();
   },
   beforeDestroy: function() {
@@ -1776,7 +1774,8 @@ export default {
         this.closeModuleSocket();
 
         if (name == "task") {
-          this.openModuleSocket();
+          this.openModuleSocket(); 
+          this.$refs.folderTreeEle.closePanel();
         }
       }
     },

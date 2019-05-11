@@ -1444,6 +1444,9 @@ export default {
       sessionStorage.setItem("moduleId", this.currentModule.moduleId);
       sessionStorage.setItem("moduleName", this.currentModule.title);
 
+      // close panels
+      this.closePanel();
+
       if (oldId !== this.currentModule.moduleId) {
         //查询公告
         this.inquiryNotice();
@@ -2416,8 +2419,9 @@ export default {
           }
 
           let panel = jsPanel.create({
-            theme: "primary",
+            theme: "success",
             headerTitle: toolName,
+            footerToolbar: '<p style="height:10px"></p>',
             contentSize: "1000 600",
             content: toolURL,
             disableOnMaximized: true,
@@ -2453,10 +2457,6 @@ export default {
     closePanel() {
       for (let i = 0; i < this.panelList.length; i++) {
         this.panelList[i].close();
-      }
-
-      if (this.panel != null) {
-        this.panel.close();
       }
     },
     createNotice() {
@@ -2559,11 +2559,12 @@ export default {
           this.resourceList[index].pathURL;
         var toolURL =
           "<iframe src=" + url + ' style="width: 100%;height:100%"></iframe>';
-        this.panel = jsPanel.create({
+        let panel = jsPanel.create({
           headerControls: {
             smallify: "remove"
           },
-          theme: "light",
+          theme: "primary",
+          footerToolbar: '<p style="height:10px"></p>',
           headerTitle: "Preview",
           contentSize: "800 600",
           content: toolURL,
@@ -2574,6 +2575,7 @@ export default {
           closeOnEscape: true
         });
         $(".jsPanel-content").css("font-size", "0");
+        this.panelList.push(panel);
       } else if (/\.(mp4)$/.test(name.toLowerCase())) {
         if (this.panel != null) {
           this.panel.close();
@@ -2586,11 +2588,12 @@ export default {
           "<video src=" +
           url +
           ' style="width: 100%;height:100%" controls></video>';
-        this.panel = jsPanel.create({
+        let panel = jsPanel.create({
           headerControls: {
             smallify: "remove"
           },
-          theme: "light",
+          theme: "primary",
+          footerToolbar: '<p style="height:10px"></p>',
           headerTitle: "Preview",
           contentSize: "800 600",
           content: toolURL,
@@ -2601,6 +2604,7 @@ export default {
           closeOnEscape: true
         });
         $(".jsPanel-content").css("font-size", "0");
+        this.panelList.push(panel);
       } else if (/\.(xml|json|md|gif|jpg|png)$/.test(name.toLowerCase())) {
         if (this.panel != null) {
           this.panel.close();
@@ -2613,11 +2617,12 @@ export default {
           "<iframe src=" +
           url +
           ' style="width: 100%;height:100%" controls></iframe>';
-        this.panel = jsPanel.create({
+        let panel = jsPanel.create({
           headerControls: {
             smallify: "remove"
           },
-          theme: "light",
+          theme: "primary",
+          footerToolbar: '<p style="height:10px"></p>',
           headerTitle: "Preview",
           contentSize: "800 600",
           content: toolURL,
@@ -2628,6 +2633,7 @@ export default {
           closeOnEscape: true
         });
         $(".jsPanel-content").css("font-size", "0");
+        this.panelList.push(panel);
       } else {
         this.$Notice.error({
           title: "Open failed",

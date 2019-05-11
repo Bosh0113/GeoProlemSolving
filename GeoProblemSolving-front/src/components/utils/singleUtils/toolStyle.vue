@@ -51,7 +51,6 @@
 <script>
 export default {
   props: {
-    participants: Array,
     resources: Array
   },
   components: {
