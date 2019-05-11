@@ -144,7 +144,7 @@
             v-model="newFolderModal"
             title="New folder"
         >
-            <Form ref="newValidate" :model="newValidate" :rules="newRuleValidate" :label-width="80">
+            <Form ref="newValidate" :model="newValidate" :rules="newRuleValidate" :label-width="80" @submit.native.prevent>
                 <FormItem label="Set name" prop="setName">
                     <Input v-model="newValidate.setName" :rows="4" placeholder="Enter the name for folder..." />
                 </FormItem>

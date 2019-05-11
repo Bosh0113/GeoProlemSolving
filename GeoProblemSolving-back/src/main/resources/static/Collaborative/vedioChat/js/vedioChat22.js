@@ -5,6 +5,17 @@
 var userID;
 //在线的成员
 var olParticipants=[];
+var thisURL= window.location.href;
+var thisUserId="";
+var thisRoomId="";
+var regUserId = /userId=(\S*)/;
+var regRoomId = /roomId=(\S*)&/;
+if(thisURL.search(regUserId)!=-1){
+  thisUserId = thisURL.match(regUserId)[1];
+}
+if(thisURL.search(regRoomId)!=-1){
+  thisRoomId = thisURL.match(regRoomId)[1];
+}
 
 $(document).ready(function () {
 
@@ -18,7 +29,6 @@ $(document).ready(function () {
     var membersList = $("#memberList");
     var localStream;
     var remoteStream;
-    var userID;
 
     //A端：是否收到了B端接受视频的应答；B端：是否应达了A端的视频请求
     var isResponsed = false;
@@ -40,14 +50,9 @@ $(document).ready(function () {
     var ws;
     if(WebSocket)
     {
-
-        // let  roomID = sessionStorage.getItem("moduleId");
-        let roomID = "123";
-        //vedioSocket/{usrId}
-        ws = new WebSocket("wss://223.2.44.124:8083/GeoProblemSolving/VideoChatServer/" + roomID);
-        // ws = new WebSocket("wss://223.2.44.124:8083/VideoChatServer/" + roomID);
-        // ws = new WebSocket("wss://172.21.212.72:8082/GeoProblemSolving/VideoChatServer/"+roomID);
-        // ws = new WebSocket("wss://172.21.213.185:8080/GeoProblemSolving/VideoChatServer/"+roomID);
+        ws = new WebSocket("wss://223.2.44.124:8083/GeoProblemSolving/VideoChatServer/" + thisRoomId);
+        // ws = new WebSocket("wss://172.21.212.72:8082/GeoProblemSolving/VideoChatServer/"+thisRoomId);
+        // ws = new WebSocket("wss://172.21.213.185:8080/GeoProblemSolving/VideoChatServer/"+thisRoomId);
 
     }
 
@@ -200,12 +205,9 @@ $(document).ready(function () {
 
 
     ws.onopen = function(){
-      var userInfo = sessionStorage.getItem("userInfo");
-      var userInfoObject = JSON.parse(userInfo);
-      var userId = userInfoObject.userId;
       var message = {
         "type":"connect",
-        "userId": userId
+        "userId": thisUserId
       };
         ws.send(JSON.stringify(message));
         initiate();
@@ -341,7 +343,6 @@ $(document).ready(function () {
                         .replace("]", "")
                         .replace(/\s/g, "")
                         .split(",");
-
                     olParticipantChange(members);
                 }
                 default:
@@ -417,80 +418,106 @@ $(document).ready(function () {
         return guid;
     }
 
+
+    function olParticipantChange(members){
+      let userIndex = -1;
+  
+      // 自己刚上线，olParticipants空
+      if (olParticipants.length == 0) {
+        var membersCount = members.length;
+          for (var i = 0; i < members.length; i++) {
+                  $.ajax({
+                      url:"/GeoProblemSolving/user/inquiry" +
+                      "?key=" +
+                      "userId" +
+                      "&value=" +
+                      members[i],
+                      type:"GET",
+                      success: data => {
+                        membersCount--;
+                          if (data != "None" && data != "Fail") {
+                              olParticipants.push(data);
+                              if(membersCount==0){
+                                createMmeberList(olParticipants);
+                              }
+                          } else if (data == "None") {
+                          }
+                      },
+                      error: err=>{
+                          console.log(err);
+                      }
+                  });
+          }
+      } else {
+          // members大于olParticipants，有人上线；小于olParticipants，离线
+          if (members.length > olParticipants.length) {
+              for (var i = 0; i < members.length; i++) {
+                  for (var j = 0; j < olParticipants.length; j++) {
+                      if (members[i] === olParticipants[j].userId) {
+                          break;
+                      }
+                  }
+                  if (j === olParticipants.length) {
+                      userIndex = i;
+                      break;
+                  }
+              }
+  
+              // 人员渲染
+              $.ajax({
+                  url:"/GeoProblemSolving/user/inquiry" +
+                  "?key=" +
+                  "userId" +
+                  "&value=" +
+                  members[userIndex],
+                  type:"GET",
+                  success: data => {
+                      if (data !== "None" && data !== "Fail") {
+                          olParticipants.push(data);
+                          createMmeberList(olParticipants);
+                      } else if (data === "None") {
+                      }
+                  }
+              });
+          } else if (members.length < olParticipants.length) {
+              for (var i = 0; i < olParticipants.length; i++) {
+                  for (var j = 0; j < members.length; j++) {
+                      if (olParticipants[i].userId === members[j]) {
+                          break;
+                      }
+                  }
+                  if (j === members.length) {
+                      userIndex = i;
+                      break;
+                  }
+              }
+              olParticipants.splice(userIndex, 1);
+              createMmeberList(olParticipants);
+          }
+      }
+  };
+  function createMmeberList(memberList){
+    membersList.html("");
+      for(var i=0;i<memberList.length;i++){
+        var userInfo = memberList[i];
+        var memberItem = document.createElement('li');
+        var memberShow = "<p>"+memberList[i].userName+"</p>"
+        memberItem.innerHTML = memberShow;
+        memberItem.style.cursor="pointer";
+        var simpleUserInfo = {
+          "userId": userInfo.userId,
+          "userName":userInfo.userName
+        }
+        memberItem.setAttribute("data-userInfo",JSON.stringify(simpleUserInfo));
+        memberItem.onclick=function(){
+          chooseSomeOne(this.dataset.userinfo);
+        }
+        membersList.append(memberItem);
+      }
+  }
+  function chooseSomeOne(userInfoStr){
+    var userInfo = JSON.parse(userInfoStr);
+    confirm(userInfo.userName);
+    userID = userInfo.userId;
+  }
 });
-
-function olParticipantChange(members){
-    let userIndex = -1;
-
-    // 自己刚上线，olParticipants空
-    if (olParticipants.length == 0) {
-        for (var i = 0; i < members.length; i++) {
-                $.ajax({
-                    url:"/GeoProblemSolving/user/inquiry" +
-                    "?key=" +
-                    "userId" +
-                    "&value=" +
-                    members[i],
-                    type:"GET",
-                    success: data => {
-                        if (data != "None" && data != "Fail") {
-                            olParticipants.push(data);
-                            createMmeberList(olParticipants);
-
-                        } else if (data == "None") {
-                        }
-                    },
-                    error: err=>{
-                        console.log(err);
-                    }
-                });
-        }
-    } else {
-        // members大于olParticipants，有人上线；小于olParticipants，离线
-        if (members.length > olParticipants.length) {
-            for (var i = 0; i < members.length; i++) {
-                for (var j = 0; j < olParticipants.length; j++) {
-                    if (members[i] === olParticipants[j].userId) {
-                        break;
-                    }
-                }
-                if (j === olParticipants.length) {
-                    userIndex = i;
-                    break;
-                }
-            }
-
-            // 人员渲染
-            $.ajax({
-                url:"/GeoProblemSolving/user/inquiry" +
-                "?key=" +
-                "userId" +
-                "&value=" +
-                members[userIndex],
-                type:"GET",
-                success: data => {
-                    if (data !== "None" && data !== "Fail") {
-                        olParticipants.push(data);
-                    } else if (data === "None") {
-                    }
-                }
-            });
-        } else if (members.length < olParticipants.length) {
-            for (var i = 0; i < olParticipants.length; i++) {
-                for (var j = 0; j < members.length; j++) {
-                    if (olParticipants[i].userId === members[j]) {
-                        break;
-                    }
-                }
-                if (j === members.length) {
-                    userIndex = i;
-                    break;
-                }
-            }
-            olParticipants.splice(userIndex, 1);
-        }
-    }
-};
-function createMmeberList(list){
-    console.table(list);
-}
