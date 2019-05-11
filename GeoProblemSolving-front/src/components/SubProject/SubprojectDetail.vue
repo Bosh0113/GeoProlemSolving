@@ -136,7 +136,10 @@
                         <div slot="title" style="font-size:18px">
                           <strong>Participants</strong>
                         </div>
-                          <div :style="{height:sidebarHeight-150+'px'}" style="max-height:600px;overflow-y:auto;overflow-x:hidden">
+                        <div
+                          :style="{height:sidebarHeight-150+'px'}"
+                          style="max-height:600px;overflow-y:auto;overflow-x:hidden"
+                        >
                           <div
                             class="member-desc"
                             v-for="(member,index) in this.participants"
@@ -167,13 +170,17 @@
                                 <div style="height:40px;width:100%">
                                   <div>
                                     <span
-                                    style="padding:0 5px;"
-                                    :title="member.userName"
-                                  >{{member.userName}}</span>
+                                      style="padding:0 5px;"
+                                      :title="member.userName"
+                                    >{{member.userName}}</span>
                                   </div>
-                                <div>
-                                  <span style="padding:0 5px;" class="memberOrganization" :title="member.organization">{{member.organization}}</span>
-                                </div>
+                                  <div>
+                                    <span
+                                      style="padding:0 5px;"
+                                      class="memberOrganization"
+                                      :title="member.organization"
+                                    >{{member.organization}}</span>
+                                  </div>
                                 </div>
                               </div>
                             </template>
@@ -198,13 +205,19 @@
                               <div class="memebr-work" style="display:flex;align-items:center">
                                 <div style="height:40px;width:100%">
                                   <div>
-                                  <span style="padding:0 5px;" :title="member.userName">{{member.userName}}</span>
+                                    <span
+                                      style="padding:0 5px;"
+                                      :title="member.userName"
+                                    >{{member.userName}}</span>
+                                  </div>
+                                  <div>
+                                    <span
+                                      style="padding:0 5px;"
+                                      class="memberOrganization"
+                                      :title="member.organization"
+                                    >{{member.organization}}</span>
+                                  </div>
                                 </div>
-                                <div>
-                                  <span style="padding:0 5px;" class="memberOrganization" :title="member.organization">{{member.organization}}</span>
-                                </div>
-                                </div>
-
                               </div>
                             </template>
                             <div style="line-height:60px" type="default">
@@ -223,11 +236,11 @@
                               ok-text="Assure"
                               cancel-text="Cancel"
                               @on-ok="removeMember(participants[index].userId,participants[index].userName)"
-                              @on-cancel=""
+                              @on-cancel
                             >
-                            <h5 style="text-align:center;color:red">
-                              Do you really want to remove this member from this sub-project?
-                            </h5>
+                              <h5
+                                style="text-align:center;color:red"
+                              >Do you really want to remove this member from this sub-project?</h5>
                             </Modal>
                           </div>
                         </div>
@@ -299,8 +312,8 @@
                           style="overflow-y:auto"
                         >{{subProjectInfo.description}}</div>
                       </Card>
-                      <div class="resourcePanel" style="padding-top: 20px" >
-                        <folder-tree :subProjectId = subProjectInfo.subProjectId></folder-tree>
+                      <div class="resourcePanel" style="padding-top: 20px">
+                        <folder-tree :subProjectId="subProjectInfo.subProjectId"></folder-tree>
                       </div>
                     </Col>
                   </Row>
@@ -544,7 +557,7 @@
       v-model="taskDeleteModal"
       title="Delete Task"
       @on-ok="taskRemove()"
-      @on-cancel=""
+      @on-cancel
       ok-text="Assure"
       cancel-text="Cancel"
     >
@@ -605,7 +618,7 @@
       v-model="editTaskModal"
       title="Edit Task"
       @on-ok="updateTask('formValidate')"
-      @on-cancel=""
+      @on-cancel
       ok-text="Ok"
       cancel-text="Cancel"
       width="800px"
@@ -910,7 +923,7 @@ export default {
           }
         }
         if (!(vm.subProjectInfo.managerId == userId || isMember)) {
-          this.$Message.error('You have no property to access it');
+          this.$Message.error("You have no property to access it");
           // next(`/project/${vm.$store.getters.currentProjectId}`);
           vm.$router.go(-1);
         }
@@ -961,7 +974,7 @@ export default {
         this.$set(this, "subProjectInfo", subProjectInfo);
         this.inviteAble = false;
         this.showMembers();
-        sessionStorage.setItem("subProjectId",subProjectInfo.subProjectId);
+        sessionStorage.setItem("subProjectId", subProjectInfo.subProjectId);
         sessionStorage.setItem("subProjectName", subProjectInfo.title);
       } else {
         $.ajax({
@@ -973,13 +986,16 @@ export default {
           type: "GET",
           async: false,
           success: data => {
-            if(data == "Offline"){
+            if (data == "Offline") {
               this.$store.commit("userLogout");
               this.$router.push({ name: "Login" });
-            }else if (data != "None"&&data!="Fail") {
+            } else if (data != "None" && data != "Fail") {
               subProjectInfo = data[0];
               this.$set(this, "subProjectInfo", subProjectInfo);
-              sessionStorage.setItem("subProjectId",subProjectInfo.subProjectId);
+              sessionStorage.setItem(
+                "subProjectId",
+                subProjectInfo.subProjectId
+              );
               sessionStorage.setItem("subProjectName", subProjectInfo.title);
 
               // this.managerIdentity(subProjectInfo.managerId);
@@ -1067,7 +1083,8 @@ export default {
         this.subprojectSocket = null;
       }
       let roomId = this.subProjectInfo.subProjectId + "task";
-      var subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + roomId;
+      var subprojectSocketURL =
+        "ws://localhost:8081/GeoProblemSolving/Module/" + roomId;
       // var subprojectSocketURL = "ws://"+this.$store.state.IP_Port+"/GeoProblemSolving/Module/" + roomId;
       this.subprojectSocket = new WebSocket(subprojectSocketURL);
       this.subprojectSocket.onopen = this.onOpen;
@@ -1145,12 +1162,11 @@ export default {
           this.axios
             .post("/GeoProblemSolving/notice/save", notice)
             .then(res => {
-              if(res.data == "Success") {
+              if (res.data == "Success") {
                 this.$Notice.success({
                   desc: "Inform Successfully"
                 });
-              }
-              else{                
+              } else {
                 this.$Notice.info({
                   desc: "Inform failed"
                 });
@@ -1169,35 +1185,35 @@ export default {
     //加载并打开成员邀请Modal
     inviteMembersModalShow() {
       this.candidates = [];
-      this.inviteList = [];  
+      this.inviteList = [];
 
-        let allMembers = this.projectInfo.members;
-              let manager = {
-                userName: this.projectInfo.managerName,
-                userId: this.projectInfo.managerId
-              };
-              allMembers.unshift(manager);
-              for (let i = 0; i < allMembers.length; i++) {
-                let exist = false;
-                for (let j = 0; j < this.participants.length; j++) {
-                  if (allMembers[i].userId === this.participants[j].userId) {
-                    exist = true;
-                  }
-                }
-                if (!exist) {
-                  this.candidates.push(allMembers[i]);
-                }
-              }
+      let allMembers = this.projectInfo.members;
+      let manager = {
+        userName: this.projectInfo.managerName,
+        userId: this.projectInfo.managerId
+      };
+      allMembers.unshift(manager);
+      for (let i = 0; i < allMembers.length; i++) {
+        let exist = false;
+        for (let j = 0; j < this.participants.length; j++) {
+          if (allMembers[i].userId === this.participants[j].userId) {
+            exist = true;
+          }
+        }
+        if (!exist) {
+          this.candidates.push(allMembers[i]);
+        }
+      }
       this.inviteModal = true;
     },
-    getProjectInfo(){      
+    getProjectInfo() {
       let that = this;
       let projectInfo = this.$store.getters.project;
       if (
         JSON.stringify(projectInfo) != "{}" &&
         projectInfo.projectId == this.subProjectInfo.projectId
       ) {
-        this.projectInfo = projectInfo;        
+        this.projectInfo = projectInfo;
       } else {
         this.axios
           .get(
@@ -1209,7 +1225,7 @@ export default {
           .then(res => {
             if (res.data != "None" && res.data != "Fail") {
               that.projectInfo = res.data[0];
-              that.$store.commit("setProjectInfo", res.data[0]);              
+              that.$store.commit("setProjectInfo", res.data[0]);
             } else {
               console.log(res.data);
             }
@@ -1348,10 +1364,10 @@ export default {
           this.axios
             .post("/GeoProblemSolving/task/save", taskForm)
             .then(res => {
-              if(res.data == "Offline"){
+              if (res.data == "Offline") {
                 this.$store.commit("userLogout");
                 this.$router.push({ name: "Login" });
-              }else if (res.data != "Fail") {
+              } else if (res.data != "Fail") {
                 // 任务更新socket
                 this.socketMsg.whoid = this.$store.getters.userId;
                 this.socketMsg.who = this.$store.getters.userName;
@@ -1379,10 +1395,10 @@ export default {
       this.axios
         .post("/GeoProblemSolving/task/update", taskForm)
         .then(res => {
-          if(res.data == "Offline"){
+          if (res.data == "Offline") {
             this.$store.commit("userLogout");
             this.$router.push({ name: "Login" });
-          }else if (res.data != "None" && res.data != "Fail") {
+          } else if (res.data != "None" && res.data != "Fail") {
             this.socketMsg.whoid = this.$store.getters.userId;
             this.socketMsg.who = this.$store.getters.userName;
             this.socketMsg.type = "tasks";
@@ -1495,10 +1511,10 @@ export default {
           this.axios
             .post("/GeoProblemSolving/task/update", taskForm)
             .then(res => {
-              if(res.data == "Offline"){
+              if (res.data == "Offline") {
                 this.$store.commit("userLogout");
                 this.$router.push({ name: "Login" });
-              }else if (res.data != "None" && res.data != "Fail") {
+              } else if (res.data != "None" && res.data != "Fail") {
                 this.updateTaskList(res.data); // 只更新单个任务
                 this.socketMsg.whoid = this.$store.getters.userId;
                 this.socketMsg.who = this.$store.getters.userName;
@@ -1613,10 +1629,10 @@ export default {
               .post("/GeoProblemSolving/task/update", taskUpdateObj)
               .then(res => {
                 count--;
-                if(res.data == "Offline"){
+                if (res.data == "Offline") {
                   this.$store.commit("userLogout");
                   this.$router.push({ name: "Login" });
-                }else if (res.data != "Fail") {
+                } else if (res.data != "Fail") {
                   //更新数组
                   taskList[stateChangeIndex].managerName = thisUserName;
                   if (this.MoveCount == 0 && count == 1) {
@@ -1636,10 +1652,10 @@ export default {
               .post("/GeoProblemSolving/task/update", taskUpdateObj)
               .then(res => {
                 count--;
-                if(res.data == "Offline"){
+                if (res.data == "Offline") {
                   this.$store.commit("userLogout");
                   this.$router.push({ name: "Login" });
-                }else if (res.data != "Fail") {
+                } else if (res.data != "Fail") {
                   if (this.MoveCount == 0 && count == 1) {
                     this.endMove();
                   }
