@@ -1,6 +1,11 @@
 /**
  * Webrtc相关
  */
+//选择的人的Id
+var userID;
+//在线的成员
+var olParticipants=[];
+
 $(document).ready(function () {
 
     var localView = document.getElementById('vedio-box1');
@@ -10,8 +15,10 @@ $(document).ready(function () {
     var responseBtn = $("#send-response");
     var rejectBtn = $("#send-reject");
     var hangupBtn = $("#send-hangup");
+    var membersList = $("#memberList");
     var localStream;
     var remoteStream;
+    var userID;
 
     //A端：是否收到了B端接受视频的应答；B端：是否应达了A端的视频请求
     var isResponsed = false;
@@ -33,28 +40,36 @@ $(document).ready(function () {
     var ws;
     if(WebSocket)
     {
-        ws = new WebSocket("wss://223.2.44.124:8083/GeoProblemSolving/vedioSocket/"+usrId);
+
+        // let  roomID = sessionStorage.getItem("moduleId");
+        let roomID = "123";
+        //vedioSocket/{usrId}
+        ws = new WebSocket("wss://223.2.44.124:8083/GeoProblemSolving/VideoChatServer/" + roomID);
+        // ws = new WebSocket("wss://223.2.44.124:8083/VideoChatServer/" + roomID);
+        // ws = new WebSocket("wss://172.21.212.72:8082/GeoProblemSolving/VideoChatServer/"+roomID);
+        // ws = new WebSocket("wss://172.21.213.185:8080/GeoProblemSolving/VideoChatServer/"+roomID);
+
     }
 
 
     $("#send-request").on("click",function () {
         displayBtn(cancelBtn);
         isAvailable = false;
-        var request = JSON.stringify({"type": "request"});
+        var request = JSON.stringify({"type": "request","to":userID});
         ws.send(request);
         //超过20秒无应答，用户可重新发起请求
         setTimeout(function reset() {
             if (!isResponsed)
             {
                 isAvailable = true;
-                consoleLog("无应答，请重新发送请求");
+                consoleLog("Request no answer, please send again!");
             }
         },8000);
 
     });
 
     $("#send-response").on("click",function () {
-        var response = JSON.stringify({"type": "response"});
+        var response = JSON.stringify({"type": "response","to":userID});
         //将B端应答状态设置为true，并返回应答
         isResponsed = true;
         hideBtn(responseBtn);
@@ -63,7 +78,7 @@ $(document).ready(function () {
     });
 
     $("#send-cancel").on("click",function () {
-        var cancel = JSON.stringify({"type": "cancel"});
+        var cancel = JSON.stringify({"type": "cancel","to":userID});
         //将A端可用状态设置为true
         isAvailable = true;
         hideBtn(cancelBtn);
@@ -71,7 +86,7 @@ $(document).ready(function () {
     });
 
     $("#send-reject").on("click",function () {
-        var reject = JSON.stringify({"type": "reject"});
+        var reject = JSON.stringify({"type": "reject","to":userID});
         isAvailable = true;
         hideBtn(responseBtn);
         hideBtn(rejectBtn);
@@ -81,7 +96,7 @@ $(document).ready(function () {
     $("#send-hangup").on("click",function () {
         closeConnection();
         resetAll();
-        var hangup = JSON.stringify({"type": "hangup"});
+        var hangup = JSON.stringify({"type": "hangup","to":userID});
         isAvailable = true;
         ws.send(hangup);
     });
@@ -117,7 +132,8 @@ $(document).ready(function () {
             "type": "offer",
             "data": {
                 "desc": peerConnection.localDescription
-            }
+            },
+            "to":userID
         }));
     }
 
@@ -169,7 +185,7 @@ $(document).ready(function () {
         peerConnection.onicecandidate = ({candidate}) =>
         {
             console.log("[发送的candidate] " + JSON.stringify({"type":"candidate","value":candidate}))
-            ws.send(JSON.stringify({"type":"candidate","value":candidate}));
+            ws.send(JSON.stringify({"type":"candidate","value":candidate,"to":userID}));
         };
 
         peerConnection.oniceconnectionstatechange = function (event) {
@@ -184,6 +200,14 @@ $(document).ready(function () {
 
 
     ws.onopen = function(){
+      var userInfo = sessionStorage.getItem("userInfo");
+      var userInfoObject = JSON.parse(userInfo);
+      var userId = userInfoObject.userId;
+      var message = {
+        "type":"connect",
+        "userId": userId
+      };
+        ws.send(JSON.stringify(message));
         initiate();
     }
 
@@ -197,7 +221,7 @@ $(document).ready(function () {
                     //请求到来时，如果B端已处于忙碌状态，返回忙碌
                     if (isAvailable === false)
                     {
-                        ws.send(JSON.stringify({"type": "busy"}));
+                        ws.send(JSON.stringify({"type": "busy","to":userID}));
                     }
                     //如果B是空闲状态
                     else
@@ -286,6 +310,7 @@ $(document).ready(function () {
                         "data": {
                             "desc": peerConnection.localDescription
                         },
+                        "to":userID
                     }));
 
                     remoteView.onloadedmetadata = function(){
@@ -309,6 +334,16 @@ $(document).ready(function () {
                     }
                     break;
                 }
+                case "members":
+                {
+                    var members = message.message
+                        .replace("[", "")
+                        .replace("]", "")
+                        .replace(/\s/g, "")
+                        .split(",");
+
+                    olParticipantChange(members);
+                }
                 default:
                     break;
             }
@@ -329,7 +364,8 @@ $(document).ready(function () {
     }
 
     function consoleLog(log) {
-        $("#ipt-console").val( $("#ipt-console").val() + log);
+        // $("#ipt-console").val( $("#ipt-console").val()  + log);
+        $("#ipt-console").val(log);
     }
 
     function displayBtn(e) {
@@ -381,4 +417,80 @@ $(document).ready(function () {
         return guid;
     }
 
-})
+});
+
+function olParticipantChange(members){
+    let userIndex = -1;
+
+    // 自己刚上线，olParticipants空
+    if (olParticipants.length == 0) {
+        for (var i = 0; i < members.length; i++) {
+                $.ajax({
+                    url:"/GeoProblemSolving/user/inquiry" +
+                    "?key=" +
+                    "userId" +
+                    "&value=" +
+                    members[i],
+                    type:"GET",
+                    success: data => {
+                        if (data != "None" && data != "Fail") {
+                            olParticipants.push(data);
+                            createMmeberList(olParticipants);
+
+                        } else if (data == "None") {
+                        }
+                    },
+                    error: err=>{
+                        console.log(err);
+                    }
+                });
+        }
+    } else {
+        // members大于olParticipants，有人上线；小于olParticipants，离线
+        if (members.length > olParticipants.length) {
+            for (var i = 0; i < members.length; i++) {
+                for (var j = 0; j < olParticipants.length; j++) {
+                    if (members[i] === olParticipants[j].userId) {
+                        break;
+                    }
+                }
+                if (j === olParticipants.length) {
+                    userIndex = i;
+                    break;
+                }
+            }
+
+            // 人员渲染
+            $.ajax({
+                url:"/GeoProblemSolving/user/inquiry" +
+                "?key=" +
+                "userId" +
+                "&value=" +
+                members[userIndex],
+                type:"GET",
+                success: data => {
+                    if (data !== "None" && data !== "Fail") {
+                        olParticipants.push(data);
+                    } else if (data === "None") {
+                    }
+                }
+            });
+        } else if (members.length < olParticipants.length) {
+            for (var i = 0; i < olParticipants.length; i++) {
+                for (var j = 0; j < members.length; j++) {
+                    if (olParticipants[i].userId === members[j]) {
+                        break;
+                    }
+                }
+                if (j === members.length) {
+                    userIndex = i;
+                    break;
+                }
+            }
+            olParticipants.splice(userIndex, 1);
+        }
+    }
+};
+function createMmeberList(list){
+    console.table(list);
+}

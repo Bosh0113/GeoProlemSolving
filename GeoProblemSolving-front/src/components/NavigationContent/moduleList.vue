@@ -2451,11 +2451,12 @@ export default {
           '/GeoProblemSolving/tinymce" style="width: 100%;height:100%"></iframe>';
         toolName = "Text editor";
       } else if (type == "video Tool") {
+        // toolURL =
+        //   '<iframe src="/Collaborative/vedioChat/WebRtcTest.html" style="width: 100%;height:100%"></iframe>';
         toolURL =
-          '<iframe src="/GeoProblemSolving/Collaborative/vedioChat/WebRtcTest.html" style="width: 100%;height:100%"></iframe>';
+           '<iframe src="https://223.2.44.124:8083/GeoProblemSolving/Collaborative/vedioChat/WebRtcTest.html" style="width: 100%;height:100%"></iframe>';
         toolName = "Video Tool";
       }
-
       let panel = jsPanel.create({
         theme: "primary",
         headerTitle: toolName,
@@ -2466,10 +2467,8 @@ export default {
           containment: 5
         },
         callback: function() {
-          // this.content.style.padding = "20px";
         }
       });
-      // panel.resizeit("disable");
       $(".jsPanel-content").css("font-size", "0");
       this.panelList.push(panel);
 
