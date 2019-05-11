@@ -782,7 +782,6 @@
               <Radio label="Private" title="Other users can not find this group."></Radio>
             </RadioGroup>
           </FormItem>
-          <!-- 加入img -->
           <FormItem prop="image" label="Image" :label-width="100">
             <div class="inline_style">
               <div class="demo-upload-list" v-show="pictureUrl!=''">
@@ -1291,7 +1290,11 @@ export default {
           this.axios
             .post("/GeoProblemSolving/subProject/create", SubProject)
             .then(res => {
-              if (res.data != "Fail") {
+              if(res.data == "Offline"){
+                this.$store.commit("userLogout");
+                this.$router.push({ name: "Login" });
+              }
+              else if (res.data != "Fail") {
                 this.$Notice.success({
                   title: "create result",
                   desc: "subproject has been created successfully.",
@@ -1366,7 +1369,11 @@ export default {
             this.newManagerId
         )
         .then(res => {
-          if (res.data != "Fail") {
+          if(res.data == "Offline"){
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          }
+          else if (res.data != "Fail") {
             var newSubProject = res.data;
             var length = this.subProjectList.length;
             var subProjectInfoList = this.subProjectList;
@@ -1381,6 +1388,26 @@ export default {
               }
             }
             //此处缺少权限移交后的通知
+            let replyNotice = {};
+              replyNotice["recipientId"] = this.newManagerId;
+              replyNotice["type"] = "notice";
+              replyNotice["content"] = {
+                title: "Subproject manager",
+                description:
+                  "You have already become the manager of subproject: " + this.subProjectList[this.editSubProjectindex].title + "."
+              };
+              this.axios
+                .post("/GeoProblemSolving/notice/save", replyNotice)
+                .then(result => {
+                  if (result.data == "Success") {
+                    this.$emit("sendNotice", this.newManagerId);
+                  } else {
+                    this.$Message.error("notice fail.");
+                  }
+                })
+                .catch(err => {
+                  this.$Message.error("notice fail.");
+                });
           } else {
             this.$Message.error("Handover management authority failed.");
           }
@@ -1416,7 +1443,11 @@ export default {
           this.axios
             .post("/GeoProblemSolving/subProject/update", obj)
             .then(res => {
-              if (res.data != "Fail") {
+              if(res.data == "Offline"){
+                this.$store.commit("userLogout");
+                this.$router.push({ name: "Login" });
+              }
+              else if (res.data != "Fail") {
                 var newSubProject = res.data;
                 for (var i = 0; i < this.subProjectList.length; i++) {
                   if (
@@ -1454,7 +1485,11 @@ export default {
             deletedSubProjectId
         )
         .then(res => {
-          if (res.data == "Success") {
+          if(res.data == "Offline"){
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          }
+          else if (res.data == "Success") {
             var length = this.subProjectList.length;
             for (var i = 0; i < length; i++) {
               if (this.subProjectList[i].subProjectId == deletedSubProjectId) {
@@ -1485,7 +1520,11 @@ export default {
             queryObject["value"]
         )
         .then(res => {
-          if (res.data === "None") {
+          if(res.data == "Offline"){
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          }
+          else if (res.data == "None"||res.data == "Fail") {
             console.log(res.data);
           } else {
             //改变this的指向，此时this需要赋值给其他变量
@@ -1667,7 +1706,12 @@ export default {
           this.axios
             .post("/GeoProblemSolving/project/update ", form)
             .then(res => {
-              this.getProjectDetail();
+              if(res.data == "Offline"){
+                this.$store.commit("userLogout");
+                this.$router.push({ name: "Login" });
+              }else if(res.data!="Fail"){
+                this.getProjectDetail();//更新后的回调处理有待优化，应该根据返回的新信息重新更新前端数据并渲染，而不是再重新请求数据
+              }
             })
             .catch(err => {
               console.log(err.data);
@@ -1734,13 +1778,22 @@ export default {
             this.currentProjectDetail.projectId
         )
         .then(res => {
-          if (res.data != "Fail") {
-            this.$Notice.success({
-              title: "Notification title",
-              desc: "Delete successfully"
+          if(res.data == "Offline"){
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          }
+          else if(res.data == "Fail"){
+            this.$Notice.error({
+              title: "Error",
+              desc: "Delete project fail."
             });
-            // 删除项目后回退到主页面
-            this.$router.push({ name: "Home" });
+          }
+          if (res.data == "Success") {
+            this.$Notice.success({
+              title: "Success",
+              desc: "Delete project successfully."
+            });
+            this.$router.push({ name: "Projects" });
           }
         })
         .catch(err => {});
@@ -1828,20 +1881,28 @@ export default {
                 data: formData
               })
                 .then(res => {
-                  if (res.data != "Size over" && res.data.length > 0) {
+                  if(res.data == "Offline"){
+                    this.$store.commit("userLogout");
+                    this.$router.push({ name: "Login" });
+                  }else if (res.data != "Size over" && res.data.length > 0) {
                     this.$Notice.open({
-                      title: "Upload notification title",
-                      desc: "File uploaded successfully",
+                      title: "Success",
+                      desc: "File uploaded successfully.",
                     });
-                    //这里重新获取一次该项目下的全部资源
-                    this.addUploadEvent(this.currentProjectDetail.projectId);
-                    this.getAllResource();
-                    this.file = [];
-                    this.fileUploadForm.description = "";
-                    this.fileUploadForm.privacy = "private";
-                    this.fileUploadForm.type = "data";
-                    // 创建一个函数根据pid去后台查询该项目下的资源
+                  }else{
+                    this.$Notice.error({
+                      title: "Error",
+                      desc: "File uploaded fail.",
+                    });
                   }
+                  //这里重新获取一次该项目下的全部资源
+                  this.addUploadEvent(this.currentProjectDetail.projectId);
+                  this.getAllResource();
+                  this.file = [];
+                  this.fileUploadForm.description = "";
+                  this.fileUploadForm.privacy = "private";
+                  this.fileUploadForm.type = "data";
+                  // 创建一个函数根据pid去后台查询该项目下的资源
                   this.progressModalShow = false;
                   this.uploadProgress = 0;
                 })
@@ -1897,18 +1958,20 @@ export default {
             this.removeMemberId
         )
         .then(res => {
-          if (res == "None") {
+          if(res.data == "Offline"){
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          }
+          else if (res.data == "None") {
             this.$Notice.warning({
               title: "Operate result",
               desc: "The project doesn't exist.",
-              duration: 0
             });
           } else {
             this.$Notice.success({
               title: "Operate result",
               desc:
                 "The member has been removed from the project successfully.",
-              duration: 0
             });
             var members = this.currentProjectDetail.members;
             for (var i = 0; i < members.length; i++) {

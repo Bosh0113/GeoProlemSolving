@@ -195,6 +195,24 @@ h1 {
 </template>
 <script>
 export default {
+  beforeRouteEnter: (to, from, next) => {
+    next(vm=>{
+      $.ajax({
+        url: "/GeoProblemSolving/user/state",
+        type: "GET",
+        async: false,
+        success: function (data) {
+            if (!data) {
+              vm.$store.commit("userLogout");
+              vm.$router.push({ name: "Login" });
+            }
+        },
+        error: function (err) {
+            console.log("Get user state fail.");
+        }
+      });
+    });
+  },
   data() {
     return {
       // 控制按钮禁用的
@@ -275,11 +293,14 @@ export default {
           this.axios
             .post("/GeoProblemSolving/project/create", createProjectForm)
             .then(res => {
-              if (res.data === "Fail") {
-                this.$Message.success("Fail");
+              if(res.data == "Offline"){
+                this.$store.commit("userLogout");
+                this.$router.push({ name: "Login" });
+              }
+              else if (res.data === "Fail") {
+                this.$Message.error("Create project fail.");
               } else {
                 this.createProjectId = res.data;
-                this.$Message.success("Success");
                 this.addHistoryEvent(this.createProjectId);
                 this.$router.push({ path: `project/${res.data}` });
               }

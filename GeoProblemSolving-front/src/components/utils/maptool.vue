@@ -1,6 +1,6 @@
 <template>
   <div>
-    <toolStyle
+    <toolStyle  :style="{height:windowHeight+'px'}"
       :participants="participants"
       :resources="resources"
       v-on:resourceUrl="selecetResource"
@@ -40,7 +40,7 @@
         title="Import GeoJSON data to resource center and show the data"
         @on-ok="viewData"
       >
-        <Upload type="drag" :before-upload="handleUpload" action="-">
+        <Upload type="drag" :before-upload="handleUpload" action="-" accept=".json, .zip">
           <div style="padding: 20px 0">
             <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
             <p>Click or drag files here to upload</p>
@@ -98,6 +98,7 @@ import imIcon from "../../../static/Images/import.png";
 import exIcon from "../../../static/Images/export.png";
 //leaflet
 import L from "leaflet";
+import shp from "shpjs";
 import "leaflet/dist/leaflet.css";
 import toolStyle from "./toolStyle";
 // this part resolve an issue where the markers would not appear
@@ -109,7 +110,6 @@ L.Icon.Default.mergeOptions({
   shadowUrl: require("leaflet/dist/images/marker-shadow.png")
 });
 export default {
-  // name: "toolDrawer",
   components: { toolStyle },
   data() {
     return {
@@ -127,8 +127,8 @@ export default {
       uploadDataName: "",
       //存储绘制的图像layer
       drawingLayerGroup: null,
-      participants: [],
-      olparticipants: [],
+      participants: [],      
+      olParticipants: [],
       resources: [],
       dataUrl: "",
       formValidate: {
@@ -147,8 +147,18 @@ export default {
   },
   methods: {
     initSize() {
-      this.windowHeight = window.innerHeight;
-      this.windowWidth = window.innerWidth - 61;
+      if(window.innerHeight > 675){
+        this.windowHeight = window.innerHeight;
+      }
+      else {
+         this.windowHeight = 675;
+      }
+      if(window.innerWidth > 1200){
+        this.windowWidth = window.innerWidth - 60;        
+      }
+      else{
+        this.windowWidth = 1140;
+      }
     },
     initMap() {
       this.tdtVectorMap =
@@ -183,7 +193,7 @@ export default {
     initControl() {
       // 图层控件
       var vectorMap = L.tileLayer(this.tdtVectorMap, {
-        maxZoom: 18,
+        maxZoom: 20,
         attribution:
           '&copy; <a href="http://map.tianditu.gov.cn/">tianditu</a> contributors'
       });
@@ -371,11 +381,15 @@ export default {
               moduleId: sessionStorage.getItem("moduleId")
             };
             formData.append("scope", JSON.stringify(scopeObject));
+            formData.append("privacy", "private");
             let that = this;
             this.axios
               .post("/GeoProblemSolving/resource/upload", formData)
               .then(res => {
-                if (res.data != "Size over" && res.data.length > 0) {
+                if(res.data == "Size over"||res.data == "Fail"||res.data == "Offline"){
+                  console.log(res.data);
+                }
+                else if (res.data.length > 0) {
                   that.showFile = true;
                   that.uploadDataName = filename;
 
@@ -385,16 +399,29 @@ export default {
                     // duration: 0
                   });
 
+                  // 文件列表更新
                   let dataName = res.data[0].fileName;
-                  that.dataUrl =
-                    "/GeoProblemSolving/resource/upload/" + dataName;
-
                   let dataItem = {
                     name: filename,
                     description: "map tool data",
                     pathURL: "/GeoProblemSolving/resource/upload/" + dataName
                   };
                   that.resources.push(dataItem);
+
+                  //文件列表协同
+                  that.send_content = {
+                    type: "resourcesSave",
+                    name: filename,
+                    description: "map tool data",
+                    pathURL: "/GeoProblemSolving/resource/upload/" + dataName
+                  };
+                  that.socketApi.sendSock(that.send_content, that.getSocketConnect);
+
+                  // 初始化formValidation
+                  that.formValidate = {
+                    fileName: "",
+                    fileDescription: ""
+                  };
                 }
               })
               .catch(err => {});
@@ -422,11 +449,15 @@ export default {
         moduleId: sessionStorage.getItem("moduleId")
       };
       formData.append("scope", JSON.stringify(scopeObject));
+      formData.append("privacy", "private");
       let that = this;
       this.axios
         .post("/GeoProblemSolving/resource/upload", formData)
         .then(res => {
-          if (res.data != "Size over" && res.data.length > 0) {
+          if(res.data == "Size over"||res.data == "Fail"||res.data == "Offline"){
+            console.log(res.data);
+          }
+          else if (res.data.length > 0) {
             that.showFile = true;
             that.uploadDataName = file.name;
 
@@ -434,7 +465,7 @@ export default {
             that.dataUrl = "/GeoProblemSolving/resource/upload/" + dataName;
 
             let dataItem = {
-              name: filename,
+              name: dataName,
               description: "map tool data",
               pathURL: "/GeoProblemSolving/resource/upload/" + dataName
             };
@@ -443,7 +474,7 @@ export default {
             //文件列表协同
             that.send_content = {
               type: "resourcesUpdate",
-              name: filename,
+              name: dataName,
               description: "map tool data",
               pathURL: "/GeoProblemSolving/resource/upload/" + dataName
             };
@@ -454,25 +485,51 @@ export default {
       return false;
     },
     viewData() {
-      //从url获取GeoJSON数据
-      var that = this;
-      var xhr = new XMLHttpRequest();
-      xhr.open("GET", this.dataUrl, true);
-      xhr.onload = function(e) {
-        if (this.status == 200) {
-          var file = JSON.parse(this.response);
+      if(/\.(json)$/.test(this.dataUrl.toLowerCase())) {
+        //从url获取GeoJSON数据
+        var that = this;
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", this.dataUrl, true);
+        xhr.onload = function(e) {
+          if (this.status == 200) {
+            var file = JSON.parse(this.response);
 
-          let geoJsonLayer = L.geoJSON(file, {
-            style: function(feature) {
-              return { color: "green" };
-            }
-          }).bindPopup(function(layer) {
-            return layer.feature.properties.description;
+            let geoJsonLayer = L.geoJSON(file, {
+              style: function(feature) {
+                return { color: "green" };
+              }
+            }).bindPopup(function(layer) {
+              return layer.feature.properties.description;
+            });
+            that.drawingLayerGroup.addLayer(geoJsonLayer);
+            //平移至数据位置
+            that.map.fitBounds(geoJsonLayer.getBounds());
+          }
+        };
+        xhr.send();
+      }
+      else if(/\.(zip)$/.test(this.dataUrl.toLowerCase())){
+        try{
+          var that = this;
+          shp(this.dataUrl).then(function(file){            
+            let geoJsonLayer = L.geoJSON(file, {
+                style: function(feature) {
+                  return { color: "orange" };
+                }
+              }).bindPopup(function(layer) {
+                return layer.feature.properties.description;
+              });
+              that.drawingLayerGroup.addLayer(geoJsonLayer);
+              that.map.fitBounds(geoJsonLayer.getBounds());
           });
-          that.drawingLayerGroup.addLayer(geoJsonLayer);
         }
-      };
-      xhr.send();
+        catch(res) {
+          this.$Message.error("Worry data format!");
+        }
+      }
+      else{
+        this.$Message.error("Worry data format!");
+      }
 
       this.showFile = false;
     },
@@ -691,13 +748,13 @@ export default {
             // this.drawingLayerGroup.addLayer(geoJsonLayer);
             // break;
           }
-          case "uploaddata": {
+          case "resourcesUpdate": {
             let dataItem = {
               name: socketMsg.name,
               description: socketMsg.description,
               pathURL:socketMsg.pathURL
             };
-            that.resources.push(dataItem);
+            this.resources.push(dataItem);
 
             var that = this;
             var xhr = new XMLHttpRequest();
@@ -719,18 +776,18 @@ export default {
             xhr.send();
             break;
           }
-          case "resourcesUpdate":{
-            let dataItem = {
-              name: socketMsg.name,
-              description: socketMsg.description,
-              pathURL:socketMsg.pathURL
-            };
-            that.resources.push(dataItem);
-            break;
-          }
           case "selectdata":{
             this.dataUrl = socketMsg.pathURL;
             this.viewData();
+            break;
+          }
+          case "resourcesSave":{
+             let dataItem = {
+                  name: socketMsg.name,
+                  description: socketMsg.description,
+                  pathURL: socketMsg.pathURL
+                };
+                this.resources.push(dataItem);
             break;
           }
         }
@@ -809,7 +866,7 @@ export default {
     },
     startWebSocket() {
       let roomId = sessionStorage.getItem("moduleId");
-      this.socketApi.initWebSocket("MapServer/" + roomId);
+      this.socketApi.initWebSocket("MapServer/" + roomId,this.$store.state.IP_Port);
 
       this.send_content = {
         type: "test",
@@ -821,9 +878,9 @@ export default {
     getResources() {
       this.resources = [];
       let resources = JSON.parse(sessionStorage.getItem("resources"));
-      if(resources.length > 0){
+      if(resources != null && resources != undefined && resources.length > 0){
         for (let i = 0; i < resources.length; i++) {
-              if (resources[i].type == "data") {
+              if (resources[i].type == "data"  && /\.(json|zip)$/.test(resources[i].name.toLowerCase())) {
                 this.resources.push(resources[i]);
               }
             }
@@ -841,7 +898,7 @@ export default {
           // 写渲染函数，取到所有资源
           if (res.data !== "None") {
             for (let i = 0; i < res.data.length; i++) {
-              if (res.data[i].type == "data") {
+              if (res.data[i].type == "data" && /\.(json|zip)$/.test(res.data[i].name.toLowerCase())) {
                 that.resources.push(res.data[i]);
               }
             }

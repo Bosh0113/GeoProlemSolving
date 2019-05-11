@@ -1,44 +1,54 @@
 <template>
 <div>
-  <Row>
-    <Col span="2">
-      <toolstyle></toolstyle>
-    </Col>
-    <Col span="21" offset="1">
-      <div class="layout" style="margin-left:60px">
+    <toolStyle :style="{height:windowHeight+'px'}"
+      :resources="resources"
+      v-on:resourceUrl="selecetResource"
+    ></toolStyle>
+  <div class="layout">    
     <div class="header">
       <div class="logo">
         <span>Drawing</span>
       </div>
       <div class="nav">
-        <Button
-          v-for="tab in tabs"
-          :key="tab.name"
-          :label="tab.name"
-          class="tab demo-flat-button"
-          :icon="tab.icon"
-          @click="tabfun(tab.fun)"
-        >
-          <span>{{tab.name}}</span>
+        <Button label="Clear" class="tab demo-flat-button" icon="md-close" @click="tabfun('clear')">
+          <span>Clear</span>
         </Button>
-        <Button
-          :label="chooseColorBtn"
-          class="tab demo-flat-button"
-          icon="ios-color-palette"
-          @click="setColor()"
-          :color="color.hex"
-        >
-          <span>{{this.chooseColorBtn}}</span>
-        </Button>
-        <a href="javascript:void(0);" ref="download" download="picture.png" v-show="false"></a>
         <Button type="default" class="edit-btn" @click="Drawcancel()">
           <Icon type="md-arrow-round-back"/>
         </Button>
         <Button type="default" class="edit-btn" @click="Drawrestore()">
           <Icon type="md-arrow-round-forward"/>
         </Button>
-        <Button type="default" class="edit-btn" @click="canvas_copy()">Copy</Button>
+        <Button type="default" class="edit-btn" @click="canvas_copy()" style="margin-left:10px">Copy</Button>
         <Button type="default" class="edit-btn" @click="canvas_paste()">Paste</Button>
+        <Button
+          :label="chooseColorBtn"
+          class="tab demo-flat-button"
+          icon="ios-color-palette"
+          @click="setColor()"
+          :color="color.hex"
+          style="margin-left:10px"
+        >
+          <span>{{this.chooseColorBtn}}</span>
+        </Button>
+        <Button
+          label="Download"
+          class="tab demo-flat-button"
+          icon="md-cloud-download"
+          @click="tabfun('save')"
+          style="margin-left:10px"
+        >
+          <span>Download</span>
+        </Button>
+        <a href="javascript:void(0);" ref="download" download="picture.png" v-show="false"></a>
+        <Button
+          label="Download"
+          class="tab demo-flat-button"
+          icon="ios-download"
+          @click="tabfun('resource')"
+        >
+          <span>Save to resources</span>
+        </Button>
       </div>
       <PhotoshopPicker
         v-model="color"
@@ -47,26 +57,19 @@
         @ok="setColor()"
         @cancel="falseColor()"
       />
-      <div class="edit_panel">
-        <Tag color="default" class="tag">default</Tag>
-        <Tag color="primary" class="tag">primary</Tag>
-        <Tag color="success" class="tag">success</Tag>
-      </div>
     </div>
-    <div class="content">
+    <div class="content" :style="{height:windowHeight-56+'px'}">
       <div class="content-left">
         <div class="setterSize">
           <span>Thickness of line:{{penSize}}</span>
-           <Slider v-model="penSize" :step="1" :max="30"></Slider>
+          <Slider v-model="penSize" :step="1" :max="30"></Slider>
           <span>Dotted length:{{lineType[0]}}</span>
-          <Slider  v-model="lineType[0]" :step="1" :max="100"></Slider>
+          <Slider v-model="lineType[0]" :step="1" :max="100"></Slider>
           <span>Dotted interval:{{lineType[1]}}</span>
-          <Slider  v-model="lineType[1]" :step="1" :max="100"></Slider>
+          <Slider v-model="lineType[1]" :step="1" :max="100"></Slider>
         </div>
         <div v-for="tool in tools" :key="tool.index">
           <div class="setting_style" @click="drawType(tool)" :class="{'selected':tool.ischoose}">
-            <!-- 这里图标可能会不显示 -->
-            <!-- <mu-icon size="30" :value="tool.icon" class="icon_style"></mu-icon> -->
             <span class="font_style">{{tool.name}}</span>
           </div>
         </div>
@@ -74,49 +77,77 @@
       <div class="content-right">
         <div
           class="body"
-          :style="{width:canvasSize.width + 'px',height: canvasSize.height + 'px' }"
+          :style="{width:canvasSize.width + 'px', height: canvasSize.height + 'px' }"
         >
           <canvas id="canvas" ref="canvas" :style="{cursor:curcursor}"></canvas>
           <canvas id="canvas_bak" ref="canvas_bak" :style="{cursor:curcursor}"></canvas>
         </div>
       </div>
     </div>
+    <Modal
+      v-model="uploadFileModal"
+      title="Save to resource"
+      @on-ok="save2Resource('formValidate')"
+      ok-text="Submit"
+      cancel-text="Cancel"
+      width="600px"
+    >
+      <Form
+        ref="formValidate"
+        :model="formValidate"
+        :rules="ruleValidate"
+        :label-width="80"
+        style="margin-left:20px"
+      >
+        <FormItem label="Name" prop="fileName">
+          <Input v-model="formValidate.fileName" placeholder="*.png" style="width: 400px"/>
+        </FormItem>
+        <FormItem label="Description" prop="fileDescription">
+          <Input
+            v-model="formValidate.fileDescription"
+            type="textarea"
+            placeholder="Enter something..."
+            style="width: 400px"
+          />
+        </FormItem>
+      </Form>
+    </Modal>
   </div>
-    </Col>
-  </RoW>
-</div>
+  </div>
 </template>
 <script>
-import toolstyle from "./../toolStyle"
 import { Photoshop } from "vue-color";
-import { canvas } from "leaflet";
-// import MuseUI from "./../../../utils/MuseUI";
+import toolStyle from "./toolStyle";
 export default {
-  // name: "draw",
-  components:{toolstyle},
+  components: { 
+    PhotoshopPicker: Photoshop,
+    toolStyle
+  },
   data() {
-    return {
+    return {      
+      windowHeight: window.innerHeight,
       //关于复制
       copyimgdata: "",
-      //关于协同 --by mzy-- point:记录点集，line 记录线，lines记录线集
+      //关于协同 -- point:记录点集，line 记录线，lines记录线集
       points: [],
-      line: [],
       lines: [],
+      storeLines: [], // 用于前进后退
       send_line: [],
       //将canvas的宽高设置好
       canvasSize: {
-        width: window.screen.availWidth - 320,
-        height: window.screen.availHeight * 0.75
+        width: window.screen.availWidth - 380,
+        height: window.screen.availHeight - 180
       },
       canvas: this.$refs.canvas,
       canvasTop: 67,
-      canvasLeft: 300,
+      canvasLeft: 360,
       context: null,
       canvas_bak: this.$refs.canvas_bak,
       context_bak: null,
       ischoosecolor: false,
       toolsToggle: false,
-      chooseColorBtn: "Select Color",
+      chooseColorBtn: "Select color",
+      isMouseDown: false,
       color: {
         hex: "#2196f3",
         hsl: {
@@ -143,8 +174,8 @@ export default {
       lineType: [0, 0],
       canDraw: false,
       curcursor: "auto",
-      cancelList: [],
-      cancelIndex: 0,
+      canvasList: [],
+      storeCanvasList: [],
       tools: [
         {
           name: "Pencil",
@@ -194,10 +225,39 @@ export default {
           icon: "ios-download",
           fun: "save"
         }
-      ]
+      ],
+      uploadFileModal: false,
+      formValidate: {
+        fileName: "",
+        fileDescription: ""
+      },
+      ruleValidate: {
+        fileName: [
+          { required: true, message: "Please select type...", trigger: "blur" }
+        ],
+        fileDescription: [
+          { required: false, message: "Drawing tool", trigger: "blur" }
+        ]
+      },
+      // toolStyle 组件
+      resources: [],
+      dataUrl: "",
     };
   },
-  methods: {
+  methods: {    
+    initSize(){
+      if(window.innerHeight  > 675){  
+        this.windowHeight = window.innerHeight;
+      }
+      else{
+        this.windowHeight = 675;
+      }
+      
+      this.canvasSize = {
+        width: window.screen.availWidth - 380,
+        height: window.screen.availHeight - 180
+      };
+    },
     initCanvas() {
       this.canvas = document.getElementById("canvas");
       this.canvas.width = this.canvasSize.width;
@@ -209,7 +269,7 @@ export default {
       this.context_bak = this.canvas_bak.getContext("2d");
     },
     setColor() {
-      this.chooseColorBtn = this.ischoosecolor ? "Select Color" : "Ok";
+      this.chooseColorBtn = this.ischoosecolor ? "Select color" : "Ok";
       this.ischoosecolor = this.ischoosecolor ? false : true;
       //这里选择后需要将属性传递过去
     },
@@ -248,9 +308,95 @@ export default {
     tabfun(fun) {
       if (fun === "clear") {
         this.clearContext("1");
+
+        this.lines = [];
       } else if (fun === "save") {
         this.downloadImage();
+      } else if (fun === "resource") {
+        this.uploadFileModal = true;
       }
+    },
+    getBlobBydataURI(dataurl) {
+      var arr = dataurl.split(","),
+        mime = arr[0].match(/:(.*?);/)[1],
+        bstr = atob(arr[1]),
+        n = bstr.length,
+        u8arr = new Uint8Array(n);
+      while (n--) {
+        u8arr[n] = bstr.charCodeAt(n);
+      }
+      return new Blob([u8arr], { type: mime });
+    },
+    save2Resource(name) {
+      this.$refs[name].validate(valid => {
+        if (valid) {
+          let imageUrl = this.canvas.toDataURL();
+
+          let filename = "";
+          if (!/\.(png)$/.test(this.formValidate.fileName.toLowerCase())) {
+            filename = this.formValidate.fileName + ".png";
+          } else {
+            filename = this.formValidate.fileName;
+          }
+          let description = "";
+          if (this.formValidate.fileDescription == "") {
+            description = "Drawing tool resource";
+          } else {
+            description = this.formValidate.fileDescription;
+          }
+
+          // base64 转blob
+          let imageForm = new FormData();
+          let userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
+          let imageBlob = this.getBlobBydataURI(imageUrl);
+          var fileOfBlob = new File([imageBlob], filename);
+
+          imageForm.append("file", fileOfBlob);
+          imageForm.append("description", description);
+          imageForm.append("type", "Image");
+          imageForm.append("uploaderId", userInfo.userId);
+          imageForm.append("belong", userInfo.userName);
+          let scopeObject = {
+            projectId: "",
+            subProjectId: "",
+            moduleId: sessionStorage.getItem("moduleId")
+          };
+          imageForm.append("scope", JSON.stringify(scopeObject));
+          imageForm.append("privacy", "private");
+
+          let that = this;
+          this.axios
+            .post("/GeoProblemSolving/resource/upload", imageForm)
+            .then(res => {
+              if (res.data != "Size over" && res.data.length > 0) {
+
+                that.$Notice.open({
+                  title: "Upload notification title",
+                  desc: "File uploaded successfully",
+                  duration: 0
+                });
+
+                // 文件列表更新
+                let dataName = res.data[0].fileName;
+                let dataItem = {
+                  name: filename,
+                  description: "drawing tool data",
+                  pathURL: "/GeoProblemSolving/resource/upload/" + dataName
+                };
+                that.resources.push(dataItem);
+
+                // 初始化formValidation
+                that.formValidate = {
+                  fileName: "",
+                  fileDescription: ""
+                };
+              } 
+            })
+            .catch(err => {});
+        } else {
+          this.$Message.error("Please enter the necessary information!");
+        }
+      });
     },
     draw_graph(graphType) {
       this.canvas_bak.style.zIndex = 1; //蒙版设置在顶层
@@ -260,8 +406,8 @@ export default {
       //鼠标按下获取 开始xy开始画图
       let mousedown = e => {
         e = e || window.event;
-        startX = e.clientX - this.canvasLeft;
-        startY = e.clientY - this.canvasTop;
+        startX = e.clientX - this.canvasLeft + (document.body.scrollLeft+document.documentElement.scrollLeft);
+        startY = e.clientY - this.canvasTop + (document.body.scrollTop+document.documentElement.scrollTop);
 
         //记录轨迹 --by mzy
         this.points = [];
@@ -278,38 +424,56 @@ export default {
           this.penSize,
           this.color.hex
         );
+
+        this.isMouseDown = true;
       };
       //鼠标离开 把蒙版canvas的图片生成到canvas中
       let mouseup = e => {
         e = e || window.event;
-        let x = e.clientX - this.canvasLeft;
-        let y = e.clientY - this.canvasTop;
 
-        this.drawOnMouseup(x, y, graphType);
+        if (this.isMouseDown) {
+          let x = e.clientX - this.canvasLeft + (document.body.scrollLeft+document.documentElement.scrollLeft);
+          let y = e.clientY - this.canvasTop + (document.body.scrollTop+document.documentElement.scrollTop);
+
+          this.drawOnMouseup(x, y, graphType);
+        }
+
+        this.isMouseDown = false;
+
+        let line = {
+          Graphtype: graphType,
+          Linetype: this.lineType,
+          Color: this.color.hex,
+          Pensize: this.penSize,
+          Points: this.points
+        };
+        this.lines.push(line);
       };
       // 鼠标移动
       let mousemove = e => {
-        e = e || window.event; //为了使吸纳多种浏览器兼容
-        let x = e.clientX - this.canvasLeft;
-        let y = e.clientY - this.canvasTop;
+        if (this.isMouseDown) {
+          e = e || window.event; //为了使多种浏览器兼容
+          let x = e.clientX - this.canvasLeft + (document.body.scrollLeft+document.documentElement.scrollLeft);
+          let y = e.clientY - this.canvasTop + (document.body.scrollTop+document.documentElement.scrollTop);
 
-        //记录轨迹 --by mzy
-        let point = {
-          X: x,
-          Y: y
-        };
-        this.points.push(point);
+          //记录轨迹 --by mzy
+          let point = {
+            X: x,
+            Y: y
+          };
+          this.points.push(point);
 
-        this.drawOnMousemove(
-          x,
-          y,
-          startX,
-          startY,
-          graphType,
-          this.lineType,
-          this.penSize,
-          this.color.hex
-        );
+          this.drawOnMousemove(
+            x,
+            y,
+            startX,
+            startY,
+            graphType,
+            this.lineType,
+            this.penSize,
+            this.color.hex
+          );
+        }
       };
       //鼠标离开区域以外 除了涂鸦 都清空
       let mouseout = () => {
@@ -334,7 +498,7 @@ export default {
         this.context_bak.beginPath(); //开始一条路径
       } else if (graphType == "circle") {
         this.context.beginPath();
-        this.context.moveTo(x, y);
+        // this.context.moveTo(x, y);
         this.context.lineTo(x + 2, y + 2);
         this.context.stroke();
       } else if (graphType == "rubber") {
@@ -457,7 +621,7 @@ export default {
           this.saveImageToAry();
         };
         this.context.beginPath();
-        this.context.moveTo(x, y);
+        // this.context.moveTo(x, y);
         this.context.lineTo(x + 2, y + 2);
         this.context.stroke();
       }
@@ -490,62 +654,65 @@ export default {
       this.$refs.download.click();
     },
     cancel() {
-      this.cancelIndex++;
-      this.context.clearRect(
-        0,
-        0,
-        this.canvasSize.width,
-        this.canvasSize.height
-      );
-      let image = new Image();
-      let index = this.cancelList.length - 1 - this.cancelIndex;
-      let url = this.cancelList[index];
-      image.src = url;
-      image.onload = () => {
-        this.context.drawImage(
-          image,
-          0,
-          0,
-          image.width,
-          image.height,
+      if (this.canvasList.length > 0) {
+        this.context.clearRect(
           0,
           0,
           this.canvasSize.width,
           this.canvasSize.height
         );
-      };
+        this.storeCanvasList.push(this.canvasList.pop());
+        let url = this.canvasList[this.canvasList.length - 1];
+        let image = new Image();
+        image.src = url;
+        image.onload = () => {
+          this.context.drawImage(
+            image,
+            0,
+            0,
+            image.width,
+            image.height,
+            0,
+            0,
+            this.canvasSize.width,
+            this.canvasSize.height
+          );
+        };
+      }
     },
     next() {
-      this.cancelIndex--;
-      this.context.clearRect(
-        0,
-        0,
-        this.canvasSize.width,
-        this.canvasSize.height
-      );
-      let image = new Image();
-      let index = this.cancelList.length - 1 - this.cancelIndex;
-      let url = this.cancelList[index];
-      image.src = url;
-      image.onload = () => {
-        this.context.drawImage(
-          image,
-          0,
-          0,
-          image.width,
-          image.height,
+      if (this.storeCanvasList.length > 0) {
+        let image = new Image();
+        this.context.clearRect(
           0,
           0,
           this.canvasSize.width,
           this.canvasSize.height
         );
-      };
+        let url = this.storeCanvasList.pop();
+        this.canvasList.push(url);
+        image.src = url;
+        image.onload = () => {
+          this.context.drawImage(
+            image,
+            0,
+            0,
+            image.width,
+            image.height,
+            0,
+            0,
+            this.canvasSize.width,
+            this.canvasSize.height
+          );
+        };
+      }
     },
     //保存历史 用于撤销
     saveImageToAry() {
-      this.cancelIndex = 0;
+      
       let dataUrl = this.canvas.toDataURL();
-      this.cancelList.push(dataUrl);
+      this.canvasList.push(dataUrl);
+      this.storeCanvasList = [];
     },
     // 处理文件拖入事件，防止浏览器默认事件带来的重定向
     handleDragOver(evt) {
@@ -618,10 +785,17 @@ export default {
       };
     },
     Drawcancel() {
-      this.cancel();
+      if (this.lines.length > 0) {
+        this.cancel();
+        this.storeLines.push(this.lines.pop());
+      }
     },
     Drawrestore() {
-      this.next();
+      if (this.storeLines.length > 0) {
+        this.next();
+        
+        this.lines.push(this.storeLines.pop());
+      }
     },
     canvas_copy() {
       var context = document.getElementById("canvas").getContext("2d");
@@ -634,6 +808,7 @@ export default {
       context.putImageData(this.copyimgdata, 300, 0);
       this.canvas_bak.onmouseup();
     },
+    
     collaDrawLine(line) {
       let pointsLength = line.Points.length;
       let collaGraphType = line.Graphtype;
@@ -663,37 +838,94 @@ export default {
       let eX = line.Points[pointsLength - 1].X;
       let eY = line.Points[pointsLength - 1].Y;
       this.drawOnMouseup(eX, eY, collaGraphType);
+    },    
+    getResources() {
+      this.resources = [];
+      let resources = JSON.parse(sessionStorage.getItem("resources"));
+      if(resources != null && resources != undefined && resources.length > 0){
+        for (let i = 0; i < resources.length; i++) {
+              if (resources[i].type == "Image"  && /\.(jpg|jpeg|png|bmp|gif)$/.test(resources[i].name.toLowerCase())) {
+                this.resources.push(resources[i]);
+              }
+            }
+      }
+      else {
+      var that = this;
+      this.axios
+        .get(
+          "/GeoProblemSolving/resource/inquiry" +
+            "?key=scope.moduleId" +
+            "&value=" +
+            sessionStorage.getItem("moduleId")
+        )
+        .then(res => {
+          // 写渲染函数，取到所有资源
+          if (res.data !== "None") {
+            for (let i = 0; i < res.data.length; i++) {
+              if (res.data[i].type == "Image" && /\.(jpg|jpeg|png|bmp|gif)$/.test(res.data[i].name.toLowerCase())) {
+                that.resources.push(res.data[i]);
+              }
+            }
+          } else {
+            that.resources = [];
+          }
+        })
+        .catch(err => {
+          console.log(err.data);
+        });
+      }
+    },
+    selecetResource(url) {
+      this.dataUrl = url;
+      this.viewData();
+    },
+    viewData() {
+      if(/\.(jpg|jpeg|png|bmp|gif)$/.test(this.dataUrl.toLowerCase())) {
+        let image = new Image();
+              image.src = this.dataUrl;
+              image.onload = () => {
+                this.context.drawImage(
+                  image,
+                  0,
+                  0,
+                  image.width,
+                  image.height,
+                  0,
+                  0,
+                  this.canvasSize.width,
+                  this.canvasSize.height
+                );
+              };
+      }
+      else{
+        this.$Message.error("Worry data format!");
+      }
+
+      this.showFile = false;
     }
-  },
-  components: {
-    PhotoshopPicker: Photoshop
   },
   beforeRouteEnter: (to, from, next) => {
     next(vm => {
       if (!vm.$store.getters.userState || vm.$store.getters.userId == "") {
-        vm.$router.push({name:"Login"});
+        vm.$router.push({ name: "Login" });
       } else {
-
       }
     });
   },
-  created() {
-  },
+  created() {},
   beforeDestroy() {
+    window.removeEventListener("resize", this.initSize);
+    this.canvas_bak.removeEventListener("click", this.falseColor);
   },
   mounted() {
+    this.initSize();
     this.initCanvas();
     this.initDrag();
     this.addkeyBoardlistener();
     this.drawType(this.tools[0]);
+    this.getResources();
     this.canvas_bak.addEventListener("click", this.falseColor);
-    window.addEventListener("resize", () => {
-      this.canvasSize = {
-        width: window.screen.availWidth - 320,
-        height: window.screen.availHeight * 0.75
-      };
-    });
-
+    window.addEventListener("resize", this.initSize);
   }
 };
 </script>
@@ -717,6 +949,7 @@ canvas {
 .layout {
   background-color: rgb(236, 236, 236);
   height: 100%;
+  margin-left:60px;
 }
 .header {
   background-color: #2196f3;
@@ -796,7 +1029,6 @@ canvas {
   display: flex;
 }
 .edit-btn {
-  margin-left: 2.5px;
-  margin-right: 2.5px;
+  margin-right: 5px;
 }
 </style>

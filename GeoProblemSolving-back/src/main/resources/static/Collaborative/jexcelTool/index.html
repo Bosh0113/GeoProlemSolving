@@ -83,7 +83,7 @@
 <body>
 <div id="app">
     <el-container>
-        <el-aside width="25%">
+        <el-aside width="400px">
             <h2>Introduction</h2>
             <p>
                 This table edit tool is offers the following functions to help you create edit
@@ -357,7 +357,7 @@
                         }
                     });
                 }
-                else if (/\S*.xls/.test(filename) || /\S*.xlsx/.test(filename)) {
+                else if (/\S*.xls/.test(name) || /\S*.xlsx/.test(name)) {
                     // 获取数据
                     var xhr = new XMLHttpRequest();
                     xhr.open("GET", "/GeoProblemSolving/resource/upload/" + name, true);

@@ -96,7 +96,8 @@
           <div class="folderContent">
                   <Card v-if="folderNameStack.length>0" :padding="5" dis-hover>
                     <Breadcrumb style="margin-left:5px">
-                      <BreadcrumbItem v-for="(folderName,index) in folderNameStack" :key="index">{{folderName}}</BreadcrumbItem>
+                      <BreadcrumbItem><Icon type="md-folder" /></BreadcrumbItem>
+                      <BreadcrumbItem v-for="(folderName,index) in folderNameStack" :key="index" v-if="index!=0">{{folderName}}</BreadcrumbItem>
                     </Breadcrumb>
                   </Card>
               <div v-if="currentFolder.folders.length>0 || currentFileList.length>0">
@@ -332,7 +333,11 @@ export default {
             this.subProjectId
         )
         .then(res => {
-          if (res.data != "Fail") {
+          if(res.data == "Offline"){
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          }
+          else if (res.data != "Fail") {
             var fileStruct = res.data;
             this.subProjectFileStruct = fileStruct;
             this.currentFolder = fileStruct;
@@ -440,7 +445,10 @@ export default {
                 newFolderName
             )
             .then(res => {
-              if (res.data != "Fail") {
+              if(res.data == "Offline"){
+                this.$store.commit("userLogout");
+                this.$router.push({ name: "Login" });
+              }else if (res.data != "Fail") {
                 this.subProjectFileStruct = res.data;
                 this.refreshCurrentAll(res.data, this.currentFolder.uid);
                 this.newFolderModal = false;
@@ -485,7 +493,10 @@ export default {
               deleteFolderUid
           )
           .then(res => {
-            if (res.data != "Fail") {
+            if(res.data == "Offline"){
+              this.$store.commit("userLogout");
+              this.$router.push({ name: "Login" });
+            }else if (res.data != "Fail") {
               this.subProjectFileStruct = res.data;
               this.refreshCurrentAll(res.data, this.currentFolder.uid);
               //此处添加从项目内删除
@@ -523,7 +534,10 @@ export default {
                 oldFolderInfo.uid
             )
             .then(res => {
-              if (res.data != "Fail") {
+              if(res.data == "Offline"){
+                this.$store.commit("userLogout");
+                this.$router.push({ name: "Login" });
+              }else if (res.data != "Fail") {
                 this.subProjectFileStruct = res.data;
                 this.refreshCurrentAll(res.data, this.currentFolder.uid);
               } else {
@@ -726,7 +740,10 @@ export default {
               deleteFileUid
           )
           .then(res => {
-            if (res.data != "Fail") {
+            if(res.data == "Offline"){
+              this.$store.commit("userLogout");
+              this.$router.push({ name: "Login" });
+            }else if (res.data != "Fail") {
               this.subProjectFileStruct = res.data;
               this.refreshCurrentAll(res.data, this.currentFolder.uid);
             } else {

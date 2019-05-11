@@ -1,5 +1,11 @@
 <template>
-  <div class="layout">
+<div>
+    <toolStyle :style="{height:windowHeight+'px'}"
+     :participants="participants"
+      :resources="resources"
+      v-on:resourceUrl="selecetResource"
+    ></toolStyle>
+  <div class="layout">    
     <div class="header">
       <div class="logo">
         <span>Drawing</span>
@@ -53,7 +59,7 @@
         @cancel="falseColor()"
       />
     </div>
-    <div class="content">
+    <div class="content" :style="{height:windowHeight-56+'px'}">
       <div class="content-left">
         <div class="setterSize">
           <span>Thickness of line:{{penSize}}</span>
@@ -107,7 +113,7 @@
         </FormItem>
       </Form>
     </Modal>
-    <toolStyle></toolStyle>
+  </div>
   </div>
 </template>
 <script>
@@ -115,10 +121,13 @@ import { Photoshop } from "vue-color";
 import * as socketApi from "./../../api/socket.js";
 import toolStyle from "./toolStyle";
 export default {
-  // name: "toolDrawer",
-  components: { toolStyle },
+  components: { 
+    PhotoshopPicker: Photoshop,
+    toolStyle
+  },
   data() {
-    return {
+    return {      
+      windowHeight: window.innerHeight,
       //关于复制
       copyimgdata: "",
       //关于协同 -- point:记录点集，line 记录线，lines记录线集
@@ -128,12 +137,12 @@ export default {
       send_line: [],
       //将canvas的宽高设置好
       canvasSize: {
-        width: window.screen.availWidth - 320,
+        width: window.screen.availWidth - 380,
         height: window.screen.availHeight - 180
       },
       canvas: this.$refs.canvas,
       canvasTop: 67,
-      canvasLeft: 300,
+      canvasLeft: 360,
       context: null,
       canvas_bak: this.$refs.canvas_bak,
       context_bak: null,
@@ -232,10 +241,28 @@ export default {
           { required: false, message: "Drawing tool", trigger: "blur" }
         ]
       },
-      socketLineStore:[]
+      socketLineStore:[],
+      // toolStyle 组件
+      participants: [],      
+      olParticipants: [],
+      resources: [],
+      dataUrl: "",
     };
   },
-  methods: {
+  methods: {    
+    initSize(){
+      if(window.innerHeight  > 675){  
+        this.windowHeight = window.innerHeight;
+      }
+      else{
+        this.windowHeight = 675;
+      }
+      
+      this.canvasSize = {
+        width: window.screen.availWidth - 380,
+        height: window.screen.availHeight - 180
+      };
+    },
     initCanvas() {
       this.canvas = document.getElementById("canvas");
       this.canvas.width = this.canvasSize.width;
@@ -346,17 +373,45 @@ export default {
             moduleId: sessionStorage.getItem("moduleId")
           };
           imageForm.append("scope", JSON.stringify(scopeObject));
+          imageForm.append("privacy", "private");
 
           let that = this;
           this.axios
             .post("/GeoProblemSolving/resource/upload", imageForm)
             .then(res => {
-              if (res.data != "Size over" && res.data.length > 0) {
+              if(res.data == "Size over"||res.data == "Fail"||res.data == "Offline"){
+                console.log(res.data);
+              }
+              else if (res.data.length > 0) {
                 that.$Notice.open({
                   title: "Upload notification title",
                   desc: "File uploaded successfully",
                   // duration: 0
                 });
+
+                // 文件列表更新
+                let dataName = res.data[0].fileName;
+                let dataItem = {
+                  name: filename,
+                  description: "drawing tool data",
+                  pathURL: "/GeoProblemSolving/resource/upload/" + dataName
+                };
+                that.resources.push(dataItem);
+                
+                //文件列表协同
+                that.send_content = {
+                  type: "imageSave",
+                  name: filename,
+                  description: "drawing tool data",
+                  pathURL: "/GeoProblemSolving/resource/upload/" + dataName
+                };
+                that.socketApi.sendSock(that.send_content, that.getSocketConnect);
+                
+                // 初始化formValidation
+                that.formValidate = {
+                  fileName: "",
+                  fileDescription: ""
+                };
               }
             })
             .catch(err => {});
@@ -373,8 +428,8 @@ export default {
       //鼠标按下获取 开始xy开始画图
       let mousedown = e => {
         e = e || window.event;
-        startX = e.clientX - this.canvasLeft;
-        startY = e.clientY - this.canvasTop;
+        startX = e.clientX - this.canvasLeft + (document.body.scrollLeft+document.documentElement.scrollLeft);
+        startY = e.clientY - this.canvasTop + (document.body.scrollTop+document.documentElement.scrollTop);
 
         //记录轨迹 --by mzy
         this.points = [];
@@ -399,8 +454,8 @@ export default {
         e = e || window.event;
 
         if (this.isMouseDown) {
-          let x = e.clientX - this.canvasLeft;
-          let y = e.clientY - this.canvasTop;
+          let x = e.clientX - this.canvasLeft + (document.body.scrollLeft+document.documentElement.scrollLeft);
+          let y = e.clientY - this.canvasTop + (document.body.scrollTop+document.documentElement.scrollTop);
 
           this.drawOnMouseup(x, y, graphType);
         }
@@ -432,8 +487,8 @@ export default {
       let mousemove = e => {
         if (this.isMouseDown) {
           e = e || window.event; //为了使多种浏览器兼容
-          let x = e.clientX - this.canvasLeft;
-          let y = e.clientY - this.canvasTop;
+          let x = e.clientX - this.canvasLeft + (document.body.scrollLeft+document.documentElement.scrollLeft);
+          let y = e.clientY - this.canvasTop + (document.body.scrollTop+document.documentElement.scrollTop);
 
           //记录轨迹 --by mzy
           let point = {
@@ -713,6 +768,7 @@ export default {
     handleFileSelect(evt) {
       evt.stopPropagation();
       evt.preventDefault();
+
       let files = evt.dataTransfer.files;
       for (let i = 0, f; (f = files[i]); i++) {
         let t = f.type ? f.type : "n/a";
@@ -801,54 +857,75 @@ export default {
     },
     getSocketConnect(data) {
       let lineData = data;
-      if (!this.isMouseDown) {
 
-        if (lineData.from === "Test") {
-          console.log(lineData.content);
-        } else if (lineData.type === "members") {
-        } else if (lineData.type === "drawing") {
-          //画面协同更新
-          if (lineData.content !== {}) {
-
-            let line = lineData.content;
-            this.collaDrawLine(line);
-            // 存储笔划
-            this.lines.push(line);
-
-            this.storeCanvasList = [];
+      if (lineData.from === "Test") {
+        console.log(lineData.content);
+      } else if (lineData.type === "members") {
+        let members = data.message
+          .replace("[", "")
+          .replace("]", "")
+          .replace(/\s/g, "")
+          .split(",");
+        this.olParticipants = members;
+        this.olParticipantChange();      
+      } else if(lineData.type === "imageSave"){            
+            let dataItem = {
+                  name: lineData.name,
+                  description: lineData.description,
+                  pathURL: lineData.pathURL
+                };
+                this.resources.push(dataItem);
+          } 
+          else if(lineData.type === "selectdata"){
+            this.dataUrl = lineData.pathURL;
+            this.viewData();
           }
-        } else if (lineData.type === "clear") {
-          //画面协同更新
-          this.clearContext("1");
-          this.lines = [];
-        } else if (lineData.type === "last") {
-          //画面协同更新
-          this.cancel();
+      else {
+        if (!this.isMouseDown) {
+          if (lineData.type === "drawing") {
+            //画面协同更新
+            if (lineData.content !== {}) {
 
-          if (this.lines.length > 0) {
-            this.storeLines.push(this.lines.pop());
-          }
-        } else if (lineData.type === "next") {
-          //画面协同更新
-          this.next();
-
-          if (this.storeLines.length > 0) {
-            this.lines.push(this.storeLines.pop());
-          }
-        } else if (lineData.type == undefined && lineData.length > 0) {
-          for (let i = 0; i < lineData.length; i++) {
-            if (lineData[i].content != {}) {
-              let line = lineData[i].content;
+              let line = lineData.content;
               this.collaDrawLine(line);
               // 存储笔划
               this.lines.push(line);
+
+              this.storeCanvasList = [];
+            }
+          } else if (lineData.type === "clear") {
+            //画面协同更新
+            this.clearContext("1");
+            this.lines = [];
+          } else if (lineData.type === "last") {
+            //画面协同更新
+            this.cancel();
+
+            if (this.lines.length > 0) {
+              this.storeLines.push(this.lines.pop());
+            }
+          } else if (lineData.type === "next") {
+            //画面协同更新
+            this.next();
+
+            if (this.storeLines.length > 0) {
+              this.lines.push(this.storeLines.pop());
+            }
+          } else if (lineData.type == undefined && lineData.length > 0) {
+            // 读取缓存里的笔划
+            for (let i = 0; i < lineData.length; i++) {
+              if (lineData[i].content != {}) {
+                let line = lineData[i].content;
+                this.collaDrawLine(line);
+                // 存储笔划
+                this.lines.push(line);
+              }
             }
           }
         }
-
-      }
-      else{
-        this.socketLineStore.push(lineData);
+        else{
+          this.socketLineStore.push(lineData);
+        }
       }
     },
     collaDrawLine(line) {
@@ -883,7 +960,7 @@ export default {
     },
     startWebSocket() {
       let roomId = sessionStorage.getItem("moduleId");
-      this.socketApi.initWebSocket("DrawServer/" + roomId);
+      this.socketApi.initWebSocket("DrawServer/" + roomId,this.$store.state.IP_Port);
 
       this.send_msg = {
         type: "test",
@@ -891,10 +968,151 @@ export default {
         content: "TestChat"
       };
       this.socketApi.sendSock(this.send_msg, this.getSocketConnect);
+    },
+    //toolStyle 组件
+    olParticipantChange() {
+      let userIndex = -1;
+
+      // 自己刚上线，olParticipants空
+      if (this.participants.length == 0) {
+        var that = this;
+        for (let i = 0; i < this.olParticipants.length; i++) {
+          this.axios
+            .get(
+              "/GeoProblemSolving/user/inquiry" +
+                "?key=" +
+                "userId" +
+                "&value=" +
+                this.olParticipants[i]
+            )
+            .then(res => {
+              if (res.data != "None" && res.data != "Fail") {
+                that.participants.push(res.data);
+              } else if (res.data == "None") {
+              }
+            });
+        }
+      } else {
+        // members大于olParticipants，有人上线；小于olParticipants，离线
+        if (this.olParticipants.length > this.participants.length) {
+          for (var i = 0; i < this.olParticipants.length; i++) {
+            for (var j = 0; j < this.participants.length; j++) {
+              if (this.olParticipants[i] == this.participants[j].userId) {
+                break;
+              }
+            }
+            if (j == this.participants.length) {
+              userIndex = i;
+              break;
+            }
+          }
+
+          // 人员渲染
+          var that = this;
+          this.axios
+            .get(
+              "/GeoProblemSolving/user/inquiry" +
+                "?key=" +
+                "userId" +
+                "&value=" +
+                this.olParticipants[userIndex]
+            )
+            .then(res => {
+              if (res.data != "None" && res.data != "Fail") {
+                that.participants.push(res.data);
+                if (userIndex != -1) {
+                }
+              } else if (res.data == "None") {
+              }
+            });
+        } else if (this.olParticipants.length < this.participants.length) {
+          for (var i = 0; i < this.participants.length; i++) {
+            for (var j = 0; j < this.olParticipants.length; j++) {
+              if (this.participants[i].userId == this.olParticipants[j]) {
+                break;
+              }
+            }
+            if (j == this.olParticipants.length) {
+              userIndex = i;
+              break;
+            }
+          }
+          this.participants.splice(userIndex, 1);
+        }
+      }
+    },
+    getResources() {
+      this.resources = [];
+      let resources = JSON.parse(sessionStorage.getItem("resources"));
+      if(resources != null && resources != undefined && resources.length > 0){
+        for (let i = 0; i < resources.length; i++) {
+              if (resources[i].type == "Image"  && /\.(jpg|jpeg|png|bmp|gif)$/.test(resources[i].name.toLowerCase())) {
+                this.resources.push(resources[i]);
+              }
+            }
+      }
+      else {
+      var that = this;
+      this.axios
+        .get(
+          "/GeoProblemSolving/resource/inquiry" +
+            "?key=scope.moduleId" +
+            "&value=" +
+            sessionStorage.getItem("moduleId")
+        )
+        .then(res => {
+          // 写渲染函数，取到所有资源
+          if (res.data !== "None") {
+            for (let i = 0; i < res.data.length; i++) {
+              if (res.data[i].type == "Image" && /\.(jpg|jpeg|png|bmp|gif)$/.test(res.data[i].name.toLowerCase())) {
+                that.resources.push(res.data[i]);
+              }
+            }
+          } else {
+            that.resources = [];
+          }
+        })
+        .catch(err => {
+          console.log(err.data);
+        });
+      }
+    },
+    selecetResource(url) {
+      this.dataUrl = url;
+      this.viewData();
+
+      // 协同
+      this.send_content = {
+        type: "selectdata",
+        pathURL: this.dataUrl
+      };
+      this.socketApi.sendSock(this.send_content, this.getSocketConnect);
+
+    },
+    viewData() {
+      if(/\.(jpg|jpeg|png|bmp|gif)$/.test(this.dataUrl.toLowerCase())) {
+        let image = new Image();
+              image.src = this.dataUrl;
+              image.onload = () => {
+                this.context.drawImage(
+                  image,
+                  0,
+                  0,
+                  image.width,
+                  image.height,
+                  0,
+                  0,
+                  this.canvasSize.width,
+                  this.canvasSize.height
+                );
+              };
+      }
+      else{
+        this.$Message.error("Worry data format!");
+      }
+
+      this.showFile = false;
     }
-  },
-  components: {
-    PhotoshopPicker: Photoshop
   },
   beforeRouteEnter: (to, from, next) => {
     next(vm => {
@@ -907,20 +1125,19 @@ export default {
   created() {},
   beforeDestroy() {
     this.socketApi.close();
+    window.removeEventListener("resize", this.initSize);
+    this.canvas_bak.removeEventListener("click", this.falseColor);
   },
   mounted() {
+    this.initSize();
     this.initCanvas();
     this.initDrag();
     this.addkeyBoardlistener();
     this.drawType(this.tools[0]);
+    this.getResources();
     this.canvas_bak.addEventListener("click", this.falseColor);
     this.startWebSocket();
-    window.addEventListener("resize", () => {
-      this.canvasSize = {
-        width: window.screen.availWidth - 320,
-        height: window.screen.availHeight - 180
-      };
-    });
+    window.addEventListener("resize", this.initSize);
   }
 };
 </script>
@@ -944,6 +1161,7 @@ canvas {
 .layout {
   background-color: rgb(236, 236, 236);
   height: 100%;
+  margin-left:60px;
 }
 .header {
   background-color: #2196f3;

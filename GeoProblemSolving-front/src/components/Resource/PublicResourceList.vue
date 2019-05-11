@@ -62,7 +62,7 @@
             </MenuGroup>
           </Menu>
         </div>
-        <div class="resourcePanel">
+        <div class="resourcePanel" style="margin-left:-20px">
           <div style="height:20px"></div>
           <div class="resourcePanel">
             <Row>
@@ -183,15 +183,22 @@ export default {
           tooltip: true
         },
         {
+          title:"Provider",
+          key:"uploaderName",
+          width: 90,
+          tooltip: true,
+          align: "center"
+        },
+        {
           title: "Upload time",
           key: "uploadTime",
-          width: 160,
+          width: 150,
           sortable: true
         },
         {
           title: "Action",
           slot: "action",
-          width: 120,
+          width: 95,
           align: "center"
         }
       ],

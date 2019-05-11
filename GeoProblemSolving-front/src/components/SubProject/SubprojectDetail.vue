@@ -34,11 +34,8 @@
   padding: 5px;
 }
 .memebr-work {
-  width: 70%;
+  width: 65%;
   height: 60px;
-  /* padding:10px 2.5px 10px 2.5px;
-  margin-top:5px; */
-  /* margin: 0 5px; */
 }
 .userName {
   margin-top: 10px;
@@ -973,7 +970,10 @@ export default {
           type: "GET",
           async: false,
           success: data => {
-            if (data != "None") {
+            if(data == "Offline"){
+              this.$store.commit("userLogout");
+              this.$router.push({ name: "Login" });
+            }else if (data != "None"&&data!="Fail") {
               subProjectInfo = data[0];
               this.$set(this, "subProjectInfo", subProjectInfo);
               sessionStorage.setItem(
@@ -1068,11 +1068,7 @@ export default {
       }
       let roomId = this.subProjectInfo.subProjectId + "task";
       // var subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + roomId;
-      var subprojectSocketURL =
-        "ws://" +
-        this.$store.state.IP_Port +
-        "/GeoProblemSolving/Module/" +
-        roomId;
+      var subprojectSocketURL = "ws://"+this.$store.state.IP_Port+"/GeoProblemSolving/Module/" + roomId;
       this.subprojectSocket = new WebSocket(subprojectSocketURL);
       this.subprojectSocket.onopen = this.onOpen;
       this.subprojectSocket.onmessage = this.onMessage;
@@ -1178,7 +1174,9 @@ export default {
           userName: projectInfo.managerName,
           userId: projectInfo.managerId
         };
-        allMembers.unshift(manager);
+        if(allMembers[0].userId!=manager.userId){
+          allMembers.unshift(manager);
+        }
         for (let i = 0; i < allMembers.length; i++) {
           let exist = false;
           for (let j = 0; j < that.participants.length; j++) {
@@ -1359,7 +1357,10 @@ export default {
           this.axios
             .post("/GeoProblemSolving/task/save", taskForm)
             .then(res => {
-              if (res.data != "Fail") {
+              if(res.data == "Offline"){
+                this.$store.commit("userLogout");
+                this.$router.push({ name: "Login" });
+              }else if (res.data != "Fail") {
                 // 任务更新socket
                 this.socketMsg.whoid = this.$store.getters.userId;
                 this.socketMsg.who = this.$store.getters.userName;
@@ -1387,7 +1388,10 @@ export default {
       this.axios
         .post("/GeoProblemSolving/task/update", taskForm)
         .then(res => {
-          if (res.data != "None" && res.data != "Fail") {
+          if(res.data == "Offline"){
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          }else if (res.data != "None" && res.data != "Fail") {
             this.socketMsg.whoid = this.$store.getters.userId;
             this.socketMsg.who = this.$store.getters.userName;
             this.socketMsg.type = "tasks";
@@ -1500,7 +1504,10 @@ export default {
           this.axios
             .post("/GeoProblemSolving/task/update", taskForm)
             .then(res => {
-              if (res.data != "None" && res.data != "Fail") {
+              if(res.data == "Offline"){
+                this.$store.commit("userLogout");
+                this.$router.push({ name: "Login" });
+              }else if (res.data != "None" && res.data != "Fail") {
                 this.updateTaskList(res.data); // 只更新单个任务
                 this.socketMsg.whoid = this.$store.getters.userId;
                 this.socketMsg.who = this.$store.getters.userName;
@@ -1615,7 +1622,10 @@ export default {
               .post("/GeoProblemSolving/task/update", taskUpdateObj)
               .then(res => {
                 count--;
-                if (res.data != "Fail") {
+                if(res.data == "Offline"){
+                  this.$store.commit("userLogout");
+                  this.$router.push({ name: "Login" });
+                }else if (res.data != "Fail") {
                   //更新数组
                   taskList[stateChangeIndex].managerName = thisUserName;
                   if (this.MoveCount == 0 && count == 1) {
@@ -1635,7 +1645,10 @@ export default {
               .post("/GeoProblemSolving/task/update", taskUpdateObj)
               .then(res => {
                 count--;
-                if (res.data != "Fail") {
+                if(res.data == "Offline"){
+                  this.$store.commit("userLogout");
+                  this.$router.push({ name: "Login" });
+                }else if (res.data != "Fail") {
                   if (this.MoveCount == 0 && count == 1) {
                     this.endMove();
                   }

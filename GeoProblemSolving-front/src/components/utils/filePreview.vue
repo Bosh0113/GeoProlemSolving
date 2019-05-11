@@ -12,7 +12,6 @@
 .sidebar{
   width:60px;
   background-color:#515a6e;
-  height:100%;
   justify-content:center;
   position: absolute
 }
@@ -20,10 +19,14 @@
   flex:1;
   height:100%
 }
+.noDetail h1 {
+  color: darkgray;
+  text-align: center;
+}
 </style>
 <template>
-  <div style="display:flex">
-    <div class="sidebar" style="width:60px;float:left">      
+  <div>
+    <div class="sidebar" style="width:60px;float:left" :style="{height:windowHeight+'px'}">      
       <div style="display:flex;justify-content:center;margin-top:20px" title="Resources">
         <span @click="resourceDrawer=true" style="cursor:pointer"><Icon type="md-folder" :size="40" color="white"/></span>
         </span>
@@ -43,14 +46,23 @@
         </Drawer>
       </div>
     </div>
-    <div :style="{height:windowHeight+'px'}" style="width:60px;flex:1;float:left;margin-left:40px">
-    </div>
-    <iframe :width="fileWidth" :height="fileHeight" :src="fileURL" class="pfdPanel">
-      This browser does not support Files. Please download the file to view it:
-      <a
-        :href="fileURL"
-      >Download file</a>
-    </iframe>
+    <div :style="{height:windowHeight+'px'}" style="margin-left:60px">
+      <template v-if="fileURL != ''" class="pfdPanel">
+      <iframe :width="fileWidth" :height="fileHeight-5" :src="fileURL">
+        This browser does not support Files. Please download the file to view it:
+        <a
+          :href="fileURL"
+        >Download file</a>
+      </iframe>
+    </template>
+    <template v-else  class="pfdPanel">
+      <div :style="{height:fileHeight+'px', width:fileWidth+'px'}" >
+        <Card class="noDetail">
+                <h1>No file selected</h1>
+              </Card>
+      </div>
+    </template>
+    </div>    
   </div>
 </template>
 <script>
@@ -58,9 +70,9 @@ export default {
   components: { },
   data() {
     return {
-      windowHeight: "",
-      fileWidth: 100,
-      fileHeight: 100,
+      windowHeight: window.innerHeight,
+      fileWidth: window.innerWidth - 60,
+      fileHeight: window.innerHeight,
       paperList: [],
       documentList: [],
       fileURL: "",
@@ -88,15 +100,26 @@ export default {
   },
   methods: {
     initSize() {
-      this.windowHeight = window.innerHeight;
-      this.fileWidth = window.innerWidth - 60;
-      this.fileHeight = window.innerHeight;
+      if(window.innerHeight > 675) {
+        this.windowHeight = window.innerHeight;
+        this.fileHeight = window.innerHeight;
+      }
+      else{
+        this.windowHeight = 675;
+        this.fileHeight = 675;
+      }
+      if(window.innerWidth >1200){
+        this.fileWidth = window.innerWidth - 60;
+      }
+      else{
+        this.fileWidth = 1200;
+      }
     },
     getResource() {
       this.paperList = [];
       this.documentList = [];
       let resources = JSON.parse(sessionStorage.getItem("resources"));
-      if (resources.length > 0) {
+      if (resources != null && resources != undefined && resources.length > 0) {
         for (let i = 0; i < resources.length; i++) {
           if (resources[i].type == "paper") {
             this.paperList.push(resources[i]);
@@ -166,11 +189,15 @@ export default {
         moduleId: sessionStorage.getItem("moduleId")
       };
       formData.append("scope", JSON.stringify(scopeObject));
+      formData.append("privacy", "private");
       let that = this;
       this.axios
         .post("/GeoProblemSolving/resource/upload", formData)
         .then(res => {
-          if (res.data != "Size over" && res.data.length > 0) {
+          if(res.data == "Size over"||res.data == "Fail"||res.data == "Offline"){
+            console.log(res.data);
+          }
+          else if (res.data.length > 0) {
             let fileName = res.data[0].fileName;
             that.fileURL = "/GeoProblemSolving/resource/upload/" + fileName;
 
@@ -192,7 +219,7 @@ export default {
       return false;
     },
     selectResource(url){
-      this.fileURL = "http://172.21.212.7:8012/previewFile?url="+'http://'+this.$store.state.IP_Port+url;
+      this.fileURL = 'http://'+this.$store.state.IP_Port+url;
     }
   }
 };

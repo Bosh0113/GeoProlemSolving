@@ -250,8 +250,9 @@ export default {
                 this.$Message.error("Invalid account or password.");
               } else {
                 this.$store.commit("userLogin", res.data);
-                // setTimeout(this.goBack, 100);
-                this.$router.push({ name: "Home" });
+                //这个地方到底应该怎么跳转？？
+                this.$router.go(-1);
+                // this.$router.push({ name: "Home" });
               }
             });
         } else {

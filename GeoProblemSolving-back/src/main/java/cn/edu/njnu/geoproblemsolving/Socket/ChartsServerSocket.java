@@ -33,7 +33,7 @@ public class ChartsServerSocket {
         else {
             rooms.get(roomId).put(httpSession.getAttribute("userId").toString(), this);
         }
-//        broadcastMembersToRoom(roomId);
+        broadcastMembersToRoom(roomId);
 
     }
     //接收消息后所调用的方法
@@ -51,7 +51,7 @@ public class ChartsServerSocket {
                 break;
             }
         }
-//        broadcastMembersToRoom(roomId);
+        broadcastMembersToRoom(roomId);
     }
     @OnError
     public void onError(@PathParam("roomId") String roomId,Throwable error)
@@ -62,7 +62,7 @@ public class ChartsServerSocket {
                 break;
             }
         }
-//        broadcastMembersToRoom(roomId);
+        broadcastMembersToRoom(roomId);
     }
 
 

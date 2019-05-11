@@ -161,12 +161,12 @@ footer {
             <MenuItem
               name="personal"
               style="width:100px"
-              to="/personalPage"
             >
             <Dropdown
               @on-click="changeSelect"
               placement="bottom-start"
             >
+            <div @click="toPersonalPage">
               <img
                 v-bind:src="avatar"
                 v-if="avatar!=''&&avatar!=undefined&&avatar!=null"
@@ -180,6 +180,7 @@ footer {
                 :title="userName"
                 v-else
               ></avatar>
+            </div>
               <DropdownMenu slot="list">
                 <!-- <DropdownItem name="personalPage">User Space</DropdownItem> -->
                 <DropdownItem name="logout">Log out</DropdownItem>
@@ -260,7 +261,12 @@ export default {
   },
   methods: {
     reSize() {
-      this.contentHeight = window.innerHeight - 120 + "px";
+      if(window.innerHeight > 675) {
+        this.contentHeight = window.innerHeight - 120 + "px";
+      }
+      else{
+        this.contentHeight = 675;
+      }
     },
     turnContent(name) {
       if (name === "home") {
@@ -290,6 +296,9 @@ export default {
         this.$router.push({ name: "Notifications" });
       } else if (name === "personal") {
       }
+    },
+    toPersonalPage(){
+      this.$router.push({ name: "PersonalPage" });
     },
     // 获取到通知的数量
     getUnreadNoticeCount() {
@@ -322,8 +331,7 @@ export default {
         this.noticeSocket = null;
       }
       // var noticeSocketURL = "ws://localhost:8081/GeoProblemSolving/NoticeSocket";
-      var noticeSocketURL =
-        "ws://" + this.$store.state.IP_Port + "/GeoProblemSolving/NoticeSocket";
+      var noticeSocketURL = "ws://"+this.$store.state.IP_Port+"/GeoProblemSolving/NoticeSocket";
       this.noticeSocket = new WebSocket(noticeSocketURL);
       this.noticeSocket.onopen = this.onOpen;
       this.noticeSocket.onmessage = this.onMessage;
