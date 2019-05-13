@@ -53,7 +53,7 @@ footer {
   font-weight: bold;
 }
 .menuItem:first-child {
-  margin-left: 25%;
+  /* margin-left: 25%; */
 }
 .userImg {
   width: 40px;
