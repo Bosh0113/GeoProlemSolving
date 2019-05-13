@@ -198,7 +198,7 @@ $(document).ready(function () {
                 peerConnection.iceConnectionState === "disconnected" ||
                 peerConnection.iceConnectionState === "closed") {
                 console.error(event);
-                console.error("连接中断请刷新");
+                console.error("Connection interruption please refresh");
             }
         };
     }
@@ -230,7 +230,7 @@ $(document).ready(function () {
                     {
                         //否则将B设置为忙碌状态
                         isAvailable = false;
-                        consoleLog("有视频聊天请求...");
+                        consoleLog("There is a video chat request...");
                         displayBtn(responseBtn);
                         displayBtn(rejectBtn);
                         hideBtn(requestBtn);
@@ -259,11 +259,11 @@ $(document).ready(function () {
                 }
                 case "busy":
                 {
-                    consoleLog("对方忙线...");break;
+                    consoleLog("The other side is busy...");break;
                 }
                 case "cancel":
                 {
-                    consoleLog("对方已取消...");
+                    consoleLog("The other side has canceled...");
                     hideBtn(responseBtn);
                     hideBtn(rejectBtn);
                     isResponsed = true;
@@ -272,14 +272,14 @@ $(document).ready(function () {
                 }
                 case "reject":
                 {
-                    consoleLog("对方已拒绝...");
+                    consoleLog("The other side has refused...");
                     isResponsed = true;
                     isAvailable = true;
                     break;
                 }
                 case "hangup":
                 {
-                    consoleLog("对方已挂断...");
+                    consoleLog("The other side has hung up...");
                     resetAll();
                     break;
                 }
@@ -300,7 +300,7 @@ $(document).ready(function () {
                         await localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
                     }
                     catch (e) {
-                        alert("系统未检测到摄像头！");
+                        alert("System does not detect the camera!！");
                         console.error(e);
                     }
 
@@ -517,7 +517,10 @@ $(document).ready(function () {
   }
   function chooseSomeOne(userInfoStr){
     var userInfo = JSON.parse(userInfoStr);
-    confirm(userInfo.userName);
+    // confirm(userInfo.userName);
     userID = userInfo.userId;
+    // 获取到userId
+    // 点击按钮后顶部会出现该人的详细信息
+    $("#videoMember").val(userInfo.userName);
   }
 });
