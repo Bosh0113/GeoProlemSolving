@@ -321,10 +321,16 @@ export default {
           key: "value"
         }
       ],
-      selectedFileData: []
+      selectedFileData: [],
+      panel:null
     };
-  },
+  }, 
   methods: {
+    closePanel() {
+      if (this.panel != null) {
+        this.panel.close();
+      }
+    },
     getSubProjectfileStruct() {
       this.axios
         .get(
@@ -658,7 +664,8 @@ export default {
           headerControls: {
             smallify: "remove"
           },
-          theme: "light",
+          theme: "primary",
+          footerToolbar: '<p style="height:10px"></p>',
           headerTitle: "Preview",
           contentSize: "800 600",
           content: toolURL,
@@ -682,7 +689,8 @@ export default {
           headerControls: {
             smallify: "remove"
           },
-          theme: "light",
+          theme: "primary",
+          footerToolbar: '<p style="height:10px"></p>',
           headerTitle: "Preview",
           contentSize: "800 600",
           content: toolURL,
@@ -704,7 +712,8 @@ export default {
           headerControls: {
             smallify: "remove"
           },
-          theme: "light",
+          theme: "primary",
+          footerToolbar: '<p style="height:10px"></p>',
           headerTitle: "Preview",
           contentSize: "800 600",
           content: toolURL,
