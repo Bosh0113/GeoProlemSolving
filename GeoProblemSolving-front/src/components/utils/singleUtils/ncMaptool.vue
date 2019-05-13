@@ -38,6 +38,8 @@
         v-model="modalImport"
         title="Import GeoJSON data to resource center and show the data"
         @on-ok="viewData"
+        ok-text="OK"
+        cancel-text="Cancel"
       >
         <Upload type="drag" :before-upload="handleUpload" action="-" accept=".json, .zip">
           <div style="padding: 20px 0">
@@ -270,7 +272,7 @@ export default {
 
           let importData = document.createElement("div");
           importData.id = "import-data";
-          importData.title = "Import GeoJSON";
+          importData.title = "Import data";
           importData.onclick = this._importData;
           let iconImport = document.createElement("img");
           iconImport.src = imIcon;

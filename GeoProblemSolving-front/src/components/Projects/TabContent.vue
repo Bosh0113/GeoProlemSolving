@@ -342,14 +342,21 @@ export default {
               this.axios
                 .post("/GeoProblemSolving/notice/save", joinForm)
                 .then(res => {
-                  this.$Notice.open({
-                    title: "Apply Successfully",
-                    desc:
-                      "The project's manager will process your apply in time,you can get a notification later to tell you the result.",
-                    duration: 2
-                  });
-                  this.$emit("sendNotice", data.managerId);
-                  this.haveApplied = true;
+                  if(res.data == "Success") {
+                    this.$Notice.open({
+                      title: "Apply Successfully",
+                      desc:
+                        "The project's manager will process your apply in time,you can get a notification later to tell you the result."
+                    });
+                    this.$emit("sendNotice", data.managerId);
+                    this.haveApplied = true;
+                  }
+                  else{
+                    this.$Notice.open({
+                      desc:
+                         "Apply failed"
+                    });
+                  }
                 })
                 .catch(err => {
                   console.log("申请失败的原因是：" + err.data);
