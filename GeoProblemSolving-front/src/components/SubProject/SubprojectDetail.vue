@@ -933,10 +933,10 @@ export default {
       this.descHeight = (window.innerHeight - 250) / 3;
       this.taskContainerHeight = this.sidebarHeight + 10;
       //通知栏的属性设置，top表示距离顶部的距离，duration表示持续的时间
-      this.$Notice.config({
-        top: 50,
-        duration: 0
-      });
+      // this.$Notice.config({
+      //   top: 50,
+      //   duration: 0
+      // });
     },
     //初始化函数，作用是控制侧边栏的高度，设置右边通知栏弹出时候的距顶高度以及延迟的时间
     init() {

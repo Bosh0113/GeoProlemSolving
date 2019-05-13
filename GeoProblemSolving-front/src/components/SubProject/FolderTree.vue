@@ -190,7 +190,7 @@
                 >
                 <div style="padding: 20px 0">
                     <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
-                    <p>Click or drag file here to upload</p>
+                     <p>Click or drag files here to upload(The file size must control in <span style="color:red">1GB</span>)</p>
                 </div>
             </Upload>
             <div style="padding:0 10px 0 10px">
