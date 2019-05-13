@@ -41,7 +41,7 @@ footer {
 .userState {
   position: absolute;
   margin-left: 85%;
-  width: 20%;
+  width: 15%;
   top: 0px;
   z-index: 1;
 }
