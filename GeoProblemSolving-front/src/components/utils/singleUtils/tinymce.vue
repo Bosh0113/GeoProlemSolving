@@ -1,14 +1,10 @@
 <template>
   <div style="display:flex">
-    <div style="z-index:20">
-      <toolStyle></toolStyle>
+    <div>
+      <toolStyle  :style="{height:windowHeight+'px'}"></toolStyle>
     </div>
-    <div
-      id="main"
-      style="flex:4;z-index:10;margin-left:60px;overflow:hidden"
-      :style="{height:toolHeight}"
-    >
-      <tinymce id="d1" v-model="data" style="min-height:600px" :other_options="options"></tinymce>
+    <div id="main" style="flex:4;margin-left:60px;overflow:hidden">
+      <tinymce id="d1" v-model="data":other_options="options" ></tinymce>
       <iframe id="form_target" name="form_target" style="display:none"></iframe>
       <form
         id="my_form"
@@ -22,7 +18,7 @@
       </form>
       <Button type="primary" @click="saveModalShow" style="margin-top:20px;margin-left:10px">Save</Button>
     </div>
-    <Modal v-model="saveModal" title="Upload txt file" @on-ok="uploadFile" @on-cancel>
+    <Modal v-model="saveModal" title="Upload txt file" @on-ok="uploadFile">
       <Form :model="mdFile" :label-width="80">
         <FormItem label="name">
           <Input v-model="mdFile.name" placeholder="Enter something..."></Input>
@@ -42,7 +38,7 @@ export default {
   data() {
     return {
       data: "",
-      toolHeight: "",
+      windowHeight: "",
       saveModal: false,
       mdFile: {
         name: "",
@@ -66,11 +62,23 @@ export default {
   },
   mounted() {
     this.init();
+    this.initSize();
+    window.addEventListener("resize", this.initSize);
+  },
+  beforeDestroy() {
+    window.removeEventListener("resize", this.initSize);
   },
   methods: {
+    initSize() {
+      if(window.innerHeight > 675){
+        this.windowHeight = window.innerHeight;
+      }
+      else {
+         this.windowHeight = 775;
+      }
+    },
     init() {
       const self = this;
-      // this.toolHeight = window.innerHeight + "px";
     },
     saveModalShow() {
       this.saveModal = true;
