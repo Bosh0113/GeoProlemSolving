@@ -650,7 +650,6 @@
                         />
                       </div>
                     </div>
-
                     <div class="tool-panel">
                       <div class="singl_tool_style">
                         <Icon
@@ -751,12 +750,30 @@
                           color="gray"
                         />
                       </div>
-                      <div class="singl_tool_style">
+                      <!-- <div class="singl_tool_style">
                         <Icon
                           type="logo-youtube"
                           size="60"
                           @click.native="toolPanel('Video Tool')"
                           title="Video Tool"
+                          color="gray"
+                        />
+                      </div> -->
+                      <div class="singl_tool_style">
+                        <Icon
+                          type="ios-water"
+                          size="60"
+                          @click.native="toolPanel('Web-SWMM')"
+                          title="Web-SWMM"
+                          color="gray0"
+                        />
+                      </div>
+                      <div class="singl_tool_style">
+                        <Icon
+                          type="ios-car"
+                          size="60"
+                          @click.native="toolPanel('TrafficNoise')"
+                          title="Traffic Noise Simulation"
                           color="gray"
                         />
                       </div>
@@ -777,16 +794,107 @@
                       <span>For different solving process of geographic problem</span>
                     </div>
                     <br>
-                    <div class="tool-panel" v-show="this.currentModule.type == 'Preparation'"></div>
-                    <div class="tool-panel" v-show="this.currentModule.type == 'Analysis'"></div>
+                    <div class="tool-panel" v-show="this.currentModule.type == 'Preparation'">
+                      <div class="singl_tool_style">
+                        <Icon
+                          type="ios-create"
+                          size="60"
+                          @click.native="toolPanel('draw')"
+                          title="DrawBoard"
+                          color="green"
+                        />
+                      </div>
+                      <div class="singl_tool_style">
+                        <Icon
+                          type="md-map"
+                          size="60"
+                          @click.native="toolPanel('map')"
+                          title="Map"
+                          color="lightblue"
+                        />
+                      </div>
+                      <div class="singl_tool_style">
+                        <Icon
+                          type="md-grid"
+                          size="60"
+                          @click.native="toolPanel('tableEditor')"
+                          title="Table editor"
+                          color="#2d8cf0"
+                        />
+                      </div>
+                      <div class="singl_tool_style">
+                        <Icon
+                          type="md-cube"
+                          size="60"
+                          @click.native="toolPanel('3DmodelViewer')"
+                          title="3D model Viewer"
+                          color="#561cec"
+                        />
+                      </div>
+                    </div>
+                    <div class="tool-panel" v-show="this.currentModule.type == 'Analysis'">                      
+                      <div class="singl_tool_style">
+                        <Icon
+                          type="ios-podium"
+                          size="60"
+                          @click.native="toolPanel('chart')"
+                          title="Chart"
+                          color="lightgreen"
+                        />
+                      </div>
+                      <div class="singl_tool_style">
+                        <Icon
+                          type="md-grid"
+                          size="60"
+                          @click.native="toolPanel('tableEditor')"
+                          title="Table editor"
+                          color="#2d8cf0"
+                        />
+                      </div>
+                      <div class="singl_tool_style">
+                        <Icon
+                          type="ios-create"
+                          size="60"
+                          @click.native="toolPanel('graphEditor')"
+                          title="Graph Editor"
+                          color="#eca01c"
+                        />
+                      </div>
+                      <div class="singl_tool_style">
+                        <Icon
+                          type="ios-water"
+                          size="60"
+                          @click.native="toolPanel('Web-SWMM')"
+                          title="Web-SWMM"
+                          color="#2d8cf0"
+                        />
+                      </div>
+                      <div class="singl_tool_style">
+                        <Icon
+                          type="ios-car"
+                          size="60"
+                          @click.native="toolPanel('TrafficNoise')"
+                          title="Traffic Noise Simulation"
+                          color="#19be6b"
+                        />
+                      </div>
+                    </div>
                     <div class="tool-panel" v-show="this.currentModule.type == 'Modeling'">
+                      <a class="singl_tool_style" href="http://172.21.212.72:8888/tree?" target="_blank">
+                        <Icon
+                          type="md-code"
+                          size="60"
+                          title="Jupyter Notebook"
+                          color="#f37726"
+                        />
+                      </a>
                       <div class="singl_tool_style">
                         <Icon
                           type="md-bonfire"
                           size="60"
                           @click.native="toolPanel('ConceptualModel')"
                           title="Conceptual Modeling"
-                          color="#f90"
+                          color="#2d8cf0"
                         />
                       </div>
                       <div class="singl_tool_style">
@@ -804,13 +912,58 @@
                           size="60"
                           @click.native="toolPanel('ComputationalModel')"
                           title="Computational Modeling"
-                          color="#2d8cf0"
+                          color="#f90"
                         />
                       </div>
                     </div>
-                    <div class="tool-panel" v-show="this.currentModule.type == 'Simulation'"></div>
-                    <div class="tool-panel" v-show="this.currentModule.type == 'validation'"></div>
-                    <div class="tool-panel" v-show="this.currentModule.type == 'Comparison'"></div>
+                    <div class="tool-panel" v-show="this.currentModule.type == 'Simulation'">                      
+                      <a class="singl_tool_style" href="http://172.21.212.72:8888/tree?" target="_blank">
+                        <Icon
+                          type="md-code"
+                          size="60"
+                          title="Jupyter Notebook"
+                          color="#f37726"
+                        />
+                      </a>
+                      <div class="singl_tool_style">
+                        <Icon
+                          type="ios-water"
+                          size="60"
+                          @click.native="toolPanel('Web-SWMM')"
+                          title="Web-SWMM"
+                          color="#2d8cf0"
+                        />
+                      </div>
+                      <div class="singl_tool_style">
+                        <Icon
+                          type="ios-car"
+                          size="60"
+                          @click.native="toolPanel('TrafficNoise')"
+                          title="Traffic Noise Simulation"
+                          color="#19be6b"
+                        />
+                      </div>
+                    </div>
+                    <div class="tool-panel" v-show="this.currentModule.type == 'validation'">
+                      <a class="singl_tool_style" href="http://172.21.212.72:8888/tree?" target="_blank">
+                        <Icon
+                          type="md-code"
+                          size="60"
+                          title="Jupyter Notebook"
+                          color="#f37726"
+                        />
+                      </a>
+                    </div>
+                    <div class="tool-panel" v-show="this.currentModule.type == 'Comparison'">
+                      <a class="singl_tool_style" href="http://172.21.212.72:8888/tree?" target="_blank">
+                        <Icon
+                          type="md-code"
+                          size="60"
+                          title="Jupyter Notebook"
+                          color="#f37726"
+                        />
+                      </a>
+                    </div>
                   </TabPane>
                 </Tabs>
               </Drawer>
@@ -2429,13 +2582,21 @@ export default {
             '<iframe src="https://223.2.44.124:8083/GeoProblemSolving/Collaborative/vedioChat/WebRtcTest.html'+
             "?roomId="+moduleId+"&userId="+userId+'" style="width: 100%;height:100%"></iframe>';
             toolName = "Video Tool";
+          } else if (type == "Web-SWMM") {
+            toolURL =
+            '<iframe src="http://geomodeling.njnu.edu.cn/hydro-model-integration/webswmm" style="width: 100%; height:100%"></iframe>';
+            toolName = "Web-SWMM";
+          } else if (type == "TrafficNoise") {
+            toolURL =
+            '<iframe src="http://geomodeling.njnu.edu.cn/TrafficNoiseTheme/trafficNoise.html" style="width: 100%; height:100%"></iframe>';
+            toolName = "Traffic Noise";
           }
 
           let panel = jsPanel.create({
             theme: "success",
             headerTitle: toolName,
             footerToolbar: '<p style="height:10px"></p>',
-            contentSize: "1000 600",
+            contentSize: "1200 600",
             content: toolURL,
             disableOnMaximized: true,
             dragit: {
