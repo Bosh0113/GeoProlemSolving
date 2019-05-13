@@ -1293,7 +1293,7 @@ export default {
               }
               else if (res.data != "Fail") {
                 this.$Notice.success({
-                  title: "create result",
+                  title: "Create result",
                   desc: "subproject has been created successfully.",
                 });
                 this.createSubProjectForm.subProjectTitle = "";
