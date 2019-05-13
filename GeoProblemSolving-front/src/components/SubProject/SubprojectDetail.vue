@@ -51,7 +51,7 @@
 .subProjectDesc {
   text-indent: 2em;
   padding: 10px;
-  word-break: break-all;
+  /* word-break: break-all; */
 }
 .taskFormItem {
   display: flex;
