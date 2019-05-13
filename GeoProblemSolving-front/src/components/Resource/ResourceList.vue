@@ -261,7 +261,7 @@ export default {
         {
           title: "Upload time",
           key: "uploadTime",
-          width: 130,
+          width: 150,
           sortable: true
         },
         {
