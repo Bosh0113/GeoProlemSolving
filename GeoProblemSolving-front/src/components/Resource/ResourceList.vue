@@ -72,7 +72,7 @@
           <div class="resourcePanel">
             <Row>
               <Col span="22" offset="1">
-                <Table :columns="resourceColumn" :data="showList">
+                <Table border :columns="resourceColumn" :data="showList">
                   <template slot-scope="{ row }" slot="name">
                     <strong>{{ row.name }}</strong>
                   </template>

@@ -185,20 +185,20 @@ export default {
         {
           title:"Provider",
           key:"uploaderName",
-          width: 90,
+          width: 150,
           tooltip: true,
           align: "center"
         },
         {
           title: "Upload time",
           key: "uploadTime",
-          width: 150,
+          width: 130,
           sortable: true
         },
         {
           title: "Action",
           slot: "action",
-          width: 95,
+          width: 125,
           align: "center"
         }
       ],
