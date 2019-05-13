@@ -84,10 +84,11 @@ var userName = userInfo.userName;
             var url = window.location.href;
             if (url.search(reg) != -1) {
                 localStorage.setItem("historyURL", url);
-                let groupID = url.match(reg)[1];
+                var groupID = url.match(reg)[1];
                 // wsMxgraph = new WebSocket("ws://172.21.212.7:8082/GeoProblemSolving/ComputationalModel/" + groupID);
-                wsMxgraph = new WebSocket("ws://172.21.213.185:8080/GeoProblemSolving/ComputationalModel/" + groupID);
+                // wsMxgraph = new WebSocket("ws://172.21.213.185:8080/GeoProblemSolving/ComputationalModel/" + groupID);
                 // wsMxgraph = new WebSocket("ws://localhost:8081/GeoProblemSolving/ComputationalModel/" + groupID);
+                wsMxgraph = new WebSocket("ws://94.191.49.160:8080/GeoProblemSolving/ComputationalModel/" + groupID);
             }
         }
         else {

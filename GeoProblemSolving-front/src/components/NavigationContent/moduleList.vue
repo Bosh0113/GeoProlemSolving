@@ -777,7 +777,7 @@
                           color="gray"
                         />
                       </div>
-                      <a class="singl_tool_style" href="http://172.21.212.72:8888/tree?" target="_blank">
+                      <a class="singl_tool_style" href="http://134.175.111.77/note" target="_blank">
                         <Icon
                           type="md-code"
                           size="60"
@@ -880,7 +880,7 @@
                       </div>
                     </div>
                     <div class="tool-panel" v-show="this.currentModule.type == 'Modeling'">
-                      <a class="singl_tool_style" href="http://172.21.212.72:8888/tree?" target="_blank">
+                      <a class="singl_tool_style" href="http://134.175.111.77/note" target="_blank">
                         <Icon
                           type="md-code"
                           size="60"
@@ -917,7 +917,7 @@
                       </div>
                     </div>
                     <div class="tool-panel" v-show="this.currentModule.type == 'Simulation'">                      
-                      <a class="singl_tool_style" href="http://172.21.212.72:8888/tree?" target="_blank">
+                      <a class="singl_tool_style" href="http://134.175.111.77/note" target="_blank">
                         <Icon
                           type="md-code"
                           size="60"
@@ -945,7 +945,7 @@
                       </div>
                     </div>
                     <div class="tool-panel" v-show="this.currentModule.type == 'validation'">
-                      <a class="singl_tool_style" href="http://172.21.212.72:8888/tree?" target="_blank">
+                      <a class="singl_tool_style" href="http://134.175.111.77/note" target="_blank">
                         <Icon
                           type="md-code"
                           size="60"
@@ -955,7 +955,7 @@
                       </a>
                     </div>
                     <div class="tool-panel" v-show="this.currentModule.type == 'Comparison'">
-                      <a class="singl_tool_style" href="http://172.21.212.72:8888/tree?" target="_blank">
+                      <a class="singl_tool_style" href="http://134.175.111.77/note" target="_blank">
                         <Icon
                           type="md-code"
                           size="60"
@@ -2726,7 +2726,7 @@ export default {
           this.panel.close();
         }
         var url =
-          "http://172.21.212.7:8012/previewFile?url=" +
+          "http://94.191.49.160:8012/previewFile?url=" +
           "http://" +
           this.$store.state.IP_Port +
           this.resourceList[index].pathURL;

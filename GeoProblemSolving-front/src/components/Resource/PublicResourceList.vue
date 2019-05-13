@@ -285,7 +285,7 @@ export default {
           this.panel.close();
         }
         var url =
-          "http://172.21.212.7:8012/previewFile?url=" +'http://'+this.$store.state.IP_Port+
+          "http://94.191.49.160:8012/previewFile?url=" +'http://'+this.$store.state.IP_Port+
           this.showList[index].pathURL;
         var toolURL =
           '<iframe src=' + url + ' style="width: 100%;height:100%"></iframe>';
