@@ -62,12 +62,12 @@
   padding: 5px;
 }
 .memebr-work {
-  width: 70%;
+  width: 65%;
   height: 60px;
-  margin: 0 20px;
 }
 .userName {
-  height: 30px;
+  margin-top: 10px;
+  height: 20px;
   display: flex;
   align-items: center;
 }
@@ -110,6 +110,14 @@
 }
 .member-panel {
   transition: all 1s;
+}
+.memberOrganization{
+  height: 40px;
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
 }
 .subProjectDesc {
   text-indent: 2em;
@@ -323,27 +331,29 @@
                       <div
                         class="member-image"
                         @click="gotoPersonalSpace(member.userId)"
-                        style="cursor:pointer"
+                        style="cursor:pointer;display:flex;justify-content:center;align-ittems:center"
                       >
                         <img
-                          v-if="member.avatar != ''"
+                          v-if="member.avatar != '' && member.avatar!='undefined' && member.avatar!='null'"
                           :src="member.avatar"
-                          style="width:auto;height:100%"
+                          style="width:100%;height:100%"
                         >
                         <avatar
                           :username="member.userName"
-                          :size="40"
-                          style="margin-top:10px"
+                          :size="50"
+                          style="width:100%;height:100%"
                           :title="member.userName"
                           v-else
                         ></avatar>
                       </div>
-                      <div class="memebr-work">
-                        <div class="userName">
-                          <span style="padding:0 5px;float:right">{{member.userName}}</span>
+                      <div class="memebr-work" style="display:flex;align-items:center">
+                        <div style="height:40px;width:100%">
+                          <div>
+                            <span style="padding:0 5px" :title="member.userName">{{member.userName}}</span>
+                          </div>
+                        <div>
+                          <span style="padding:0 5px" class="memberOrganization" :title="member.organization">{{member.organization}}</span>
                         </div>
-                        <div class="organization">
-                          <span style="padding:0 5px">{{member.organization}}</span>
                         </div>
                       </div>
                     </template>
@@ -2323,7 +2333,6 @@ export default {
         }else{
           var toolURL = "";
           let toolName = "";
-
           if (type == "map") {
             toolURL = '<iframe src="'+'http://'+this.$store.state.IP_Port+'/GeoProblemSolving/map" style="width: 100%;height:100%"></iframe>';
             toolName = "Map";
@@ -2413,8 +2422,11 @@ export default {
               '<iframe src="'+'http://'+this.$store.state.IP_Port+'/GeoProblemSolving/tinymce" style="width: 100%;height:100%"></iframe>';
             toolName = "Text editor";
           } else if (type == "Video Tool") {
+            var userId = this.$store.getters.userId;
+            var moduleId = this.currentModule.moduleId;
             toolURL =
-              '<iframe src="/GeoProblemSolving/Collaborative/vedioChat/WebRtcTest.html" style="width: 100%;height:100%"></iframe>';
+            '<iframe src="https://223.2.44.124:8083/GeoProblemSolving/Collaborative/vedioChat/WebRtcTest.html'+
+            "?roomId="+moduleId+"&userId="+userId+'" style="width: 100%;height:100%"></iframe>';
             toolName = "Video Tool";
           }
 
@@ -2435,7 +2447,6 @@ export default {
           // panel.resizeit("disable");
           $(".jsPanel-content").css("font-size", "0");
           this.panelList.push(panel);
-
           // 生成records, 同步
           let record = {
             who: this.$store.getters.userName,

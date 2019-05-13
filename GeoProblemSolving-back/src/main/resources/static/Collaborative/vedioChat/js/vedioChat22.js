@@ -1,6 +1,22 @@
 /**
  * Webrtc相关
  */
+//选择的人的Id
+var userID;
+//在线的成员
+var olParticipants=[];
+var thisURL= window.location.href;
+var thisUserId="";
+var thisRoomId="";
+var regUserId = /userId=(\S*)/;
+var regRoomId = /roomId=(\S*)&/;
+if(thisURL.search(regUserId)!=-1){
+  thisUserId = thisURL.match(regUserId)[1];
+}
+if(thisURL.search(regRoomId)!=-1){
+  thisRoomId = thisURL.match(regRoomId)[1];
+}
+
 $(document).ready(function () {
 
     var localView = document.getElementById('vedio-box1');
@@ -10,6 +26,7 @@ $(document).ready(function () {
     var responseBtn = $("#send-response");
     var rejectBtn = $("#send-reject");
     var hangupBtn = $("#send-hangup");
+    var membersList = $("#memberList");
     var localStream;
     var remoteStream;
 
@@ -33,28 +50,31 @@ $(document).ready(function () {
     var ws;
     if(WebSocket)
     {
-        ws = new WebSocket("wss://223.2.44.124:8083/GeoProblemSolving/vedioSocket/"+usrId);
+        ws = new WebSocket("wss://223.2.44.124:8083/GeoProblemSolving/VideoChatServer/" + thisRoomId);
+        // ws = new WebSocket("wss://172.21.212.72:8082/GeoProblemSolving/VideoChatServer/"+thisRoomId);
+        // ws = new WebSocket("wss://172.21.213.185:8080/GeoProblemSolving/VideoChatServer/"+thisRoomId);
+
     }
 
 
     $("#send-request").on("click",function () {
         displayBtn(cancelBtn);
         isAvailable = false;
-        var request = JSON.stringify({"type": "request"});
+        var request = JSON.stringify({"type": "request","to":userID});
         ws.send(request);
         //超过20秒无应答，用户可重新发起请求
         setTimeout(function reset() {
             if (!isResponsed)
             {
                 isAvailable = true;
-                consoleLog("无应答，请重新发送请求");
+                consoleLog("Request no answer, please send again!");
             }
         },8000);
 
     });
 
     $("#send-response").on("click",function () {
-        var response = JSON.stringify({"type": "response"});
+        var response = JSON.stringify({"type": "response","to":userID});
         //将B端应答状态设置为true，并返回应答
         isResponsed = true;
         hideBtn(responseBtn);
@@ -63,7 +83,7 @@ $(document).ready(function () {
     });
 
     $("#send-cancel").on("click",function () {
-        var cancel = JSON.stringify({"type": "cancel"});
+        var cancel = JSON.stringify({"type": "cancel","to":userID});
         //将A端可用状态设置为true
         isAvailable = true;
         hideBtn(cancelBtn);
@@ -71,7 +91,7 @@ $(document).ready(function () {
     });
 
     $("#send-reject").on("click",function () {
-        var reject = JSON.stringify({"type": "reject"});
+        var reject = JSON.stringify({"type": "reject","to":userID});
         isAvailable = true;
         hideBtn(responseBtn);
         hideBtn(rejectBtn);
@@ -81,7 +101,7 @@ $(document).ready(function () {
     $("#send-hangup").on("click",function () {
         closeConnection();
         resetAll();
-        var hangup = JSON.stringify({"type": "hangup"});
+        var hangup = JSON.stringify({"type": "hangup","to":userID});
         isAvailable = true;
         ws.send(hangup);
     });
@@ -117,7 +137,8 @@ $(document).ready(function () {
             "type": "offer",
             "data": {
                 "desc": peerConnection.localDescription
-            }
+            },
+            "to":userID
         }));
     }
 
@@ -169,7 +190,7 @@ $(document).ready(function () {
         peerConnection.onicecandidate = ({candidate}) =>
         {
             console.log("[发送的candidate] " + JSON.stringify({"type":"candidate","value":candidate}))
-            ws.send(JSON.stringify({"type":"candidate","value":candidate}));
+            ws.send(JSON.stringify({"type":"candidate","value":candidate,"to":userID}));
         };
 
         peerConnection.oniceconnectionstatechange = function (event) {
@@ -177,13 +198,18 @@ $(document).ready(function () {
                 peerConnection.iceConnectionState === "disconnected" ||
                 peerConnection.iceConnectionState === "closed") {
                 console.error(event);
-                console.error("连接中断请刷新");
+                console.error("Connection interruption please refresh");
             }
         };
     }
 
 
     ws.onopen = function(){
+      var message = {
+        "type":"connect",
+        "userId": thisUserId
+      };
+        ws.send(JSON.stringify(message));
         initiate();
     }
 
@@ -197,14 +223,14 @@ $(document).ready(function () {
                     //请求到来时，如果B端已处于忙碌状态，返回忙碌
                     if (isAvailable === false)
                     {
-                        ws.send(JSON.stringify({"type": "busy"}));
+                        ws.send(JSON.stringify({"type": "busy","to":userID}));
                     }
                     //如果B是空闲状态
                     else
                     {
                         //否则将B设置为忙碌状态
                         isAvailable = false;
-                        consoleLog("有视频聊天请求...");
+                        consoleLog("There is a video chat request...");
                         displayBtn(responseBtn);
                         displayBtn(rejectBtn);
                         hideBtn(requestBtn);
@@ -233,11 +259,11 @@ $(document).ready(function () {
                 }
                 case "busy":
                 {
-                    consoleLog("对方忙线...");break;
+                    consoleLog("The other side is busy...");break;
                 }
                 case "cancel":
                 {
-                    consoleLog("对方已取消...");
+                    consoleLog("The other side has canceled...");
                     hideBtn(responseBtn);
                     hideBtn(rejectBtn);
                     isResponsed = true;
@@ -246,14 +272,14 @@ $(document).ready(function () {
                 }
                 case "reject":
                 {
-                    consoleLog("对方已拒绝...");
+                    consoleLog("The other side has refused...");
                     isResponsed = true;
                     isAvailable = true;
                     break;
                 }
                 case "hangup":
                 {
-                    consoleLog("对方已挂断...");
+                    consoleLog("The other side has hung up...");
                     resetAll();
                     break;
                 }
@@ -274,7 +300,7 @@ $(document).ready(function () {
                         await localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
                     }
                     catch (e) {
-                        alert("系统未检测到摄像头！");
+                        alert("System does not detect the camera!！");
                         console.error(e);
                     }
 
@@ -286,6 +312,7 @@ $(document).ready(function () {
                         "data": {
                             "desc": peerConnection.localDescription
                         },
+                        "to":userID
                     }));
 
                     remoteView.onloadedmetadata = function(){
@@ -309,6 +336,15 @@ $(document).ready(function () {
                     }
                     break;
                 }
+                case "members":
+                {
+                    var members = message.message
+                        .replace("[", "")
+                        .replace("]", "")
+                        .replace(/\s/g, "")
+                        .split(",");
+                    olParticipantChange(members);
+                }
                 default:
                     break;
             }
@@ -329,7 +365,8 @@ $(document).ready(function () {
     }
 
     function consoleLog(log) {
-        $("#ipt-console").val( $("#ipt-console").val() + log);
+        // $("#ipt-console").val( $("#ipt-console").val()  + log);
+        $("#ipt-console").val(log);
     }
 
     function displayBtn(e) {
@@ -381,4 +418,109 @@ $(document).ready(function () {
         return guid;
     }
 
-})
+
+    function olParticipantChange(members){
+      let userIndex = -1;
+  
+      // 自己刚上线，olParticipants空
+      if (olParticipants.length == 0) {
+        var membersCount = members.length;
+          for (var i = 0; i < members.length; i++) {
+                  $.ajax({
+                      url:"/GeoProblemSolving/user/inquiry" +
+                      "?key=" +
+                      "userId" +
+                      "&value=" +
+                      members[i],
+                      type:"GET",
+                      success: data => {
+                        membersCount--;
+                          if (data != "None" && data != "Fail") {
+                              olParticipants.push(data);
+                              if(membersCount==0){
+                                createMmeberList(olParticipants);
+                              }
+                          } else if (data == "None") {
+                          }
+                      },
+                      error: err=>{
+                          console.log(err);
+                      }
+                  });
+          }
+      } else {
+          // members大于olParticipants，有人上线；小于olParticipants，离线
+          if (members.length > olParticipants.length) {
+              for (var i = 0; i < members.length; i++) {
+                  for (var j = 0; j < olParticipants.length; j++) {
+                      if (members[i] === olParticipants[j].userId) {
+                          break;
+                      }
+                  }
+                  if (j === olParticipants.length) {
+                      userIndex = i;
+                      break;
+                  }
+              }
+  
+              // 人员渲染
+              $.ajax({
+                  url:"/GeoProblemSolving/user/inquiry" +
+                  "?key=" +
+                  "userId" +
+                  "&value=" +
+                  members[userIndex],
+                  type:"GET",
+                  success: data => {
+                      if (data !== "None" && data !== "Fail") {
+                          olParticipants.push(data);
+                          createMmeberList(olParticipants);
+                      } else if (data === "None") {
+                      }
+                  }
+              });
+          } else if (members.length < olParticipants.length) {
+              for (var i = 0; i < olParticipants.length; i++) {
+                  for (var j = 0; j < members.length; j++) {
+                      if (olParticipants[i].userId === members[j]) {
+                          break;
+                      }
+                  }
+                  if (j === members.length) {
+                      userIndex = i;
+                      break;
+                  }
+              }
+              olParticipants.splice(userIndex, 1);
+              createMmeberList(olParticipants);
+          }
+      }
+  };
+  function createMmeberList(memberList){
+    membersList.html("");
+      for(var i=0;i<memberList.length;i++){
+        var userInfo = memberList[i];
+        var memberItem = document.createElement('li');
+        var memberShow = "<p>"+memberList[i].userName+"</p>"
+        memberItem.innerHTML = memberShow;
+        memberItem.style.cursor="pointer";
+        var simpleUserInfo = {
+          "userId": userInfo.userId,
+          "userName":userInfo.userName
+        }
+        memberItem.setAttribute("data-userInfo",JSON.stringify(simpleUserInfo));
+        memberItem.onclick=function(){
+          chooseSomeOne(this.dataset.userinfo);
+        }
+        membersList.append(memberItem);
+      }
+  }
+  function chooseSomeOne(userInfoStr){
+    var userInfo = JSON.parse(userInfoStr);
+    // confirm(userInfo.userName);
+    userID = userInfo.userId;
+    // 获取到userId
+    // 点击按钮后顶部会出现该人的详细信息
+    $("#videoMember").val(userInfo.userName);
+  }
+});
