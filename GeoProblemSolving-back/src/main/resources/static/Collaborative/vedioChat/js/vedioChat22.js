@@ -501,7 +501,7 @@ $(document).ready(function () {
       for(var i=0;i<memberList.length;i++){
         var userInfo = memberList[i];
         var memberItem = document.createElement('li');
-        var memberShow = "<p>"+memberList[i].userName+"</p>"
+        var memberShow = "<p style='margin-left:10px'>"+memberList[i].userName+"</p>"
         memberItem.innerHTML = memberShow;
         memberItem.style.cursor="pointer";
         var simpleUserInfo = {
@@ -517,10 +517,10 @@ $(document).ready(function () {
   }
   function chooseSomeOne(userInfoStr){
     var userInfo = JSON.parse(userInfoStr);
-    // confirm(userInfo.userName);
+    confirm(userInfo.userName);
     userID = userInfo.userId;
     // 获取到userId
     // 点击按钮后顶部会出现该人的详细信息
-    $("#videoMember").val(userInfo.userName);
+    // $("#videoMember").val(userInfo.userName);
   }
 });
