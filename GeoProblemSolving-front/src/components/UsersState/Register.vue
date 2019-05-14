@@ -470,6 +470,17 @@ export default {
                       that.$Message.error("Invalid account or password.");
                     } else {
                       that.$Message.success("Success!");
+                      let registerEmailBody = {};
+                      registerEmailBody["recipient"] = this.registerForm.email;
+                      registerEmailBody["mailTitle"] = "Register result";
+                      registerEmailBody["mailContent"] = "Welcome to join in GeoProblem-Solving platform, you can solve complex problems in this platform with others collaboratively."
+                      that.axios.post("/GeoProblemSolving/email/send", registerEmailBody)
+                        .then(res=>{
+                          console.log(res.data);
+                        })
+                        .catch(err=>{
+                          console.log(err.data);
+                        })
                       that.$store.commit("userLogin", res.data);
                       that.$router.push({ path: "/" });
                     }

@@ -13,6 +13,7 @@
                   &&userDetail.avatar!='null'"
                 >
                 <avatar
+                  style="width:200px"
                   class="avatarStyle"
                   :username="userDetail.userName"
                   :size="200"
@@ -20,147 +21,142 @@
                   v-else
                 ></avatar>
               </div>
-              <div class="single-info" title="Name">
+              <div class="single-info" :title="`Name: `+ userDetail.userName">
                 <Icon type="ios-contact-outline" :size="20"/>
                 <span>{{userDetail.userName}}</span>
               </div>
-                <div class="single-info" title="Email">
-                  <Icon type="ios-mail-outline" :size="20"/>
-                  <span>{{userDetail.email}}</span>
-                </div>
-                <div class="single-info" title="Phone" v-show="userDetail.mobilePhone!=''">
-                  <Icon type="ios-call-outline" :size="20"/>
-                  <span>{{userDetail.mobilePhone}}</span>
-                </div>
-                <div class="single-info" title="Job Title">
-                  <Icon type="ios-hammer-outline" :size="20"/>
-                  <span>{{userDetail.jobTitle}}</span>
-                </div>
-                <div class="single-info" title="City&Country" v-show="userDetail.city!=''&&userDetail.country!=''">
-                  <Icon type="ios-compass-outline" :size="20"/>
-                  <span>{{userDetail.city}}&nbsp{{userDetail.country}}</span>
-                </div>
-                <div class="single-info" title="Organization" v-show="userDetail.organization!=''">
-                  <Icon type="ios-home-outline" :size="20"/>
-                  <span>{{userDetail.organization}}</span>
-                </div>
-                <div class="single-info" title="Direction" v-show="userDetail.direction!=''">
-                  <Icon type="ios-contract" :size="20"/>
-                  <span>{{userDetail.direction}}</span>
-                </div>
-                <div class="single-info"  title="Home Page" v-show="userDetail.homePage!=''">
-                  <Icon type="md-link" :size="20"/>
-                  <span>{{userDetail.homePage}}</span>
-                </div>
-                <br>
-                <div style="padding:10px;font-size:12px;border:1px dotted lightgray"  title="Introduction" v-show="userDetail.introduction!=''">
-                  {{userDetail.introduction}}
-                </div>
-                <div class="whitespace"></div>
-                <div style="display:flex;justify-content:center">
-                  <Button type="success" style="height:40px" @click="editModalShow()" title="Edit">
-                    <Icon type="md-create" :size="20"/>
-                  </Button>
-                  <Drawer
-                    title="Profile Edit Panel"
-                    placement="left"
-                    :closable="true"
-                    v-model="editProfileModal"
-                    width="600px"
-                  >
-                    <Form
+              <div class="single-info" :title="`Email:  ` + userDetail.email">
+                <Icon type="ios-mail-outline" :size="20"/>
+                <span>{{userDetail.email}}</span>
+              </div>
+              <div class="single-info"  v-show="userDetail.mobilePhone!=''">
+                <Icon type="ios-call-outline" :size="20"/>
+                <span>{{userDetail.mobilePhone}}</span>
+              </div>
+              <div class="single-info" :title="`Job Title:  `+userDetail.jobTitle">
+                <Icon type="ios-hammer-outline" :size="20"/>
+                <span>{{userDetail.jobTitle}}</span>
+              </div>
+              <div
+                class="single-info"
+                :title="`City&Country:  `+ userDetail.city + userDetail.country"
+                v-show="userDetail.city!=''&&userDetail.country!=''"
+              >
+                <Icon type="ios-compass-outline" :size="20"/>
+                <span>{{userDetail.city}}&nbsp{{userDetail.country}}</span>
+              </div>
+              <div
+                class="single-info"
+                :title="`Organization:  `+ userDetail.organization"
+                v-show="userDetail.organization!=''"
+                style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis"
+              >
+                <Icon type="ios-home-outline" :size="20"/>{{userDetail.organization}}
+              </div>
+              <div class="single-info" :title="`Direction:  `+ userDetail.direction" v-show="userDetail.direction!=''">
+                <Icon type="ios-contract" :size="20"/>
+                <span>{{userDetail.direction}}</span>
+              </div>
+              <div class="single-info" :title="`Home Page:  `+ userDetail.homePage" v-show="userDetail.homePage!=''">
+                <Icon type="md-link" :size="20"/>
+                <span>{{userDetail.homePage}}</span>
+              </div>
+              <br>
+              <div
+                style="padding:10px;font-size:12px;border:1px dotted lightgray"
+                title="Introduction"
+                v-show="userDetail.introduction!=''"
+              >{{userDetail.introduction}}</div>
+              <div class="whitespace"></div>
+              <div style="display:flex;justify-content:center">
+                <Button type="success" style="height:40px" @click="editModalShow()" title="Edit">
+                  <Icon type="md-create" :size="20"/>
+                </Button>
+                <Drawer
+                  title="Profile Edit Panel"
+                  placement="left"
+                  :closable="true"
+                  v-model="editProfileModal"
+                  width="600px"
+                >
+                  <Form
                     ref="personalInfoItem"
                     :model="personalInfoItem"
                     :rules="ruleValidate"
-                    :label-width="80">
-                      <FormItem label="Name" prop="userName">
-                        <Input
-                          v-model="personalInfoItem.userName"
-                          :class="{InputStyle: inputstyle}"
-                        ></Input>
-                      </FormItem>
-                      <FormItem label="Job title" prop="jobTitle">
-                        <Input
-                          v-model="personalInfoItem.jobTitle"
-                          :class="{InputStyle: inputstyle}"
-                        ></Input>
-                      </FormItem>
-                      <FormItem label="E-mail" prop="email">
-                        <Input
-                          v-model="personalInfoItem.email"
-                          :class="{InputStyle: inputstyle}"
-                          disabled
-                        ></Input>
-                      </FormItem>
-                      <FormItem label="Phone" prop="mobilePhone">
-                        <Input
-                          v-model="personalInfoItem.mobilePhone"
-                          :class="{InputStyle: inputstyle}"
-                        ></Input>
-                      </FormItem>
-                      <FormItem label="Country" prop="country">
-                        <Input v-model="personalInfoItem.country" :class="{InputStyle: inputstyle}"></Input>
-                      </FormItem>
-                      <FormItem label="City" prop="city">
-                        <Input v-model="personalInfoItem.city" :class="{InputStyle: inputstyle}"></Input>
-                      </FormItem>
-                      <FormItem label="Affiliation" prop="organization">
-                        <Input
-                          v-model="personalInfoItem.organization"
-                          :class="{InputStyle: inputstyle}"
-                        ></Input>
-                      </FormItem>
-                      <FormItem label="Field" prop="direction">
-                        <Input
-                          v-model="personalInfoItem.direction"
-                          :class="{InputStyle: inputstyle}"
-                        ></Input>
-                      </FormItem>
-                      <FormItem label="Home page" prop="homePage">
-                        <Input
-                          v-model="personalInfoItem.homePage"
-                          :class="{InputStyle: inputstyle}"
-                        ></Input>
-                      </FormItem>
-                      <FormItem label="Introduction" prop="introduction">
-                        <Input
-                          style="word-wrap:break-word"
-                          v-model="personalInfoItem.introduction"
-                          type="textarea"
-                          :autosize="{minRows: 2,maxRows: 5}"
-                        ></Input>
-                      </FormItem>
-                      <FormItem label="Avatar" prop="avatar">
-                        <div>
-                          <div class="demo-upload-list" v-if="personalInfoItem.avatar!=''">
-                            <template>
-                              <img v-bind:src="personalInfoItem.avatar" class="avatarImage">
-                              <div class="demo-upload-list-cover">
-                                <Icon type="ios-eye-outline" @click.native="handleView()"></Icon>
-                                <Icon type="ios-trash-outline" @click.native="handleRemove()"></Icon>
-                              </div>
-                            </template>
-                          </div>
-                          <div class="uploadBox">
-                            <Icon
-                              type="ios-camera"
-                              size="20"
-                              style="position:absolute;margin:18px;"
-                            ></Icon>
-                            <input @change="uploadPhoto($event)" type="file" class="uploadAvatar">
-                          </div>
-                          <Modal title="View Image" v-model="visible">
-                            <img :src="personalInfoItem.avatar" v-if="visible" style="width: 100%">
-                          </Modal>
+                    :label-width="80"
+                  >
+                    <FormItem label="Name" prop="userName">
+                      <Input v-model="personalInfoItem.userName" :class="{InputStyle: inputstyle}"></Input>
+                    </FormItem>
+                    <FormItem label="Job title" prop="jobTitle">
+                      <Input v-model="personalInfoItem.jobTitle" :class="{InputStyle: inputstyle}"></Input>
+                    </FormItem>
+                    <FormItem label="E-mail" prop="email">
+                      <Input
+                        v-model="personalInfoItem.email"
+                        :class="{InputStyle: inputstyle}"
+                        disabled
+                      ></Input>
+                    </FormItem>
+                    <FormItem label="Phone" prop="mobilePhone">
+                      <Input
+                        v-model="personalInfoItem.mobilePhone"
+                        :class="{InputStyle: inputstyle}"
+                      ></Input>
+                    </FormItem>
+                    <FormItem label="Country" prop="country">
+                      <Input v-model="personalInfoItem.country" :class="{InputStyle: inputstyle}"></Input>
+                    </FormItem>
+                    <FormItem label="City" prop="city">
+                      <Input v-model="personalInfoItem.city" :class="{InputStyle: inputstyle}"></Input>
+                    </FormItem>
+                    <FormItem label="Affiliation" prop="organization">
+                      <Input
+                        v-model="personalInfoItem.organization"
+                        :class="{InputStyle: inputstyle}"
+                      ></Input>
+                    </FormItem>
+                    <FormItem label="Field" prop="direction">
+                      <Input v-model="personalInfoItem.direction" :class="{InputStyle: inputstyle}"></Input>
+                    </FormItem>
+                    <FormItem label="Home page" prop="homePage">
+                      <Input v-model="personalInfoItem.homePage" :class="{InputStyle: inputstyle}"></Input>
+                    </FormItem>
+                    <FormItem label="Introduction" prop="introduction">
+                      <Input
+                        style="word-wrap:break-word"
+                        v-model="personalInfoItem.introduction"
+                        type="textarea"
+                        :autosize="{minRows: 2,maxRows: 5}"
+                      ></Input>
+                    </FormItem>
+                    <FormItem label="Avatar" prop="avatar">
+                      <div>
+                        <div class="demo-upload-list" v-if="personalInfoItem.avatar!=''">
+                          <template>
+                            <img v-bind:src="personalInfoItem.avatar" class="avatarImage">
+                            <div class="demo-upload-list-cover">
+                              <Icon type="ios-eye-outline" @click.native="handleView()"></Icon>
+                              <Icon type="ios-trash-outline" @click.native="handleRemove()"></Icon>
+                            </div>
+                          </template>
                         </div>
-                      </FormItem>
-                      <FormItem>
-                        <Button type="success" @click="submitProfileEdit('personalInfoItem')">Submit</Button>
-                        <Button @click="resetForm()" style="margin-left: 50%" type="primary">Reset</Button>
-                      </FormItem>
-                    </Form>
-                  </Drawer>
-                </div>
+                        <div class="uploadBox">
+                          <Icon type="ios-camera" size="20" style="position:absolute;margin:18px;"></Icon>
+                          <input @change="uploadPhoto($event)" type="file" class="uploadAvatar">
+                        </div>
+                        <Modal title="View Image" v-model="visible">
+                          <img :src="personalInfoItem.avatar" v-if="visible" style="width: 100%">
+                        </Modal>
+                      </div>
+                    </FormItem>
+                    <FormItem>
+                      <Button type="success" @click="submitProfileEdit('personalInfoItem')">Submit</Button>
+                      <Button @click="resetForm()" style="margin-left: 50%" type="primary">Reset</Button>
+                    </FormItem>
+                  </Form>
+                </Drawer>
+              </div>
             </div>
           </Col>
           <Col
@@ -233,10 +229,9 @@
                                   size="small"
                                   @click="deleteResourceModalShow(userResourceList[index].resourceId)"
                                 >
-                                <!-- @click="deleteResource(userResourceList[index].resourceId)" -->
+                                  <!-- @click="deleteResource(userResourceList[index].resourceId)" -->
                                   <Icon type="md-close"/>
                                 </Button>
-
                               </template>
                             </Table>
                           </div>
@@ -320,7 +315,6 @@
                               type="default"
                               slot="extra"
                               style="margin:-5px 5px 0 5px"
-
                               @click.stop="deleteProjectModalShow(mProject.projectId)"
                               icon="md-close"
                               title="remove"
@@ -353,7 +347,7 @@
     <Modal
       v-model="authorizeProjectModal"
       @on-ok="authorize()"
-      @on-cancel=""
+      @on-cancel
       ok-text="Assure"
       cancel-text="Cancel"
     >
@@ -372,7 +366,7 @@
       title="Quit Project"
       v-model="quitModal"
       @on-ok="quitProject()"
-      @on-cancel=""
+      @on-cancel
       ok-text="Ok"
       cancel-text="Cancel"
     >
@@ -382,7 +376,7 @@
       v-model="processResourceModal"
       title="share resource in other projects"
       @on-ok="processResource()"
-      @on-cancel=""
+      @on-cancel
       ok-text="Confirm"
       cancel-text="Cancel"
     >
@@ -420,19 +414,20 @@
     </Modal>
     <!-- 删除资源的模态框 -->
     <!-- deleteResourceModal -->
-    <Modal v-model="deleteResourceModal"
+    <Modal
+      v-model="deleteResourceModal"
       @on-ok="deleteResource"
-      @on-cancel=""
+      @on-cancel
       ok-text="Assure"
       cancel-text="Cancel"
     >
-    <h3>Do you really want to delete this resource?</h3>
+      <h3>Do you really want to delete this resource?</h3>
     </Modal>
     <!-- 退出子项目的modal -->
     <Modal
       v-model="deleteProjectModal"
       @on-ok="deleteProject"
-      @on-cancel=""
+      @on-cancel
       ok-text="Assure"
       cancel-text="Cancel"
     >
@@ -678,13 +673,13 @@ export default {
       selectShareProjectId: "",
       selectShareProjectName: "",
       // 删除资源的的模态框
-      deleteResourceModal:false,
+      deleteResourceModal: false,
       // 要删除的资源的id
-      deleteResourceId: '',
+      deleteResourceId: "",
       // 要删除管理的项目的模态框
-      deleteProjectModal:false,
+      deleteProjectModal: false,
       // 要删除的项目的Id
-      deleteProjectId:''
+      deleteProjectId: ""
     };
   },
   methods: {
@@ -784,11 +779,10 @@ export default {
             this.$store.getters.userId
         )
         .then(res => {
-          if(res.data == "Offline"){
+          if (res.data == "Offline") {
             this.$store.commit("userLogout");
             this.$router.push({ name: "Login" });
-          }
-          else if (res.data != "Fail" && res.data != "None") {
+          } else if (res.data != "Fail" && res.data != "None") {
             this.$Message.success("Quit Success");
             this.removeQuitProject(quitProjectId);
             let notice = {};
@@ -814,9 +808,9 @@ export default {
               .catch(err => {
                 console.log("申请失败的原因是：" + err.data);
               });
-          } else{
+          } else {
             this.$Message.error("Quit Fail.");
-            console.log("Quit fail: "+res.data);
+            console.log("Quit fail: " + res.data);
           }
         })
         .catch(err => {});
@@ -846,11 +840,10 @@ export default {
             this.selectManagerId
         )
         .then(res => {
-          if(res.data == "Offline"){
+          if (res.data == "Offline") {
             this.$store.commit("userLogout");
             this.$router.push({ name: "Login" });
-          }
-          else if (res.data != "Fail") {
+          } else if (res.data != "Fail") {
             let projectInfo = res.data;
             projectInfo.projectId = this.currentProject.projectId;
             this.projectManageToJoin(projectInfo);
@@ -890,20 +883,23 @@ export default {
       }
       this.$set(this, "userManagerProjectList", newManageProjects);
     },
-    deleteProjectModalShow(pid){
+    deleteProjectModalShow(pid) {
       this.deleteProjectId = pid;
       this.deleteProjectModal = true;
     },
-    deleteProject(){
-      if(this.deleteProjectId!=''){
+    deleteProject() {
+      if (this.deleteProjectId != "") {
         this.axios
-          .get("/GeoProblemSolving/project/delete?" + "projectId=" + this.deleteProjectId)
+          .get(
+            "/GeoProblemSolving/project/delete?" +
+              "projectId=" +
+              this.deleteProjectId
+          )
           .then(res => {
-            if(res.data == "Offline"){
+            if (res.data == "Offline") {
               this.$store.commit("userLogout");
               this.$router.push({ name: "Login" });
-            }
-            else if(res.data=="Success"){
+            } else if (res.data == "Success") {
               var newManageProjects = [];
               var oldManageProjects = this.userManagerProjectList;
               for (var i = 0; i < oldManageProjects.length; i++) {
@@ -912,8 +908,7 @@ export default {
                 }
               }
               this.$set(this, "userManagerProjectList", newManageProjects);
-            }
-            else{
+            } else {
               this.$Notice.error({
                 title: "Error",
                 desc: "Delete project fail."
@@ -1005,11 +1000,10 @@ export default {
             this.$store.getters.userId
         )
         .then(res => {
-          if(res.data == "Offline"){
+          if (res.data == "Offline") {
             this.$store.commit("userLogout");
             this.$router.push({ name: "Login" });
-          }
-          else if(res.data !="None"&&res.data !="Fail"){
+          } else if (res.data != "None" && res.data != "Fail") {
             this.userEventList = res.data;
           }
         })
@@ -1039,20 +1033,24 @@ export default {
     download(index) {
       window.open(this.userResourceList[index].pathURL);
     },
-    deleteResourceModalShow(id){
+    deleteResourceModalShow(id) {
       this.deleteResourceModal = true;
       this.deleteResourceId = id;
     },
     deleteResource() {
       if (this.deleteResourceId != "") {
         this.axios
-          .get("/GeoProblemSolving/resource/delete?" + "resourceId=" + this.deleteResourceId)
+          .get(
+            "/GeoProblemSolving/resource/delete?" +
+              "resourceId=" +
+              this.deleteResourceId
+          )
           .then(res => {
             if (res.data == "Success") {
               this.$Notice.success({
-              title: "Notification title",
-              desc: "Delete successfully"
-            });
+                title: "Notification title",
+                desc: "Delete successfully"
+              });
               this.getUserResource();
             } else if (res.data == "Fail") {
               this.$Message.info("Failure");
@@ -1093,9 +1091,7 @@ export default {
               this.$Notice.open({
                 title: "Upload notification title",
                 desc:
-                  "File shared to " +
-                  this.selectShareProject +
-                  " successfully.",
+                  "File shared to " + this.selectShareProject + " successfully."
               });
               // 保存记录
               this.addUploadEvent(this.selectShareProjectId);
@@ -1149,6 +1145,9 @@ export default {
 /* 用户头像 */
 .user-img {
   margin-top: 20px;
+  width: 100%;
+  max-height: 100%;
+  text-align: center;
 }
 /* 注册时上传头像的用户的头像样式 */
 .u_img {
@@ -1165,10 +1164,10 @@ body {
 }
 /* 侧边用户信息的显示样式 */
 .single-info {
-  padding: 15px;
-  height: 20px;
-  font-size: 10px;
-  line-height: 10px;
+  padding: 5px;
+  height: 30px;
+  font-size: 12px;
+  line-height: 15px;
 }
 /* 表示空格间距的 */
 .whitespace {

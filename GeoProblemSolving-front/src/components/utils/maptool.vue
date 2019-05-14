@@ -45,7 +45,8 @@
         <Upload type="drag" :before-upload="handleUpload" action="-" accept=".json, .zip">
           <div style="padding: 20px 0">
             <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
-            <p>Click or drag files here to upload</p>
+             <p>Click or drag files here to upload(The file size must control in <span style="color:red">1GB</span>)</p>
+
           </div>
         </Upload>
         <div v-show="showFile">
@@ -129,7 +130,7 @@ export default {
       uploadDataName: "",
       //存储绘制的图像layer
       drawingLayerGroup: null,
-      participants: [],      
+      participants: [],
       olParticipants: [],
       resources: [],
       dataUrl: "",
@@ -156,7 +157,7 @@ export default {
          this.windowHeight = 675;
       }
       if(window.innerWidth > 1200){
-        this.windowWidth = window.innerWidth - 60;        
+        this.windowWidth = window.innerWidth - 60;
       }
       else{
         this.windowWidth = 1140;
@@ -515,7 +516,7 @@ export default {
       else if(/\.(zip)$/.test(this.dataUrl.toLowerCase())){
         try{
           var that = this;
-          shp(this.dataUrl).then(function(file){            
+          shp(this.dataUrl).then(function(file){
             let geoJsonLayer = L.geoJSON(file, {
                 style: function(feature) {
                   return { color: "orange" };
