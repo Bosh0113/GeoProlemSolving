@@ -185,7 +185,7 @@ export default {
         {
           title:"Provider",
           key:"uploaderName",
-          width: 90,
+          width: 150,
           tooltip: true,
           align: "center"
         },
@@ -198,7 +198,7 @@ export default {
         {
           title: "Action",
           slot: "action",
-          width: 95,
+          width: 125,
           align: "center"
         }
       ],

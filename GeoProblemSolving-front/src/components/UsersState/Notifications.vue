@@ -340,7 +340,7 @@ export default {
         });
     },
     gotoWork(noticeId,subProjectId){
-      //路由跳转好像和回调的关系有点问题，这样在回调之前就已经跳转了，回调的内容好像没啥用      
+      //路由跳转好像和回调的关系有点问题，这样在回调之前就已经跳转了，回调的内容好像没啥用
       this.axios
         .get("/GeoProblemSolving/notice/read" + "?noticeId=" + noticeId)
         .then(res => {
@@ -358,7 +358,7 @@ export default {
         .catch(err => {
           this.$Message.error("update notification fail.");
         });
-      
+
       this.$router.push( `./project/${id}/subproject`);
     },
     refuseApply(apply) {
@@ -453,11 +453,37 @@ export default {
                 apply.content.projectTitle +
                 " ."
             };
+
+            // 这里加入给申请者发送已成功加入某项目的邮件
+            console.table(apply.content);
+            //
             this.axios
               .post("/GeoProblemSolving/notice/save", replyNotice)
               .then(result => {
                 if (result.data == "Success") {
                   this.$emit("sendNotice", apply.content.userId);
+                  let resultEmailBody = {};
+                  resultEmailBody["recipient"] = apply.content.userEmail;
+                  resultEmailBody["mailTitle"] = "Join project result";
+                  resultEmailBody["mailContent"] = "Hello, "+ apply.content.userName + ", Congratulations for joining the "+apply.content.scope+": " + apply.content.projectTitle + " .";
+                  this.axios.post("/GeoProblemSolving/email/send", resultEmailBody)
+                  .then(res=>{
+                    if (res.data == "Success") {
+                        this.$Notice.success({
+                          title: "Result for application",
+                          desc:
+                            "The process result email has been sent,if he/she doesn't online,the email will remind the joiner in time."
+                        });
+                      } else {
+                        this.$Notice.error({
+                          title: "Email send fail",
+                          desc: "The invitation isn't be sent successfully."
+                        });
+                      }
+                  })
+                  .catch(err=>{
+                    console.log(err.data);
+                  })
                 } else {
                   this.$Message.error("reply fail.");
                 }
@@ -465,6 +491,13 @@ export default {
               .catch(err => {
                 this.$Message.error("reply fail.");
               });
+
+              // 发送审核通过的邮件
+              // let resultEmailBody = {};
+              // resultEmailBody["recipient"] =
+
+
+
           } else {
             this.$Message.error("update notification fail.");
           }

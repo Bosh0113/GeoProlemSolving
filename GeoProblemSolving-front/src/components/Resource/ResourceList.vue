@@ -72,7 +72,7 @@
           <div class="resourcePanel">
             <Row>
               <Col span="22" offset="1">
-                <Table :columns="resourceColumn" :data="showList">
+                <Table border :columns="resourceColumn" :data="showList">
                   <template slot-scope="{ row }" slot="name">
                     <strong>{{ row.name }}</strong>
                   </template>
@@ -160,7 +160,7 @@
           >
             <div style="padding: 20px 0">
               <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
-              <p>Click or drag files here to upload</p>
+              <p>Click or drag files here to upload(The file size must control in <span style="color:red">1GB</span>)</p>
             </div>
           </Upload>
           <div style="padding:0 10px 0 10px">
@@ -190,7 +190,7 @@
               </li>
             </ul>
           </div>
-          <h6 style="text-align:center;color:red">The file's size must control smaller than 1 GB.</h6>
+          <!-- <h6 style="text-align:center;color:red">The file's size must control smaller than 1 GB.</h6> -->
         </Form>
       </div>
       <!-- <input type="file" @change="getFile($event)" style="margin-left:20%" multiple="multiple"> -->
@@ -261,7 +261,7 @@ export default {
         {
           title: "Upload time",
           key: "uploadTime",
-          width: 130,
+          width: 150,
           sortable: true
         },
         {

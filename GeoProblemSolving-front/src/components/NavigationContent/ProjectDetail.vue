@@ -585,6 +585,13 @@
                 <Icon type="md-more"/>
               </Button>
             </div>
+            <div style="text-align:center">
+              <!-- <Form ref="formCustom" :model="formCustom" :rules="ruleCustom" :label-width="80">
+                <FormItem label="Search specified resource" prop="searchText">
+                    <Input type="password" v-model="formCustom.passwd"></Input>
+                </FormItem>
+              </Form> -->
+            </div>
             <div style="height:300px;overflow-y:scroll">
               <Table
                 :columns="resourceTableColName"
@@ -658,7 +665,10 @@
           <Upload :max-size="1024*1024" multiple type="drag" :before-upload="gatherFile" action="-">
             <div style="padding: 20px 0">
               <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
-              <p>Click or drag files here to upload</p>
+              <p>
+                Click or drag files here to upload(The file size must control in
+                <span style="color:red">1GB</span>)
+              </p>
             </div>
           </Upload>
 
@@ -689,7 +699,7 @@
               </li>
             </ul>
           </div>
-          <h6 style="text-align:center;color:red">The file's size must control smaller than 1 GB.</h6>
+          <!-- <h6 style="text-align:center;color:red">The file's size must control smaller than 1 GB.</h6> -->
         </Modal>
         <br>
       </Col>
@@ -1153,7 +1163,7 @@ export default {
           vm.currentProjectDetail.isManager = true;
         }
         if (!(isMember || vm.currentProjectDetail.isManager)) {
-          this.$Message.error('You have no property to access it');
+          this.$Message.error("You have no property to access it");
           next("/projectlist");
           // vm.$router.go(-1);
         }
@@ -1287,14 +1297,13 @@ export default {
           this.axios
             .post("/GeoProblemSolving/subProject/create", SubProject)
             .then(res => {
-              if(res.data == "Offline"){
+              if (res.data == "Offline") {
                 this.$store.commit("userLogout");
                 this.$router.push({ name: "Login" });
-              }
-              else if (res.data != "Fail") {
+              } else if (res.data != "Fail") {
                 this.$Notice.success({
                   title: "Create result",
-                  desc: "subproject has been created successfully.",
+                  desc: "Subproject has been created successfully.",
                 });
                 this.createSubProjectForm.subProjectTitle = "";
                 this.createSubProjectForm.subProjectDescription = "";
@@ -1366,11 +1375,10 @@ export default {
             this.newManagerId
         )
         .then(res => {
-          if(res.data == "Offline"){
+          if (res.data == "Offline") {
             this.$store.commit("userLogout");
             this.$router.push({ name: "Login" });
-          }
-          else if (res.data != "Fail") {
+          } else if (res.data != "Fail") {
             var newSubProject = res.data;
             var length = this.subProjectList.length;
             var subProjectInfoList = this.subProjectList;
@@ -1386,25 +1394,27 @@ export default {
             }
             //此处缺少权限移交后的通知
             let replyNotice = {};
-              replyNotice["recipientId"] = this.newManagerId;
-              replyNotice["type"] = "notice";
-              replyNotice["content"] = {
-                title: "Subproject manager",
-                description:
-                  "You have already become the manager of subproject: " + this.subProjectList[this.editSubProjectindex].title + "."
-              };
-              this.axios
-                .post("/GeoProblemSolving/notice/save", replyNotice)
-                .then(result => {
-                  if (result.data == "Success") {
-                    this.$emit("sendNotice", this.newManagerId);
-                  } else {
-                    this.$Message.error("notice fail.");
-                  }
-                })
-                .catch(err => {
+            replyNotice["recipientId"] = this.newManagerId;
+            replyNotice["type"] = "notice";
+            replyNotice["content"] = {
+              title: "Subproject manager",
+              description:
+                "You have already become the manager of subproject: " +
+                this.subProjectList[this.editSubProjectindex].title +
+                "."
+            };
+            this.axios
+              .post("/GeoProblemSolving/notice/save", replyNotice)
+              .then(result => {
+                if (result.data == "Success") {
+                  this.$emit("sendNotice", this.newManagerId);
+                } else {
                   this.$Message.error("notice fail.");
-                });
+                }
+              })
+              .catch(err => {
+                this.$Message.error("notice fail.");
+              });
           } else {
             this.$Message.error("Handover management authority failed.");
           }
@@ -1440,11 +1450,10 @@ export default {
           this.axios
             .post("/GeoProblemSolving/subProject/update", obj)
             .then(res => {
-              if(res.data == "Offline"){
+              if (res.data == "Offline") {
                 this.$store.commit("userLogout");
                 this.$router.push({ name: "Login" });
-              }
-              else if (res.data != "Fail") {
+              } else if (res.data != "Fail") {
                 var newSubProject = res.data;
                 for (var i = 0; i < this.subProjectList.length; i++) {
                   if (
@@ -1482,11 +1491,10 @@ export default {
             deletedSubProjectId
         )
         .then(res => {
-          if(res.data == "Offline"){
+          if (res.data == "Offline") {
             this.$store.commit("userLogout");
             this.$router.push({ name: "Login" });
-          }
-          else if (res.data == "Success") {
+          } else if (res.data == "Success") {
             var length = this.subProjectList.length;
             for (var i = 0; i < length; i++) {
               if (this.subProjectList[i].subProjectId == deletedSubProjectId) {
@@ -1517,11 +1525,10 @@ export default {
             queryObject["value"]
         )
         .then(res => {
-          if(res.data == "Offline"){
+          if (res.data == "Offline") {
             this.$store.commit("userLogout");
             this.$router.push({ name: "Login" });
-          }
-          else if (res.data == "None"||res.data == "Fail") {
+          } else if (res.data == "None" || res.data == "Fail") {
             console.log(res.data);
           } else {
             //改变this的指向，此时this需要赋值给其他变量
@@ -1706,11 +1713,11 @@ export default {
           this.axios
             .post("/GeoProblemSolving/project/update ", form)
             .then(res => {
-              if(res.data == "Offline"){
+              if (res.data == "Offline") {
                 this.$store.commit("userLogout");
                 this.$router.push({ name: "Login" });
-              }else if(res.data!="Fail"){
-                this.getProjectDetail();//更新后的回调处理有待优化，应该根据返回的新信息重新更新前端数据并渲染，而不是再重新请求数据
+              } else if (res.data != "Fail") {
+                this.getProjectDetail(); //更新后的回调处理有待优化，应该根据返回的新信息重新更新前端数据并渲染，而不是再重新请求数据
               }
             })
             .catch(err => {
@@ -1778,11 +1785,10 @@ export default {
             this.currentProjectDetail.projectId
         )
         .then(res => {
-          if(res.data == "Offline"){
+          if (res.data == "Offline") {
             this.$store.commit("userLogout");
             this.$router.push({ name: "Login" });
-          }
-          else if(res.data == "Fail"){
+          } else if (res.data == "Fail") {
             this.$Notice.error({
               title: "Error",
               desc: "Delete project fail."
@@ -1802,7 +1808,9 @@ export default {
       let joinSubPForm = {};
       joinSubPForm["recipientId"] = project.managerId;
       joinSubPForm["type"] = "apply";
+      let userDetail = this.$store.getters.userInfo;
       joinSubPForm["content"] = {
+        userEmail: userDetail.email,
         userName: this.$store.getters.userName,
         userId: this.$store.getters.userId,
         title: "Group application",
@@ -1817,6 +1825,7 @@ export default {
         scope: "subProject",
         approve: "unknow"
       };
+
       this.axios
         .post("/GeoProblemSolving/notice/save", joinSubPForm)
         .then(res => {
@@ -1825,6 +1834,35 @@ export default {
         })
         .catch(err => {
           console.log("申请失败的原因是：" + err.data);
+        });
+      let joinSubProjectEmail = {};
+      joinSubProjectEmail["recipient"] = userDetail.email;
+      joinSubProjectEmail["mailTitle"] = "Join sub project application";
+      joinSubProjectEmail["mailContent"] =
+        "User " +
+        this.$store.getters.userName +
+        " apply to join in your project's sub project: " +
+        project.title +
+        " ." +
+        "you can access the platform to process it.";
+      this.axios
+        .post("/GeoProblemSolving/email/send", joinSubProjectEmail)
+        .then(res => {
+          if (res.data == "Success") {
+            this.$Notice.success({
+              title: "Email send title",
+              desc:
+                "The join email has been sent,if he/she doesn't online,the email will remind the mamnager in time."
+            });
+          } else {
+            this.$Notice.error({
+              title: "Email send fail",
+              desc: "The invitation isn't be sent successfully."
+            });
+          }
+        })
+        .catch(err => {
+          console.log(err.data);
         });
     },
     emialAutoFill(value) {
@@ -1881,18 +1919,18 @@ export default {
                 data: formData
               })
                 .then(res => {
-                  if(res.data == "Offline"){
+                  if (res.data == "Offline") {
                     this.$store.commit("userLogout");
                     this.$router.push({ name: "Login" });
-                  }else if (res.data != "Size over" && res.data.length > 0) {
+                  } else if (res.data != "Size over" && res.data.length > 0) {
                     this.$Notice.open({
                       title: "Success",
-                      desc: "File uploaded successfully.",
+                      desc: "File uploaded successfully."
                     });
-                  }else{
+                  } else {
                     this.$Notice.error({
                       title: "Error",
-                      desc: "File uploaded fail.",
+                      desc: "File uploaded fail."
                     });
                   }
                   //这里重新获取一次该项目下的全部资源
@@ -1958,20 +1996,18 @@ export default {
             this.removeMemberId
         )
         .then(res => {
-          if(res.data == "Offline"){
+          if (res.data == "Offline") {
             this.$store.commit("userLogout");
             this.$router.push({ name: "Login" });
-          }
-          else if (res.data == "None") {
+          } else if (res.data == "None") {
             this.$Notice.warning({
               title: "Operate result",
-              desc: "The project doesn't exist.",
+              desc: "The project doesn't exist."
             });
           } else {
             this.$Notice.success({
               title: "Operate result",
-              desc:
-                "The member has been removed from the project successfully.",
+              desc: "The member has been removed from the project successfully."
             });
             var members = this.currentProjectDetail.members;
             for (var i = 0; i < members.length; i++) {
