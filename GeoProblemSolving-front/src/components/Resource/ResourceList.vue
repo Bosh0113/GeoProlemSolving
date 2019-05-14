@@ -485,7 +485,7 @@ export default {
       let name = this.showList[index].name;
 
       if (
-        /\.(pdf|doc|docx|xls|xlsx|csv|ppt|pptx|zip)$/.test(name.toLowerCase())
+        /\.(doc|docx|xls|xlsx|csv|ppt|pptx|zip)$/.test(name.toLowerCase())
       ) {
         if (this.panel != null) {
           this.panel.close();
@@ -541,7 +541,7 @@ export default {
           closeOnEscape: true
         });
         $(".jsPanel-content").css("font-size", "0");
-      } else if (/\.(xml|json|md|gif|jpg|png)$/.test(name.toLowerCase())) {
+      } else if (/\.(pdf|xml|json|md|gif|jpg|png)$/.test(name.toLowerCase())) {
         if (this.panel != null) {
           this.panel.close();
         }
