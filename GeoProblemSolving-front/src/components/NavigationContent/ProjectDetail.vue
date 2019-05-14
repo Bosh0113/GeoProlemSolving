@@ -402,7 +402,6 @@
                 ok-text="Create"
                 cancel-text="Cancel"
                 @on-ok="createSubProject('createSubProjectForm')"
-                @on-cancel
                 title="Create a new subproject"
                 width="800px"
                 :mask-closable="false"
@@ -525,7 +524,6 @@
                 ok-text="Submit"
                 cancel-text="Cancel"
                 @on-ok="editSubProject('editSubProjectForm')"
-                @on-cancel
                 title="Edit the information of this subproject"
                 width="800px"
                 :mask-closable="false"
@@ -699,7 +697,6 @@
         v-model="removeProjectModal"
         title="Delete warning "
         @on-ok="deleteProject"
-        @on-cancel
         ok-text="Submit"
         cancel-text="Cancel"
       >
@@ -711,7 +708,6 @@
       v-model="editProjectModal"
       title="Edit project"
       @on-ok="editProjectSubmit('projectEditForm')"
-      @on-cancel
       ok-text="Confirm"
       cancel-text="Cancel"
       :mask-closable="false"
@@ -848,18 +844,20 @@ export default {
             trigger: "blur"
           }
         ],
-        description: [
-          {
-            required: true,
-            message: "The project description cannot be empty",
-            trigger: "blur"
-          }
-        ],
         title: [
           {
             required: true,
-            message: "The project title cannot be empty",
-            trigger: "blur"
+            message: "The title cannot be empty and no more than 60 characters",
+            trigger: "blur",
+            max: 60
+          }
+        ],
+        description: [
+          {
+            required: true,
+            message: "The description cannot be empty and no more than 360 characters",
+            trigger: "blur",
+            max: 360
           }
         ],
         privacy: [
@@ -872,7 +870,6 @@ export default {
         introduction: [
           {
             required: true,
-            max: 180,
             message: "The project introduction cannot be empty",
             trigger: "blur"
           }
@@ -1467,7 +1464,7 @@ export default {
               console.log(err.data);
             });
         } else {
-          this.$Message.warning("please check your form again!");
+          this.$Message.warning("Please check your form again!");
         }
       });
     },

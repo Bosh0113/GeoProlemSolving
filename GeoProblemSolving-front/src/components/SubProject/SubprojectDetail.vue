@@ -51,7 +51,7 @@
 .subProjectDesc {
   text-indent: 2em;
   padding: 10px;
-  word-break: break-all;
+  /* word-break: break-all; */
 }
 .taskFormItem {
   display: flex;
@@ -136,7 +136,10 @@
                         <div slot="title" style="font-size:18px">
                           <strong>Participants</strong>
                         </div>
-                          <div :style="{height:sidebarHeight-150+'px'}" style="max-height:600px;overflow-y:auto;overflow-x:hidden">
+                        <div
+                          :style="{height:sidebarHeight-150+'px'}"
+                          style="max-height:600px;overflow-y:auto;overflow-x:hidden"
+                        >
                           <div
                             class="member-desc"
                             v-for="(member,index) in this.participants"
@@ -167,13 +170,17 @@
                                 <div style="height:40px;width:100%">
                                   <div>
                                     <span
-                                    style="padding:0 5px;"
-                                    :title="member.userName"
-                                  >{{member.userName}}</span>
+                                      style="padding:0 5px;"
+                                      :title="member.userName"
+                                    >{{member.userName}}</span>
                                   </div>
-                                <div>
-                                  <span style="padding:0 5px;" class="memberOrganization" :title="member.organization">{{member.organization}}</span>
-                                </div>
+                                  <div>
+                                    <span
+                                      style="padding:0 5px;"
+                                      class="memberOrganization"
+                                      :title="member.organization"
+                                    >{{member.organization}}</span>
+                                  </div>
                                 </div>
                               </div>
                             </template>
@@ -198,13 +205,19 @@
                               <div class="memebr-work" style="display:flex;align-items:center">
                                 <div style="height:40px;width:100%">
                                   <div>
-                                  <span style="padding:0 5px;" :title="member.userName">{{member.userName}}</span>
+                                    <span
+                                      style="padding:0 5px;"
+                                      :title="member.userName"
+                                    >{{member.userName}}</span>
+                                  </div>
+                                  <div>
+                                    <span
+                                      style="padding:0 5px;"
+                                      class="memberOrganization"
+                                      :title="member.organization"
+                                    >{{member.organization}}</span>
+                                  </div>
                                 </div>
-                                <div>
-                                  <span style="padding:0 5px;" class="memberOrganization" :title="member.organization">{{member.organization}}</span>
-                                </div>
-                                </div>
-
                               </div>
                             </template>
                             <div style="line-height:60px" type="default">
@@ -223,11 +236,11 @@
                               ok-text="Assure"
                               cancel-text="Cancel"
                               @on-ok="removeMember(participants[index].userId,participants[index].userName)"
-                              @on-cancel=""
+                              @on-cancel
                             >
-                            <h5 style="text-align:center;color:red">
-                              Do you really want to remove this member from this sub-project?
-                            </h5>
+                              <h5
+                                style="text-align:center;color:red"
+                              >Do you really want to remove this member from this sub-project?</h5>
                             </Modal>
                           </div>
                         </div>
@@ -544,7 +557,7 @@
       v-model="taskDeleteModal"
       title="Delete Task"
       @on-ok="taskRemove()"
-      @on-cancel=""
+      @on-cancel
       ok-text="Assure"
       cancel-text="Cancel"
     >
@@ -605,7 +618,7 @@
       v-model="editTaskModal"
       title="Edit Task"
       @on-ok="updateTask('formValidate')"
-      @on-cancel=""
+      @on-cancel
       ok-text="Ok"
       cancel-text="Cancel"
       width="800px"
@@ -891,6 +904,7 @@ export default {
     this.contentHeight = window.innerHeight + "px";
     this.toProjectPage = "/project/" + sessionStorage.getItem("projectId");
     this.inquiryTask();
+    this.getProjectInfo();
     window.addEventListener("resize", this.initSize);
   },
   // add by mzy for navigation guards
@@ -909,7 +923,7 @@ export default {
           }
         }
         if (!(vm.subProjectInfo.managerId == userId || isMember)) {
-          this.$Message.error('You have no property to access it');
+          this.$Message.error("You have no property to access it");
           // next(`/project/${vm.$store.getters.currentProjectId}`);
           vm.$router.go(-1);
         }
@@ -958,6 +972,8 @@ export default {
         this.$set(this, "subProjectInfo", subProjectInfo);
         this.inviteAble = false;
         this.showMembers();
+        sessionStorage.setItem("subProjectId", subProjectInfo.subProjectId);
+        sessionStorage.setItem("subProjectName", subProjectInfo.title);
       } else {
         $.ajax({
           url:
@@ -968,10 +984,10 @@ export default {
           type: "GET",
           async: false,
           success: data => {
-            if(data == "Offline"){
+            if (data == "Offline") {
               this.$store.commit("userLogout");
               this.$router.push({ name: "Login" });
-            }else if (data != "None"&&data!="Fail") {
+            } else if (data != "None" && data != "Fail") {
               subProjectInfo = data[0];
               this.$set(this, "subProjectInfo", subProjectInfo);
               sessionStorage.setItem(
@@ -1065,8 +1081,9 @@ export default {
         this.subprojectSocket = null;
       }
       let roomId = this.subProjectInfo.subProjectId + "task";
-      // var subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + roomId;
-      var subprojectSocketURL = "ws://"+this.$store.state.IP_Port+"/GeoProblemSolving/Module/" + roomId;
+      var subprojectSocketURL =
+        "ws://localhost:8081/GeoProblemSolving/Module/" + roomId;
+      // var subprojectSocketURL = "ws://"+this.$store.state.IP_Port+"/GeoProblemSolving/Module/" + roomId;
       this.subprojectSocket = new WebSocket(subprojectSocketURL);
       this.subprojectSocket.onopen = this.onOpen;
       this.subprojectSocket.onmessage = this.onMessage;
@@ -1128,26 +1145,33 @@ export default {
         if (this.participants[i].userId != this.$store.getters.userId) {
           let notice = {};
           notice["recipientId"] = this.participants[i].userId;
-          notice["type"] = "Work"; //其他的类型都是小写，当然如果用的地方也同样用大写来判断也没问题
+          notice["type"] = "work";
           notice["content"] = {
             subProjectId: this.subProjectInfo.subProjectId,
             title: "Work Notice",
             description:
-              "The sub-project " +
+              "The manager of" +
+              " the sub-project " +
               this.subProjectInfo.title +
               " of project " +
               this.projectInfo.title +
-              " in which you participate has new progress!"
+              " informs you to start working!"
           };
           this.axios
             .post("/GeoProblemSolving/notice/save", notice)
             .then(res => {
-              //这个地方是不是应该加个回执判断比较好
-              this.$Message.info("Apply Successfully"); //这个提示是不是有点不对应情景？
-              this.$emit("sendNotice", data.managerId); //这个地方是拿不到managerId的
+              if (res.data == "Success") {
+                this.$Notice.success({
+                  desc: "Inform Successfully"
+                });
+              } else {
+                this.$Notice.info({
+                  desc: "Inform failed"
+                });
+              }
             })
             .catch(err => {
-              console.log("申请失败的原因是：" + err.data); //这也不对应情景
+              console.log(err.data);
             });
         }
       }
@@ -1158,34 +1182,36 @@ export default {
     cancel() {},
     //加载并打开成员邀请Modal
     inviteMembersModalShow() {
-      let that = this;
       this.candidates = [];
       this.inviteList = [];
-      let projectInfo = this.$store.getters.project;
 
+      let allMembers = this.projectInfo.members;
+      let manager = {
+        userName: this.projectInfo.managerName,
+        userId: this.projectInfo.managerId
+      };
+      allMembers.unshift(manager);
+      for (let i = 0; i < allMembers.length; i++) {
+        let exist = false;
+        for (let j = 0; j < this.participants.length; j++) {
+          if (allMembers[i].userId === this.participants[j].userId) {
+            exist = true;
+          }
+        }
+        if (!exist) {
+          this.candidates.push(allMembers[i]);
+        }
+      }
+      this.inviteModal = true;
+    },
+    getProjectInfo() {
+      let that = this;
+      let projectInfo = this.$store.getters.project;
       if (
         JSON.stringify(projectInfo) != "{}" &&
         projectInfo.projectId == this.subProjectInfo.projectId
       ) {
-        let allMembers = projectInfo.members;
-        let manager = {
-          userName: projectInfo.managerName,
-          userId: projectInfo.managerId
-        };
-        if(allMembers[0].userId!=manager.userId){
-          allMembers.unshift(manager);
-        }
-        for (let i = 0; i < allMembers.length; i++) {
-          let exist = false;
-          for (let j = 0; j < that.participants.length; j++) {
-            if (allMembers[i].userId === that.participants[j].userId) {
-              exist = true;
-            }
-          }
-          if (!exist) {
-            that.candidates.push(allMembers[i]);
-          }
-        }
+        this.projectInfo = projectInfo;
       } else {
         this.axios
           .get(
@@ -1196,26 +1222,8 @@ export default {
           )
           .then(res => {
             if (res.data != "None" && res.data != "Fail") {
-              this.projectInfo = res.data[0];
-              this.$store.commit("setProjectInfo", res.data[0]);
-
-              let allMembers = this.projectInfo.members;
-              let manager = {
-                userName: this.projectInfo.managerName,
-                userId: this.projectInfo.managerId
-              };
-              allMembers.unshift(manager);
-              for (let i = 0; i < allMembers.length; i++) {
-                let exist = false;
-                for (let j = 0; j < that.participants.length; j++) {
-                  if (allMembers[i].userId === that.participants[j].userId) {
-                    exist = true;
-                  }
-                }
-                if (!exist) {
-                  that.candidates.push(allMembers[i]);
-                }
-              }
+              that.projectInfo = res.data[0];
+              that.$store.commit("setProjectInfo", res.data[0]);
             } else {
               console.log(res.data);
             }
@@ -1224,7 +1232,6 @@ export default {
             console.log(err.data);
           });
       }
-      this.inviteModal = true;
     },
     inviteMembers() {
       var that = this;
@@ -1355,10 +1362,10 @@ export default {
           this.axios
             .post("/GeoProblemSolving/task/save", taskForm)
             .then(res => {
-              if(res.data == "Offline"){
+              if (res.data == "Offline") {
                 this.$store.commit("userLogout");
                 this.$router.push({ name: "Login" });
-              }else if (res.data != "Fail") {
+              } else if (res.data != "Fail") {
                 // 任务更新socket
                 this.socketMsg.whoid = this.$store.getters.userId;
                 this.socketMsg.who = this.$store.getters.userName;
@@ -1386,10 +1393,10 @@ export default {
       this.axios
         .post("/GeoProblemSolving/task/update", taskForm)
         .then(res => {
-          if(res.data == "Offline"){
+          if (res.data == "Offline") {
             this.$store.commit("userLogout");
             this.$router.push({ name: "Login" });
-          }else if (res.data != "None" && res.data != "Fail") {
+          } else if (res.data != "None" && res.data != "Fail") {
             this.socketMsg.whoid = this.$store.getters.userId;
             this.socketMsg.who = this.$store.getters.userName;
             this.socketMsg.type = "tasks";
@@ -1502,10 +1509,10 @@ export default {
           this.axios
             .post("/GeoProblemSolving/task/update", taskForm)
             .then(res => {
-              if(res.data == "Offline"){
+              if (res.data == "Offline") {
                 this.$store.commit("userLogout");
                 this.$router.push({ name: "Login" });
-              }else if (res.data != "None" && res.data != "Fail") {
+              } else if (res.data != "None" && res.data != "Fail") {
                 this.updateTaskList(res.data); // 只更新单个任务
                 this.socketMsg.whoid = this.$store.getters.userId;
                 this.socketMsg.who = this.$store.getters.userName;
@@ -1620,10 +1627,10 @@ export default {
               .post("/GeoProblemSolving/task/update", taskUpdateObj)
               .then(res => {
                 count--;
-                if(res.data == "Offline"){
+                if (res.data == "Offline") {
                   this.$store.commit("userLogout");
                   this.$router.push({ name: "Login" });
-                }else if (res.data != "Fail") {
+                } else if (res.data != "Fail") {
                   //更新数组
                   taskList[stateChangeIndex].managerName = thisUserName;
                   if (this.MoveCount == 0 && count == 1) {
@@ -1643,10 +1650,10 @@ export default {
               .post("/GeoProblemSolving/task/update", taskUpdateObj)
               .then(res => {
                 count--;
-                if(res.data == "Offline"){
+                if (res.data == "Offline") {
                   this.$store.commit("userLogout");
                   this.$router.push({ name: "Login" });
-                }else if (res.data != "Fail") {
+                } else if (res.data != "Fail") {
                   if (this.MoveCount == 0 && count == 1) {
                     this.endMove();
                   }

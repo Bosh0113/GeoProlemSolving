@@ -1895,6 +1895,7 @@ export default {
                     this1.axios
                       .post("/GeoProblemSolving/module/update", updateObject)
                       .then(res => {
+                        this1.allRecords = [];
                         this1.getAllModules("init");
 
                         let socketMsg = { type: "module", operate: "update" };
