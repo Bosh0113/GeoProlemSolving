@@ -402,31 +402,34 @@ export default {
       var count = files.length;
       var filesInfoList = [];
       if (files.length > 0) {
-        for (var i = 0; i < files.length; i++) {
-          var fileId = files[i].uid;
-          this.axios
-            .get(
-              "/GeoProblemSolving/resource/inquiry" +
-                "?key=resourceId" +
-                "&value=" +
-                fileId
-            )
-            .then(res => {
-              if (res != "Fail") {
-                var fileInfo = res.data[0];
-                fileInfo.uploadTime = fileInfo.uploadTime.substring(0, 10);
-                filesInfoList.push(fileInfo);
-                if (--count == 0) {
-                  this.$set(this, "currentFileList", filesInfoList);
+        this.axios
+          .get(
+            "/GeoProblemSolving/resource/inquiry" +
+              "?key=scope.subProjectId" +
+              "&value=" +
+              this.subProjectId
+          )
+          .then(res => {
+            if (res != "Fail") {
+              var allFiles = res.data;
+              for(var i=0;i<allFiles.length;i++){
+                var subProjectFile = allFiles[i];
+                for(var j=0;j<files.length;j++){
+                  var folderFile = files[j];
+                  if(subProjectFile.resourceId == folderFile.uid){
+                    subProjectFile.uploadTime = subProjectFile.uploadTime.substring(0,10);
+                    filesInfoList.push(subProjectFile);
+                  }
                 }
-              } else {
-                console.log("Get file info fail.");
               }
-            })
-            .catch(err => {
+              this.$set(this, "currentFileList", filesInfoList);
+            } else {
               console.log("Get file info fail.");
-            });
-        }
+            }
+          })
+          .catch(err => {
+            console.log("Get file info fail.");
+          });
       } else {
         this.$set(this, "currentFileList", filesInfoList);
       }
