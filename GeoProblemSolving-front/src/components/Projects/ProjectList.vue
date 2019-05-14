@@ -53,34 +53,34 @@ img {
         <div>
           <Tabs value="All" type="card" @on-click="filterProjects">
             <TabPane label="All" name="All" icon="ios-list">
-              <project-list :projectList = projectShowList projectType="All"></project-list>
+              <project-list :projectList = projectShowList projectType="All" @sendNotice="sendMessage"></project-list>
             </TabPane>
             <TabPane label="Terrestrial" name="Terrestrial" icon="md-globe">
-              <project-list :projectList = projectShowList projectType="Terrestrial"></project-list>
+              <project-list :projectList = projectShowList projectType="Terrestrial" @sendNotice="sendMessage"></project-list>
             </TabPane>
             <TabPane label="Coastal" name="Coastal" icon="ios-boat">
-              <project-list :projectList = projectShowList projectType="Coastal"></project-list>
+              <project-list :projectList = projectShowList projectType="Coastal" @sendNotice="sendMessage"></project-list>
             </TabPane>
             <TabPane label="Marine" name="Marine" icon="ios-water">
-              <project-list :projectList = projectShowList projectType="Marine"></project-list>
+              <project-list :projectList = projectShowList projectType="Marine" @sendNotice="sendMessage"></project-list>
             </TabPane>
             <TabPane label="Climate" name="Climate" icon="ios-partly-sunny">
-              <project-list :projectList = projectShowList projectType="Climate"></project-list>
+              <project-list :projectList = projectShowList projectType="Climate" @sendNotice="sendMessage"></project-list>
             </TabPane>
             <TabPane label="Ecological" name="Ecological" icon="ios-leaf">
-              <project-list :projectList = projectShowList projectType="Ecological"></project-list>
+              <project-list :projectList = projectShowList projectType="Ecological" @sendNotice="sendMessage"></project-list>
             </TabPane>
             <TabPane label="Geological" name="Geological" icon="ios-analytics">
-              <project-list :projectList = projectShowList projectType="Geological"></project-list>
+              <project-list :projectList = projectShowList projectType="Geological" @sendNotice="sendMessage"></project-list>
             </TabPane>
             <TabPane label="Human-Activity" name="Human" icon="ios-people">
-              <project-list :projectList = projectShowList projectType="Human"></project-list>
+              <project-list :projectList = projectShowList projectType="Human" @sendNotice="sendMessage"></project-list>
             </TabPane>
             <TabPane label="GIS & RS" name="GISRS" icon="ios-globe">
-              <project-list :projectList = projectShowList projectType="GISRS"></project-list>
+              <project-list :projectList = projectShowList projectType="GISRS" @sendNotice="sendMessage"></project-list>
             </TabPane>
             <TabPane label="General" name="General" icon="ios-grid">
-              <project-list :projectList = projectShowList projectType="General"></project-list>
+              <project-list :projectList = projectShowList projectType="General" @sendNotice="sendMessage"></project-list>
             </TabPane>
           </Tabs>
         </div>
@@ -169,6 +169,9 @@ export default {
       } else {
         this.$router.push({ name: "NewProject" });
       }
+    },
+    sendMessage(recipientId){
+      this.$emit("sendNotice", recipientId);
     }
   }
 };
