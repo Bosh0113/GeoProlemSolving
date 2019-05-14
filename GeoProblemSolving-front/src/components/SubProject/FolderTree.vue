@@ -193,7 +193,7 @@
                      <p>Click or drag files here to upload(The file size must control in <span style="color:red">1GB</span>)</p>
                 </div>
             </Upload>
-            <div style="padding:0 10px 0 10px">
+            <div style="padding:0 10px 0 10px;max-height:200px;overflow-y:auto">
                 <ul v-for="(list,index) in toUploadFiles" :key="index">
                     <li style="display:flex">
                     File name:
@@ -324,7 +324,7 @@ export default {
       selectedFileData: [],
       panel:null
     };
-  }, 
+  },
   methods: {
     closePanel() {
       if (this.panel != null) {
@@ -568,12 +568,12 @@ export default {
     },
     gatherFile(file) {
       let that = this;
-      if (that.toUploadFiles.length >= 5) {
+      if (that.toUploadFiles.length >= 500) {
         if(this.fileCountTimer!=null){
           clearTimeout(this.fileCountTimer);
         }
         this.fileCountTimer=setTimeout(()=>{
-          this.$Message.info("最多只能上传5个文件");
+          this.$Message.info("最多只能上传500个文件");
         },500);
       } else {
         var fileSize = file.size;
