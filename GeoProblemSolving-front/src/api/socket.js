@@ -9,8 +9,8 @@ function getWebIP() {
     return curIP;
 }
 
-function initWebSocket(para) { //初始化websocket
-    var wsurl = "ws://"+this.$store.state.IP_Port+"/GeoProblemSolving/" + para;
+function initWebSocket(para,IP_Port) { //初始化websocket
+    var wsurl = "ws://"+IP_Port+"/GeoProblemSolving/" + para;
     // var wsurl = "ws://localhost:8081/GeoProblemSolving/" + para;
     //switch 使用时提供一个参数type
     websock = new WebSocket(wsurl);
