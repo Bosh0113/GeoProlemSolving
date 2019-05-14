@@ -9,49 +9,48 @@
                 <img v-bind:src="userDetail.avatar" class="u_img"
                   v-if="userDetail.avatar!=''&&userDetail.avatar!='undefined'&&userDetail.avatar!='null'">
                 <avatar
-                  style="width:100%"
+                  style="width:200px"
+                  class="avatarStyle"
                   :username="userDetail.userName"
                   :size="200"
                   :rounded="false"
                   v-else>
                 </avatar>
               </div>
-              <div class="single-info">
+              <div class="single-info" :title="`Name: `+ userDetail.userName">
                 <Icon type="ios-contact-outline" :size="20"/>
                 <span>{{userDetail.userName}}</span>
               </div>
-              <div class="user-info">
-                <div class="single-info" >
+                <div class="single-info" :title="`Email:  ` + userDetail.email">
                   <!-- <span>email:</span> -->
                   <Icon type="ios-mail-outline" :size="20"/>
                   <span>{{userDetail.email}}</span>
                 </div>
-                <div class="single-info">
+                <div class="single-info" v-show="userDetail.mobilePhone!=''" :title="`Phone:  `+ userDetail.mobilePhone ">
                   <Icon type="ios-call-outline" :size="20"/>
                   <span>{{userDetail.mobilePhone}}</span>
                 </div>
-                <div class="single-info">
+                <div class="single-info" :title="`Job Title:  `+userDetail.jobTitle">
                   <Icon type="ios-hammer-outline" :size="20"/>
                   <span>{{userDetail.jobTitle}}</span>
                 </div>
-                <div class="single-info">
+                <div class="single-info" v-show="userDetail.city!=''&&userDetail.country!=''">
                   <Icon type="ios-compass-outline" :size="20"/>
                   <span>{{userDetail.country}}&nbsp{{userDetail.city}}</span>
                 </div>
-                <div class="single-info">
-                  <Icon type="ios-home-outline" :size="20"/>
+                <div class="single-info" v-show="userDetail.organization!=''" :title="`Organization:  `+ userDetail.organization" style="overflow:hidden;white-space:nowrap;text-overflow:clips">
+                  <Icon type="ios-home-outline" :size="20"/ >
                   <span>{{userDetail.organization}}</span>
                 </div>
-                <div class="single-info">
+                <div class="single-info" v-show="userDetail.direction!=''" :title="`Direction:  `+ userDetail.direction">
                   <Icon type="ios-contract" :size="20"/>
                   <span>{{userDetail.direction}}</span>
                 </div>
-                <div class="single-info">
+                <div class="single-info" v-show="userDetail.homePage!=''" :title="`Home Page:  `+ userDetail.homePage">
                   <Icon type="md-link" :size="20"/>
                   <span>{{userDetail.homePage}}</span>
-                </div>
                 <br>
-                <div style="padding:20px 20px 0 20px;font-size:12px;text-indent:2em;border:1px dotted lightgray">
+                <div style="padding:20px 20px 0 20px;font-size:12px;text-indent:2em;border:1px dotted lightgray" v-show="userDetail.introduction!=''">
                   {{this.userDetail.introduction}}
                 </div>
               </div>
@@ -213,12 +212,16 @@ body {
 }
 .u_img {
   max-width: 100%;
+  padding: 10px;
+}
+.avatarStyle {
+  margin: 0 auto;
 }
 .single-info {
-  padding: 20px;
-  height: 20px;
-  font-size: 10px;
-  line-height: 20px;
+  padding: 5px;
+  height: 30px;
+  font-size: 12px;
+  line-height: 15px;
 }
 .userDescription {
   height: auto;

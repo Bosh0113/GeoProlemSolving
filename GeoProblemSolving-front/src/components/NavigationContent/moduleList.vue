@@ -1001,6 +1001,8 @@
       title="Start a new process"
       @on-ok="addModule('formValidate1')"
       @on-cancel
+      ok-text='Confirm'
+      cancel-text='Cancel'
     >
       <Form
         ref="formValidate1"
@@ -1036,6 +1038,8 @@
       title="Choose data to next process"
       @on-ok="createModule()"
       @on-cancel
+      ok-text="Confirm"
+      cancel-text="Cancel"
     >
       <Transfer
         :data="inheritResource"
