@@ -1053,12 +1053,16 @@ export default {
           .then(res => {
             if (res.data == "Success") {
               this.$Notice.success({
-                title: "Notification title",
+                title: "Process result",
                 desc: "Delete successfully"
               });
               this.getUserResource();
             } else if (res.data == "Fail") {
-              this.$Message.info("Failure");
+              this.$Notice.error({
+                title: "Process result",
+                desc: "Delete fail"
+              });
+              // this.$Message.info("Failure");
             }
           })
           .catch(err => {
