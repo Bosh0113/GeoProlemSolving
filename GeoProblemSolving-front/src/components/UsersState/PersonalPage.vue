@@ -39,7 +39,7 @@
               </div>
               <div
                 class="single-info"
-                :title="`City&Country:  `+ userDetail.city + userDetail.country"
+                :title="`Position:  `+ userDetail.city + userDetail.country"
                 v-show="userDetail.city!=''&&userDetail.country!=''"
               >
                 <Icon type="ios-compass-outline" :size="20"/>

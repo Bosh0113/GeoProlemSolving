@@ -34,7 +34,7 @@
                   <Icon type="ios-hammer-outline" :size="20"/>
                   <span>{{userDetail.jobTitle}}</span>
                 </div>
-                <div class="single-info" v-show="userDetail.city!=''&&userDetail.country!=''">
+                <div class="single-info" v-show="userDetail.city!=''&&userDetail.country!=''" :title="`Position:  `+ userDetail.city + ' ' + userDetail.country">
                   <Icon type="ios-compass-outline" :size="20"/>
                   <span>{{userDetail.country}}&nbsp{{userDetail.city}}</span>
                 </div>
