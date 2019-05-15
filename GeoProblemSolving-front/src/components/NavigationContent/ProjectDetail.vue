@@ -1163,7 +1163,7 @@ export default {
           vm.currentProjectDetail.isManager = true;
         }
         if (!(isMember || vm.currentProjectDetail.isManager)) {
-          this.$Message.error("You have no property to access it");
+          vm.$Message.error("You have no property to access it");
           next("/projectlist");
           // vm.$router.go(-1);
         }
@@ -1180,11 +1180,11 @@ export default {
     getProjectDetail() {
       let projectInfo = this.$store.getters.project;
       let pid = this.$route.params.id;
-      var that = this;
       if (JSON.stringify(projectInfo) != "{}" && projectInfo.projectId == pid) {
-        that.currentProjectDetail = projectInfo;
+        this.currentProjectDetail = projectInfo;
         this.updateRelatedInfo();
       } else {
+        let that = this;
         let queryObject = { key: "projectId", value: pid };
         try {
           $.ajax({
@@ -1203,6 +1203,7 @@ export default {
                   introduction: "",
                   projectId: ""
                 };
+                that.updateRelatedInfo();
               } else {
                 let projectInfo = data[0];
                 projectInfo.isManager = that.managerIdentity(
@@ -1224,15 +1225,14 @@ export default {
       }
     },
     updateRelatedInfo() {
-      var that = this;
       // 邀请他人加入项目的form的复制项目id与项目名的按钮
-      that.copyProjectId = that.currentProjectDetail.projectId;
-      that.copyProjectTitle = that.currentProjectDetail.title;
-      that.projectManager.userId = that.currentProjectDetail.managerId;
-      that.projectManager.userName = that.currentProjectDetail.managerName;
-      sessionStorage.setItem("projectId", that.currentProjectDetail.projectId);
-      sessionStorage.setItem("projectName", that.currentProjectDetail.title);
-      //将tag进行分割
+      this.copyProjectId = this.currentProjectDetail.projectId;
+      this.copyProjectTitle = this.currentProjectDetail.title;
+      this.projectManager.userId = this.currentProjectDetail.managerId;
+      this.projectManager.userName = this.currentProjectDetail.managerName;
+
+      sessionStorage.setItem("projectId", this.currentProjectDetail.projectId);
+      sessionStorage.setItem("projectName", this.currentProjectDetail.title);
     },
     // identify the manager of project
     managerIdentity(managerId) {
@@ -1804,9 +1804,9 @@ export default {
         })
         .catch(err => {});
     },
-    joinSubProject(project) {
+    joinSubProject(subProject) {
       let joinSubPForm = {};
-      joinSubPForm["recipientId"] = project.managerId;
+      joinSubPForm["recipientId"] = subProject.managerId;
       joinSubPForm["type"] = "apply";
       let userDetail = this.$store.getters.userInfo;
       joinSubPForm["content"] = {
@@ -1817,11 +1817,13 @@ export default {
         description:
           "User " +
           this.$store.getters.userName +
-          " apply to join in your project's sub project: " +
-          project.title +
+          " apply to join in your subproject: " +
+          subProject.title +
+          " of project: " +
+          this.currentProjectDetail.title +
           " .",
-        projectId: project.subProjectId,
-        projectTitle: project.title,
+        projectId: subProject.subProjectId,
+        projectTitle: subProject.title,
         scope: "subProject",
         approve: "unknow"
       };
@@ -1830,7 +1832,7 @@ export default {
         .post("/GeoProblemSolving/notice/save", joinSubPForm)
         .then(res => {
           this.$Message.info("Apply Successfully");
-          this.$emit("sendNotice", project.managerId);
+          this.$emit("sendNotice", subProject.managerId);
         })
         .catch(err => {
           console.log("申请失败的原因是：" + err.data);
@@ -1841,10 +1843,12 @@ export default {
       joinSubProjectEmail["mailContent"] =
         "User " +
         this.$store.getters.userName +
-        " apply to join in your project's sub project: " +
-        project.title +
+        " apply to join in your subproject: " +
+        subProject.title +
+        " of project: " +
+        this.currentProjectDetail.title +
         " ." +
-        "you can access the platform to process it.";
+        " And you can access the subproject from this platform.";
       this.axios
         .post("/GeoProblemSolving/email/send", joinSubProjectEmail)
         .then(res => {

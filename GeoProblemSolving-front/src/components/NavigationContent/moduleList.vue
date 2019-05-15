@@ -1352,7 +1352,7 @@ export default {
           }
         }
         if (!(isManager || isMember)) {
-          this.$Message.error("You have no property to access it");
+          vm.$Message.error("You have no property to access it");
           // next(`/project/${vm.$store.getters.currentProjectId}`);
           vm.$router.go(-1);
         }
