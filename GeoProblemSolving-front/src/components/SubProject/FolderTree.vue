@@ -218,10 +218,20 @@
       <Upload :max-size="1024*1024" multiple type="drag" :before-upload="gatherFile" action="-">
         <div style="padding: 20px 0">
           <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
+<<<<<<< HEAD
           <p>Click or drag file here to upload</p>
         </div>
       </Upload>
       <div style="padding:0 10px 0 10px">
+=======
+          <p>
+            Click or drag files here to upload(The file size must control in
+            <span style="color:red">1GB</span>)
+          </p>
+        </div>
+      </Upload>
+      <div style="padding:0 10px 0 10px;max-height:200px;overflow-y:auto">
+>>>>>>> lyc
         <ul v-for="(list,index) in toUploadFiles" :key="index">
           <li style="display:flex">
             File name:
@@ -392,21 +402,17 @@ export default {
       this.currentFolder = folder;
       this.folderUIDStack.push(this.currentFolder.uid);
       this.folderNameStack.push(this.currentFolder.name);
-      this.getCurrentFilesInfo();
+      // this.getCurrentFilesInfo();
+      this.getCurrentFilesInfo2();
     },
-    getCurrentFilesInfo() {
-      var files = this.currentFolder.files;
-      var count = files.length;
-      var filesInfoList = [];
-      if (files.length > 0) {
-        for (var i = 0; i < files.length; i++) {
-          var fileId = files[i].uid;
+
+    getCurrentFilesInfo2(){
           this.axios
             .get(
               "/GeoProblemSolving/resource/inquiry" +
-                "?key=resourceId" +
+                "?key=scope.subProjectId" +
                 "&value=" +
-                fileId
+                this.subProjectId
             )
             .then(res => {
               if (res != "Fail") {
@@ -415,6 +421,8 @@ export default {
                 filesInfoList.push(fileInfo);
                 if (--count == 0) {
                   this.$set(this, "currentFileList", filesInfoList);
+                  console.table(this.currentFileList);
+
                 }
               } else {
                 console.log("Get file info fail.");
@@ -423,7 +431,74 @@ export default {
             .catch(err => {
               console.log("Get file info fail.");
             });
-        }
+      // var files = this.currentFolder.files;
+      // var count = files.length;
+      // var filesInfoList = [];
+      // if (files.length > 0) {
+      //   for (var i = 0; i < files.length; i++) {
+      //     var fileId = files[i].uid;
+      //     console.log("subProjectID是:" + this.subProjectId);
+      //     this.axios
+      //       .get(
+      //         "/GeoProblemSolving/resource/inquiry" +
+      //           "?key=scope.subProjectId" +
+      //           "&value=" +
+      //           this.subProjectId
+      //       )
+      //       .then(res => {
+      //         if (res != "Fail") {
+      //           var fileInfo = res.data[0];
+      //           fileInfo.uploadTime = fileInfo.uploadTime.substring(0,10);
+      //           filesInfoList.push(fileInfo);
+      //           if (--count == 0) {
+      //             this.$set(this, "currentFileList", filesInfoList);
+      //             console.table(this.currentFileList);
+      //           }
+      //         } else {
+      //           console.log("Get file info fail.");
+      //         }
+      //       })
+      //       .catch(err => {
+      //         console.log("Get file info fail.");
+      //       });
+      //   }
+      // } else {
+      //   this.$set(this, "currentFileList", filesInfoList);
+      // }
+    },
+    getCurrentFilesInfo() {
+      var files = this.currentFolder.files;
+      var count = files.length;
+      var filesInfoList = [];
+      if (files.length > 0) {
+        this.axios
+          .get(
+            "/GeoProblemSolving/resource/inquiry" +
+              "?key=scope.subProjectId" +
+              "&value=" +
+              this.subProjectId
+          )
+          .then(res => {
+            if (res != "Fail") {
+              var allFiles = res.data;
+              for(var i=0;i<allFiles.length;i++){
+                var subProjectFile = allFiles[i];
+                for(var j=0;j<files.length;j++){
+                  var folderFile = files[j];
+                  if(subProjectFile.resourceId == folderFile.uid){
+                    subProjectFile.uploadTime = subProjectFile.uploadTime.substring(0,10);
+                    filesInfoList.push(subProjectFile);
+                  }
+                }
+              }
+              this.$set(this, "currentFileList", filesInfoList);
+            } else {
+              console.log("Get file info fail.");
+            }
+          })
+          .catch(err => {
+            console.log("Get file info fail.");
+          });
       } else {
         this.$set(this, "currentFileList", filesInfoList);
       }
@@ -516,7 +591,8 @@ export default {
     },
     refreshCurrentAll(folder, uid) {
       this.refreshCurrentFolder(folder, uid);
-      this.getCurrentFilesInfo();
+      // this.getCurrentFilesInfo();
+      this.getCurrentFilesInfo2();
     },
     deleteFolder(folder) {
       if (confirm("Are you sure to delete this folder?")) {
@@ -603,12 +679,20 @@ export default {
     },
     gatherFile(file) {
       let that = this;
+<<<<<<< HEAD
       if (that.toUploadFiles.length >= 5) {
+=======
+      if (that.toUploadFiles.length >= 500) {
+>>>>>>> lyc
         if (this.fileCountTimer != null) {
           clearTimeout(this.fileCountTimer);
         }
         this.fileCountTimer = setTimeout(() => {
+<<<<<<< HEAD
           this.$Message.info("最多只能上传5个文件");
+=======
+          this.$Message.info("最多只能上传500个文件");
+>>>>>>> lyc
         }, 500);
       } else {
         var fileSize = file.size;
@@ -694,7 +778,11 @@ export default {
           this.panel.close();
         }
         var url =
+<<<<<<< HEAD
           "http://94.191.49.160:8012/previewFile?url=" +
+=======
+          "http://172.21.212.7:8012/previewFile?url=" +
+>>>>>>> lyc
           "http://" +
           this.$store.state.IP_Port +
           fileInfo.pathURL;

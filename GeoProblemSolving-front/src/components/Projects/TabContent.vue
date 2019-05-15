@@ -319,7 +319,6 @@ export default {
           } else {
             if (this.$store.getters.userState) {
               let userDetail = this.$store.getters.userInfo;
-              console.table(userDetail.email);
               let joinForm = {};
               sessionStorage.setItem("applyId", data.projectId);
               joinForm["recipientId"] = data.managerId;
@@ -342,34 +341,6 @@ export default {
                 scope: "project",
                 approve: "unknow"
               };
-              let emailForm = {};
-              emailForm["recipient"] = userDetail.email;
-              emailForm["mailTitle"] = "Join application";
-              emailForm["mailContent"] = "User " +
-                  this.$store.getters.userName +
-                  " apply to join your project: " +
-                  data.title +
-                  " ." +
-                  " The reason for application is: " +
-                  this.applyValidate.reason,"you can access the platform to process it.";
-              this.axios.post("/GeoProblemSolving/email/send", emailForm)
-              .then(res=>{
-                  if (res.data == "Success") {
-                  this.$Notice.success({
-                    title: "Email send title",
-                    desc:
-                      "The join email has been sent,if he/she doesn't online,the email will remind the mamnager in time."
-                  });
-                } else {
-                  this.$Notice.error({
-                    title: "Email send fail",
-                    desc: "The invitation isn't be sent successfully."
-                  });
-                }
-              })
-              .catch(err=> {
-                console.log(err.data);
-              })
               this.axios
                 .post("/GeoProblemSolving/notice/save", joinForm)
                 .then(res => {

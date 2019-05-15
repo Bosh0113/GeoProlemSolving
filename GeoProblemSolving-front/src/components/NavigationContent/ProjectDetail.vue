@@ -810,7 +810,7 @@
               </div>
               <br>
               <Modal title="View Image" v-model="visible">
-                <img :src="projectEditForm.picture" v-if="visible" style="width: 100%">
+                <img :src="pictureUrl" v-if="visible" style="width: 100%">
               </Modal>
             </div>
           </FormItem>

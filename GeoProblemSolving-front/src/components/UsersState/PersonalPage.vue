@@ -39,7 +39,7 @@
               </div>
               <div
                 class="single-info"
-                :title="`City&Country:  `+ userDetail.city + userDetail.country"
+                :title="`Position:  `+ userDetail.city + userDetail.country"
                 v-show="userDetail.city!=''&&userDetail.country!=''"
               >
                 <Icon type="ios-compass-outline" :size="20"/>
@@ -51,15 +51,14 @@
                 v-show="userDetail.organization!=''"
                 style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis"
               >
-                <Icon type="ios-home-outline" :size="20"/>{{userDetail.organization}}
+                <Icon type="ios-home-outline" :size="20"/><span> {{userDetail.organization}}</span>
               </div>
-              <div class="single-info" :title="`Direction:  `+ userDetail.direction" v-show="userDetail.direction!=''">
-                <Icon type="ios-contract" :size="20"/>
-                <span>{{userDetail.direction}}</span>
+              <div class="single-info" :title="`Direction:  `+ userDetail.direction" v-show="userDetail.direction!=''" style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis">
+                <Icon type="ios-contract" :size="20"/><span> {{userDetail.direction}}</span>
               </div>
-              <div class="single-info" :title="`Home Page:  `+ userDetail.homePage" v-show="userDetail.homePage!=''">
+              <div class="single-info" :title="`Home Page:  `+ userDetail.homePage" v-show="userDetail.homePage!=''" style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis">
                 <Icon type="md-link" :size="20"/>
-                <span>{{userDetail.homePage}}</span>
+                <span> {{userDetail.homePage}}</span>
               </div>
               <br>
               <div
@@ -679,7 +678,8 @@ export default {
       // 要删除管理的项目的模态框
       deleteProjectModal: false,
       // 要删除的项目的Id
-      deleteProjectId: ""
+      deleteProjectId: "",
+      img:"",
     };
   },
   methods: {
@@ -941,6 +941,8 @@ export default {
         reader.onload = e => {
           // 读取到的图片base64 数据编码 将此编码字符串传给后台即可
           imgcode = e.target.result;
+          this.personalInfoItem.avatar = imgcode;
+          this.userDetail.avatar = "";
           this.$store.commit("uploadAvatar", imgcode);
         };
       }
@@ -949,6 +951,8 @@ export default {
       this.visible = true;
     },
     handleRemove() {
+      this.personalInfoItem.avatar = "";
+      this.userDetail.avatar = "";
       this.$store.commit("uploadAvatar", "");
     },
     submitProfileEdit(name) {
@@ -1048,12 +1052,16 @@ export default {
           .then(res => {
             if (res.data == "Success") {
               this.$Notice.success({
-                title: "Notification title",
+                title: "Process result",
                 desc: "Delete successfully"
               });
               this.getUserResource();
             } else if (res.data == "Fail") {
-              this.$Message.info("Failure");
+              this.$Notice.error({
+                title: "Process result",
+                desc: "Delete fail"
+              });
+              // this.$Message.info("Failure");
             }
           })
           .catch(err => {

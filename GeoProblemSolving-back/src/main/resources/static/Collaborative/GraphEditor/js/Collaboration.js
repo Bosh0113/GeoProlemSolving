@@ -55,8 +55,7 @@ var waitingList = [];
                 let groupID = url.match(reg)[1];
                 // mxGraphSocket = new WebSocket("ws://localhost:8081/GeoProblemSolving/GraphEditorSocket/" + groupID);
                 // mxGraphSocket = new WebSocket("ws://172.21.212.7:8082/GeoProblemSolving/GraphEditorSocket/" + groupID);
-                // mxGraphSocket = new WebSocket("ws://172.21.213.185:8080/GeoProblemSolving/GraphEditorSocket/" + groupID);
-                mxGraphSocket = new WebSocket("ws://94.191.49.160:8080/GeoProblemSolving/GraphEditorSocket/" + groupID);
+                mxGraphSocket = new WebSocket("ws://172.21.213.185:8080/GeoProblemSolving/GraphEditorSocket/" + groupID);
                 mxGraphSocket.onopen = function () {
                     console.log("Websocket connected.");
                     var messageObject={
