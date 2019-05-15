@@ -679,7 +679,8 @@ export default {
       // 要删除管理的项目的模态框
       deleteProjectModal: false,
       // 要删除的项目的Id
-      deleteProjectId: ""
+      deleteProjectId: "",
+      img:"",
     };
   },
   methods: {
@@ -941,6 +942,8 @@ export default {
         reader.onload = e => {
           // 读取到的图片base64 数据编码 将此编码字符串传给后台即可
           imgcode = e.target.result;
+          this.personalInfoItem.avatar = imgcode;
+          this.userDetail.avatar = "";
           this.$store.commit("uploadAvatar", imgcode);
         };
       }
@@ -949,6 +952,8 @@ export default {
       this.visible = true;
     },
     handleRemove() {
+      this.personalInfoItem.avatar = "";
+      this.userDetail.avatar = "";
       this.$store.commit("uploadAvatar", "");
     },
     submitProfileEdit(name) {
