@@ -395,69 +395,7 @@ export default {
       this.currentFolder = folder;
       this.folderUIDStack.push(this.currentFolder.uid);
       this.folderNameStack.push(this.currentFolder.name);
-      // this.getCurrentFilesInfo();
-      this.getCurrentFilesInfo2();
-    },
-
-    getCurrentFilesInfo2(){
-          this.axios
-            .get(
-              "/GeoProblemSolving/resource/inquiry" +
-                "?key=scope.subProjectId" +
-                "&value=" +
-                this.subProjectId
-            )
-            .then(res => {
-              if (res != "Fail") {
-                var fileInfo = res.data[0];
-                fileInfo.uploadTime = fileInfo.uploadTime.substring(0,10);
-                filesInfoList.push(fileInfo);
-                if (--count == 0) {
-                  this.$set(this, "currentFileList", filesInfoList);
-                  console.table(this.currentFileList);
-
-                }
-              } else {
-                console.log("Get file info fail.");
-              }
-            })
-            .catch(err => {
-              console.log("Get file info fail.");
-            });
-      // var files = this.currentFolder.files;
-      // var count = files.length;
-      // var filesInfoList = [];
-      // if (files.length > 0) {
-      //   for (var i = 0; i < files.length; i++) {
-      //     var fileId = files[i].uid;
-      //     console.log("subProjectID是:" + this.subProjectId);
-      //     this.axios
-      //       .get(
-      //         "/GeoProblemSolving/resource/inquiry" +
-      //           "?key=scope.subProjectId" +
-      //           "&value=" +
-      //           this.subProjectId
-      //       )
-      //       .then(res => {
-      //         if (res != "Fail") {
-      //           var fileInfo = res.data[0];
-      //           fileInfo.uploadTime = fileInfo.uploadTime.substring(0,10);
-      //           filesInfoList.push(fileInfo);
-      //           if (--count == 0) {
-      //             this.$set(this, "currentFileList", filesInfoList);
-      //             console.table(this.currentFileList);
-      //           }
-      //         } else {
-      //           console.log("Get file info fail.");
-      //         }
-      //       })
-      //       .catch(err => {
-      //         console.log("Get file info fail.");
-      //       });
-      //   }
-      // } else {
-      //   this.$set(this, "currentFileList", filesInfoList);
-      // }
+      this.getCurrentFilesInfo();
     },
     getCurrentFilesInfo() {
       var files = this.currentFolder.files;
@@ -584,8 +522,7 @@ export default {
     },
     refreshCurrentAll(folder, uid) {
       this.refreshCurrentFolder(folder, uid);
-      // this.getCurrentFilesInfo();
-      this.getCurrentFilesInfo2();
+      this.getCurrentFilesInfo();
     },
     deleteFolder(folder) {
       if (confirm("Are you sure to delete this folder?")) {
