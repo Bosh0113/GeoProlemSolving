@@ -51,7 +51,7 @@
                 v-show="userDetail.organization!=''"
                 style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis"
               >
-                <Icon type="ios-home-outline" :size="20"/>{{userDetail.organization}}
+                <Icon type="ios-home-outline" :size="20"/> {{userDetail.organization}}
               </div>
               <div class="single-info" :title="`Direction:  `+ userDetail.direction" v-show="userDetail.direction!=''">
                 <Icon type="ios-contract" :size="20"/>
