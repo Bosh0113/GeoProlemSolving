@@ -39,16 +39,16 @@
                   <span>{{userDetail.country}}&nbsp{{userDetail.city}}</span>
                 </div>
                 <div class="single-info" v-show="userDetail.organization!=''" :title="`Organization:  `+ userDetail.organization" style="overflow:hidden;white-space:nowrap;text-overflow:clips">
-                  <Icon type="ios-home-outline" :size="20"/ >
-                  <span>{{userDetail.organization}}</span>
+                  <Icon type="ios-home-outline" :size="20"/>
+                  <span> {{userDetail.organization}}</span>
                 </div>
-                <div class="single-info" v-show="userDetail.direction!=''" :title="`Direction:  `+ userDetail.direction">
+                <div class="single-info" v-show="userDetail.direction!=''" :title="`Direction:  `+ userDetail.direction" style="overflow:hidden;white-space:nowrap;text-overflow:clips">
                   <Icon type="ios-contract" :size="20"/>
-                  <span>{{userDetail.direction}}</span>
+                  <span> {{userDetail.direction}}</span>
                 </div>
-                <div class="single-info" v-show="userDetail.homePage!=''" :title="`Home Page:  `+ userDetail.homePage">
+                <div class="single-info" v-show="userDetail.homePage!=''" :title="`Home Page:  `+ userDetail.homePage" style="overflow:hidden;white-space:nowrap;text-overflow:clips">
                   <Icon type="md-link" :size="20"/>
-                  <span>{{userDetail.homePage}}</span>
+                  <span> {{userDetail.homePage}}</span>
                 <br>
                 <div style="padding:20px 20px 0 20px;font-size:12px;text-indent:2em;border:1px dotted lightgray" v-show="userDetail.introduction!=''">
                   {{this.userDetail.introduction}}

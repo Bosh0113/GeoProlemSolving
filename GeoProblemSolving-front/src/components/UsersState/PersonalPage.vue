@@ -51,15 +51,14 @@
                 v-show="userDetail.organization!=''"
                 style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis"
               >
-                <Icon type="ios-home-outline" :size="20"/> {{userDetail.organization}}
+                <Icon type="ios-home-outline" :size="20"/><span> {{userDetail.organization}}</span>
               </div>
-              <div class="single-info" :title="`Direction:  `+ userDetail.direction" v-show="userDetail.direction!=''">
-                <Icon type="ios-contract" :size="20"/>
-                <span>{{userDetail.direction}}</span>
+              <div class="single-info" :title="`Direction:  `+ userDetail.direction" v-show="userDetail.direction!=''" style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis">
+                <Icon type="ios-contract" :size="20"/><span> {{userDetail.direction}}</span>
               </div>
-              <div class="single-info" :title="`Home Page:  `+ userDetail.homePage" v-show="userDetail.homePage!=''">
+              <div class="single-info" :title="`Home Page:  `+ userDetail.homePage" v-show="userDetail.homePage!=''" style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis">
                 <Icon type="md-link" :size="20"/>
-                <span>{{userDetail.homePage}}</span>
+                <span> {{userDetail.homePage}}</span>
               </div>
               <br>
               <div
