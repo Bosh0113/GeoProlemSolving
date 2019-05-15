@@ -1848,7 +1848,7 @@ export default {
         " of project: " +
         this.currentProjectDetail.title +
         " ." +
-        " And you can access the subproject from this platform. " + "http://"+this.$store.state.IP_Port+"/GeoProblemSolving/home";
+        " And you can access the subproject from this platform. "+"The url is " + "http://"+this.$store.state.IP_Port+"/GeoProblemSolving/home";;
       this.axios
         .post("/GeoProblemSolving/project/applyByMail", joinSubProjectEmail)
         .then(res => {
