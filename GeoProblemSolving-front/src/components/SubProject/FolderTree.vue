@@ -218,20 +218,13 @@
       <Upload :max-size="1024*1024" multiple type="drag" :before-upload="gatherFile" action="-">
         <div style="padding: 20px 0">
           <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
-<<<<<<< HEAD
-          <p>Click or drag file here to upload</p>
-        </div>
-      </Upload>
-      <div style="padding:0 10px 0 10px">
-=======
           <p>
-            Click or drag files here to upload(The file size must control in
+            Click or drag files here to upload (The file size must control in
             <span style="color:red">1GB</span>)
           </p>
         </div>
       </Upload>
       <div style="padding:0 10px 0 10px;max-height:200px;overflow-y:auto">
->>>>>>> lyc
         <ul v-for="(list,index) in toUploadFiles" :key="index">
           <li style="display:flex">
             File name:
@@ -679,20 +672,12 @@ export default {
     },
     gatherFile(file) {
       let that = this;
-<<<<<<< HEAD
       if (that.toUploadFiles.length >= 5) {
-=======
-      if (that.toUploadFiles.length >= 500) {
->>>>>>> lyc
         if (this.fileCountTimer != null) {
           clearTimeout(this.fileCountTimer);
         }
         this.fileCountTimer = setTimeout(() => {
-<<<<<<< HEAD
           this.$Message.info("最多只能上传5个文件");
-=======
-          this.$Message.info("最多只能上传500个文件");
->>>>>>> lyc
         }, 500);
       } else {
         var fileSize = file.size;
@@ -778,11 +763,7 @@ export default {
           this.panel.close();
         }
         var url =
-<<<<<<< HEAD
           "http://94.191.49.160:8012/previewFile?url=" +
-=======
-          "http://172.21.212.7:8012/previewFile?url=" +
->>>>>>> lyc
           "http://" +
           this.$store.state.IP_Port +
           fileInfo.pathURL;

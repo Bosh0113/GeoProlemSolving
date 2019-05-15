@@ -1077,13 +1077,9 @@ export default {
       if (this.subprojectSocket != null) {
         this.subprojectSocket = null;
       }
+      
       let roomId = this.subProjectInfo.subProjectId + "task";
-<<<<<<< HEAD
       // var subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + roomId;
-=======
-      // var subprojectSocketURL =
-        // "ws://localhost:8081/GeoProblemSolving/Module/" + roomId;
->>>>>>> lyc
       var subprojectSocketURL = "ws://"+this.$store.state.IP_Port+"/GeoProblemSolving/Module/" + roomId;
       this.subprojectSocket = new WebSocket(subprojectSocketURL);
       this.subprojectSocket.onopen = this.onOpen;
