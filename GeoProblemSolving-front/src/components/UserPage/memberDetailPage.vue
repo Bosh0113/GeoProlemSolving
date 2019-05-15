@@ -38,15 +38,15 @@
                   <Icon type="ios-compass-outline" :size="20"/>
                   <span>{{userDetail.country}}&nbsp{{userDetail.city}}</span>
                 </div>
-                <div class="single-info" v-show="userDetail.organization!=''" :title="`Organization:  `+ userDetail.organization" style="overflow:hidden;white-space:nowrap;text-overflow:clips">
+                <div class="single-info" v-show="userDetail.organization!=''" :title="`Organization:  `+ userDetail.organization" style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis">
                   <Icon type="ios-home-outline" :size="20"/>
                   <span> {{userDetail.organization}}</span>
                 </div>
-                <div class="single-info" v-show="userDetail.direction!=''" :title="`Direction:  `+ userDetail.direction" style="overflow:hidden;white-space:nowrap;text-overflow:clips">
+                <div class="single-info" v-show="userDetail.direction!=''" :title="`Direction:  `+ userDetail.direction" style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis">
                   <Icon type="ios-contract" :size="20"/>
                   <span> {{userDetail.direction}}</span>
                 </div>
-                <div class="single-info" v-show="userDetail.homePage!=''" :title="`Home Page:  `+ userDetail.homePage" style="overflow:hidden;white-space:nowrap;text-overflow:clips">
+                <div class="single-info" v-show="userDetail.homePage!=''" :title="`Home Page:  `+ userDetail.homePage" style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis">
                   <Icon type="md-link" :size="20"/>
                   <span> {{userDetail.homePage}}</span>
                 <br>
