@@ -269,7 +269,7 @@
                             ok-text="Ok"
                             cancel-text="Cancel"
                           >
-                            <h2>Are you sure to quit this subproject?</h2>
+                            <h4 style="color:red">Are you sure to quit this subproject?</h4>
                           </Modal>
                           <Modal
                             v-model="inviteModal"
@@ -1318,6 +1318,29 @@ export default {
         )
         .then(res => {
           if (res.data == "Success") {
+            // 这里添加一个通知
+            let quitNotice = {};
+            quitNotice["recipientId"] = this.subProjectInfo.managerId;
+            quitNotice["type"] = "notice";
+            quitNotice["content"] = {
+              userName: this.$store.getters.userId,
+              title:"Member quit notice",
+              description:"User " + this.$store.getters.userName + " quit from your project called " + sessionStorage.getItem("subProjectName"),
+              scope: "subProject",
+              approve: "unknow"
+            };
+            this.axios
+                .post("/GeoProblemSolving/notice/save", quitNotice)
+                .then(res => {
+                  if(res.data == "Success") {
+                    this.$emit("sendNotice", this.subProjectInfo.managerId);
+                  }
+                  else{
+                  }
+                })
+                .catch(err => {
+                  console.log(err.data);
+                });
             let projectId = sessionStorage.getItem("projectId");
             this.$router.push({
               name: "ProjectDetail",
@@ -1781,7 +1804,7 @@ export default {
         this.closeModuleSocket();
 
         if (name == "task") {
-          this.openModuleSocket(); 
+          this.openModuleSocket();
           this.$refs.folderTreeEle.closePanel();
         }
       }

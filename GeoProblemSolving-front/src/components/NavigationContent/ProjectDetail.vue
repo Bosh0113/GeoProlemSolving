@@ -1804,9 +1804,9 @@ export default {
         })
         .catch(err => {});
     },
-    joinSubProject(project) {
+    joinSubProject(subProject) {
       let joinSubPForm = {};
-      joinSubPForm["recipientId"] = project.managerId;
+      joinSubPForm["recipientId"] = subProject.managerId;
       joinSubPForm["type"] = "apply";
       let userDetail = this.$store.getters.userInfo;
       joinSubPForm["content"] = {
@@ -1817,11 +1817,11 @@ export default {
         description:
           "User " +
           this.$store.getters.userName +
-          " apply to join in your project's sub project: " +
-          project.title +
+          " apply to join in your project "+ this.currentProjectDetail.title + "'s sub project: " +
+          subProject.title +
           " .",
-        projectId: project.subProjectId,
-        projectTitle: project.title,
+        projectId: subProject.subProjectId,
+        projectTitle: subProject.title,
         scope: "subProject",
         approve: "unknow"
       };
@@ -1830,23 +1830,23 @@ export default {
         .post("/GeoProblemSolving/notice/save", joinSubPForm)
         .then(res => {
           this.$Message.info("Apply Successfully");
-          this.$emit("sendNotice", project.managerId);
+          this.$emit("sendNotice", subProject.managerId);
         })
         .catch(err => {
           console.log("申请失败的原因是：" + err.data);
         });
       let joinSubProjectEmail = {};
-      joinSubProjectEmail["recipient"] = userDetail.email;
+      joinSubProjectEmail["recipient"] = subProject.managerId;
       joinSubProjectEmail["mailTitle"] = "Join sub project application";
       joinSubProjectEmail["mailContent"] =
         "User " +
         this.$store.getters.userName +
-        " apply to join in your project's sub project: " +
-        project.title +
+        " apply to join in your project "+ this.currentProjectDetail.title + "'s sub project: " +
+        subProject.title +
         " ." +
-        "you can access the platform to process it.";
+        "you can access the platform to process it."+"The url is " + "http://"+this.$store.state.IP_Port+"/GeoProblemSolving/home";
       this.axios
-        .post("/GeoProblemSolving/email/send", joinSubProjectEmail)
+        .post("/GeoProblemSolving/project/applyByMail", joinSubProjectEmail)
         .then(res => {
           if (res.data == "Success") {
             this.$Notice.success({
