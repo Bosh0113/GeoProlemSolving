@@ -1163,7 +1163,7 @@ export default {
           vm.currentProjectDetail.isManager = true;
         }
         if (!(isMember || vm.currentProjectDetail.isManager)) {
-          this.$Message.error("You have no property to access it");
+          vm.$Message.error("You have no property to access it");
           next("/projectlist");
           // vm.$router.go(-1);
         }
@@ -1180,11 +1180,11 @@ export default {
     getProjectDetail() {
       let projectInfo = this.$store.getters.project;
       let pid = this.$route.params.id;
-      var that = this;
       if (JSON.stringify(projectInfo) != "{}" && projectInfo.projectId == pid) {
-        that.currentProjectDetail = projectInfo;
+        this.currentProjectDetail = projectInfo;
         this.updateRelatedInfo();
       } else {
+        let that = this;
         let queryObject = { key: "projectId", value: pid };
         try {
           $.ajax({
@@ -1203,6 +1203,7 @@ export default {
                   introduction: "",
                   projectId: ""
                 };
+                that.updateRelatedInfo();
               } else {
                 let projectInfo = data[0];
                 projectInfo.isManager = that.managerIdentity(
@@ -1224,15 +1225,14 @@ export default {
       }
     },
     updateRelatedInfo() {
-      var that = this;
       // 邀请他人加入项目的form的复制项目id与项目名的按钮
-      that.copyProjectId = that.currentProjectDetail.projectId;
-      that.copyProjectTitle = that.currentProjectDetail.title;
-      that.projectManager.userId = that.currentProjectDetail.managerId;
-      that.projectManager.userName = that.currentProjectDetail.managerName;
-      sessionStorage.setItem("projectId", that.currentProjectDetail.projectId);
-      sessionStorage.setItem("projectName", that.currentProjectDetail.title);
-      //将tag进行分割
+      this.copyProjectId = this.currentProjectDetail.projectId;
+      this.copyProjectTitle = this.currentProjectDetail.title;
+      this.projectManager.userId = this.currentProjectDetail.managerId;
+      this.projectManager.userName = this.currentProjectDetail.managerName;
+
+      sessionStorage.setItem("projectId", this.currentProjectDetail.projectId);
+      sessionStorage.setItem("projectName", this.currentProjectDetail.title);
     },
     // identify the manager of project
     managerIdentity(managerId) {
@@ -1817,8 +1817,10 @@ export default {
         description:
           "User " +
           this.$store.getters.userName +
-          " apply to join in your project "+ this.currentProjectDetail.title + "'s sub project: " +
+          " apply to join in your subproject: " +
           subProject.title +
+          " of project: " +
+          this.currentProjectDetail.title +
           " .",
         projectId: subProject.subProjectId,
         projectTitle: subProject.title,
@@ -1841,10 +1843,12 @@ export default {
       joinSubProjectEmail["mailContent"] =
         "User " +
         this.$store.getters.userName +
-        " apply to join in your project "+ this.currentProjectDetail.title + "'s sub project: " +
+        " apply to join in your subproject: " +
         subProject.title +
+        " of project: " +
+        this.currentProjectDetail.title +
         " ." +
-        "you can access the platform to process it."+"The url is " + "http://"+this.$store.state.IP_Port+"/GeoProblemSolving/home";
+        " And you can access the subproject from this platform. " + "http://"+this.$store.state.IP_Port+"/GeoProblemSolving/home";
       this.axios
         .post("/GeoProblemSolving/project/applyByMail", joinSubProjectEmail)
         .then(res => {
