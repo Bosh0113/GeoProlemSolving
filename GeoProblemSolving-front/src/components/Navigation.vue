@@ -40,8 +40,8 @@ footer {
 }
 .userState {
   position: absolute;
-  margin-left: 80%;
-  width: 20%;
+  margin-left: 85%;
+  width: 15%;
   top: 0px;
   z-index: 1;
 }
@@ -53,7 +53,7 @@ footer {
   font-weight: bold;
 }
 .menuItem:first-child {
-  margin-left: 25%;
+  /* margin-left: 25%; */
 }
 .userImg {
   width: 40px;
@@ -80,7 +80,7 @@ footer {
         id="logo"
         class="pic"
         @click="goHome"
-        style="cursor:pointer"
+        style="cursor:pointer;margin-left:5%"
       >
       <div class="navPart">
         <Menu

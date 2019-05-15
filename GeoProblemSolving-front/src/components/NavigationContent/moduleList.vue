@@ -1587,8 +1587,8 @@ export default {
         this.subprojectSocket = null;
       }
       let subProjectId = this.subProjectInfo.subProjectId;
-      var subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + subProjectId;
-      // var subprojectSocketURL = "ws://" + this.$store.state.IP_Port + "/GeoProblemSolving/Module/" + subProjectId;
+      // var subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + subProjectId;
+      var subprojectSocketURL = "ws://" + this.$store.state.IP_Port + "/GeoProblemSolving/Module/" + subProjectId;
       this.subprojectSocket = new WebSocket(subprojectSocketURL);
       this.subprojectSocket.onopen = this.onOpen;
       this.subprojectSocket.onmessage = this.onMessage;
@@ -1909,6 +1909,7 @@ export default {
                     this1.axios
                       .post("/GeoProblemSolving/module/update", updateObject)
                       .then(res => {
+                        this1.allRecords = [];
                         this1.getAllModules("init");
 
                         let socketMsg = { type: "module", operate: "update" };
@@ -2428,8 +2429,11 @@ export default {
           } else if (type == "Video Tool") {
             var userId = this.$store.getters.userId;
             var moduleId = this.currentModule.moduleId;
+            var reg = /(\S)*:80/;
+            var IP_Port = this.$store.state.IP_Port;
+            var videoIP_Port = IP_Port.match(reg)[1];
             toolURL =
-            '<iframe src="https://223.2.44.124:8083/GeoProblemSolving/Collaborative/vedioChat/WebRtcTest.html'+
+            '<iframe src="https://'+videoIP_Port+':8083/GeoProblemSolving/Collaborative/vedioChat/WebRtcTest.html'+
             "?roomId="+moduleId+"&userId="+userId+'" style="width: 100%;height:100%"></iframe>';
             toolName = "Video Tool";
           }

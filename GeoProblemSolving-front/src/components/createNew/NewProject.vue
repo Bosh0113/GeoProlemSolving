@@ -259,9 +259,9 @@ export default {
         description:[
           {
             required: true,
-            message: "The description cannot be empty and no more than 180 words",
+            message: "The description cannot be empty and no more than 360 characters",
             trigger: "blur",
-            max: 180
+            max: 360
           }
         ]
       },

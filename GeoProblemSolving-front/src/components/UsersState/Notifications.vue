@@ -61,7 +61,7 @@
               </Card>
               <template v-else-if="this.noticeList.length>0">
                 <div class="noticeDetail" v-for="notice in noticeList" :key="notice.index">
-                  <template v-if="notice.type =='Work'">
+                  <template v-if="notice.type =='work'">
                     <Card style="height:100%">
                       <template v-if="notice.state=='unread'">
                         <Badge dot>
@@ -232,7 +232,7 @@ export default {
             let applyUnreadCount = 0;
             let notifications = res.data;
             for (let i = 0; i < notifications.length; i++) {
-              if (notifications[i].type === "notice"|| notifications[i].type === "Work") {
+              if (notifications[i].type === "notice"|| notifications[i].type === "work") {
                 noticeListTest.push(notifications[i]);
                 if (notifications[i].state === "unread") {
                   noticeUnreadCount++;
