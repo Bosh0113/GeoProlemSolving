@@ -453,10 +453,6 @@ export default {
                 apply.content.projectTitle +
                 " ."
             };
-
-            // 这里加入给申请者发送已成功加入某项目的邮件
-            console.table(apply.content);
-            //
             this.axios
               .post("/GeoProblemSolving/notice/save", replyNotice)
               .then(result => {
