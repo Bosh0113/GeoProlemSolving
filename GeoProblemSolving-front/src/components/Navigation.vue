@@ -190,13 +190,18 @@ export default {
     };
   },
   mounted() {
-    this.contentHeight = window.innerHeight - 120 + "px";
+    if(window.innerHeight > 675){
+      this.contentHeight = window.innerHeight - 120 + "px";
+    }
+    else{
+      this.contentHeight = 675 - 120 + "px";
+    }
+    this.headerWidth = window.innerWidth + "px";
     if (this.$store.getters.userState) {
       this.setTimer();
       this.initWebSocket();
       this.getUnreadNoticeCount();
     }
-    this.headerWidth = window.innerWidth + "px";
     window.addEventListener("resize", this.reSize);
   },
   beforeDestroy: function() {

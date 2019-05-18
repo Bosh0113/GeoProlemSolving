@@ -23,6 +23,9 @@
   display: flex;
   float: right;
 }
+.ivu-table td, .ivu-table th{
+  height: 40px !important;
+}
 </style>
 
 <template>
@@ -63,9 +66,8 @@
           </Menu>
         </div>
         <div class="resourcePanel" style="margin-left:-20px">
-          <div style="height:20px"></div>
-          <div class="resourcePanel">
-            <Row>
+          <div class="resourcePanel" style="margin-top: 20px">
+            <Row style="height:100%; overflow-y:auto">
               <template v-if="$store.getters.userState">
                 <Col span="22" offset="1">
                   <Table :columns="resourceColumn" :data="showList" border>
