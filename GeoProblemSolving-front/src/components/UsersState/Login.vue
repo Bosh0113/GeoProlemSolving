@@ -4,6 +4,8 @@
   --layout-background: lightgray;
   --headerHeight: 60px;
   --footerHeight: 60px;
+  --loginDivWidth:40%;
+  --loginTextAlign:center;
   overflow: hidden;
 }
 .header {
@@ -18,16 +20,16 @@
   justify-content: center;
 }
 .loginDiv {
+  width: var(--loginDivWidth);
   border: var(--loginBorder);
   --loginContentColor: white;
   --loginFontColor: white;
   --loginTitleColor: #57a3f3;
-  width: 40%;
   --loginBtnFontSize: 15px;
 }
-.login_title {
+.loginTitle {
   background-color: var(--loginTitleColor);
-  text-align: center;
+  text-align: var(--loginTextAlign);
   vertical-align: middle;
   line-height: 60px;
   color: var(--loginFontColor);
@@ -60,12 +62,12 @@ img {
 }
 .reUseDiv {
   display: flex;
-  text-align: center;
+  text-align: var(--loginTextAlign);
   justify-content: center;
 }
 .reciverSpan {
   width: 100px;
-  text-align: center;
+  text-align: var(--loginTextAlign);
 }
 .resetReuseDiv {
   display: flex;
@@ -84,7 +86,7 @@ img {
     </div>
     <div class="content" ref="homePage" v-if="UserState===false" v-bind:style="contentStyle">
       <div class="loginDiv" v-bind:style="loginStyle">
-        <div class="login_title">Log in</div>
+        <div class="loginTitle">Log in</div>
         <div class="login-content">
           <Form ref="loginForm" :model="loginForm" :rules="loginFormRule">
             <FormItem prop="user" label="E-mail" :label-width="100">
