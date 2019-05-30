@@ -100,10 +100,10 @@
                 <BreadcrumbItem>Subproject</BreadcrumbItem>
               </Breadcrumb>
             </Col>
-            <Col span="13" style="text-align:center;font-size:1.5rem;height:40px">
+            <Col span="14" style="text-align:center;font-size:1.5rem;height:40px">
               <strong>{{subProjectInfo.title}}</strong>
             </Col>
-            <Col span="5" style="height:40px;" class="operatePanel">
+            <Col span="4" style="height:40px;" class="operatePanel">
               <Button
                 type="success"
                 @click="gotoWorkingPanel()"
@@ -1079,8 +1079,8 @@ export default {
       }
       
       let roomId = this.subProjectInfo.subProjectId + "task";
-      // var subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + roomId;
-      var subprojectSocketURL = "ws://"+this.$store.state.IP_Port+"/GeoProblemSolving/Module/" + roomId;
+      var subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + roomId;
+      // var subprojectSocketURL = "ws://"+this.$store.state.IP_Port+"/GeoProblemSolving/Module/" + roomId;
       this.subprojectSocket = new WebSocket(subprojectSocketURL);
       this.subprojectSocket.onopen = this.onOpen;
       this.subprojectSocket.onmessage = this.onMessage;

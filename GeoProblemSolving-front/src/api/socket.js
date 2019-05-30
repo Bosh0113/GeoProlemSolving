@@ -10,8 +10,8 @@ function getWebIP() {
 }
 
 function initWebSocket(para,IP_Port) { //初始化websocket
-    var wsurl = "ws://"+IP_Port+"/GeoProblemSolving/" + para;
-    // var wsurl = "ws://localhost:8081/GeoProblemSolving/" + para;
+    // var wsurl = "ws://"+IP_Port+"/GeoProblemSolving/" + para;
+    var wsurl = "ws://localhost:8081/GeoProblemSolving/" + para;
     //switch 使用时提供一个参数type
     websock = new WebSocket(wsurl);
     websock.onmessage = function (e) {

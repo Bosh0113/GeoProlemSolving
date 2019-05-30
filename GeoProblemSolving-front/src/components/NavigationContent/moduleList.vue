@@ -193,17 +193,17 @@
       <Col span="22" offset="1">
         <Card>
           <Row>
-            <Col span="6" style="height:20px">
+            <Col span="6" style="height:40px">
               <Breadcrumb>
                 <BreadcrumbItem :to="toProjectPage">Project</BreadcrumbItem>
                 <BreadcrumbItem :to="toSubProjectPage">Subproject</BreadcrumbItem>
                 <BreadcrumbItem>Working panel</BreadcrumbItem>
               </Breadcrumb>
             </Col>
-            <Col span="12" style="text-align:center;font-size:1.5rem;height:20px;;margin-top:-10px">
+            <Col span="12" style="text-align:center;font-size:1.5rem;height:20px;">
               <strong>{{subProjectInfo.title}}</strong>
             </Col>
-            <Col span="5" offset="1" style="height:20px;display:flex;align-items:center" class="operatePanel">
+            <Col span="5" offset="1" style="height:40px;display:flex;align-items:center" class="operatePanel">
               <template v-if="$store.getters.userInfo.userId == this.subProjectInfo.managerId">
                 <template v-if="this.moduleList.length == 0">
                   <Button
@@ -254,10 +254,10 @@
           <Row>
             <Col span="1" style="background-color:white;margin-top:20px">
               <button class="moduleShow" @click="moudelMove('back')" v-if="moduleLeftMove">
-                <Icon type="ios-arrow-back" style="font-size: 2rem;font-weight: 700"/>
+                <Icon type="ios-arrow-back" style="font-size:2rem; font-weight:700"/>
               </button>
             </Col>
-            <Col span="22" style="background-color:white;margin-top:20px">
+            <Col span="21" style="background-color:white;margin-top:20px">
               <template v-if="$store.getters.userInfo.userId == this.subProjectInfo.managerId">
                 <Steps :current="order">
                   <Step
@@ -287,6 +287,9 @@
               <button class="moduleShow" @click="moudelMove('forward')" v-if="moduleRightMove">
                 <Icon type="ios-arrow-forward" style="font-size: 2rem;font-weight: 700"/>
               </button>
+            </Col>
+            <Col span="1" style="background-color:white;margin-top:20px">
+              <Button>View</Button>
             </Col>
           </Row>
         </Card>
@@ -1740,8 +1743,8 @@ export default {
         this.subprojectSocket = null;
       }
       let subProjectId = this.subProjectInfo.subProjectId;
-      // var subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + subProjectId;
-      var subprojectSocketURL = "ws://" + this.$store.state.IP_Port + "/GeoProblemSolving/Module/" + subProjectId;
+      var subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + subProjectId;
+      // var subprojectSocketURL = "ws://" + this.$store.state.IP_Port + "/GeoProblemSolving/Module/" + subProjectId;
       this.subprojectSocket = new WebSocket(subprojectSocketURL);
       this.subprojectSocket.onopen = this.onOpen;
       this.subprojectSocket.onmessage = this.onMessage;
