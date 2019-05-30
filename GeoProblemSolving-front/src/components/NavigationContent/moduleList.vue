@@ -257,7 +257,7 @@
                 <Icon type="ios-arrow-back" style="font-size:2rem; font-weight:700"/>
               </button>
             </Col>
-            <Col span="21" style="background-color:white;margin-top:20px">
+            <Col span="22" style="background-color:white;margin-top:20px">
               <template v-if="$store.getters.userInfo.userId == this.subProjectInfo.managerId">
                 <Steps :current="order">
                   <Step
@@ -288,9 +288,9 @@
                 <Icon type="ios-arrow-forward" style="font-size: 2rem;font-weight: 700"/>
               </button>
             </Col>
-            <Col span="1" style="background-color:white;margin-top:20px">
+            <!-- <Col span="1" style="background-color:white;margin-top:20px">
               <Button>View</Button>
-            </Col>
+            </Col> -->
           </Row>
         </Card>
       </Col>
