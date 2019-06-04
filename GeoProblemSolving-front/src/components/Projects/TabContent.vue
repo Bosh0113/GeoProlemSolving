@@ -414,6 +414,7 @@ export default {
       this.$router.push({ name: "Login" });
     },
     joinPublicProjects(){
+      console.log(this.$store.getters.project);
       this.axios.get("/GeoProblemSolving/project/join?projectId="+ this.applyProjectInfo.projectId + '&userId=' + this.$store.getters.userId)
         .then(res=> {
           // console.log(res.data);

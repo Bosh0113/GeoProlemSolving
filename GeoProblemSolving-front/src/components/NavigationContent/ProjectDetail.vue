@@ -1807,87 +1807,92 @@ export default {
         .catch(err => {});
     },
     joinSubProject(subProject) {
-      console.table(subProject);
-      this.axios.get("/GeoProblemSolving/subProject/join?subProjectId="+ subProject.subProjectId + '&userId=' + this.$store.getters.userId)
-      .then(res=> {
-        var that = this;
-        console.log(res.data);
-        if(res.data !== ""){
-            this.$Notice.open({
-                title: 'Notification title',
-                desc: 'Success,now you are a member in this sub project.',
-                duration: 0
-            });
-            // this.subProject.isMember = true;
-            that.getAllSubProject();
-          }
-      })
-      .catch(err=>{
-        console.log(err.data);
-      })
-      // let joinSubPForm = {};
-      // joinSubPForm["recipientId"] = subProject.managerId;
-      // joinSubPForm["type"] = "apply";
-      // let userDetail = this.$store.getters.userInfo;
-      // joinSubPForm["content"] = {
-      //   userEmail: userDetail.email,
-      //   userName: this.$store.getters.userName,
-      //   userId: this.$store.getters.userId,
-      //   title: "Group application",
-      //   description:
-      //     "User " +
-      //     this.$store.getters.userName +
-      //     " apply to join in your subproject: " +
-      //     subProject.title +
-      //     " of project: " +
-      //     this.currentProjectDetail.title +
-      //     " .",
-      //   projectId: subProject.subProjectId,
-      //   projectTitle: subProject.title,
-      //   scope: "subProject",
-      //   approve: "unknow"
-      // };
+      // console.table(subProject);
+      console.log(this.$store.getters.project);
+      let projectPrivacy = this.$store.getters.project.privacy;
+      if(projectPrivacy == "Public"){
+        this.axios.get("/GeoProblemSolving/subProject/join?subProjectId="+ subProject.subProjectId + '&userId=' + this.$store.getters.userId)
+        .then(res=> {
+          var that = this;
+          console.log(res.data);
+          if(res.data !== ""){
+              this.$Notice.open({
+                  title: 'Notification title',
+                  desc: 'Success,now you are a member in this sub project.',
+                  duration: 0
+              });
+              // this.subProject.isMember = true;
+              that.getAllSubProject();
+            }
+        })
+        .catch(err=>{
+          console.log(err.data);
+        })
+      }else if(projectPrivacy == "Discoverable"){
+        let joinSubPForm = {};
+          joinSubPForm["recipientId"] = subProject.managerId;
+          joinSubPForm["type"] = "apply";
+          let userDetail = this.$store.getters.userInfo;
+          joinSubPForm["content"] = {
+            userEmail: userDetail.email,
+            userName: this.$store.getters.userName,
+            userId: this.$store.getters.userId,
+            title: "Group application",
+            description:
+              "User " +
+              this.$store.getters.userName +
+              " apply to join in your subproject: " +
+              subProject.title +
+              " of project: " +
+              this.currentProjectDetail.title +
+              " .",
+            projectId: subProject.subProjectId,
+            projectTitle: subProject.title,
+            scope: "subProject",
+            approve: "unknow"
+          };
 
-      // this.axios
-      //   .post("/GeoProblemSolving/notice/save", joinSubPForm)
-      //   .then(res => {
-      //     this.$Message.info("Apply Successfully");
-      //     this.$emit("sendNotice", subProject.managerId);
-      //   })
-      //   .catch(err => {
-      //     console.log("申请失败的原因是：" + err.data);
-      //   });
-      // let joinSubProjectEmail = {};
-      // joinSubProjectEmail["recipient"] = subProject.managerId;
-      // joinSubProjectEmail["mailTitle"] = "Join sub project application";
-      // joinSubProjectEmail["mailContent"] =
-      //   "User " +
-      //   this.$store.getters.userName +
-      //   " apply to join in your subproject: " +
-      //   subProject.title +
-      //   " of project: " +
-      //   this.currentProjectDetail.title +
-      //   " ." +
-      //   " And you can access the subproject from this platform. "+"The url is " + "http://"+this.$store.state.IP_Port+"/GeoProblemSolving/home";;
-      // this.axios
-      //   .post("/GeoProblemSolving/project/applyByMail", joinSubProjectEmail)
-      //   .then(res => {
-      //     if (res.data == "Success") {
-      //       this.$Notice.success({
-      //         title: "Email send title",
-      //         desc:
-      //           "The join email has been sent,if he/she doesn't online,the email will remind the mamnager in time."
-      //       });
-      //     } else {
-      //       this.$Notice.error({
-      //         title: "Email send fail",
-      //         desc: "The invitation isn't be sent successfully."
-      //       });
-      //     }
-      //   })
-      //   .catch(err => {
-      //     console.log(err.data);
-      //   });
+          this.axios
+            .post("/GeoProblemSolving/notice/save", joinSubPForm)
+            .then(res => {
+              this.$Message.info("Apply Successfully");
+              this.$emit("sendNotice", subProject.managerId);
+            })
+            .catch(err => {
+              console.log("申请失败的原因是：" + err.data);
+            });
+          let joinSubProjectEmail = {};
+          joinSubProjectEmail["recipient"] = subProject.managerId;
+          joinSubProjectEmail["mailTitle"] = "Join sub project application";
+          joinSubProjectEmail["mailContent"] =
+            "User " +
+            this.$store.getters.userName +
+            " apply to join in your subproject: " +
+            subProject.title +
+            " of project: " +
+            this.currentProjectDetail.title +
+            " ." +
+            " And you can access the subproject from this platform. "+"The url is " + "http://"+this.$store.state.IP_Port+"/GeoProblemSolving/home";;
+          this.axios
+            .post("/GeoProblemSolving/project/applyByMail", joinSubProjectEmail)
+            .then(res => {
+              if (res.data == "Success") {
+                this.$Notice.success({
+                  title: "Email send title",
+                  desc:
+                    "The join email has been sent,if he/she doesn't online,the email will remind the mamnager in time."
+                });
+              } else {
+                this.$Notice.error({
+                  title: "Email send fail",
+                  desc: "The invitation isn't be sent successfully."
+                });
+              }
+            })
+            .catch(err => {
+              console.log(err.data);
+            });
+          }
     },
     emialAutoFill(value) {
       this.prompt =

@@ -117,6 +117,7 @@ export default {
             this.judgeMember(res.data);
           }
           this.projectShowList = Object.assign([], this.currentProjectList);
+          console.table(this.projectShowList);
         })
         .catch(err => {
           console.log(err.data);
