@@ -153,6 +153,16 @@ img {
           <Button type="success" @click="joinApply('applyValidate')">Apply</Button>
         </div>
         </Modal>
+        <Modal
+          v-model="publicApplyAssureModal"
+          title="Join Assure Notification"
+          @on-ok="joinPublicProjects"
+          @on-cancel=""
+          ok-text = "ok"
+          cancel-text = "cancel"
+          >
+           <p>Do you really want to join in this project?</p>
+        </Modal>
     </div>
 </template>
 <script>
@@ -207,7 +217,9 @@ export default {
       // 记录已经申请的情况
       haveApplied: false,
       // 申请加入项目的模态框
-      applyJoinModal: false
+      applyJoinModal: false,
+      // 申请加入公共项目的模态框
+      publicApplyAssureModal:false,
     };
   },
   methods: {
@@ -302,7 +314,13 @@ export default {
       this.$set(this, "applyProjectInfo", applyProjectInfo);
       console.table(this.applyProjectInfo);
       this.applyValidate.reason = "";
-      this.applyJoinModal = true;
+      if(this.applyProjectInfo.privacy == "Public"){
+        // 加个模态框
+        this.publicApplyAssureModal = true;
+
+      }else{
+        this.applyJoinModal = true;
+      }
     },
     joinApply(name) {
       this.$refs[name].validate(valid => {
@@ -317,11 +335,7 @@ export default {
               title: "repeat apply warning",
               desc: "You have apply success, no need to click again!"
             });
-          } else if(data.privacy == "Public"){
-            // 把这个人直接加入到该项目的成员列表中
-
-            alert("这是公开的！");
-          }else if(data.privacy == "Discoverable"){
+          }else{
             if (this.$store.getters.userState) {
               let userDetail = this.$store.getters.userInfo;
               let joinForm = {};
@@ -398,6 +412,24 @@ export default {
     },
     login(){
       this.$router.push({ name: "Login" });
+    },
+    joinPublicProjects(){
+      this.axios.get("/GeoProblemSolving/project/join?projectId="+ this.applyProjectInfo.projectId + '&userId=' + this.$store.getters.userId)
+        .then(res=> {
+          // console.log(res.data);
+          // console.table(this.applyProjectInfo);
+          if(res.data == "Success"){
+            this.$Notice.open({
+                title: 'Notification title',
+                desc: 'Success,now you are a member in this project.',
+                duration: 0
+            });
+            this.applyProjectInfo.isMember = true;
+          }
+        })
+        .catch(err=>{
+          console.log(err.data);
+        })
     }
   }
 };
