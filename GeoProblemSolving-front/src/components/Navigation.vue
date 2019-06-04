@@ -91,36 +91,20 @@ footer {
           :style="`z-index:0;background:`+headerBgColor"
           width="auto"
         >
-          <MenuItem
-            name="home"
-            class="menuItem"
-            style="margin-left:30%"
-          >
-          <span>Home</span>
+          <MenuItem name="home" class="menuItem" style="margin-left:35%">
+            <span>Home</span>
           </MenuItem>
-          <MenuItem
-            name="projects"
-            class="menuItem"
-          >
-          <span>Projects</span>
+          <MenuItem name="projects" class="menuItem">
+            <span>Projects</span>
           </MenuItem>
-          <MenuItem
-            name="resources"
-            class="menuItem"
-          >
-          <span> Resources</span>
+          <MenuItem name="resources" class="menuItem">
+            <span>Resources</span>
           </MenuItem>
-          <MenuItem
-            name="community"
-            class="menuItem"
-          >
-          <span>Community</span>
-          </MenuItem>
-          <MenuItem
-            name="help"
-            class="menuItem"
-          >
-          <span>Help</span>
+          <!-- <MenuItem name="community" class="menuItem">
+            <span>Community</span>
+          </MenuItem> -->
+          <MenuItem name="help" class="menuItem">
+            <span>Help</span>
           </MenuItem>
         </Menu>
         <div class="userState">
@@ -133,10 +117,10 @@ footer {
             class="menuItem"
           >
             <MenuItem name="login">
-            <span>Login</span>
+              <span>Login</span>
             </MenuItem>
             <MenuItem name="register">
-            <span>Sign up</span>
+              <span>Sign up</span>
             </MenuItem>
           </Menu>
           <Menu
@@ -148,60 +132,44 @@ footer {
             class="menuItem"
           >
             <MenuItem name="notification">
-            <Badge
-              :count="unreadNoticeCount"
-              id="noticeBadge"
-            >
-              <Icon
-                type="ios-notifications-outline"
-                size="25"
-              ></Icon>
-            </Badge>
+              <Badge :count="unreadNoticeCount" id="noticeBadge">
+                <Icon type="ios-notifications-outline" size="25"></Icon>
+              </Badge>
             </MenuItem>
-            <MenuItem
-              name="personal"
-              style="width:100px"
-            >
-            <Dropdown
-              @on-click="changeSelect"
-              placement="bottom-start"
-            >
-            <div @click="toPersonalPage">
-              <img
-                v-bind:src="avatar"
-                v-if="avatar!=''&&avatar!=undefined&&avatar!=null"
-                :title="userName"
-                style="width:40px;height:40px;vertical-align:middle;"
-              >
-              <avatar
-                :username="userName"
-                :size="40"
-                style="margin-top:10px"
-                :title="userName"
-                v-else
-              ></avatar>
-            </div>
-              <DropdownMenu slot="list">
-                <!-- <DropdownItem name="personalPage">User Space</DropdownItem> -->
-                <DropdownItem name="logout">Log out</DropdownItem>
-              </DropdownMenu>
-            </Dropdown>
+            <MenuItem name="personal" style="width:100px">
+              <Dropdown @on-click="changeSelect" placement="bottom-start">
+                <div @click="toPersonalPage">
+                  <img
+                    v-bind:src="avatar"
+                    v-if="avatar!=''&&avatar!=undefined&&avatar!=null"
+                    :title="userName"
+                    style="width:40px;height:40px;vertical-align:middle;"
+                  >
+                  <avatar
+                    :username="userName"
+                    :size="40"
+                    style="margin-top:10px"
+                    :title="userName"
+                    v-else
+                  ></avatar>
+                </div>
+                <DropdownMenu slot="list">
+                  <!-- <DropdownItem name="personalPage">User Space</DropdownItem> -->
+                  <DropdownItem name="logout">Log out</DropdownItem>
+                </DropdownMenu>
+              </Dropdown>
             </MenuItem>
           </Menu>
         </div>
       </div>
     </header>
-    <section
-      class="content"
-      :style="{minHeight:contentHeight}"
-    >
-      <router-view
-        @sendNotice="sendMessage"
-        @readNotification="readNotification"
-      ></router-view>
+    <section class="content" :style="{minHeight:contentHeight}">
+      <router-view @sendNotice="sendMessage" @readNotification="readNotification"></router-view>
     </section>
     <footer>
-      <h2 class="footerTop"><i>Open Geographic Modeling and Simulation</i></h2>
+      <h2 class="footerTop">
+        <i>Open Geographic Modeling and Simulation</i>
+      </h2>
       <p class="footerBottom">Copyright © 2013-2019 OpenGMS. All rights reserved.</p>
     </footer>
   </div>
@@ -222,13 +190,18 @@ export default {
     };
   },
   mounted() {
-    this.contentHeight = window.innerHeight - 120 + "px";
+    if(window.innerHeight > 675){
+      this.contentHeight = window.innerHeight - 120 + "px";
+    }
+    else{
+      this.contentHeight = 675 - 120 + "px";
+    }
+    this.headerWidth = window.innerWidth + "px";
     if (this.$store.getters.userState) {
       this.setTimer();
       this.initWebSocket();
       this.getUnreadNoticeCount();
     }
-    this.headerWidth = window.innerWidth + "px";
     window.addEventListener("resize", this.reSize);
   },
   beforeDestroy: function() {
@@ -261,10 +234,9 @@ export default {
   },
   methods: {
     reSize() {
-      if(window.innerHeight > 675) {
+      if (window.innerHeight > 675) {
         this.contentHeight = window.innerHeight - 120 + "px";
-      }
-      else{
+      } else {
         this.contentHeight = 675;
       }
     },
@@ -297,7 +269,7 @@ export default {
       } else if (name === "personal") {
       }
     },
-    toPersonalPage(){
+    toPersonalPage() {
       this.$router.push({ name: "PersonalPage" });
     },
     // 获取到通知的数量
@@ -330,8 +302,8 @@ export default {
       if (this.noticeSocket != null) {
         this.noticeSocket = null;
       }
-      // var noticeSocketURL = "ws://localhost:8081/GeoProblemSolving/NoticeSocket";
-      var noticeSocketURL = "ws://"+this.$store.state.IP_Port+"/GeoProblemSolving/NoticeSocket";
+      var noticeSocketURL = "ws://localhost:8081/GeoProblemSolving/NoticeSocket";
+      // var noticeSocketURL = "ws://"+this.$store.state.IP_Port+"/GeoProblemSolving/NoticeSocket";
       this.noticeSocket = new WebSocket(noticeSocketURL);
       this.noticeSocket.onopen = this.onOpen;
       this.noticeSocket.onmessage = this.onMessage;

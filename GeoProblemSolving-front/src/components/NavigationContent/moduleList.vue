@@ -193,17 +193,17 @@
       <Col span="22" offset="1">
         <Card>
           <Row>
-            <Col span="6" style="height:20px">
+            <Col span="6" style="height:40px">
               <Breadcrumb>
                 <BreadcrumbItem :to="toProjectPage">Project</BreadcrumbItem>
                 <BreadcrumbItem :to="toSubProjectPage">Subproject</BreadcrumbItem>
                 <BreadcrumbItem>Working panel</BreadcrumbItem>
               </Breadcrumb>
             </Col>
-            <Col span="12" style="text-align:center;font-size:1.5rem;height:20px;;margin-top:-10px">
+            <Col span="12" style="text-align:center;font-size:1.5rem;height:20px;">
               <strong>{{subProjectInfo.title}}</strong>
             </Col>
-            <Col span="5" offset="1" style="height:20px;display:flex;align-items:center" class="operatePanel">
+            <Col span="5" offset="1" style="height:40px;display:flex;align-items:center" class="operatePanel">
               <template v-if="$store.getters.userInfo.userId == this.subProjectInfo.managerId">
                 <template v-if="this.moduleList.length == 0">
                   <Button
@@ -254,7 +254,7 @@
           <Row>
             <Col span="1" style="background-color:white;margin-top:20px">
               <button class="moduleShow" @click="moudelMove('back')" v-if="moduleLeftMove">
-                <Icon type="ios-arrow-back" style="font-size: 2rem;font-weight: 700"/>
+                <Icon type="ios-arrow-back" style="font-size:2rem; font-weight:700"/>
               </button>
             </Col>
             <Col span="22" style="background-color:white;margin-top:20px">
@@ -288,6 +288,9 @@
                 <Icon type="ios-arrow-forward" style="font-size: 2rem;font-weight: 700"/>
               </button>
             </Col>
+            <!-- <Col span="1" style="background-color:white;margin-top:20px">
+              <Button>View</Button>
+            </Col> -->
           </Row>
         </Card>
       </Col>
@@ -650,7 +653,6 @@
                         />
                       </div>
                     </div>
-
                     <div class="tool-panel">
                       <div class="singl_tool_style">
                         <Icon
@@ -751,7 +753,7 @@
                           color="gray"
                         />
                       </div>
-                      <div class="singl_tool_style">
+                      <!-- <div class="singl_tool_style">
                         <Icon
                           type="logo-youtube"
                           size="60"
@@ -759,8 +761,26 @@
                           title="Video Tool"
                           color="gray"
                         />
+                      </div> -->
+                      <div class="singl_tool_style">
+                        <Icon
+                          type="ios-water"
+                          size="60"
+                          @click.native="toolPanel('Web-SWMM')"
+                          title="Web-SWMM"
+                          color="gray0"
+                        />
                       </div>
-                      <a class="singl_tool_style" href="http://172.21.212.72:8888/tree?" target="_blank">
+                      <div class="singl_tool_style">
+                        <Icon
+                          type="ios-car"
+                          size="60"
+                          @click.native="toolPanel('TrafficNoise')"
+                          title="Traffic Noise Simulation"
+                          color="gray"
+                        />
+                      </div>
+                      <a class="singl_tool_style" href="http://134.175.111.77/note" target="_blank">
                         <Icon
                           type="md-code"
                           size="60"
@@ -777,16 +797,107 @@
                       <span>For different solving process of geographic problem</span>
                     </div>
                     <br>
-                    <div class="tool-panel" v-show="this.currentModule.type == 'Preparation'"></div>
-                    <div class="tool-panel" v-show="this.currentModule.type == 'Analysis'"></div>
+                    <div class="tool-panel" v-show="this.currentModule.type == 'Preparation'">
+                      <div class="singl_tool_style">
+                        <Icon
+                          type="ios-create"
+                          size="60"
+                          @click.native="toolPanel('draw')"
+                          title="DrawBoard"
+                          color="green"
+                        />
+                      </div>
+                      <div class="singl_tool_style">
+                        <Icon
+                          type="md-map"
+                          size="60"
+                          @click.native="toolPanel('map')"
+                          title="Map"
+                          color="lightblue"
+                        />
+                      </div>
+                      <div class="singl_tool_style">
+                        <Icon
+                          type="md-grid"
+                          size="60"
+                          @click.native="toolPanel('tableEditor')"
+                          title="Table editor"
+                          color="#2d8cf0"
+                        />
+                      </div>
+                      <div class="singl_tool_style">
+                        <Icon
+                          type="md-cube"
+                          size="60"
+                          @click.native="toolPanel('3DmodelViewer')"
+                          title="3D model Viewer"
+                          color="#561cec"
+                        />
+                      </div>
+                    </div>
+                    <div class="tool-panel" v-show="this.currentModule.type == 'Analysis'">                      
+                      <div class="singl_tool_style">
+                        <Icon
+                          type="ios-podium"
+                          size="60"
+                          @click.native="toolPanel('chart')"
+                          title="Chart"
+                          color="lightgreen"
+                        />
+                      </div>
+                      <div class="singl_tool_style">
+                        <Icon
+                          type="md-grid"
+                          size="60"
+                          @click.native="toolPanel('tableEditor')"
+                          title="Table editor"
+                          color="#2d8cf0"
+                        />
+                      </div>
+                      <div class="singl_tool_style">
+                        <Icon
+                          type="ios-create"
+                          size="60"
+                          @click.native="toolPanel('graphEditor')"
+                          title="Graph Editor"
+                          color="#eca01c"
+                        />
+                      </div>
+                      <div class="singl_tool_style">
+                        <Icon
+                          type="ios-water"
+                          size="60"
+                          @click.native="toolPanel('Web-SWMM')"
+                          title="Web-SWMM"
+                          color="#2d8cf0"
+                        />
+                      </div>
+                      <div class="singl_tool_style">
+                        <Icon
+                          type="ios-car"
+                          size="60"
+                          @click.native="toolPanel('TrafficNoise')"
+                          title="Traffic Noise Simulation"
+                          color="#19be6b"
+                        />
+                      </div>
+                    </div>
                     <div class="tool-panel" v-show="this.currentModule.type == 'Modeling'">
+                      <a class="singl_tool_style" href="http://134.175.111.77/note" target="_blank">
+                        <Icon
+                          type="md-code"
+                          size="60"
+                          title="Jupyter Notebook"
+                          color="#f37726"
+                        />
+                      </a>
                       <div class="singl_tool_style">
                         <Icon
                           type="md-bonfire"
                           size="60"
                           @click.native="toolPanel('ConceptualModel')"
                           title="Conceptual Modeling"
-                          color="#f90"
+                          color="#2d8cf0"
                         />
                       </div>
                       <div class="singl_tool_style">
@@ -804,13 +915,58 @@
                           size="60"
                           @click.native="toolPanel('ComputationalModel')"
                           title="Computational Modeling"
-                          color="#2d8cf0"
+                          color="#f90"
                         />
                       </div>
                     </div>
-                    <div class="tool-panel" v-show="this.currentModule.type == 'Simulation'"></div>
-                    <div class="tool-panel" v-show="this.currentModule.type == 'validation'"></div>
-                    <div class="tool-panel" v-show="this.currentModule.type == 'Comparison'"></div>
+                    <div class="tool-panel" v-show="this.currentModule.type == 'Simulation'">                      
+                      <a class="singl_tool_style" href="http://134.175.111.77/note" target="_blank">
+                        <Icon
+                          type="md-code"
+                          size="60"
+                          title="Jupyter Notebook"
+                          color="#f37726"
+                        />
+                      </a>
+                      <div class="singl_tool_style">
+                        <Icon
+                          type="ios-water"
+                          size="60"
+                          @click.native="toolPanel('Web-SWMM')"
+                          title="Web-SWMM"
+                          color="#2d8cf0"
+                        />
+                      </div>
+                      <div class="singl_tool_style">
+                        <Icon
+                          type="ios-car"
+                          size="60"
+                          @click.native="toolPanel('TrafficNoise')"
+                          title="Traffic Noise Simulation"
+                          color="#19be6b"
+                        />
+                      </div>
+                    </div>
+                    <div class="tool-panel" v-show="this.currentModule.type == 'validation'">
+                      <a class="singl_tool_style" href="http://134.175.111.77/note" target="_blank">
+                        <Icon
+                          type="md-code"
+                          size="60"
+                          title="Jupyter Notebook"
+                          color="#f37726"
+                        />
+                      </a>
+                    </div>
+                    <div class="tool-panel" v-show="this.currentModule.type == 'Comparison'">
+                      <a class="singl_tool_style" href="http://134.175.111.77/note" target="_blank">
+                        <Icon
+                          type="md-code"
+                          size="60"
+                          title="Jupyter Notebook"
+                          color="#f37726"
+                        />
+                      </a>
+                    </div>
                   </TabPane>
                 </Tabs>
               </Drawer>
@@ -1587,8 +1743,8 @@ export default {
         this.subprojectSocket = null;
       }
       let subProjectId = this.subProjectInfo.subProjectId;
-      // var subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + subProjectId;
-      var subprojectSocketURL = "ws://" + this.$store.state.IP_Port + "/GeoProblemSolving/Module/" + subProjectId;
+      var subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + subProjectId;
+      // var subprojectSocketURL = "ws://" + this.$store.state.IP_Port + "/GeoProblemSolving/Module/" + subProjectId;
       this.subprojectSocket = new WebSocket(subprojectSocketURL);
       this.subprojectSocket.onopen = this.onOpen;
       this.subprojectSocket.onmessage = this.onMessage;
@@ -2436,13 +2592,21 @@ export default {
             '<iframe src="https://'+videoIP_Port+':8083/GeoProblemSolving/Collaborative/vedioChat/WebRtcTest.html'+
             "?roomId="+moduleId+"&userId="+userId+'" style="width: 100%;height:100%"></iframe>';
             toolName = "Video Tool";
+          } else if (type == "Web-SWMM") {
+            toolURL =
+            '<iframe src="http://geomodeling.njnu.edu.cn/hydro-model-integration/webswmm" style="width: 100%; height:100%"></iframe>';
+            toolName = "Web-SWMM";
+          } else if (type == "TrafficNoise") {
+            toolURL =
+            '<iframe src="http://geomodeling.njnu.edu.cn/TrafficNoiseTheme/trafficNoise.html" style="width: 100%; height:100%"></iframe>';
+            toolName = "Traffic Noise";
           }
 
           let panel = jsPanel.create({
             theme: "success",
             headerTitle: toolName,
             footerToolbar: '<p style="height:10px"></p>',
-            contentSize: "1000 600",
+            contentSize: "1200 600",
             content: toolURL,
             disableOnMaximized: true,
             dragit: {
@@ -2566,13 +2730,13 @@ export default {
       let name = this.resourceList[index].name;
 
       if (
-        /\.(pdf|doc|docx|xls|xlsx|csv|ppt|pptx|zip)$/.test(name.toLowerCase())
+        /\.(doc|docx|xls|xlsx|csv|ppt|pptx|zip)$/.test(name.toLowerCase())
       ) {
         if (this.panel != null) {
           this.panel.close();
         }
         var url =
-          "http://172.21.212.7:8012/previewFile?url=" +
+          "http://94.191.49.160:8012/previewFile?url=" +
           "http://" +
           this.$store.state.IP_Port +
           this.resourceList[index].pathURL;
@@ -2624,7 +2788,7 @@ export default {
         });
         $(".jsPanel-content").css("font-size", "0");
         this.panelList.push(panel);
-      } else if (/\.(xml|json|md|gif|jpg|png)$/.test(name.toLowerCase())) {
+      } else if (/\.(pdf|xml|json|md|gif|jpg|png)$/.test(name.toLowerCase())) {
         if (this.panel != null) {
           this.panel.close();
         }

@@ -23,6 +23,9 @@
   display: flex;
   float: right;
 }
+.ivu-table td, .ivu-table th{
+  height: 40px !important;
+}
 </style>
 
 <template>
@@ -63,9 +66,8 @@
           </Menu>
         </div>
         <div class="resourcePanel" style="margin-left:-20px">
-          <div style="height:20px"></div>
-          <div class="resourcePanel">
-            <Row>
+          <div class="resourcePanel" style="margin-top: 20px">
+            <Row style="height:100%; overflow-y:auto">
               <template v-if="$store.getters.userState">
                 <Col span="22" offset="1">
                   <Table :columns="resourceColumn" :data="showList" border>
@@ -280,12 +282,12 @@ export default {
     },
     show(index) {
       let name = this.showList[index].name;
-      if (/\.(pdf|doc|docx|xls|xlsx|csv|ppt|pptx|zip)$/.test(name.toLowerCase())) {
+      if (/\.(doc|docx|xls|xlsx|csv|ppt|pptx|zip)$/.test(name.toLowerCase())) {
         if (this.panel != null) {
           this.panel.close();
         }
         var url =
-          "http://172.21.212.7:8012/previewFile?url=" +'http://'+this.$store.state.IP_Port+
+          "http://94.191.49.160:8012/previewFile?url=" +'http://'+this.$store.state.IP_Port+
           this.showList[index].pathURL;
         var toolURL =
           '<iframe src=' + url + ' style="width: 100%;height:100%"></iframe>';
@@ -331,7 +333,7 @@ export default {
         });
         $(".jsPanel-content").css("font-size", "0");
       }
-      else if(/\.(xml|json|md|gif|jpg|png)$/.test(name.toLowerCase())){
+      else if(/\.(pdf|xml|json|md|gif|jpg|png)$/.test(name.toLowerCase())){
         if (this.panel != null) {
           this.panel.close();
         }
