@@ -312,7 +312,6 @@ export default {
     },
     joinApplyModalShow(applyProjectInfo) {
       this.$set(this, "applyProjectInfo", applyProjectInfo);
-      console.table(this.applyProjectInfo);
       this.applyValidate.reason = "";
       if(this.applyProjectInfo.privacy == "Public"){
         // 加个模态框
@@ -414,18 +413,21 @@ export default {
       this.$router.push({ name: "Login" });
     },
     joinPublicProjects(){
-      console.log(this.$store.getters.project);
       this.axios.get("/GeoProblemSolving/project/join?projectId="+ this.applyProjectInfo.projectId + '&userId=' + this.$store.getters.userId)
         .then(res=> {
-          // console.log(res.data);
-          // console.table(this.applyProjectInfo);
           if(res.data == "Success"){
             this.$Notice.open({
                 title: 'Notification title',
                 desc: 'Success,now you are a member in this project.',
-                // duration: 0
+                duration: 0
             });
-            this.applyProjectInfo.isMember = true;
+            for(var i=0;i<this.projectList.length;i++){
+              var thisProjectId = this.projectList[i].projectId;
+              if(thisProjectId==this.applyProjectInfo.projectId){
+                this.projectList[i].isMember=true;
+                break;
+              }
+            }
           }
         })
         .catch(err=>{
