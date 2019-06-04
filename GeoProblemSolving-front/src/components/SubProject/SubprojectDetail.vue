@@ -923,7 +923,7 @@ export default {
           }
         }
         if (!(vm.subProjectInfo.managerId == userId || isMember)) {
-          this.$Message.error("You have no property to access it");
+          vm.$Message.error("You have no property to access it");
           // next(`/project/${vm.$store.getters.currentProjectId}`);
           vm.$router.go(-1);
         }
@@ -990,10 +990,7 @@ export default {
             } else if (data != "None" && data != "Fail") {
               subProjectInfo = data[0];
               this.$set(this, "subProjectInfo", subProjectInfo);
-              sessionStorage.setItem(
-                "subProjectId",
-                subProjectInfo.subProjectId
-              );
+              sessionStorage.setItem("subProjectId", subProjectInfo.subProjectId);
               sessionStorage.setItem("subProjectName", subProjectInfo.title);
 
               // this.managerIdentity(subProjectInfo.managerId);
@@ -1285,9 +1282,11 @@ export default {
                 description:
                   "You have been invited by " +
                   this.subProjectInfo.managerName +
-                  " to join in the sub project:" +
+                  " to join in the subproject: " +
                   this.subProjectInfo.title +
-                  " , and now you are a member in this sub project."
+                  " of project: " +
+                  this.projectInfo.title +
+                  " , and now you are a member in this subproject."
               };
               this.axios
                 .post("/GeoProblemSolving/notice/save", replyNotice)
