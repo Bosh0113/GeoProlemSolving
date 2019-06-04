@@ -300,6 +300,7 @@ export default {
     },
     joinApplyModalShow(applyProjectInfo) {
       this.$set(this, "applyProjectInfo", applyProjectInfo);
+      console.table(this.applyProjectInfo);
       this.applyValidate.reason = "";
       this.applyJoinModal = true;
     },
@@ -316,7 +317,11 @@ export default {
               title: "repeat apply warning",
               desc: "You have apply success, no need to click again!"
             });
-          } else {
+          } else if(data.privacy == "Public"){
+            // 把这个人直接加入到该项目的成员列表中
+
+            alert("这是公开的！");
+          }else if(data.privacy == "Discoverable"){
             if (this.$store.getters.userState) {
               let userDetail = this.$store.getters.userInfo;
               let joinForm = {};
