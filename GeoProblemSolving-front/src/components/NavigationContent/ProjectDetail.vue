@@ -1819,7 +1819,7 @@ export default {
               this.$Notice.open({
                   title: 'Notification title',
                   desc: 'Success,now you are a member in this sub project.',
-                  duration: 0
+                  // duration: 0
               });
               // this.subProject.isMember = true;
               that.getAllSubProject();
