@@ -85,4 +85,10 @@ public class ResourceController {
         ResourceDaoImpl resourceDao = new ResourceDaoImpl(mongoTemplate);
         return resourceDao.shareResource(request);
     }
+
+    @RequestMapping(value = "/packageZIP",method = RequestMethod.POST)
+    public void packageZIP(HttpServletRequest request,HttpServletResponse response){
+        ResourceDaoImpl resourceDao = new ResourceDaoImpl(mongoTemplate);
+        resourceDao.packageToZip(request,response);
+    }
 }

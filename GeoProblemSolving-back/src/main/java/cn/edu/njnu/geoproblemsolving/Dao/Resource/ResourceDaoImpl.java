@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 @Component
 public class ResourceDaoImpl implements IResourceDao {
@@ -299,6 +300,46 @@ public class ResourceDaoImpl implements IResourceDao {
         }
     }
 
+    public void packageToZip(HttpServletRequest request,HttpServletResponse response){
+        String fileURLsStr = request.getParameter("fileURLs");
+        String[] fileURLs = fileURLsStr.split(",");
+        List files = new ArrayList();
+        for (String fileURL : fileURLs) {
+            String regexGetUrl="/GeoProblemSolving/([\\S]*)";
+            Pattern regexPattern=Pattern.compile(regexGetUrl);
+            Matcher matcher=regexPattern.matcher(fileURL);
+            if (matcher.find()){
+                fileURL=matcher.group(1);
+            }
+            fileURL = fileURL.replace("/","\\");
+            String localPath =request.getSession().getServletContext().getRealPath("/") + fileURL;
+            File file = new File(localPath);
+            files.add(file);
+        }
+        try {
+            String servicePath = request.getSession().getServletContext().getRealPath("/");
+            String folderPath = servicePath+"resource\\tempZIP\\";
+            File tempFolder = new File(folderPath);
+            if (!tempFolder.exists()) {
+                tempFolder.mkdirs();
+            }
+            String tempZIP = folderPath+ UUID.randomUUID()+".zip";
+            File zipFile = new File(tempZIP);
+            zipFile.createNewFile();
+            response.reset();
+            FileOutputStream fOut = new FileOutputStream(tempZIP);
+            ZipOutputStream zipOut = new ZipOutputStream(fOut);
+            for (Object file : files) {
+                zipFile((File) file, zipOut);
+            }
+            zipOut.close();
+            fOut.close();
+            downloadZip(zipFile,response);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
     //删除时改变子项目的文件树结构
     private void deleteFromSubProject(String resourceId){
         try {
@@ -336,5 +377,56 @@ public class ResourceDaoImpl implements IResourceDao {
             }
         }
         return "";
+    }
+
+    private static void zipFile(File inputFile, ZipOutputStream outputStream){
+        try {
+            if (inputFile.exists()){
+                if (inputFile.isFile()){
+                    FileInputStream IN = new FileInputStream(inputFile);
+                    BufferedInputStream bins = new BufferedInputStream(IN,512);
+                    ZipEntry entry = new ZipEntry(inputFile.getName());
+                    outputStream.putNextEntry(entry);
+                    int nNumber;
+                    byte[] buffer = new byte[512];
+                    while ((nNumber = bins.read(buffer))!=-1){
+                        outputStream.write(buffer,0,nNumber);
+                    }
+                    bins.close();
+                    IN.close();
+                }
+            }
+        }catch (Exception e ){
+            e.printStackTrace();
+        }
+    }
+
+    private static void downloadZip(File file,HttpServletResponse response){
+        if (!file.exists()){
+            System.out.println("待压缩目录"+file+"不存在");
+        }
+        else {
+            try {
+                InputStream fis = new BufferedInputStream(new FileInputStream(file.getPath()));
+                byte[] buffer = new byte[fis.available()];
+                fis.read(buffer);
+                fis.close();
+                response.reset();
+                OutputStream toClient = new BufferedOutputStream(response.getOutputStream());
+                response.setContentType("application/octet-stream");
+                toClient.write(buffer);
+                toClient.flush();
+                toClient.close();
+            }catch (Exception e){
+                e.printStackTrace();
+            }finally {
+                try {
+                    File temp = new File(file.getPath());
+                    temp.delete();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }
