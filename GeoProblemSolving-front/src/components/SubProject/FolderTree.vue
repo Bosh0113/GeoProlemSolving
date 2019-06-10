@@ -78,6 +78,11 @@
         <strong>Resources</strong>
       </div>
       <div slot="extra" class="resourceBtnDiv">
+        <Tooltip content="Selec all" placement="bottom" class="fileBtn">
+          <Button @click="selectAllFile">
+            <Icon type="md-done-all" size="20"/>
+          </Button>
+        </Tooltip>
         <Tooltip content="Back" placement="bottom" class="fileBtn">
           <Button @click="backforeFolder">
             <Icon type="md-arrow-round-back" size="20"/>
@@ -358,7 +363,9 @@ export default {
         }
       ],
       selectedFileData: [],
-      panel: null
+      panel: null,
+      // 批量下载文件名数组
+      fileUrlsArray:[]
     };
   },
   methods: {
@@ -812,6 +819,22 @@ export default {
             this.$Message.warning("Delete file fail.");
           });
       }
+    },
+    selectAllFile(){
+      this.currentFileList.forEach(item=>{
+        this.fileUrlsArray.push(item.pathURL);
+      });
+      let fileUrls = this.fileUrlsArray.toString();
+      console.log(fileUrls);
+      this.axios.post("/GeoProblemSolving/resource/packageZIP"+"?fileURLs="+ fileUrls)
+      .then(res=>{
+        if(res.data!=""){
+          let stream = res.data;
+          console.log(stream);
+        }
+      })
+      .catch(err=>{
+      })
     }
   }
 };
