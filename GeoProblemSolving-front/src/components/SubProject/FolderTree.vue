@@ -97,11 +97,6 @@
         <strong>Resources</strong>
       </div>
       <div slot="extra" class="resourceBtnDiv">
-        <!-- <Tooltip content="Download select files" placement="bottom" class="fileBtn">
-          <Button @click="downloadSelectFile">
-            <Icon type="md-cloud-download" size="20"/>
-          </Button>
-        </Tooltip> -->
         <Tooltip content="Back" placement="bottom" class="fileBtn">
           <Button @click="backforeFolder">
             <Icon type="md-arrow-round-back" size="20"/>
@@ -197,7 +192,6 @@
                 </Spin>
             </Col>
           </Row>
-          <!-- <Spin size="large" v-show="spinAnimate==true"></Spin> -->
         </div>
       </div>
     </Card>
