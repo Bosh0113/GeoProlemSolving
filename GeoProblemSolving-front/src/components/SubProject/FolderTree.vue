@@ -97,17 +97,11 @@
         <strong>Resources</strong>
       </div>
       <div slot="extra" class="resourceBtnDiv">
-        <!-- <Tooltip content="Download all" placement="bottom" class="fileBtn">
-          <Button @click="selectAllFile">
-            <Icon type="md-cloud-download"  size="20"/>
-          </Button>
-        </Tooltip>-->
-        <Tooltip content="Download select files" placement="bottom" class="fileBtn">
+        <!-- <Tooltip content="Download select files" placement="bottom" class="fileBtn">
           <Button @click="downloadSelectFile">
-            <!-- md-done-all -->
             <Icon type="md-cloud-download" size="20"/>
           </Button>
-        </Tooltip>
+        </Tooltip> -->
         <Tooltip content="Back" placement="bottom" class="fileBtn">
           <Button @click="backforeFolder">
             <Icon type="md-arrow-round-back" size="20"/>
@@ -138,13 +132,17 @@
               >{{folderName}}</BreadcrumbItem>
             </Breadcrumb>
             <div slot="extra" style="margin-left:60%;display:flex">
-              <Button style="float:right" @click="selectAll" v-show="currentFileList.length>0">
+              <Button @click="downloadSelectFile" v-show="currentFileList.length>0" title="Download">
+                <Icon type="md-cloud-download" size="20"/>
+              </Button>
+              <Button style="float:right;margin-left:10px;" @click="selectAll" v-show="currentFileList.length>0" title="Select all">
                 <Icon type="md-done-all" :size="20" color="green"></Icon>
               </Button>
               <Button
                 style="margin-left:10px;"
                 @click="unSelectAll"
                 v-show="currentFileList.length>0"
+                title="Unselect all"
               >
                 <Icon type="md-remove" :size="20" color="red"/>
               </Button>
@@ -168,28 +166,24 @@
               </span>
             </div>
           </Card>
-          <Card v-for="(file,index) in currentFileList" :key="file.index" :padding="5">
-            <input
-              type="checkbox"
-              :value="file.pathURL"
-              @change="processURL(file.pathURL,file.chooseableStatus)"
-              v-model="file.chooseableStatus"
-              class="fileListCheckBox"
-            >
-            <Icon type="ios-document-outline" class="itemIcon" size="25"/>
-            <span @click="getFileInfo(file)" class="fileItemName" :title="file.name">{{file.name}}</span>
-            <span class="fileItemSize">{{file.fileSize}}</span>
-            <span style="width:20%;margin-right:5%">{{file.uploadTime}}</span>
-            <span @click="fileDelete(file)" class="fileDeleteBtn">
-              <Icon type="ios-trash" title="Remove" size="25"/>
-            </span>
-            <a :href="file.pathURL" :download="file.name" class="fileDownloadBtn">
-              <Icon type="ios-cloud-download" title="Download" size="25"/>
-            </a>
-            <span @click="filePreview(file)" class="filePreviewBtn">
-              <Icon type="md-eye" title="Preview" size="25"/>
-            </span>
-          </Card>
+          <CheckboxGroup v-model="chooseFilesArray">
+            <Card v-for="(file,index) in currentFileList" :key="file.index" :padding="5"> 
+              <Checkbox :label="file.pathURL">&nbsp;</Checkbox>
+              <Icon type="ios-document-outline" class="itemIcon" size="25"/>
+              <span @click="getFileInfo(file)" class="fileItemName" :title="file.name">{{file.name}}</span>
+              <span class="fileItemSize">{{file.fileSize}}</span>
+              <span style="width:20%;margin-right:5%">{{file.uploadTime}}</span>
+              <span @click="fileDelete(file)" class="fileDeleteBtn">
+                <Icon type="ios-trash" title="Remove" size="25"/>
+              </span>
+              <a :href="file.pathURL" :download="file.name" class="fileDownloadBtn">
+                <Icon type="ios-cloud-download" title="Download" size="25"/>
+              </a>
+              <span @click="filePreview(file)" class="filePreviewBtn">
+                <Icon type="md-eye" title="Preview" size="25"/>
+              </span>
+            </Card>
+          </CheckboxGroup>
         </div>
         <div v-else style="text-align:center">
           <div style="color:lightgray;font-size:2em; font-weight:bold">No file or folder</div>
@@ -344,7 +338,7 @@ export default {
       currentFolder: {
         folders: []
       },
-      currentFileList: [{ chooseStatus: false }],
+      currentFileList: [],
       folderUIDStack: [],
       folderNameStack: [],
       newFolderModal: false,
@@ -430,7 +424,7 @@ export default {
       // 是否选中
       chooseableStatus: false,
       // loading动画
-      spinAnimate: false
+      spinAnimate: false,
     };
   },
   methods: {
@@ -511,6 +505,7 @@ export default {
       }
     },
     backforeFolder() {
+      this.chooseFilesArray = [];
       if (this.folderUIDStack.length > 1) {
         var foreFolderUid = this.folderUIDStack.pop();
         var foreForlderName = this.folderNameStack.pop();
@@ -897,28 +892,14 @@ export default {
       a.click();
       document.body.removeChild(a);
     },
-    processURL(pathURL, chooseStatus) {
-      if (chooseStatus == true) {
-        this.chooseFilesArray.push(pathURL);
-      } else {
-        let index = this.fileUrlsArray.indexOf(pathURL);
-        this.chooseFilesArray.splice(index, 1);
-      }
-    },
     selectAll() {
-      var inputs = document.getElementsByClassName("fileListCheckBox");
-      for (var i = 0; i < inputs.length; i++) {
-        inputs[i].checked = true;
-        this.processURL(inputs[i].value, inputs[i].checked);
-      }
+      this.chooseFilesArray=[];
+        this.currentFileList.forEach(item=>{
+          this.chooseFilesArray.push(item["pathURL"]);
+        })
     },
     unSelectAll() {
-      var inputs = document.getElementsByClassName("fileListCheckBox");
-      for (var i = 0; i < inputs.length; i++) {
-        inputs[i].checked = false;
-        this.processURL(inputs[i].value, inputs[i].checked);
-      }
-      console.log(this.chooseFilesArray);
+      this.chooseFilesArray=[];
     },
     downloadSelectFile() {
       let choosefileUrls = this.chooseFilesArray.toString();
