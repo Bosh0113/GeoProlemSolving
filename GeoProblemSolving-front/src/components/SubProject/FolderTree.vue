@@ -78,9 +78,15 @@
         <strong>Resources</strong>
       </div>
       <div slot="extra" class="resourceBtnDiv">
-        <Tooltip content="Selec all" placement="bottom" class="fileBtn">
+        <!-- <Tooltip content="Download all" placement="bottom" class="fileBtn">
           <Button @click="selectAllFile">
-            <Icon type="md-done-all" size="20"/>
+            <Icon type="md-cloud-download"  size="20"/>
+          </Button>
+        </Tooltip> -->
+        <Tooltip content="Download select files" placement="bottom" class="fileBtn">
+          <Button @click="downloadSelectFile">
+            <!-- md-done-all -->
+            <Icon type="md-cloud-download" size="20"/>
           </Button>
         </Tooltip>
         <Tooltip content="Back" placement="bottom" class="fileBtn">
@@ -101,7 +107,8 @@
       </div>
       <div class="folderContent">
         <Card v-if="folderNameStack.length>0" :padding="5" dis-hover>
-          <Breadcrumb style="margin-left:5px">
+          <div style="height:30px;display:flex">
+            <Breadcrumb style="margin-left:5px;padding-top:5px;width:60%">
             <BreadcrumbItem>
               <Icon type="md-folder"/>
             </BreadcrumbItem>
@@ -111,6 +118,11 @@
               v-if="index!=0"
             >{{folderName}}</BreadcrumbItem>
           </Breadcrumb>
+          <div slot="extra" style="margin-left:60%;display:flex">
+            <Button style="float:right" @click="selectAll" v-show="currentFileList.length>0"><Icon type="md-done-all" :size="20" color="green"></Icon></Button>
+            <Button style="margin-left:10px;" @click="unSelectAll" v-show="currentFileList.length>0"><Icon type="md-remove" :size="20" color="red"/></Button>
+          </div>
+          </div>
         </Card>
         <div v-if="currentFolder.folders.length>0 || currentFileList.length>0">
           <Card v-for="(folder,index) in currentFolder.folders" :key="folder.index" :padding="5">
@@ -130,6 +142,7 @@
             </div>
           </Card>
           <Card v-for="(file,index) in currentFileList" :key="file.index" :padding="5">
+            <input type="checkbox" :value="file.pathURL" @change="processURL(file.pathURL,file.chooseableStatus)" v-model="file.chooseableStatus" class="fileListCheckBox">
             <Icon type="ios-document-outline" class="itemIcon" size="25"/>
             <span @click="getFileInfo(file)" class="fileItemName" :title="file.name">{{file.name}}</span>
             <span class="fileItemSize">{{file.fileSize}}</span>
@@ -285,7 +298,7 @@ export default {
       currentFolder: {
         folders: []
       },
-      currentFileList: [],
+      currentFileList: [{'chooseStatus':false}],
       folderUIDStack: [],
       folderNameStack: [],
       newFolderModal: false,
@@ -365,7 +378,11 @@ export default {
       selectedFileData: [],
       panel: null,
       // 批量下载文件名数组
-      fileUrlsArray:[]
+      fileUrlsArray:[],
+      // 单选选中的名称数组
+      chooseFilesArray:[],
+      // 是否选中
+      chooseableStatus:false,
     };
   },
   methods: {
@@ -399,6 +416,7 @@ export default {
         });
     },
     enterFolder(folder) {
+      this.chooseFilesArray = [];
       this.currentFolder = folder;
       this.folderUIDStack.push(this.currentFolder.uid);
       this.folderNameStack.push(this.currentFolder.name);
@@ -820,21 +838,84 @@ export default {
           });
       }
     },
-    selectAllFile(){
-      this.currentFileList.forEach(item=>{
-        this.fileUrlsArray.push(item.pathURL);
-      });
-      let fileUrls = this.fileUrlsArray.toString();
-      console.log(fileUrls);
-      this.axios.post("/GeoProblemSolving/resource/packageZIP"+"?fileURLs="+ fileUrls)
+    // selectAllFile(){
+    //   this.currentFileList.forEach(item=>{
+    //     this.fileUrlsArray.push(item.pathURL);
+    //   });
+    //   let fileUrls = this.fileUrlsArray.toString();
+    //   console.log(fileUrls);
+    //   this.axios({
+    //     method:'post',
+    //     url:"/GeoProblemSolving/resource/packageZIP?fileURLs="+fileUrls,
+    //     responseType:'blob'})
+    //   .then(res=>{
+    //     if(res.status== 200){
+    //       const blobUrl = window.URL.createObjectURL(res.data);
+    //       if(blobUrl!=""){
+    //         this.download(blobUrl);
+    //       }
+    //     }
+    //   })
+    //   .catch(err=>{
+    //   })
+    // },
+    download(blobUrl){
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.download = 'package.zip';
+      a.href = blobUrl;
+      a.click();
+      document.body.removeChild(a);
+      // console.log("待下载列表的长度之前是:"+this.chooseFilesArray.length);
+      // this.chooseFilesArray = [];
+      // console.log("待下载列表的长度之后是:"+this.chooseFilesArray.length);
+    },
+    processURL(pathURL,chooseStatus){
+      // console.log(data);
+      if(chooseStatus == true){
+        this.chooseFilesArray.push(pathURL);
+      }else{
+        let index = this.fileUrlsArray.indexOf(pathURL);
+        this.chooseFilesArray.splice(index,1);
+      }
+    },
+    selectAll(){
+      var inputs = document.getElementsByClassName("fileListCheckBox");
+      for(var i = 0;i<inputs.length;i++){
+        inputs[i].checked = true;
+        this.processURL(inputs[i].value,inputs[i].checked);
+      }
+    },
+    unSelectAll(){
+      var inputs = document.getElementsByClassName("fileListCheckBox");
+      for(var i = 0;i<inputs.length;i++){
+        inputs[i].checked = false;
+        this.processURL(inputs[i].value,inputs[i].checked);
+      };
+      console.log(this.chooseFilesArray);
+    },
+    downloadSelectFile(){
+      let choosefileUrls = this.chooseFilesArray.toString();
+      if(choosefileUrls!=""){
+        this.axios({
+        method:'post',
+        url:"/GeoProblemSolving/resource/packageZIP?fileURLs="+choosefileUrls,
+        responseType:'blob'})
       .then(res=>{
-        if(res.data!=""){
-          let stream = res.data;
-          console.log(stream);
+        if(res.status== 200){
+          const blobUrl = window.URL.createObjectURL(res.data);
+          if(blobUrl!=""){
+            this.download(blobUrl);
+            this.chooseFilesArray=[];
+            console.log("待下载列表的长度之前是:"+this.chooseFilesArray.length);
+          }
         }
       })
       .catch(err=>{
       })
+      }else{
+        alert("you don't choose any file!");
+      }
     }
   }
 };
