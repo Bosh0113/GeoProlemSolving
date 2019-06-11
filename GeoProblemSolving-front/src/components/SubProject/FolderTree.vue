@@ -116,7 +116,18 @@
       <div class="folderContent">
         <Card v-if="folderNameStack.length>0" :padding="5" dis-hover>
           <div style="height:30px;display:flex">
-            <Breadcrumb style="margin-left:5px;padding-top:5px;width:60%">
+            <div style="display:flex;align-items:center;width:80px;"v-show="currentFileList.length>0">
+              <Checkbox
+                :indeterminate="indeterminate"
+                :value="checkAll"
+                @click.prevent.native="handleCheckAll"
+                v-show="currentFileList.length>0"
+                style="align-items:center"
+                >
+                Select
+            </Checkbox>
+            </div>
+            <Breadcrumb style="margin-left:5px;padding-top:5px;width:70%">
               <BreadcrumbItem>
                 <Icon type="md-folder"/>
               </BreadcrumbItem>
@@ -126,20 +137,9 @@
                 v-if="index!=0"
               >{{folderName}}</BreadcrumbItem>
             </Breadcrumb>
-            <div slot="extra" style="margin-left:60%;display:flex">
+            <div slot="extra" style="width:20%;display:flex;justify-content:flex-end">
               <Button @click="downloadSelectFile" v-show="currentFileList.length>0" title="Download">
                 <Icon type="md-cloud-download" size="20"/>
-              </Button>
-              <Button style="float:right;margin-left:10px;" @click="selectAll" v-show="currentFileList.length>0" title="Select all">
-                <Icon type="md-done-all" :size="20" color="green"></Icon>
-              </Button>
-              <Button
-                style="margin-left:10px;"
-                @click="unSelectAll"
-                v-show="currentFileList.length>0"
-                title="Unselect all"
-              >
-                <Icon type="md-remove" :size="20" color="red"/>
               </Button>
             </div>
           </div>
@@ -161,8 +161,10 @@
               </span>
             </div>
           </Card>
-          <CheckboxGroup v-model="chooseFilesArray">
-            <Card v-for="(file,index) in currentFileList" :key="file.index" :padding="5"> 
+
+
+          <CheckboxGroup v-model="chooseFilesArray" @on-change="checkAllGroupChange">
+            <Card v-for="(file,index) in currentFileList" :key="file.index" :padding="5">
               <Checkbox :label="file.pathURL">&nbsp;</Checkbox>
               <Icon type="ios-document-outline" class="itemIcon" size="25"/>
               <span @click="getFileInfo(file)" class="fileItemName" :title="file.name">{{file.name}}</span>
@@ -411,14 +413,13 @@ export default {
       ],
       selectedFileData: [],
       panel: null,
-      // 批量下载文件名数组
-      fileUrlsArray: [],
       // 单选选中的名称数组
       chooseFilesArray: [],
-      // 是否选中
-      chooseableStatus: false,
       // loading动画
       spinAnimate: false,
+      // 关于单选多选的按钮
+      indeterminate: true,
+      checkAll: false,
     };
   },
   methods: {
@@ -453,6 +454,7 @@ export default {
     },
     enterFolder(folder) {
       this.chooseFilesArray = [];
+      this.checkAll = false;
       this.currentFolder = folder;
       this.folderUIDStack.push(this.currentFolder.uid);
       this.folderNameStack.push(this.currentFolder.name);
@@ -500,6 +502,7 @@ export default {
     },
     backforeFolder() {
       this.chooseFilesArray = [];
+      this.checkAll = false;
       if (this.folderUIDStack.length > 1) {
         var foreFolderUid = this.folderUIDStack.pop();
         var foreForlderName = this.folderNameStack.pop();
@@ -886,14 +889,32 @@ export default {
       a.click();
       document.body.removeChild(a);
     },
-    selectAll() {
-      this.chooseFilesArray=[];
+    handleCheckAll(){
+      if (this.indeterminate) {
+        this.checkAll = false;
+      } else {
+        this.checkAll = !this.checkAll;
+      }
+      this.indeterminate = false;
+      if (this.checkAll) {
         this.currentFileList.forEach(item=>{
           this.chooseFilesArray.push(item["pathURL"]);
         })
+      } else {
+        this.chooseFilesArray=[];
+      }
     },
-    unSelectAll() {
-      this.chooseFilesArray=[];
+    checkAllGroupChange(data){
+      if(data.length == this.currentFileList.length){
+        this.indeterminate = false;
+        this.checkAll = true;
+      }else if (data.length > 0) {
+        this.indeterminate = true;
+        this.checkAll = false;
+      }else {
+        this.indeterminate = false;
+        this.checkAll = false;
+      }
     },
     downloadSelectFile() {
       let choosefileUrls = this.chooseFilesArray.toString();
