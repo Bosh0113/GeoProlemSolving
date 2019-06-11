@@ -440,10 +440,10 @@ export default {
               that.fillTable(file);
             }
           };
-          xhr.send();          
+          xhr.send();
         } else if (socketData.operate === "selectdata") {
-          this.dataUrl = socketData.pathURL;     
-          this.viewData();       
+          this.dataUrl = socketData.pathURL;
+          this.viewData();
         }
       }
     },
