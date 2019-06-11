@@ -70,6 +70,25 @@
   white-space: nowrap;
   height: 16px;
 }
+.demo-spin-icon-load {
+  animation: ani-demo-spin 1s linear infinite;
+}
+@keyframes ani-demo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(180deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+.demo-spin-col {
+  height: 100px;
+  position: relative;
+  /* border: 1px solid #eee; */
+}
 </style>
 <template>
   <div class="fileSpace">
@@ -82,7 +101,7 @@
           <Button @click="selectAllFile">
             <Icon type="md-cloud-download"  size="20"/>
           </Button>
-        </Tooltip> -->
+        </Tooltip>-->
         <Tooltip content="Download select files" placement="bottom" class="fileBtn">
           <Button @click="downloadSelectFile">
             <!-- md-done-all -->
@@ -109,19 +128,27 @@
         <Card v-if="folderNameStack.length>0" :padding="5" dis-hover>
           <div style="height:30px;display:flex">
             <Breadcrumb style="margin-left:5px;padding-top:5px;width:60%">
-            <BreadcrumbItem>
-              <Icon type="md-folder"/>
-            </BreadcrumbItem>
-            <BreadcrumbItem
-              v-for="(folderName,index) in folderNameStack"
-              :key="index"
-              v-if="index!=0"
-            >{{folderName}}</BreadcrumbItem>
-          </Breadcrumb>
-          <div slot="extra" style="margin-left:60%;display:flex">
-            <Button style="float:right" @click="selectAll" v-show="currentFileList.length>0"><Icon type="md-done-all" :size="20" color="green"></Icon></Button>
-            <Button style="margin-left:10px;" @click="unSelectAll" v-show="currentFileList.length>0"><Icon type="md-remove" :size="20" color="red"/></Button>
-          </div>
+              <BreadcrumbItem>
+                <Icon type="md-folder"/>
+              </BreadcrumbItem>
+              <BreadcrumbItem
+                v-for="(folderName,index) in folderNameStack"
+                :key="index"
+                v-if="index!=0"
+              >{{folderName}}</BreadcrumbItem>
+            </Breadcrumb>
+            <div slot="extra" style="margin-left:60%;display:flex">
+              <Button style="float:right" @click="selectAll" v-show="currentFileList.length>0">
+                <Icon type="md-done-all" :size="20" color="green"></Icon>
+              </Button>
+              <Button
+                style="margin-left:10px;"
+                @click="unSelectAll"
+                v-show="currentFileList.length>0"
+              >
+                <Icon type="md-remove" :size="20" color="red"/>
+              </Button>
+            </div>
           </div>
         </Card>
         <div v-if="currentFolder.folders.length>0 || currentFileList.length>0">
@@ -142,7 +169,13 @@
             </div>
           </Card>
           <Card v-for="(file,index) in currentFileList" :key="file.index" :padding="5">
-            <input type="checkbox" :value="file.pathURL" @change="processURL(file.pathURL,file.chooseableStatus)" v-model="file.chooseableStatus" class="fileListCheckBox">
+            <input
+              type="checkbox"
+              :value="file.pathURL"
+              @change="processURL(file.pathURL,file.chooseableStatus)"
+              v-model="file.chooseableStatus"
+              class="fileListCheckBox"
+            >
             <Icon type="ios-document-outline" class="itemIcon" size="25"/>
             <span @click="getFileInfo(file)" class="fileItemName" :title="file.name">{{file.name}}</span>
             <span class="fileItemSize">{{file.fileSize}}</span>
@@ -160,6 +193,17 @@
         </div>
         <div v-else style="text-align:center">
           <div style="color:lightgray;font-size:2em; font-weight:bold">No file or folder</div>
+        </div>
+        <div>
+          <Row>
+            <Col class="demo-spin-col" span="8" offset="8" v-show="spinAnimate==true">
+                <Spin fix v-show="spinAnimate==true">
+                    <Icon type="ios-loading" size=40 class="demo-spin-icon-load"></Icon>
+                    <div>Loading</div>
+                </Spin>
+            </Col>
+          </Row>
+          <!-- <Spin size="large" v-show="spinAnimate==true"></Spin> -->
         </div>
       </div>
     </Card>
@@ -238,7 +282,9 @@
           <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
           <p>
             Click or drag files here to upload (The file size must control in
-            <span style="color:red">1GB</span>)
+            <span
+              style="color:red"
+            >1GB</span>)
           </p>
         </div>
       </Upload>
@@ -298,7 +344,7 @@ export default {
       currentFolder: {
         folders: []
       },
-      currentFileList: [{'chooseStatus':false}],
+      currentFileList: [{ chooseStatus: false }],
       folderUIDStack: [],
       folderNameStack: [],
       newFolderModal: false,
@@ -378,11 +424,13 @@ export default {
       selectedFileData: [],
       panel: null,
       // 批量下载文件名数组
-      fileUrlsArray:[],
+      fileUrlsArray: [],
       // 单选选中的名称数组
-      chooseFilesArray:[],
+      chooseFilesArray: [],
       // 是否选中
-      chooseableStatus:false,
+      chooseableStatus: false,
+      // loading动画
+      spinAnimate: false
     };
   },
   methods: {
@@ -437,12 +485,15 @@ export default {
           .then(res => {
             if (res != "Fail") {
               var allFiles = res.data;
-              for(var i=0;i<allFiles.length;i++){
+              for (var i = 0; i < allFiles.length; i++) {
                 var subProjectFile = allFiles[i];
-                for(var j=0;j<files.length;j++){
+                for (var j = 0; j < files.length; j++) {
                   var folderFile = files[j];
-                  if(subProjectFile.resourceId == folderFile.uid){
-                    subProjectFile.uploadTime = subProjectFile.uploadTime.substring(0,10);
+                  if (subProjectFile.resourceId == folderFile.uid) {
+                    subProjectFile.uploadTime = subProjectFile.uploadTime.substring(
+                      0,
+                      10
+                    );
                     filesInfoList.push(subProjectFile);
                   }
                 }
@@ -838,82 +889,58 @@ export default {
           });
       }
     },
-    // selectAllFile(){
-    //   this.currentFileList.forEach(item=>{
-    //     this.fileUrlsArray.push(item.pathURL);
-    //   });
-    //   let fileUrls = this.fileUrlsArray.toString();
-    //   console.log(fileUrls);
-    //   this.axios({
-    //     method:'post',
-    //     url:"/GeoProblemSolving/resource/packageZIP?fileURLs="+fileUrls,
-    //     responseType:'blob'})
-    //   .then(res=>{
-    //     if(res.status== 200){
-    //       const blobUrl = window.URL.createObjectURL(res.data);
-    //       if(blobUrl!=""){
-    //         this.download(blobUrl);
-    //       }
-    //     }
-    //   })
-    //   .catch(err=>{
-    //   })
-    // },
-    download(blobUrl){
-      const a = document.createElement('a');
-      a.style.display = 'none';
-      a.download = 'package.zip';
+    download(blobUrl) {
+      const a = document.createElement("a");
+      a.style.display = "none";
+      a.download = "package.zip";
       a.href = blobUrl;
       a.click();
       document.body.removeChild(a);
-      // console.log("待下载列表的长度之前是:"+this.chooseFilesArray.length);
-      // this.chooseFilesArray = [];
-      // console.log("待下载列表的长度之后是:"+this.chooseFilesArray.length);
     },
-    processURL(pathURL,chooseStatus){
-      // console.log(data);
-      if(chooseStatus == true){
+    processURL(pathURL, chooseStatus) {
+      if (chooseStatus == true) {
         this.chooseFilesArray.push(pathURL);
-      }else{
+      } else {
         let index = this.fileUrlsArray.indexOf(pathURL);
-        this.chooseFilesArray.splice(index,1);
+        this.chooseFilesArray.splice(index, 1);
       }
     },
-    selectAll(){
+    selectAll() {
       var inputs = document.getElementsByClassName("fileListCheckBox");
-      for(var i = 0;i<inputs.length;i++){
+      for (var i = 0; i < inputs.length; i++) {
         inputs[i].checked = true;
-        this.processURL(inputs[i].value,inputs[i].checked);
+        this.processURL(inputs[i].value, inputs[i].checked);
       }
     },
-    unSelectAll(){
+    unSelectAll() {
       var inputs = document.getElementsByClassName("fileListCheckBox");
-      for(var i = 0;i<inputs.length;i++){
+      for (var i = 0; i < inputs.length; i++) {
         inputs[i].checked = false;
-        this.processURL(inputs[i].value,inputs[i].checked);
-      };
+        this.processURL(inputs[i].value, inputs[i].checked);
+      }
       console.log(this.chooseFilesArray);
     },
-    downloadSelectFile(){
+    downloadSelectFile() {
       let choosefileUrls = this.chooseFilesArray.toString();
-      if(choosefileUrls!=""){
+      if (choosefileUrls != "") {
+        this.spinAnimate = true;
         this.axios({
-        method:'post',
-        url:"/GeoProblemSolving/resource/packageZIP?fileURLs="+choosefileUrls,
-        responseType:'blob'})
-      .then(res=>{
-        if(res.status== 200){
-          const blobUrl = window.URL.createObjectURL(res.data);
-          if(blobUrl!=""){
-            this.download(blobUrl);
-            this.chooseFilesArray=[];
-            console.log("待下载列表的长度之前是:"+this.chooseFilesArray.length);
-          }
-        }
-      })
-      .catch(err=>{
-      })
-      }else{
+          method: "post",
+          url:
+            "/GeoProblemSolving/resource/packageZIP?fileURLs=" + choosefileUrls,
+          responseType: "blob"
+        })
+          .then(res => {
+            if (res.status == 200) {
+              this.spinAnimate = false;
+              const blobUrl = window.URL.createObjectURL(res.data);
+              if (blobUrl != "") {
+                this.download(blobUrl);
+              }
+            }
+          })
+          .catch(err => {});
+      } else {
         alert("you don't choose any file!");
       }
     }
