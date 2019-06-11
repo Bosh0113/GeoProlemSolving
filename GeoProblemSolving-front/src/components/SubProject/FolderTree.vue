@@ -97,14 +97,8 @@
         <strong>Resources</strong>
       </div>
       <div slot="extra" class="resourceBtnDiv">
-        <!-- <Tooltip content="Download all" placement="bottom" class="fileBtn">
-          <Button @click="selectAllFile">
-            <Icon type="md-cloud-download"  size="20"/>
-          </Button>
-        </Tooltip>-->
         <Tooltip content="Download select files" placement="bottom" class="fileBtn">
           <Button @click="downloadSelectFile">
-            <!-- md-done-all -->
             <Icon type="md-cloud-download" size="20"/>
           </Button>
         </Tooltip>
@@ -203,7 +197,6 @@
                 </Spin>
             </Col>
           </Row>
-          <!-- <Spin size="large" v-show="spinAnimate==true"></Spin> -->
         </div>
       </div>
     </Card>
