@@ -115,8 +115,8 @@
       </div>
       <div class="folderContent">
         <Card v-if="folderNameStack.length>0" :padding="5" dis-hover>
-          <div style="height:30px;display:flex">
-            <div style="display:flex;align-items:center;width:80px;"v-show="currentFileList.length>0">
+          <div style="display:flex;align-items:center">
+            <div style="min-width:60px"v-show="currentFileList.length>0">
               <Checkbox
                 :indeterminate="indeterminate"
                 :value="checkAll"
@@ -124,10 +124,11 @@
                 v-show="currentFileList.length>0"
                 style="align-items:center"
                 >
-                Select
+                All files
             </Checkbox>
             </div>
-            <Breadcrumb style="margin-left:5px;padding-top:5px;width:70%">
+            <div style="flex:1;margin-left:3px;">
+              <Breadcrumb>
               <BreadcrumbItem>
                 <Icon type="md-folder"/>
               </BreadcrumbItem>
@@ -137,8 +138,9 @@
                 v-if="index!=0"
               >{{folderName}}</BreadcrumbItem>
             </Breadcrumb>
-            <div slot="extra" style="width:20%;display:flex;justify-content:flex-end">
-              <Button @click="downloadSelectFile" v-show="currentFileList.length>0" title="Download">
+            </div>
+            <div style="align-items:flex-end">
+              <Button @click="downloadSelectFile" v-show="currentFileList.length>0" title="Download" style="width:60px;height:30px;">
                 <Icon type="md-cloud-download" size="20"/>
               </Button>
             </div>
@@ -419,7 +421,7 @@ export default {
       spinAnimate: false,
       // 关于单选多选的按钮
       indeterminate: true,
-      checkAll: false,
+      checkAll: false
     };
   },
   methods: {
@@ -455,6 +457,7 @@ export default {
     enterFolder(folder) {
       this.chooseFilesArray = [];
       this.checkAll = false;
+      this.indeterminate = false;
       this.currentFolder = folder;
       this.folderUIDStack.push(this.currentFolder.uid);
       this.folderNameStack.push(this.currentFolder.name);
@@ -503,6 +506,7 @@ export default {
     backforeFolder() {
       this.chooseFilesArray = [];
       this.checkAll = false;
+      this.indeterminate = false;
       if (this.folderUIDStack.length > 1) {
         var foreFolderUid = this.folderUIDStack.pop();
         var foreForlderName = this.folderNameStack.pop();
@@ -889,7 +893,7 @@ export default {
       a.click();
       document.body.removeChild(a);
     },
-    handleCheckAll(){
+    handleCheckAll() {
       if (this.indeterminate) {
         this.checkAll = false;
       } else {
@@ -897,21 +901,21 @@ export default {
       }
       this.indeterminate = false;
       if (this.checkAll) {
-        this.currentFileList.forEach(item=>{
+        this.currentFileList.forEach(item => {
           this.chooseFilesArray.push(item["pathURL"]);
-        })
+        });
       } else {
-        this.chooseFilesArray=[];
+        this.chooseFilesArray = [];
       }
     },
-    checkAllGroupChange(data){
-      if(data.length == this.currentFileList.length){
+    checkAllGroupChange(data) {
+      if (data.length == this.currentFileList.length) {
         this.indeterminate = false;
         this.checkAll = true;
-      }else if (data.length > 0) {
+      } else if (data.length > 0) {
         this.indeterminate = true;
         this.checkAll = false;
-      }else {
+      } else {
         this.indeterminate = false;
         this.checkAll = false;
       }
