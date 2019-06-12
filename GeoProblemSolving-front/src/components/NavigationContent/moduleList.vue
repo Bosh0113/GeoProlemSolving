@@ -209,24 +209,26 @@
               style="height:40px;display:flex;align-items:center"
               class="operatePanel"
             >
-              <Button @click="showSteps" class="addBtn">Steps</Button>
-              <template v-if="this.currentModule.activeStatus">
-                <Button
-                  type="default"
-                  @click="editModalShow()"
-                  icon="ios-create"
-                  class="editBtn"
-                  title="Edit this module"
-                >Edit</Button>
-              </template>
-              <template v-else>
-                <Button
-                  type="default"
-                  @click="activateModal = true"
-                  icon="md-bulb"
-                  class="editBtn"
-                  title="Activate this module"
-                >Activate</Button>
+              <template v-if="this.moduleList.length > 0">
+                <Button @click="showSteps" class="addBtn">Steps</Button>
+                <template v-if="this.currentModule.activeStatus">
+                  <Button
+                    type="default"
+                    @click="editModalShow()"
+                    icon="ios-create"
+                    class="editBtn"
+                    title="Edit this module"
+                  >Edit</Button>
+                </template>
+                <template v-else>
+                  <Button
+                    type="default"
+                    @click="activateModal = true"
+                    icon="md-bulb"
+                    class="editBtn"
+                    title="Activate this module"
+                  >Activate</Button>
+                </template>
               </template>
             </Col>
           </Row>
@@ -1153,21 +1155,25 @@
       v-model="stepsModal"
       title="The process of geo-problem solving"
       :mask-closable="false"
-      @on-ok="changeProcess"
-      ok-text="Change"
-      cancel-text="Cancel"
+      footer-hide
     >
       <div style="width:780px;height:400px" id="steps"></div>
       <div style="width: 765px; height: 25px">
+        <label style="margin-left:20px">New step name:</label>
+        <Input
+          v-model="formValidate1.moduleTitle"
+          placeholder="Enter something..."
+          style="width: 200px"
+        />
+        <label style="margin-left:20px">New step type:</label>
+        <Select
+          v-model="formValidate1.moduleType"
+          style="width:100px"
+          placeholder="please select module type..."
+        >
+          <Option v-for="item in typeList" :key="item.index" :value="item">{{ item }}</Option>
+        </Select>
         <template v-if="$store.getters.userInfo.userId == this.subProjectInfo.managerId">
-          <Button
-            type="default"
-            @click="addNewStep()"
-            icon="md-add"
-            class="addBtn"
-            title="Add a new module"
-            style="float:right;margin-left:10px"
-          >Add</Button>
           <template v-if="(this.moduleList.length != 0) && (!this.currentModule.activeStatus)">
             <Button
               type="default"
@@ -1178,6 +1184,14 @@
               style="float:right;margin-left:10px"
             >Remove</Button>
           </template>
+          <Button
+            type="default"
+            @click="addNewStep()"
+            icon="md-add"
+            class="addBtn"
+            title="Add a new module"
+            style="float:right;margin-left:10px"
+          >Add</Button>
         </template>
       </div>
     </Modal>
@@ -1732,7 +1746,7 @@ export default {
             type: "graph",
             layout: "none",
             legendHoverLink: true,
-            // roam: true,
+            roam: true,
             label: {
               normal: {
                 show: true
@@ -1740,6 +1754,7 @@ export default {
             },
             edgeSymbol: ["circle", "arrow"],
             edgeSymbolSize: [4, 10],
+            focusNodeAdjacency: true,
             data: [],
             categories: [
               {
@@ -1775,7 +1790,6 @@ export default {
 
       if (this.processStructure.length > 0 && this.moduleList.length > 0) {
         for (let i = 0; i < this.processStructure.length; i++) {
-          
           //get data
           if (
             this.processStructure[i].stepID ==
@@ -1788,7 +1802,7 @@ export default {
               x: this.processStructure[i].x,
               y: this.processStructure[i].y,
               category: this.processStructure[i].category,
-              symbolSize: 50
+              symbolSize: 45
             });
           } else {
             option.series[0].data.push({
@@ -1814,34 +1828,33 @@ export default {
 
       if (this.stepChart == null) {
         this.stepChart = echarts.init(document.getElementById("steps"));
-        this.stepChart.setOption(option);
-        let _this = this;
-        this.stepChart.on("click", function(params) {
-          if (option.series[0].data[params.data.index].symbolSize == 30) {
-            option.series[0].data[params.data.index].symbolSize = 45;
-            
-            // record the selected step nodes
-            _this.selectedModule.push({
-              moduleId: params.data.moduleId,
-              index: params.data.index
-            });
-          } else if (
-            option.series[0].data[params.data.index].symbolSize == 45
-          ) {
-            option.series[0].data[params.data.index].symbolSize = 30;
-            
-            // remove these not selected step nodes
-            for (let i = 0; i < _this.selectedModule.length; i++) {
-              if (_this.selectedModule[i].ModuleId == params.data.moduleId) {
-                _this.selectedModule.splice(i, 1);
-                break;
-              }
+      } else {
+        this.stepChart.off("click");
+      }
+      this.stepChart.setOption(option);
+      let _this = this;
+      this.stepChart.on("click", function(params) {
+        if (option.series[0].data[params.data.index].symbolSize == 30) {
+          option.series[0].data[params.data.index].symbolSize = 45;
+
+          // record the selected step nodes
+          _this.selectedModule.push({
+            moduleId: params.data.moduleId,
+            index: params.data.index
+          });
+        } else if (option.series[0].data[params.data.index].symbolSize == 45) {
+          option.series[0].data[params.data.index].symbolSize = 30;
+
+          // remove these not selected step nodes
+          for (let i = 0; i < _this.selectedModule.length; i++) {
+            if (_this.selectedModule[i].ModuleId == params.data.moduleId) {
+              _this.selectedModule.splice(i, 1);
+              break;
             }
           }
-          _this.stepChart.setOption(option);
-        });
-      }
-
+        }
+        _this.stepChart.setOption(option);
+      });
       this.stepsModal = true;
     },
     changeProcess() {
@@ -1850,57 +1863,146 @@ export default {
       }
     },
     addNewStep() {
-      if (this.selectedModule.length > 0) {
-        this.stepOperation = "addStepModule";
+      // 重复命名检测
+      for (let i = 0; i < this.processStructure.length; i++) {
+        if (this.formValidate1.moduleTitle == this.processStructure[i].name) {
+          this.$Notice.info({
+            desc: "The name of new step should not be different!"
+          });
+          return;
+        }
+      }
+      if (
+        this.formValidate1.moduleTitle != "" &&
+        this.formValidate1.moduleType != ""
+      ) {
+        if (
+          this.selectedModule.length > 0 ||
+          this.processStructure.length == 0
+        ) {
+          this.stepOperation = "addStepModule";
 
-        let lastNode = [];
-        let nodeLevel = 0;
-        let nodeY = 0;
-        for(let i=0; i<this.selectedModule.length;i++){
-          lastNode.push(this.selectedModule[i].index)
-          
-          if(this.processStructure[this.selectedModule[i].index].level >= nodeLevel){
-            nodeLevel = this.processStructure[this.selectedModule[i].index].level + 1;
-          }
-          
-          // modify original step node
-          this.processStructure[this.selectedModule[i].index].next.push(this.processStructure.length);
-          this.processStructure[this.selectedModule[i].index].end = false;
+          //  计算新增节点的属性信息
+          let lastNode = [];
+          let nodeLevel = 0;
+          let nodeY = 0;
+          let nodeCategory = 0;
+          for (let i = 0; i < this.selectedModule.length; i++) {
+            lastNode.push(this.selectedModule[i].index);
 
-          // calculate x & y 
-          if(this.processStructure[i].last == []){
-            nodeY = 200;
-          } else {
-            let sumY = 0;
-            for(let j = 0;j < this.selectedModule.length; j++){
-              sumY += this.processStructure[this.selectedModule[j].index].y
+            if (
+              this.processStructure[this.selectedModule[i].index].level >=
+              nodeLevel
+            ) {
+              nodeLevel =
+                this.processStructure[this.selectedModule[i].index].level + 1;
             }
-            nodeY = sumY/this.selectedModule.length;
+
+            // modify original step node
+            this.processStructure[this.selectedModule[i].index].next.push(
+              this.processStructure.length
+            );
+            this.processStructure[this.selectedModule[i].index].end = false;
+
+            // calculate y
+            if (this.processStructure[i].last == []) {
+              nodeY = 200;
+            } else {
+              let sumY = 0;
+              for (let j = 0; j < this.selectedModule.length; j++) {
+                sumY += this.processStructure[this.selectedModule[j].index].y;
+              }
+              nodeY = sumY / this.selectedModule.length;
+            }
           }
+
+          let isOverlap = false;
+          // 统计每层的节点数
+          let levelNum = [];
+          for (let i = 0; i < this.processStructure.length; i++) {
+            if (this.processStructure[i].level == nodeLevel) {
+              levelNum.push(this.processStructure[i].id);
+            }
+          }
+          // 节点重复检测
+          for (let i = 0; i < levelNum.length; i++) {
+            if (Math.abs(this.processStructure[levelNum[i]].y - nodeY) < 30) {
+              isOverlap = true;
+              break;
+            }
+          }
+
+          // 新步骤的类别
+          if (this.formValidate1.moduleType == "Preparation") {
+            nodeCategory = 0;
+          } else if (this.formValidate1.moduleType == "Analysis") {
+            nodeCategory = 1;
+          } else if (this.formValidate1.moduleType == "Modeling") {
+            nodeCategory = 2;
+          } else if (this.formValidate1.moduleType == "Simulation") {
+            nodeCategory = 3;
+          } else if (this.formValidate1.moduleType == "Validation") {
+            nodeCategory = 4;
+          } else if (this.formValidate1.moduleType == "Comparison") {
+            nodeCategory = 5;
+          }
+
+          // create step node
+          let newStepNode = {
+            id: this.processStructure.length,
+            stepID: "",
+            name: this.formValidate1.moduleTitle,
+            category: nodeCategory,
+            last: lastNode,
+            next: [],
+            x: 0,
+            y: nodeY,
+            level: nodeLevel,
+            end: true
+          };
+          this.processStructure.push(newStepNode);
+          levelNum.push(newStepNode.id);
+
+          // 如果重叠，修改y坐标
+          if (isOverlap) {
+            for (let i = 0; i < levelNum.length; i++) {
+              this.processStructure[levelNum[i]].y =
+                (600 / (levelNum.length + 1)) * (i + 1);
+            }
+            isOverlap = false;
+          }
+
+          // calculate x
+          let maxLevel = 0;
+          for (let i = 0; i < this.processStructure.length; i++) {
+            if (this.processStructure[i].level > maxLevel) {
+              maxLevel = this.processStructure[i].level;
+            }
+          }
+          for (let i = 0; i < this.processStructure.length; i++) {
+            this.processStructure[i].x =
+              (800 / maxLevel) * this.processStructure[i].level;
+          }
+
+          this.stepChart.dispose();
+          this.stepChart = null;
+          this.showSteps();
+          //关闭当前模态框
+          this.stepsModal = false;
+          //选择资源
+          this.chooseResource();
+        } else {
+          this.$Notice.info({
+            desc: "There is no step node being selected!"
+          });
         }
-
-        // create step node
-        let newStepNode = {
-          id: this.processStructure.length,
-          stepID: "",
-          name: "",
-          category: 1,
-          last: lastNode,
-          next: [],
-          x: (nodeLevel+1) * 300,
-          y: nodeY,
-          level: nodeLevel,
-          end: true
-        }
-        this.processStructure.push(newStepNode);
-
-        this.stepChart.dispose()
-        this.stepChart = null;
-        this.showSteps();
-
-      } else {
+      } else if (this.formValidate1.moduleTitle == "") {
         this.$Notice.info({
-          desc: "There is no step node being selected!"
+          desc: "The name of new step should not be empty!"
+        });
+      } else if (this.formValidate1.moduleType == "") {
+        this.$Notice.info({
+          desc: "The type of new step should not be empty!"
         });
       }
     },
@@ -2248,7 +2350,7 @@ export default {
       // this.targetKeys = this.getTargetKeys();
     },
     createModule() {
-      this.addModal = true;
+      // this.addModal = true;
       this.selectResource = [];
       this.selectResource = this.getTargetKeys();
     },
