@@ -1174,10 +1174,10 @@
           <Option v-for="item in typeList" :key="item.index" :value="item">{{ item }}</Option>
         </Select>
         <template v-if="$store.getters.userInfo.userId == this.subProjectInfo.managerId">
-          <template v-if="(this.moduleList.length != 0) && (!this.currentModule.activeStatus)">
+          <template v-if="this.moduleList.length > 0">
             <Button
               type="default"
-              @click="delModal = true"
+              @click="removeNewStep()"
               icon="md-remove"
               class="removeBtn"
               title="Remove this module"
@@ -1502,7 +1502,7 @@ export default {
           name: "000",
           category: 0,
           last: [],
-          next: [1, 2, 3],
+          next: ["001", "002", "003"],
           x: 300,
           y: 300,
           level: 0,
@@ -1513,8 +1513,8 @@ export default {
           stepID: "xxx",
           name: "001",
           category: 1,
-          last: [0],
-          next: [4],
+          last: ["000"],
+          next: ["004"],
           x: 600,
           y: 100,
           level: 1,
@@ -1525,8 +1525,8 @@ export default {
           stepID: "xxx",
           name: "002",
           category: 1,
-          last: [0],
-          next: [4],
+          last: ["000"],
+          next: ["004"],
           x: 600,
           y: 300,
           level: 1,
@@ -1537,7 +1537,7 @@ export default {
           stepID: "xxx",
           name: "003",
           category: 3,
-          last: [0],
+          last: ["000"],
           next: [],
           x: 600,
           y: 500,
@@ -1549,8 +1549,8 @@ export default {
           stepID: "xxx",
           name: "004",
           category: 2,
-          last: [1, 2],
-          next: [5],
+          last: ["001", "002"],
+          next: ["005"],
           x: 900,
           y: 300,
           level: 2,
@@ -1561,7 +1561,7 @@ export default {
           stepID: "xxx",
           name: "005",
           category: 3,
-          last: [4],
+          last: ["004"],
           next: [],
           x: 1200,
           y: 300,
@@ -1710,7 +1710,7 @@ export default {
     showSteps() {
       this.selectedModule = [];
       let option = {
-        animationDurationUpdate: 1500,
+        animationDurationUpdate: 500,
         animationEasingUpdate: "quinticInOut",
         legend: {
           show: true,
@@ -1804,6 +1804,10 @@ export default {
               category: this.processStructure[i].category,
               symbolSize: 45
             });
+            this.selectedModule.push({
+              moduleId: this.processStructure[i].stepID,
+              index: this.processStructure[i].id
+            });
           } else {
             option.series[0].data.push({
               name: this.processStructure[i].name,
@@ -1819,7 +1823,7 @@ export default {
           //get links
           for (let j = 0; j < this.processStructure[i].next.length; j++) {
             option.series[0].links.push({
-              source: this.processStructure[i].id,
+              source: this.processStructure[i].name,
               target: this.processStructure[i].next[j]
             });
           }
@@ -1830,9 +1834,11 @@ export default {
         this.stepChart = echarts.init(document.getElementById("steps"));
       } else {
         this.stepChart.off("click");
+        this.stepChart.off("dblclick");
       }
       this.stepChart.setOption(option);
       let _this = this;
+      // 单击选择步骤
       this.stepChart.on("click", function(params) {
         if (option.series[0].data[params.data.index].symbolSize == 30) {
           option.series[0].data[params.data.index].symbolSize = 45;
@@ -1840,7 +1846,8 @@ export default {
           // record the selected step nodes
           _this.selectedModule.push({
             moduleId: params.data.moduleId,
-            index: params.data.index
+            index: params.data.index,
+            name: params.data.name
           });
         } else if (option.series[0].data[params.data.index].symbolSize == 45) {
           option.series[0].data[params.data.index].symbolSize = 30;
@@ -1854,6 +1861,10 @@ export default {
           }
         }
         _this.stepChart.setOption(option);
+      });
+      // 双击切换当前步骤
+      this.stepChart.on("dblclick", function(params) {
+        console.log(params.data.moduleId);
       });
       this.stepsModal = true;
     },
@@ -1888,7 +1899,7 @@ export default {
           let nodeY = 0;
           let nodeCategory = 0;
           for (let i = 0; i < this.selectedModule.length; i++) {
-            lastNode.push(this.selectedModule[i].index);
+            lastNode.push(this.selectedModule[i].name);
 
             if (
               this.processStructure[this.selectedModule[i].index].level >=
@@ -1986,7 +1997,6 @@ export default {
 
           this.stepChart.dispose();
           this.stepChart = null;
-          this.showSteps();
           //关闭当前模态框
           this.stepsModal = false;
           //选择资源
@@ -2003,6 +2013,49 @@ export default {
       } else if (this.formValidate1.moduleType == "") {
         this.$Notice.info({
           desc: "The type of new step should not be empty!"
+        });
+      }
+    },
+    removeNewStep() {
+      if (this.selectedModule.length > 0) {
+        let allowRemove = [];
+        for (let i = 0; i < this.selectedModule.length; i++) {
+          if (this.processStructure[this.selectedModule[i].index].end) {
+            // 删除节点
+            this.processStructure.splice(this.selectedModule[i].index, 1);
+            // 更新记录
+            if (this.selectedModule[i].index > 0) {
+              // 处理被删除节点的前驱节点
+              if(this.processStructure[this.selectedModule[i].index-1].next.length === 1){
+                this.processStructure[this.selectedModule[i].index-1].next = [];             
+                this.processStructure[this.selectedModule[i].index-1].end = true;
+              }
+              else if (this.processStructure[this.selectedModule[i].index-1].next.length > 1){
+                for(let j=0; j< this.processStructure[this.selectedModule[i].index-1].next.length; j++){
+                  if(this.processStructure[this.selectedModule[i].index-1].next[j] === this.selectedModule[i].name){
+                    this.processStructure[this.selectedModule[i].index-1].next.splice(j,1);
+                  }
+                }
+              }
+              // 处理后继节点
+              for (let j = this.selectedModule[i].index; j < this.processStructure.length; j++) {
+                if(this.processStructure[j].id !== j){
+                  this.processStructure[j].id = j;
+                }
+              }
+            }
+            // 记录步骤模块id
+            allowRemove.push(this.selectedModule[i].moduleId);
+          }
+        }
+        if (allowRemove.length > 0) {          
+          this.stepsModal = false;
+          this.delModal = true;
+        }
+      }
+      else{        
+        this.$Notice.info({
+          desc: "The name of new step should not be empty!"
         });
       }
     },
@@ -2356,14 +2409,50 @@ export default {
     },
     getMockData() {
       let mockData = [];
-      for (let i = 0; i < this.resourceList.length; i++) {
-        mockData.push({
-          key: i,
-          name: this.resourceList[i].name,
-          type: this.resourceList[i].type,
-          resourceId: this.resourceList[i].resourceId
-        });
+      for (let i = 0; i < this.selectedModule.length; i++) {
+        if (this.selectedModule[i].moduleId == this.currentModule.moduleId) {
+          for (let i = 0; i < this.resourceList.length; i++) {
+            mockData.push({
+              key: i,
+              name: this.resourceList[i].name,
+              type: this.resourceList[i].type,
+              resourceId: this.resourceList[i].resourceId
+            });
+          }
+        } else {
+          let selectedRes = [];
+          $.ajax({
+            url:
+              "/GeoProblemSolving/resource/inquiry" +
+              "?key=scope.moduleId" +
+              "&value=" +
+              this.selectedModule[i].moduleId,
+            type: "GET",
+            async: false,
+            success: function(data) {
+              if (data !== "None") {
+                selectedRes = data;
+                for (let i = 0; i < selectedRes.length; i++) {
+                  mockData.push({
+                    key: i,
+                    name: selectedRes.name,
+                    type: selectedRes.type,
+                    resourceId: selectedRes.resourceId
+                  });
+                }
+              } else {
+                selectedRes = [];
+              }
+            },
+            error: function(err) {
+              selectedRes = [];
+              console.log("err!");
+            }
+          });
+        }
       }
+      this.selectedModule = [];
+
       return mockData;
     },
     getTargetKeys() {
@@ -2384,7 +2473,11 @@ export default {
       this.targetKeys = newTargetKeys;
     },
     filterMethod(data, query) {
-      return data.type.indexOf(query) > -1;
+      if (data.length > 0) {
+        return data.type.indexOf(query) > -1;
+      } else {
+        return false;
+      }
     },
     resourceRender(item) {
       return item.type + " - " + item.name;
