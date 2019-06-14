@@ -1496,78 +1496,78 @@ export default {
       uploadProgress: 0,
       // 问题解决流程结构
       processStructure: [
-        {
-          id: 0,
-          stepID: "xxx",
-          name: "000",
-          category: 0,
-          last: [],
-          next: ["001", "002", "003"],
-          x: 300,
-          y: 300,
-          level: 0,
-          end: false
-        },
-        {
-          id: 1,
-          stepID: "xxx",
-          name: "001",
-          category: 1,
-          last: ["000"],
-          next: ["004"],
-          x: 600,
-          y: 100,
-          level: 1,
-          end: false
-        },
-        {
-          id: 2,
-          stepID: "xxx",
-          name: "002",
-          category: 1,
-          last: ["000"],
-          next: ["004"],
-          x: 600,
-          y: 300,
-          level: 1,
-          end: false
-        },
-        {
-          id: 3,
-          stepID: "xxx",
-          name: "003",
-          category: 3,
-          last: ["000"],
-          next: [],
-          x: 600,
-          y: 500,
-          level: 1,
-          end: true
-        },
-        {
-          id: 4,
-          stepID: "xxx",
-          name: "004",
-          category: 2,
-          last: ["001", "002"],
-          next: ["005"],
-          x: 900,
-          y: 300,
-          level: 2,
-          end: false
-        },
-        {
-          id: 5,
-          stepID: "xxx",
-          name: "005",
-          category: 3,
-          last: ["004"],
-          next: [],
-          x: 1200,
-          y: 300,
-          level: 3,
-          end: true
-        }
+        // {
+        //   id: 0,
+        //   stepID: "xxx",
+        //   name: "000",
+        //   category: 0,
+        //   last: [],
+        //   next: ["001", "002", "003"],
+        //   x: 300,
+        //   y: 300,
+        //   level: 0,
+        //   end: false
+        // },
+        // {
+        //   id: 1,
+        //   stepID: "xxx",
+        //   name: "001",
+        //   category: 1,
+        //   last: ["000"],
+        //   next: ["004"],
+        //   x: 600,
+        //   y: 100,
+        //   level: 1,
+        //   end: false
+        // },
+        // {
+        //   id: 2,
+        //   stepID: "xxx",
+        //   name: "002",
+        //   category: 1,
+        //   last: ["000"],
+        //   next: ["004"],
+        //   x: 600,
+        //   y: 300,
+        //   level: 1,
+        //   end: false
+        // },
+        // {
+        //   id: 3,
+        //   stepID: "xxx",
+        //   name: "003",
+        //   category: 3,
+        //   last: ["000"],
+        //   next: [],
+        //   x: 600,
+        //   y: 500,
+        //   level: 1,
+        //   end: true
+        // },
+        // {
+        //   id: 4,
+        //   stepID: "xxx",
+        //   name: "004",
+        //   category: 2,
+        //   last: ["001", "002"],
+        //   next: ["005"],
+        //   x: 900,
+        //   y: 300,
+        //   level: 2,
+        //   end: false
+        // },
+        // {
+        //   id: 5,
+        //   stepID: "xxx",
+        //   name: "005",
+        //   category: 3,
+        //   last: ["004"],
+        //   next: [],
+        //   x: 1200,
+        //   y: 300,
+        //   level: 3,
+        //   end: true
+        // }
       ]
     };
   },
@@ -1868,11 +1868,6 @@ export default {
       });
       this.stepsModal = true;
     },
-    changeProcess() {
-      if (this.stepOperation === "addStepModule") {
-      } else if (this.stepOperation === "removeStepModule") {
-      }
-    },
     addNewStep() {
       // 重复命名检测
       for (let i = 0; i < this.processStructure.length; i++) {
@@ -1887,12 +1882,7 @@ export default {
         this.formValidate1.moduleTitle != "" &&
         this.formValidate1.moduleType != ""
       ) {
-        if (
-          this.selectedModule.length > 0 ||
-          this.processStructure.length == 0
-        ) {
-          this.stepOperation = "addStepModule";
-
+        if (this.selectedModule.length > 0) {
           //  计算新增节点的属性信息
           let lastNode = [];
           let nodeLevel = 0;
@@ -1911,7 +1901,7 @@ export default {
 
             // modify original step node
             this.processStructure[this.selectedModule[i].index].next.push(
-              this.processStructure.length
+              this.formValidate1.moduleTitle
             );
             this.processStructure[this.selectedModule[i].index].end = false;
 
@@ -1978,7 +1968,7 @@ export default {
           if (isOverlap) {
             for (let i = 0; i < levelNum.length; i++) {
               this.processStructure[levelNum[i]].y =
-                (600 / (levelNum.length + 1)) * (i + 1);
+                (400 / (levelNum.length + 1)) * (i + 1);
             }
             isOverlap = false;
           }
@@ -1992,9 +1982,48 @@ export default {
           }
           for (let i = 0; i < this.processStructure.length; i++) {
             this.processStructure[i].x =
-              (800 / maxLevel) * this.processStructure[i].level;
+              (800 / (maxLevel + 1)) * (this.processStructure[i].level + 1);
           }
 
+          this.stepChart.dispose();
+          this.stepChart = null;
+          //关闭当前模态框
+          this.stepsModal = false;
+          //选择资源
+          this.chooseResource();
+        } else if (this.processStructure.length == 0) {
+          // 新步骤的类别
+          let nodeCategory = 0;
+          if (this.formValidate1.moduleType == "Preparation") {
+            nodeCategory = 0;
+          } else if (this.formValidate1.moduleType == "Analysis") {
+            nodeCategory = 1;
+          } else if (this.formValidate1.moduleType == "Modeling") {
+            nodeCategory = 2;
+          } else if (this.formValidate1.moduleType == "Simulation") {
+            nodeCategory = 3;
+          } else if (this.formValidate1.moduleType == "Validation") {
+            nodeCategory = 4;
+          } else if (this.formValidate1.moduleType == "Comparison") {
+            nodeCategory = 5;
+          }
+
+          // create step node
+          let newStepNode = {
+            id: this.processStructure.length,
+            stepID: "",
+            name: this.formValidate1.moduleTitle,
+            category: nodeCategory,
+            last: [],
+            next: [],
+            x: 400,
+            y: 200,
+            level: 0,
+            end: true
+          };
+          this.processStructure.push(newStepNode);
+
+          // 关闭当前图表
           this.stepChart.dispose();
           this.stepChart = null;
           //关闭当前模态框
@@ -2020,40 +2049,75 @@ export default {
       if (this.selectedModule.length > 0) {
         let allowRemove = [];
         for (let i = 0; i < this.selectedModule.length; i++) {
-          if (this.processStructure[this.selectedModule[i].index].end) {
-            // 删除节点
-            this.processStructure.splice(this.selectedModule[i].index, 1);
-            // 更新记录
-            if (this.selectedModule[i].index > 0) {
+          let thisStepIndex = this.selectedModule[i].index;
+          if (this.processStructure[thisStepIndex].end) {
+            if (thisStepIndex > 0) {
               // 处理被删除节点的前驱节点
-              if(this.processStructure[this.selectedModule[i].index-1].next.length === 1){
-                this.processStructure[this.selectedModule[i].index-1].next = [];             
-                this.processStructure[this.selectedModule[i].index-1].end = true;
-              }
-              else if (this.processStructure[this.selectedModule[i].index-1].next.length > 1){
-                for(let j=0; j< this.processStructure[this.selectedModule[i].index-1].next.length; j++){
-                  if(this.processStructure[this.selectedModule[i].index-1].next[j] === this.selectedModule[i].name){
-                    this.processStructure[this.selectedModule[i].index-1].next.splice(j,1);
+              // 遍历前驱节点
+              for (
+                let j = 0;
+                j < this.processStructure[thisStepIndex].last.length;
+                j++
+              ) {
+                let lastStepName = this.processStructure[thisStepIndex].last[j];
+                for (let k = 0; k < this.processStructure.length; k++) {
+                  if (this.processStructure[k].name === lastStepName) {
+                    // 删除前驱节点和被删节点的关系
+                    if (this.processStructure[k].next.length === 1) {
+                      this.processStructure[k].next = [];
+                      this.processStructure[k].end = true;
+                    } else if (this.processStructure[k].next.length > 1) {
+                      for (
+                        let s = 0;
+                        s < this.processStructure[k].next.length;
+                        s++
+                      ) {
+                        if (
+                          this.processStructure[k].next[s] ===
+                          this.selectedModule[i].name
+                        ) {
+                          this.processStructure[k].next.splice(s, 1);
+                        }
+                      }
+                    }
                   }
                 }
               }
+
+              // 删除节点
+              this.processStructure.splice(thisStepIndex, 1);
+
               // 处理后继节点
-              for (let j = this.selectedModule[i].index; j < this.processStructure.length; j++) {
-                if(this.processStructure[j].id !== j){
+              for (
+                let j = thisStepIndex;
+                j < this.processStructure.length;
+                j++
+              ) {
+                if (this.processStructure[j].id !== j) {
                   this.processStructure[j].id = j;
                 }
               }
+            } else if (thisStepIndex === 0) {
+              // 删除节点
+              this.processStructure.splice(thisStepIndex, 1);
             }
+
             // 记录步骤模块id
             allowRemove.push(this.selectedModule[i].moduleId);
+          } else {
+            this.$Notice.info({
+              desc:
+                "The selected step " +
+                this.selectedModule[i].name +
+                "can not be removed. Because it has the next step!"
+            });
           }
         }
-        if (allowRemove.length > 0) {          
+        if (allowRemove.length > 0) {
           this.stepsModal = false;
           this.delModal = true;
         }
-      }
-      else{        
+      } else {
         this.$Notice.info({
           desc: "The name of new step should not be empty!"
         });
@@ -2398,7 +2462,6 @@ export default {
         });
     },
     chooseResource() {
-      this.inheritData = true;
       this.inheritResource = this.getMockData();
       // this.targetKeys = this.getTargetKeys();
     },
@@ -2410,7 +2473,8 @@ export default {
     getMockData() {
       let mockData = [];
       for (let i = 0; i < this.selectedModule.length; i++) {
-        if (this.selectedModule[i].moduleId == this.currentModule.moduleId) {
+        let selectedModuleId = this.selectedModule[i].moduleId;
+        if (selectedModuleId == this.currentModule.moduleId) {
           for (let i = 0; i < this.resourceList.length; i++) {
             mockData.push({
               key: i,
@@ -2426,7 +2490,7 @@ export default {
               "/GeoProblemSolving/resource/inquiry" +
               "?key=scope.moduleId" +
               "&value=" +
-              this.selectedModule[i].moduleId,
+              selectedModuleId,
             type: "GET",
             async: false,
             success: function(data) {
@@ -2452,6 +2516,12 @@ export default {
         }
       }
       this.selectedModule = [];
+
+      if (mockData.length > 0) {
+        this.inheritData = true;
+      } else {
+        this.inheritData = false;
+      }
 
       return mockData;
     },
@@ -2519,6 +2589,7 @@ export default {
           if (
             this.$store.getters.userInfo.userId == this.subProjectInfo.managerId
           ) {
+            // 创建module
             let Module = {};
             Module["activeStatus"] = true;
             Module["subProjectId"] = this.$route.params.id;
@@ -2579,6 +2650,39 @@ export default {
               .catch(err => {
                 console.log(err.data);
               });
+              
+            if (this.processStructure.length === 0) {
+              //创建步骤
+              let nodeCategory = 0;
+              if (this.formValidate1.moduleType == "Preparation") {
+                nodeCategory = 0;
+              } else if (this.formValidate1.moduleType == "Analysis") {
+                nodeCategory = 1;
+              } else if (this.formValidate1.moduleType == "Modeling") {
+                nodeCategory = 2;
+              } else if (this.formValidate1.moduleType == "Simulation") {
+                nodeCategory = 3;
+              } else if (this.formValidate1.moduleType == "Validation") {
+                nodeCategory = 4;
+              } else if (this.formValidate1.moduleType == "Comparison") {
+                nodeCategory = 5;
+              }
+
+              // create step node
+              let newStepNode = {
+                id: this.processStructure.length,
+                stepID: "",
+                name: this.formValidate1.moduleTitle,
+                category: nodeCategory,
+                last: [],
+                next: [],
+                x: 400,
+                y: 200,
+                level: 0,
+                end: true
+              };
+              this.processStructure.push(newStepNode);
+            }
           }
         } else {
           this.$Message.error("Please enter the necessary information!");
