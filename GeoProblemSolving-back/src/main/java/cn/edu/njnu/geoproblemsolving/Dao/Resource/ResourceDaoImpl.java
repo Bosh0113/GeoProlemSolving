@@ -63,7 +63,7 @@ public class ResourceDaoImpl implements IResourceDao {
                         String suffix = fileNames.substring(fileNames.lastIndexOf(".") + 1);
                         String regexp = "[^A-Za-z_0-9\\u4E00-\\u9FA5]";
                         String saveName = fileName.replaceAll(regexp, "");
-                        String folderPath = servicePath + "resource\\"+folderName;
+                        String folderPath = servicePath + "resource/"+folderName;
                         File temp = new File(folderPath);
                         if (!temp.exists()) {
                             temp.mkdirs();
@@ -74,7 +74,7 @@ public class ResourceDaoImpl implements IResourceDao {
                             randomNum = randomNum * 10 + (int) (Math.random() * 10 + 1);
                         }
                         String newFileTitle=saveName + randomNum + "." + suffix;
-                        String localPath = temp + "\\" + newFileTitle;
+                        String localPath = temp + "/" + newFileTitle;
                         System.out.println("资源上传到本地路径："+localPath);
                         File file = new File(localPath);
                         FileOutputStream fileOutputStream = new FileOutputStream(file);
@@ -238,12 +238,12 @@ public class ResourceDaoImpl implements IResourceDao {
         try {
             OutputStream outputStream = response.getOutputStream();
             String servicePath = request.getSession().getServletContext().getRealPath("/");
-            String folderPath = servicePath + "resource\\upload";
+            String folderPath = servicePath + "resource/upload";
             File temp = new File(folderPath);
             if (!temp.exists()) {
                 temp.mkdirs();
             }
-            String localPath = temp + "\\" + zipName;
+            String localPath = temp + "/" + zipName;
             ZipFile zipFile = new ZipFile(localPath);
             InputStream in = new BufferedInputStream(new FileInputStream(localPath));
             ZipInputStream zipInputStream = new ZipInputStream(in);
@@ -311,14 +311,14 @@ public class ResourceDaoImpl implements IResourceDao {
             if (matcher.find()){
                 fileURL=matcher.group(1);
             }
-            fileURL = fileURL.replace("/","\\");
+//            fileURL = fileURL.replace("/","\\");
             String localPath =request.getSession().getServletContext().getRealPath("/") + fileURL;
             File file = new File(localPath);
             files.add(file);
         }
         try {
             String servicePath = request.getSession().getServletContext().getRealPath("/");
-            String folderPath = servicePath+"resource\\tempZIP\\";
+            String folderPath = servicePath+"resource/tempZIP/";
             File tempFolder = new File(folderPath);
             if (!tempFolder.exists()) {
                 tempFolder.mkdirs();
