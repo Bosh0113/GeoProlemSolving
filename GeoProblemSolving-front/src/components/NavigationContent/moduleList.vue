@@ -2463,12 +2463,13 @@ export default {
     },
     chooseResource() {
       this.inheritResource = this.getMockData();
-      // this.targetKeys = this.getTargetKeys();
     },
     createModule() {
-      // this.addModal = true;
       this.selectResource = [];
       this.selectResource = this.getTargetKeys();
+
+      // 创建项目
+      // ......
     },
     getMockData() {
       let mockData = [];
@@ -2608,39 +2609,98 @@ export default {
             this.axios
               .post("/GeoProblemSolving/module/create", Module)
               .then(res => {
-                if (res.data === "Fail") {
+                if (res.data == "Offline") {
+                  this.$store.commit("userLogout");
+                  this.$router.push({ name: "Login" });
+                } else if (res.data === "Fail") {
                   this1.$Message.info("Fail");
                 } else {
-                  //更新新module的资源
-                  this1.copyResource(res.data);
+                   this1.getAllModules("init");
 
-                  // 使其他module为非激活状态
-                  if (this1.moduleList.length > 0) {
-                    let moduleId = "";
-                    if (this1.currentModule.activeStatus) {
-                      moduleId = this1.currentModule.moduleId;
-                    } else {
-                      let index = this1.getActiveModule();
-                      moduleId = this1.moduleList[index].moduleId;
+                  // 创建步骤
+                  if (this1.processStructure.length === 0) {
+                    let nodeCategory = 0;
+                    if (this1.formValidate1.moduleType == "Preparation") {
+                      nodeCategory = 0;
+                    } else if (this1.formValidate1.moduleType == "Analysis") {
+                      nodeCategory = 1;
+                    } else if (this1.formValidate1.moduleType == "Modeling") {
+                      nodeCategory = 2;
+                    } else if (this1.formValidate1.moduleType == "Simulation") {
+                      nodeCategory = 3;
+                    } else if (this1.formValidate1.moduleType == "Validation") {
+                      nodeCategory = 4;
+                    } else if (this1.formValidate1.moduleType == "Comparison") {
+                      nodeCategory = 5;
                     }
-                    let updateObject = new URLSearchParams();
-                    updateObject.append("moduleId", moduleId);
-                    updateObject.append("activeStatus", false);
-                    this1.axios
-                      .post("/GeoProblemSolving/module/update", updateObject)
-                      .then(res => {
-                        this1.allRecords = [];
-                        this1.getAllModules("init");
 
-                        let socketMsg = { type: "module", operate: "update" };
-                        this1.subprojectSocket.send(JSON.stringify(socketMsg));
-                      })
-                      .catch(err => {
-                        console.log(err.data);
-                      });
-                  } else {
-                    this1.getAllModules("init");
+                    // create step node
+                    let newStepNode = {
+                      id: this1.processStructure.length,
+                      stepID: res.data,
+                      name: this1.formValidate1.moduleTitle,
+                      category: nodeCategory,
+                      last: [],
+                      next: [],
+                      x: 400,
+                      y: 200,
+                      level: 0,
+                      end: true
+                    };
+                    this1.processStructure.push(newStepNode);
                   }
+
+                  // 存储Step
+                  let obj = new URLSearchParams();
+                  obj.append("subProjectId", this1.subProjectInfo.subProjectId);
+                  obj.append("solvingProcess", JSON.stringify(this1.processStructure));
+                  this1.axios
+                    .post("/GeoProblemSolving/subProject/update", obj)
+                    .then(res => {
+                      if (res.data == "Offline") {
+                        this.$store.commit("userLogout");
+                        this.$router.push({ name: "Login" });
+                      } else if (res.data != "Fail") {
+                        var newSubProject = res.data;
+                      } else {
+                        this.$Message.error("Update sub-project failed.");
+                      }
+                    })
+                    .catch(err => {
+                      console.log(err.data);
+                    });
+
+                  // //更新新module的资源
+                  // this1.copyResource(res.data);
+
+                  // // 使其他module为非激活状态
+                  // if (this1.moduleList.length > 0) {
+                  //   let moduleId = "";
+                  //   if (this1.currentModule.activeStatus) {
+                  //     moduleId = this1.currentModule.moduleId;
+                  //   } else {
+                  //     let index = this1.getActiveModule();
+                  //     moduleId = this1.moduleList[index].moduleId;
+                  //   }
+                  //   let updateObject = new URLSearchParams();
+                  //   updateObject.append("moduleId", moduleId);
+                  //   updateObject.append("activeStatus", false);
+                  //   this1.axios
+                  //     .post("/GeoProblemSolving/module/update", updateObject)
+                  //     .then(res => {
+                  //       this1.allRecords = [];
+                  //       this1.getAllModules("init");
+
+                  //       let socketMsg = { type: "module", operate: "update" };
+                  //       this1.subprojectSocket.send(JSON.stringify(socketMsg));
+                  //     })
+                  //     .catch(err => {
+                  //       console.log(err.data);
+                  //     });
+                  // } else {
+                  //   this1.getAllModules("init");
+                  // }
+
                   this1.createModuleSuccess(Module["title"]);
                   this1.formValidate1.moduleTitle = "";
                   this1.moduleDescription = "";
@@ -2650,39 +2710,6 @@ export default {
               .catch(err => {
                 console.log(err.data);
               });
-              
-            if (this.processStructure.length === 0) {
-              //创建步骤
-              let nodeCategory = 0;
-              if (this.formValidate1.moduleType == "Preparation") {
-                nodeCategory = 0;
-              } else if (this.formValidate1.moduleType == "Analysis") {
-                nodeCategory = 1;
-              } else if (this.formValidate1.moduleType == "Modeling") {
-                nodeCategory = 2;
-              } else if (this.formValidate1.moduleType == "Simulation") {
-                nodeCategory = 3;
-              } else if (this.formValidate1.moduleType == "Validation") {
-                nodeCategory = 4;
-              } else if (this.formValidate1.moduleType == "Comparison") {
-                nodeCategory = 5;
-              }
-
-              // create step node
-              let newStepNode = {
-                id: this.processStructure.length,
-                stepID: "",
-                name: this.formValidate1.moduleTitle,
-                category: nodeCategory,
-                last: [],
-                next: [],
-                x: 400,
-                y: 200,
-                level: 0,
-                end: true
-              };
-              this.processStructure.push(newStepNode);
-            }
           }
         } else {
           this.$Message.error("Please enter the necessary information!");
