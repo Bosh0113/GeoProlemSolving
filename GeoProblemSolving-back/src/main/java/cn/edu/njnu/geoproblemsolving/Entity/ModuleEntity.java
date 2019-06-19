@@ -13,8 +13,8 @@ public class ModuleEntity {
     private String type;
     private String creator;
     private String createTime;
-    private String foreModuleId;
-    private String nextModuleId;
+//    private String foreModuleId;
+//    private String nextModuleId;
 
     public  void setActive(boolean status) {this.activeStatus = status; }
 
@@ -46,13 +46,13 @@ public class ModuleEntity {
         this.createTime = createTime;
     }
 
-    public void setForeModuleId(String foreModuleId) {
-        this.foreModuleId = foreModuleId;
-    }
-
-    public void setNextModuleId(String nextModuleId) {
-        this.nextModuleId = nextModuleId;
-    }
+//    public void setForeModuleId(String foreModuleId) {
+//        this.foreModuleId = foreModuleId;
+//    }
+//
+//    public void setNextModuleId(String nextModuleId) {
+//        this.nextModuleId = nextModuleId;
+//    }
 
     public boolean getActiveStatus() { return activeStatus; }
 
@@ -84,11 +84,11 @@ public class ModuleEntity {
         return type;
     }
 
-    public String getForeModuleId() {
-        return foreModuleId;
-    }
-
-    public String getNextModuleId() {
-        return nextModuleId;
-    }
+//    public String getForeModuleId() {
+//        return foreModuleId;
+//    }
+//
+//    public String getNextModuleId() {
+//        return nextModuleId;
+//    }
 }
