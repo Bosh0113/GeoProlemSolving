@@ -5,7 +5,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "Module")
 public class ModuleEntity {
 
-    private  boolean activeStatus;
+//    private  boolean activeStatus;
     private String moduleId;
     private String subProjectId;
     private String title;
@@ -16,7 +16,7 @@ public class ModuleEntity {
 //    private String foreModuleId;
 //    private String nextModuleId;
 
-    public  void setActive(boolean status) {this.activeStatus = status; }
+//    public  void setActive(boolean status) {this.activeStatus = status; }
 
     public void setSubProjectId(String subProjectId) {
         this.subProjectId = subProjectId;
@@ -54,7 +54,7 @@ public class ModuleEntity {
 //        this.nextModuleId = nextModuleId;
 //    }
 
-    public boolean getActiveStatus() { return activeStatus; }
+//    public boolean getActiveStatus() { return activeStatus; }
 
     public String getDescription() {
         return description;

@@ -152,21 +152,6 @@
 .taskFormItem span {
   text-align: center;
 }
-.whiteSpace {
-  height: 10px;
-}
-.taskList {
-  min-height: 50px;
-  background: #f7f7f7;
-}
-.taskName {
-  display: inline-block;
-  cursor: pointer;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  max-width: 120px;
-}
 .operatePanel {
   display: flex;
   justify-content: flex-end;
@@ -232,44 +217,6 @@
               </template>
             </Col>
           </Row>
-          <!-- <Row>
-            <Col span="1" style="background-color:white;margin-top:20px">
-              <button class="moduleShow" @click="moudelMove('back')" v-if="moduleLeftMove">
-                <Icon type="ios-arrow-back" style="font-size:2rem; font-weight:700"/>
-              </button>
-            </Col>
-            <Col span="21" style="background-color:white;margin-top:20px">
-              <template v-if="$store.getters.userInfo.userId == this.subProjectInfo.managerId">
-                <Steps :current="order">
-                  <Step
-                    v-for="(list,index) in showedModules"
-                    :key="index"
-                    @click.native="showDetail(index)"
-                    :title="list.type"
-                    :content="list.title"
-                    :order="index"
-                  ></Step>
-                </Steps>
-              </template>
-              <template v-else>
-                <Steps :current="order">
-                  <Step
-                    v-for="(list,index) in showedModules"
-                    :key="index"
-                    @click.native="showDetail(index)"
-                    :title="list.type"
-                    :content="list.title"
-                    :order="index"
-                  ></Step>
-                </Steps>
-              </template>
-            </Col>
-            <Col span="1" style="background-color:white;margin-top:20px">
-              <button class="moduleShow" @click="moudelMove('forward')" v-if="moduleRightMove">
-                <Icon type="ios-arrow-forward" style="font-size: 2rem;font-weight: 700"/>
-              </button>
-            </Col>
-          </Row>-->
         </Card>
       </Col>
     </Row>
@@ -1335,27 +1282,19 @@ export default {
     return {
       // 步骤逻辑图
       stepChart: null,
-      // information of project
-      projectInfo: {},
       // info of subproject --by mzy
       subProjectInfo: [],
       // 关于邀请的模态框
-      inviteModal: false,
-      quitModal: false,
       sidebarHeight: 800,
       participants: [],
-      candidates: [],
-      inviteList: [],
       // current: 0,
       addModal: false,
-      copyModal: false,
       delModal: false,
       inheritData: false,
       //编辑的模态框
       editModal: false,
       activateModal: false,
       stepsModal: false,
-      order: -1,
       // chart适用
       chart: new FlowChart(),
       //现在点击的module
@@ -1411,21 +1350,8 @@ export default {
       updateModuleDescription: "",
       // 抽屉的控制开关
       drawerOpen: false,
-      // 后台获取的module下的task列表
-      taskList: [],
-      // 后台拿到的Module集合，渲染成一条轴用的
-      moduleList: [],
-      showedModules: [],
-      moduleRightMove: false,
-      moduleLeftMove: false,
-      // 当前模块的索引
-      // currentModuleIndex: 0,
       // 选择的模块
       selectedModule: [],
-      // 编辑问题解决步骤的操作
-      stepOperation: "",
-      //模块的 显示层级
-      showedModuleLevel: 0,
       // web socket for module
       subprojectSocket: null,
       timer: null,
@@ -1494,20 +1420,7 @@ export default {
       // 文件上传的进度
       uploadProgress: 0,
       // 问题解决流程结构
-      processStructure: [
-        // {
-        //   id: 0,
-        //   stepID: "xxx",
-        //   name: "000",
-        //   category: 0,
-        //   last: [],
-        //   next: [{name:"001",id:1}],
-        //   x: 300,
-        //   y: 300,
-        //   level: 0,
-        //   end: false
-        // }
-      ],
+      processStructure: [],
       currentStep: {}
     };
   },
@@ -1518,7 +1431,6 @@ export default {
     window.addEventListener("resize", this.reSize);
     this.openModuleSocket();
     this.getHistoryRecords();
-    // this.getAllModules("init");
     this.getProcessSteps();
   },
   // add by mzy for navigation guards
@@ -1971,44 +1883,6 @@ export default {
           this.stepsModal = false;
           //选择资源
           this.chooseResource();
-        } else if (this.processStructure.length == 0) {
-          // // 新步骤的类别
-          // let nodeCategory = 0;
-          // if (this.formValidate1.moduleType == "Preparation") {
-          //   nodeCategory = 0;
-          // } else if (this.formValidate1.moduleType == "Analysis") {
-          //   nodeCategory = 1;
-          // } else if (this.formValidate1.moduleType == "Modeling") {
-          //   nodeCategory = 2;
-          // } else if (this.formValidate1.moduleType == "Simulation") {
-          //   nodeCategory = 3;
-          // } else if (this.formValidate1.moduleType == "Validation") {
-          //   nodeCategory = 4;
-          // } else if (this.formValidate1.moduleType == "Comparison") {
-          //   nodeCategory = 5;
-          // }
-          // // create step node
-          // let newStepNode = {
-          //   id: this.processStructure.length,
-          //   stepID: "",
-          //   name: this.formValidate1.moduleTitle,
-          //   category: nodeCategory,
-          //   last: [],
-          //   next: [],
-          //   x: 400,
-          //   y: 200,
-          //   level: 0,
-          //   end: true,
-          //   activeStatus: true
-          // };
-          // this.processStructure.push(newStepNode);
-          // // 关闭当前图表
-          // this.stepChart.dispose();
-          // this.stepChart = null;
-          // //关闭当前模态框
-          // this.stepsModal = false;
-          // //选择资源
-          // this.chooseResource();
         } else {
           this.$Notice.info({
             desc: "There is no step node being selected!"
@@ -2034,132 +1908,6 @@ export default {
         });
       }
     },
-    // showDetail(item) {
-    //   let oldId = this.currentModule.moduleId;
-    //   this.currentModuleIndex = this.showedModuleLevel * 5 + item;
-    //   this.currentModule = this.moduleList[this.currentModuleIndex];
-
-    //   sessionStorage.setItem("moduleId", this.currentModule.moduleId);
-    //   sessionStorage.setItem("moduleName", this.currentModule.title);
-
-    //   // close panels
-    //   this.closePanel();
-
-    //   if (oldId !== this.currentModule.moduleId) {
-    //     //查询公告
-    //     this.inquiryNotice();
-    //     this.getAllResource();
-    //     this.showModules("init");
-    //     let records = [];
-    //     if (!this.currentModule.activeStatus) {
-    //       for (let i = 0; i < this.allHistRecords.length; i++) {
-    //         if (
-    //           this.currentModule.moduleId == this.allHistRecords[i].moduleId
-    //         ) {
-    //           let record = this.allHistRecords[i];
-    //           records.push(record);
-    //         }
-    //       }
-    //       this.historyRecords = records;
-    //     } else {
-    //       let noRecords = true;
-    //       for (let i = 0; i < this.allRecords.length; i++) {
-    //         if (this.allRecords[i].type != "participants") {
-    //           noRecords = false;
-    //           break;
-    //         }
-    //       }
-    //       if (noRecords) {
-    //         for (let i = 0; i < this.allHistRecords.length; i++) {
-    //           if (
-    //             this.currentModule.moduleId == this.allHistRecords[i].moduleId
-    //           ) {
-    //             let record = this.allHistRecords[i];
-    //             records.push(record);
-    //           }
-    //         }
-    //         let temp = records.concat(this.allRecords);
-    //         this.allRecords = temp;
-    //       }
-    //     }
-    //   }
-    // },
-    // moudelMove(direction) {
-    //   if (direction == "back") {
-    //     this.showModules("back");
-    //   } else if (direction == "forward") {
-    //     this.showModules("forward");
-    //   }
-    // },
-    // showModules(type) {
-    //   this.showedModules = [];
-    //   if (this.moduleList.length > 5) {
-    //     if (type == "init") {
-    //       this.order = Math.round(
-    //         (this.currentModuleIndex / 5 -
-    //           Math.floor(this.currentModuleIndex / 5)) *
-    //           5
-    //       );
-    //       this.showedModuleLevel = Math.floor(this.currentModuleIndex / 5);
-    //     } else if (type == "back") {
-    //       this.showedModuleLevel--;
-    //       if (
-    //         this.showedModuleLevel == Math.floor(this.currentModuleIndex / 5)
-    //       ) {
-    //         this.order = Math.round(
-    //           (this.currentModuleIndex / 5 -
-    //             Math.floor(this.currentModuleIndex / 5)) *
-    //             5
-    //         );
-    //       } else {
-    //         this.order = -1;
-    //       }
-    //     } else if (type == "forward") {
-    //       this.showedModuleLevel++;
-    //       if (
-    //         this.showedModuleLevel == Math.floor(this.currentModuleIndex / 5)
-    //       ) {
-    //         this.order = Math.round(
-    //           (this.currentModuleIndex / 5 -
-    //             Math.floor(this.currentModuleIndex / 5)) *
-    //             5
-    //         );
-    //       } else {
-    //         this.order = -1;
-    //       }
-    //     }
-
-    //     for (
-    //       let i = this.showedModuleLevel * 5;
-    //       i < (this.showedModuleLevel + 1) * 5;
-    //       i++
-    //     ) {
-    //       if (i == this.moduleList.length) {
-    //         break;
-    //       }
-    //       this.showedModules.push(this.moduleList[i]);
-    //     }
-
-    //     if (this.showedModuleLevel > 0) {
-    //       this.moduleLeftMove = type;
-    //     } else {
-    //       this.moduleLeftMove = false;
-    //     }
-    //     if (
-    //       this.showedModuleLevel < Math.floor((this.moduleList.length - 1) / 5)
-    //     ) {
-    //       this.moduleRightMove = true;
-    //     } else {
-    //       this.moduleRightMove = false;
-    //     }
-    //   } else {
-    //     this.showedModules = this.moduleList;
-    //     this.moduleRightMove = false;
-    //     this.moduleLeftMove = false;
-    //     this.showedModuleLevel = 0;
-    //     this.order = this.currentModuleIndex;
-    //   }
-    // },
     closeModuleSocket() {
       if (this.subprojectSocket != null) {
         this.removeTimer();
@@ -2212,8 +1960,8 @@ export default {
         this.allRecords.push(messageJson);
       }
       // module 更新
-      else if (messageJson.type == "module") {
-        // this.getAllModules("init");
+      else if (messageJson.type == "step") {
+        this.processStructure = messageJson.content;
       } else if (messageJson.type == "members") {
         // 比较 判断人员动态 更新records
 
@@ -2336,18 +2084,6 @@ export default {
       //records 更新
       this.allRecords.push(record);
     },
-    // ofParticipant(olPersons) {
-    //   this.ofParticipants = [];
-    //   for (let i = 0; i < this.participants.length; i++) {
-    //     for (var j = 0; j < olPersons.length; j++) {
-    //       this.participants[i].userId == olPersons[j];
-    //       break;
-    //     }
-    //     if (j == olPersons.length) {
-    //       this.ofParticipants.push(this.participants[i]);
-    //     }
-    //   }
-    // },
     getHistoryRecords() {
       this.allHistRecords = [];
       let that = this;
@@ -2402,13 +2138,21 @@ export default {
             this.currentStep = this.processStructure[index];
             Module["moduleId"] = res.data;
             this.currentModule = Module;
-
             // 存储Step
             this.updateSteps();
 
-            // //更新新module的资源
-            this1.copyResource(res.data);
-            this1.createModuleSuccess(Module["title"]);
+            // collaborative
+            let socketMsg = {
+              type: "step",
+              operate: "update",
+              content: JSON.stringify(this.processStructure)
+            };
+            this.subprojectSocket.send(socketMsg);
+
+            //更新新module的资源---------------------静态化之后完成
+            // this.copyResource(res.data);
+
+            this.createModuleSuccess(Module["title"]);
           }
         })
         .catch(err => {
@@ -2536,37 +2280,6 @@ export default {
         })
         .catch(err => {});
     },
-    // getAllModules(state) {
-    //   //这里重写以下获取module
-    //   let subProjectId = this.$route.params.id;
-    //   this.axios
-    //     .get(
-    //       "/GeoProblemSolving/module/inquiry" +
-    //         "?key=subProjectId" +
-    //         "&value=" +
-    //         subProjectId
-    //     )
-    //     .then(res => {
-    //       if (res.data == "Offline") {
-    //         this.$store.commit("userLogout");
-    //         this.$router.push({ name: "Login" });
-    //       } else if (res.data != "None" && res.data != "Fail") {
-    //         this.moduleList = res.data;
-
-    //         if (state == "init") {
-    //           let index = this.getActiveModule();
-    //           this.showedModuleLevel = 0;
-    //           this.showDetail(index);
-    //         } else if (state == "update") {
-    //           this.allRecords = [];
-    //           this.showDetail(this.order);
-    //         }
-    //       } else if (res.data == "None") {
-    //         this.moduleList = [];
-    //       }
-    //     })
-    //     .catch(err => {});
-    // },
     addModule(name) {
       this.$refs[name].validate(valid => {
         if (valid) {
@@ -2575,19 +2288,11 @@ export default {
           ) {
             // 创建module
             let Module = {};
-            // Module["activeStatus"] = true;
             Module["subProjectId"] = this.$route.params.id;
             Module["title"] = this.formValidate1.moduleTitle;
             Module["description"] = this.moduleDescription;
             Module["creator"] = this.$store.getters.userId;
             Module["type"] = this.formValidate1.moduleType;
-            // if (this.moduleList.length !== 0) {
-            //   Module["foreModuleId"] = this.moduleList[
-            //     this.moduleList.length - 1
-            //   ].moduleId;
-            // } else {
-            //   Module["foreModuleId"] = "";
-            // }
             this.axios
               .post("/GeoProblemSolving/module/create", Module)
               .then(res => {
@@ -2635,38 +2340,15 @@ export default {
 
                     // 存储Step
                     this.updateSteps();
+
+                    // collaborative
+                    let socketMsg = {
+                      type: "step",
+                      operate: "update",
+                      content: JSON.stringify(this.processStructure)
+                    };
+                    this.subprojectSocket.send(socketMsg);
                   }
-
-                  // //更新新module的资源
-                  // this1.copyResource(res.data);
-
-                  // // 使其他module为非激活状态
-                  // if (this1.moduleList.length > 0) {
-                  //   let moduleId = "";
-                  //   if (this1.currentModule.activeStatus) {
-                  //     moduleId = this1.currentModule.moduleId;
-                  //   } else {
-                  //     let index = this1.getActiveModule();
-                  //     moduleId = this1.moduleList[index].moduleId;
-                  //   }
-                  //   let updateObject = new URLSearchParams();
-                  //   updateObject.append("moduleId", moduleId);
-                  //   updateObject.append("activeStatus", false);
-                  //   this1.axios
-                  //     .post("/GeoProblemSolving/module/update", updateObject)
-                  //     .then(res => {
-                  //       this1.allRecords = [];
-                  //       this1.getAllModules("init");
-
-                  //       let socketMsg = { type: "module", operate: "update" };
-                  //       this1.subprojectSocket.send(JSON.stringify(socketMsg));
-                  //     })
-                  //     .catch(err => {
-                  //       console.log(err.data);
-                  //     });
-                  // } else {
-                  //   this1.getAllModules("init");
-                  // }
 
                   this.createModuleSuccess(Module["title"]);
                   this.formValidate1.moduleTitle = "";
@@ -2697,6 +2379,14 @@ export default {
 
           // 保存 step
           this.updateSteps();
+
+          // collaborative
+          let socketMsg = {
+            type: "step",
+            operate: "update",
+            content: JSON.stringify(this.processStructure)
+          };
+          this.subprojectSocket.send(socketMsg);
         }
       }
     },
@@ -2771,6 +2461,14 @@ export default {
               this.processStructure.splice(currentIndex, 1);
             }
             this.updateSteps();
+
+            // collaborative
+            let socketMsg = {
+              type: "step",
+              operate: "update",
+              content: JSON.stringify(this.processStructure)
+            };
+            this.subprojectSocket.send(socketMsg);
           } else {
             this.$Notice.info({
               desc:
@@ -2884,8 +2582,12 @@ export default {
                   this.updateSteps();
 
                   // collaborative
-                  let socketMsg = { type: "module", operate: "update" };
-                  this1.subprojectSocket.send(JSON.stringify(socketMsg));
+                  let socketMsg = {
+                    type: "step",
+                    operate: "update",
+                    content: JSON.stringify(this.processStructure)
+                  };
+                  this.subprojectSocket.send(socketMsg);
                 }
               })
               .catch(err => {
@@ -2920,57 +2622,47 @@ export default {
         });
     },
     copyResource(newModuleId) {
-      for (let i = 0; i < this.selectResource.length; i++) {
-        for (let j = 0; j < this.resourceList.length; j++) {
-          if (
-            this.resourceList[j].resourceId == this.selectResource[i].resourceId
-          ) {
-            let resourceInfo = this.resourceList[j];
-            let shareForm = new FormData();
-            shareForm.append("name", resourceInfo.name);
-            shareForm.append("description", resourceInfo.description);
-            shareForm.append("belong", resourceInfo.belong);
-            shareForm.append("type", resourceInfo.type);
-            shareForm.append("fileSize", resourceInfo.fileSize);
-            shareForm.append("pathURL", resourceInfo.pathURL);
-            shareForm.append("uploaderId", resourceInfo.uploaderId);
-            let scopeObject = {
-              projectId: "",
-              subProjectId: "",
-              moduleId: newModuleId
-            };
-            shareForm.append("scope", JSON.stringify(scopeObject));
+      // for (let i = 0; i < this.selectResource.length; i++) {
+      //   for (let j = 0; j < this.resourceList.length; j++) {
+      //     if (
+      //       this.resourceList[j].resourceId == this.selectResource[i].resourceId
+      //     ) {
+      //       let resourceInfo = this.resourceList[j];
+      //       let shareForm = new FormData();
+      //       shareForm.append("name", resourceInfo.name);
+      //       shareForm.append("description", resourceInfo.description);
+      //       shareForm.append("belong", resourceInfo.belong);
+      //       shareForm.append("type", resourceInfo.type);
+      //       shareForm.append("fileSize", resourceInfo.fileSize);
+      //       shareForm.append("pathURL", resourceInfo.pathURL);
+      //       shareForm.append("uploaderId", resourceInfo.uploaderId);
+      //       let scopeObject = {
+      //         projectId: "",
+      //         subProjectId: "",
+      //         moduleId: newModuleId
+      //       };
+      //       shareForm.append("scope", JSON.stringify(scopeObject));
 
-            if (
-              newModuleId != null &&
-              newModuleId != undefined &&
-              newModuleId.length > 0
-            ) {
-              this.axios
-                .post("/GeoProblemSolving/resource/share", shareForm)
-                .then(res => {
-                  if (res.data != "Fail") {
-                    //...
-                  }
-                })
-                .catch(err => {
-                  console.log(err);
-                });
-            }
-            break;
-          }
-        }
-      }
-    },
-    getActiveModule() {
-      var index = 0;
-      for (let i = 0; i < this.moduleList.length; i++) {
-        if (this.moduleList[i].activeStatus) {
-          index = i;
-          break;
-        }
-      }
-      return index;
+      //       if (
+      //         newModuleId != null &&
+      //         newModuleId != undefined &&
+      //         newModuleId.length > 0
+      //       ) {
+      //         this.axios
+      //           .post("/GeoProblemSolving/resource/share", shareForm)
+      //           .then(res => {
+      //             if (res.data != "Fail") {
+      //               //...
+      //             }
+      //           })
+      //           .catch(err => {
+      //             console.log(err);
+      //           });
+      //       }
+      //       break;
+      //     }
+      //   }
+      // }
     },
     toResourceList() {
       this.$router.push({ path: "/resourceList" });
@@ -3071,7 +2763,6 @@ export default {
                     };
                     that.subprojectSocket.send(JSON.stringify(record));
 
-                    // 创建一个函数根据pid去后台查询该项目下的资源
                   }
                 })
                 .catch(err => {
@@ -3118,7 +2809,6 @@ export default {
     },
     editModalShow() {
       this.editModal = true;
-      // let order = this.currentModuleIndex;
       this.formValidate2.updateModuleTitle = this.currentModule.title;
       this.formValidate2.updateModuleType = this.currentModule.type;
       this.updateModuleDescription = this.currentModule.description;
@@ -3393,7 +3083,6 @@ export default {
               time: new Date().toLocaleString()
             };
             this.subprojectSocket.send(JSON.stringify(record));
-            // this.allRecords.push(record);
           }
         })
         .catch(err => {
