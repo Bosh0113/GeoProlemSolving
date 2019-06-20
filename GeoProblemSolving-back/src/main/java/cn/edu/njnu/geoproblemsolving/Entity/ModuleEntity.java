@@ -5,7 +5,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "Module")
 public class ModuleEntity {
 
-    private  boolean activeStatus;
+//    private  boolean activeStatus;
     private String moduleId;
     private String subProjectId;
     private String title;
@@ -13,10 +13,10 @@ public class ModuleEntity {
     private String type;
     private String creator;
     private String createTime;
-    private String foreModuleId;
-    private String nextModuleId;
+//    private String foreModuleId;
+//    private String nextModuleId;
 
-    public  void setActive(boolean status) {this.activeStatus = status; }
+//    public  void setActive(boolean status) {this.activeStatus = status; }
 
     public void setSubProjectId(String subProjectId) {
         this.subProjectId = subProjectId;
@@ -46,15 +46,15 @@ public class ModuleEntity {
         this.createTime = createTime;
     }
 
-    public void setForeModuleId(String foreModuleId) {
-        this.foreModuleId = foreModuleId;
-    }
+//    public void setForeModuleId(String foreModuleId) {
+//        this.foreModuleId = foreModuleId;
+//    }
+//
+//    public void setNextModuleId(String nextModuleId) {
+//        this.nextModuleId = nextModuleId;
+//    }
 
-    public void setNextModuleId(String nextModuleId) {
-        this.nextModuleId = nextModuleId;
-    }
-
-    public boolean getActiveStatus() { return activeStatus; }
+//    public boolean getActiveStatus() { return activeStatus; }
 
     public String getDescription() {
         return description;
@@ -84,11 +84,11 @@ public class ModuleEntity {
         return type;
     }
 
-    public String getForeModuleId() {
-        return foreModuleId;
-    }
-
-    public String getNextModuleId() {
-        return nextModuleId;
-    }
+//    public String getForeModuleId() {
+//        return foreModuleId;
+//    }
+//
+//    public String getNextModuleId() {
+//        return nextModuleId;
+//    }
 }

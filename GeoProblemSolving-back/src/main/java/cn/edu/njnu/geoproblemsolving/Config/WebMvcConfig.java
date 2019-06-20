@@ -22,6 +22,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/subProject/renameFolder",
                         "/subProject/deleteFile",
                         "/module/inquiry",
+                        "/module/create",
                         "/resource/upload",
                         "/project/create",
                         "/project/delete",

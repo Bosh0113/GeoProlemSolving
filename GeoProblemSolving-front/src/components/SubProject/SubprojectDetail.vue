@@ -236,7 +236,6 @@
                               ok-text="Assure"
                               cancel-text="Cancel"
                               @on-ok="removeMember(participants[index].userId,participants[index].userName)"
-                              @on-cancel
                             >
                               <h5
                                 style="text-align:center;color:red"

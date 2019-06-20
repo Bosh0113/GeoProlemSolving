@@ -111,7 +111,7 @@
 .member-panel {
   transition: all 1s;
 }
-.memberOrganization{
+.memberOrganization {
   height: 40px;
   display: inline-block;
   overflow: hidden;
@@ -152,21 +152,6 @@
 .taskFormItem span {
   text-align: center;
 }
-.whiteSpace {
-  height: 10px;
-}
-.taskList {
-  min-height: 50px;
-  background: #f7f7f7;
-}
-.taskName {
-  display: inline-block;
-  cursor: pointer;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  max-width: 120px;
-}
 .operatePanel {
   display: flex;
   justify-content: flex-end;
@@ -203,27 +188,15 @@
             <Col span="12" style="text-align:center;font-size:1.5rem;height:20px;">
               <strong>{{subProjectInfo.title}}</strong>
             </Col>
-            <Col span="5" offset="1" style="height:40px;display:flex;align-items:center" class="operatePanel">
-              <template v-if="$store.getters.userInfo.userId == this.subProjectInfo.managerId">
-                <template v-if="this.moduleList.length == 0">
-                  <Button
-                    type="default"
-                    @click="addModal = true"
-                    icon="md-add"
-                    class="addBtn"
-                    title="Add a new module"
-                  >Add</Button>
-                </template>
-                <template v-else>
-                  <Button
-                    type="default"
-                    @click="chooseResource()"
-                    icon="md-add"
-                    class="addBtn"
-                    title="Add a new module"
-                  >Add</Button>
-                </template>
-                <template v-if="this.currentModule.activeStatus">
+            <Col
+              span="5"
+              offset="1"
+              style="height:40px;display:flex;align-items:center"
+              class="operatePanel"
+            >
+              <template v-if="processStructure.length > 0">
+                <Button @click="showSteps" class="addBtn">Steps</Button>
+                <template v-if="currentStep.activeStatus">
                   <Button
                     type="default"
                     @click="editModalShow()"
@@ -240,62 +213,14 @@
                     class="editBtn"
                     title="Activate this module"
                   >Activate</Button>
-                  <Button
-                    type="default"
-                    @click="delModal = true"
-                    icon="md-remove"
-                    class="removeBtn"
-                    title="Remove this module"
-                  >Remove</Button>
                 </template>
               </template>
             </Col>
           </Row>
-          <Row>
-            <Col span="1" style="background-color:white;margin-top:20px">
-              <button class="moduleShow" @click="moudelMove('back')" v-if="moduleLeftMove">
-                <Icon type="ios-arrow-back" style="font-size:2rem; font-weight:700"/>
-              </button>
-            </Col>
-            <Col span="22" style="background-color:white;margin-top:20px">
-              <template v-if="$store.getters.userInfo.userId == this.subProjectInfo.managerId">
-                <Steps :current="order">
-                  <Step
-                    v-for="(list,index) in showedModules"
-                    :key="index"
-                    @click.native="showDetail(index)"
-                    :title="list.type"
-                    :content="list.title"
-                    :order="index"
-                  ></Step>
-                </Steps>
-              </template>
-              <template v-else>
-                <Steps :current="order">
-                  <Step
-                    v-for="(list,index) in showedModules"
-                    :key="index"
-                    @click.native="showDetail(index)"
-                    :title="list.type"
-                    :content="list.title"
-                    :order="index"
-                  ></Step>
-                </Steps>
-              </template>
-            </Col>
-            <Col span="1" style="background-color:white;margin-top:20px">
-              <button class="moduleShow" @click="moudelMove('forward')" v-if="moduleRightMove">
-                <Icon type="ios-arrow-forward" style="font-size: 2rem;font-weight: 700"/>
-              </button>
-            </Col>
-            <!-- <Col span="1" style="background-color:white;margin-top:20px">
-              <Button>View</Button>
-            </Col> -->
-          </Row>
         </Card>
       </Col>
     </Row>
-    <div v-if="this.moduleList.length == 0" class="workspaceContent">
+    <div v-if="this.processStructure.length == 0" class="workspaceContent">
       <Row style="margin-top:20px" :style="{height:sidebarHeight+30+'px'}">
         <Col span="22" offset="1">
           <Card class="noModule">
@@ -314,7 +239,7 @@
       </Row>
     </div>
     <div v-else class="workspaceContent">
-      <template v-if="this.currentModule.activeStatus">
+      <template v-if="currentStep.activeStatus">
         <Row style="margin-top:20px">
           <Col
             :xs="8"
@@ -323,7 +248,7 @@
             :lg="5"
             v-bind="this.olParticipants"
             offset="1"
-            :style="{height:sidebarHeight+8+'px'}"
+            :style="{height:sidebarHeight+13+'px'}"
           >
             <div :style="{height:sidebarHeight-6+'px'}">
               <Card style="background-color:white">
@@ -354,9 +279,13 @@
                           <div>
                             <span style="padding:0 5px" :title="member.userName">{{member.userName}}</span>
                           </div>
-                        <div>
-                          <span style="padding:0 5px" class="memberOrganization" :title="member.organization">{{member.organization}}</span>
-                        </div>
+                          <div>
+                            <span
+                              style="padding:0 5px"
+                              class="memberOrganization"
+                              :title="member.organization"
+                            >{{member.organization}}</span>
+                          </div>
                         </div>
                       </div>
                     </template>
@@ -761,7 +690,7 @@
                           title="Video Tool"
                           color="gray"
                         />
-                      </div> -->
+                      </div>-->
                       <div class="singl_tool_style">
                         <Icon
                           type="ios-water"
@@ -781,12 +710,7 @@
                         />
                       </div>
                       <a class="singl_tool_style" href="http://134.175.111.77/note" target="_blank">
-                        <Icon
-                          type="md-code"
-                          size="60"
-                          title="Jupyter Notebook"
-                          color="gray"
-                        />
+                        <Icon type="md-code" size="60" title="Jupyter Notebook" color="gray"/>
                       </a>
                     </div>
                   </TabPane>
@@ -835,7 +759,7 @@
                         />
                       </div>
                     </div>
-                    <div class="tool-panel" v-show="this.currentModule.type == 'Analysis'">                      
+                    <div class="tool-panel" v-show="this.currentModule.type == 'Analysis'">
                       <div class="singl_tool_style">
                         <Icon
                           type="ios-podium"
@@ -884,12 +808,7 @@
                     </div>
                     <div class="tool-panel" v-show="this.currentModule.type == 'Modeling'">
                       <a class="singl_tool_style" href="http://134.175.111.77/note" target="_blank">
-                        <Icon
-                          type="md-code"
-                          size="60"
-                          title="Jupyter Notebook"
-                          color="#f37726"
-                        />
+                        <Icon type="md-code" size="60" title="Jupyter Notebook" color="#f37726"/>
                       </a>
                       <div class="singl_tool_style">
                         <Icon
@@ -919,14 +838,9 @@
                         />
                       </div>
                     </div>
-                    <div class="tool-panel" v-show="this.currentModule.type == 'Simulation'">                      
+                    <div class="tool-panel" v-show="this.currentModule.type == 'Simulation'">
                       <a class="singl_tool_style" href="http://134.175.111.77/note" target="_blank">
-                        <Icon
-                          type="md-code"
-                          size="60"
-                          title="Jupyter Notebook"
-                          color="#f37726"
-                        />
+                        <Icon type="md-code" size="60" title="Jupyter Notebook" color="#f37726"/>
                       </a>
                       <div class="singl_tool_style">
                         <Icon
@@ -949,22 +863,12 @@
                     </div>
                     <div class="tool-panel" v-show="this.currentModule.type == 'validation'">
                       <a class="singl_tool_style" href="http://134.175.111.77/note" target="_blank">
-                        <Icon
-                          type="md-code"
-                          size="60"
-                          title="Jupyter Notebook"
-                          color="#f37726"
-                        />
+                        <Icon type="md-code" size="60" title="Jupyter Notebook" color="#f37726"/>
                       </a>
                     </div>
                     <div class="tool-panel" v-show="this.currentModule.type == 'Comparison'">
                       <a class="singl_tool_style" href="http://134.175.111.77/note" target="_blank">
-                        <Icon
-                          type="md-code"
-                          size="60"
-                          title="Jupyter Notebook"
-                          color="#f37726"
-                        />
+                        <Icon type="md-code" size="60" title="Jupyter Notebook" color="#f37726"/>
                       </a>
                     </div>
                   </TabPane>
@@ -975,7 +879,7 @@
         </Row>
       </template>
       <template v-else>
-        <Row style="margin-top:20px" :style="{height:sidebarHeight+8+'px'}">
+        <Row style="margin-top:20px" :style="{height:sidebarHeight+13+'px'}">
           <template>
             <Col span="22" offset="1" :style="{height:sidebarHeight/3*1+'px'}">
               <Card :style="{height:sidebarHeight/3*1 +'px'}">
@@ -1107,7 +1011,13 @@
         </Row>
       </template>
     </div>
-    <Modal v-model="delModal" title="Delete this process" @on-ok="delModule" @on-cancel>
+    <Modal
+      v-model="delModal"
+      title="Delete this process"
+      @on-ok="delModule"
+      ok-text="Ok"
+      cancel-text="Cancel"
+    >
       <p>Do you really want to delete this step?</p>
     </Modal>
     <Modal
@@ -1115,7 +1025,6 @@
       v-model="editModal"
       title="Update this process"
       @on-ok="updateModule('formValidate2')"
-      @on-cancel
     >
       <Form
         ref="formValidate2"
@@ -1154,11 +1063,10 @@
     <Modal
       width="600px"
       v-model="addModal"
-      title="Start a new process"
+      title="Start a new step"
       @on-ok="addModule('formValidate1')"
-      @on-cancel
-      ok-text='Confirm'
-      cancel-text='Cancel'
+      ok-text="Confirm"
+      cancel-text="Cancel"
     >
       <Form
         ref="formValidate1"
@@ -1190,10 +1098,54 @@
       </div>
     </Modal>
     <Modal
+      width="800"
+      v-model="stepsModal"
+      title="The process of geo-problem solving"
+      :mask-closable="false"
+      footer-hide
+    >
+      <div style="width:780px;height:400px" id="steps"></div>
+      <div style="width: 765px; height: 25px">
+        <label style="margin-left:20px">New step name:</label>
+        <Input
+          v-model="formValidate1.moduleTitle"
+          placeholder="Enter something..."
+          style="width: 200px"
+        />
+        <label style="margin-left:20px">New step type:</label>
+        <Select
+          v-model="formValidate1.moduleType"
+          style="width:100px"
+          placeholder="please select module type..."
+        >
+          <Option v-for="item in typeList" :key="item.index" :value="item">{{ item }}</Option>
+        </Select>
+        <template v-if="$store.getters.userInfo.userId == this.subProjectInfo.managerId">
+          <template v-if="this.processStructure.length > 0">
+            <Button
+              type="default"
+              @click="removeStep()"
+              icon="md-remove"
+              class="removeBtn"
+              title="Remove this module"
+              style="float:right;margin-left:10px"
+            >Remove</Button>
+          </template>
+          <Button
+            type="default"
+            @click="addNewStep()"
+            icon="md-add"
+            class="addBtn"
+            title="Add a new module"
+            style="float:right;margin-left:10px"
+          >Add</Button>
+        </template>
+      </div>
+    </Modal>
+    <Modal
       v-model="inheritData"
       title="Choose data to next process"
       @on-ok="createModule()"
-      @on-cancel
       ok-text="Confirm"
       cancel-text="Cancel"
     >
@@ -1214,7 +1166,8 @@
       v-model="activateModal"
       title="Activate this process"
       @on-ok="activateModule()"
-      @on-cancel
+      ok-text="Ok"
+      cancel-text="Cancel"
     >
       <p>Do you want to activate this process?</p>
     </Modal>
@@ -1260,7 +1213,12 @@
       <Upload :max-size="1024*1024" multiple type="drag" :before-upload="gatherFile" action="-">
         <div style="padding: 20px 0">
           <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
-          <p>Click or drag files here to upload(The file size must control in <span style="color:red">1GB</span>)</p>
+          <p>
+            Click or drag files here to upload(The file size must control in
+            <span
+              style="color:red"
+            >1GB</span>)
+          </p>
         </div>
       </Upload>
       <div style="padding:0 10px 0 10px">
@@ -1306,6 +1264,7 @@
 import { VueFlowy, FlowChart } from "vue-flowy";
 import * as socketApi from "./../../api/socket";
 import Avatar from "vue-avatar";
+import echarts from "echarts";
 export default {
   updated() {
     $(".userAvatar sup").css("margin", "15px 15px 0 0");
@@ -1321,27 +1280,21 @@ export default {
   },
   data() {
     return {
-      // information of project
-      projectInfo: {},
+      // 步骤逻辑图
+      stepChart: null,
       // info of subproject --by mzy
       subProjectInfo: [],
-      //登陆者身份
       // 关于邀请的模态框
-      inviteModal: false,
-      quitModal: false,
       sidebarHeight: 800,
       participants: [],
-      candidates: [],
-      inviteList: [],
       // current: 0,
       addModal: false,
-      copyModal: false,
       delModal: false,
       inheritData: false,
       //编辑的模态框
       editModal: false,
       activateModal: false,
-      order: -1,
+      stepsModal: false,
       // chart适用
       chart: new FlowChart(),
       //现在点击的module
@@ -1397,16 +1350,8 @@ export default {
       updateModuleDescription: "",
       // 抽屉的控制开关
       drawerOpen: false,
-      // 后台获取的module下的task列表
-      taskList: [],
-      // 后台拿到的Module集合，渲染成一条轴用的
-      moduleList: [],
-      showedModules: [],
-      moduleRightMove: false,
-      moduleLeftMove: false,
-      // 当前模块的索引
-      currentModuleIndex: 0,
-      showedModuleLevel: 0,
+      // 选择的模块
+      selectedModule: [],
       // web socket for module
       subprojectSocket: null,
       timer: null,
@@ -1473,7 +1418,10 @@ export default {
       // 显示进度条的模态框
       progressModalShow: false,
       // 文件上传的进度
-      uploadProgress: 0
+      uploadProgress: 0,
+      // 问题解决流程结构
+      processStructure: [],
+      currentStep: {}
     };
   },
   created() {
@@ -1483,7 +1431,7 @@ export default {
     window.addEventListener("resize", this.reSize);
     this.openModuleSocket();
     this.getHistoryRecords();
-    this.getAllModules("init");
+    this.getProcessSteps();
   },
   // add by mzy for navigation guards
   beforeRouteEnter: (to, from, next) => {
@@ -1492,16 +1440,15 @@ export default {
         next("/login");
         // vm.$router.push({ name: "Login" });
       } else {
-        var isManager=false;
-        var isMember=false;
-        var subProjectInfo= vm.subProjectInfo;
-        if(subProjectInfo.managerId == vm.$store.getters.userId){
+        var isManager = false;
+        var isMember = false;
+        var subProjectInfo = vm.subProjectInfo;
+        if (subProjectInfo.managerId == vm.$store.getters.userId) {
           isManager = true;
-        }
-        else{
+        } else {
           var members = subProjectInfo.members;
-          for(var i=0;i<members.length;i++){
-            if(members[i].userId==vm.$store.getters.userId){
+          for (var i = 0; i < members.length; i++) {
+            if (members[i].userId == vm.$store.getters.userId) {
               isMember = true;
               break;
             }
@@ -1519,6 +1466,9 @@ export default {
     this.removeTimer();
     this.closeModuleSocket();
     this.closePanel();
+    if (this.stepChart != null) {
+      this.stepChart.dispose();
+    }
     next();
   },
   beforeDestroy: function() {
@@ -1559,7 +1509,8 @@ export default {
       ) {
         this.$set(this, "subProjectInfo", subProjectInfo);
         this.toProjectPage = "/project/" + subProjectInfo.projectId;
-        this.toSubProjectPage = "/project/" + subProjectInfo.subProjectId + "/subproject";
+        this.toSubProjectPage =
+          "/project/" + subProjectInfo.subProjectId + "/subproject";
       } else {
         $.ajax({
           url:
@@ -1570,21 +1521,24 @@ export default {
           type: "GET",
           async: false,
           success: data => {
-            if(data == "Offline"){
+            if (data == "Offline") {
               this.$store.commit("userLogout");
               this.$router.push({ name: "Login" });
-            }
-            else if (data != "None"&&data != "Fail") {
+            } else if (data != "None" && data != "Fail") {
               subProjectInfo = data[0];
               this.$set(this, "subProjectInfo", subProjectInfo);
-              sessionStorage.setItem("subProjectId", subProjectInfo.subProjectId);
+              sessionStorage.setItem(
+                "subProjectId",
+                subProjectInfo.subProjectId
+              );
               sessionStorage.setItem("subProjectName", subProjectInfo.title);
 
               this.managerIdentity(subProjectInfo.managerId);
               this.memberIdentity(subProjectInfo.members);
               this.$store.commit("setSubProjectInfo", subProjectInfo);
               this.toProjectPage = "/project/" + subProjectInfo.projectId;
-              this.toSubProjectPage = "/project/" + subProjectInfo.subProjectId + "/subproject";
+              this.toSubProjectPage =
+                "/project/" + subProjectInfo.subProjectId + "/subproject";
             }
           },
           error: function(err) {
@@ -1606,130 +1560,352 @@ export default {
         }
       }
     },
-    showDetail(item) {
-      let oldId = this.currentModule.moduleId;
-      this.currentModuleIndex = this.showedModuleLevel * 5 + item;
-      this.currentModule = this.moduleList[this.currentModuleIndex];
-
-      sessionStorage.setItem("moduleId", this.currentModule.moduleId);
-      sessionStorage.setItem("moduleName", this.currentModule.title);
-
-      // close panels
-      this.closePanel();
-
-      if (oldId !== this.currentModule.moduleId) {
-        //查询公告
-        this.inquiryNotice();
-        this.getAllResource();
-        this.showModules("init");
-        let records = [];
-        if (!this.currentModule.activeStatus) {
-          for (let i = 0; i < this.allHistRecords.length; i++) {
-            if (
-              this.currentModule.moduleId == this.allHistRecords[i].moduleId
-            ) {
-              let record = this.allHistRecords[i];
-              records.push(record);
+    showSteps() {
+      this.selectedModule = [];
+      let option = {
+        animationDurationUpdate: 500,
+        animationEasingUpdate: "quinticInOut",
+        legend: {
+          show: true,
+          data: [
+            {
+              name: "Preparation",
+              icon: "circle"
+            },
+            {
+              name: "Analysis",
+              icon: "circle"
+            },
+            {
+              name: "Modeling",
+              icon: "circle"
+            },
+            {
+              name: "Simulation",
+              icon: "circle"
+            },
+            {
+              name: "Verification",
+              icon: "circle"
+            },
+            {
+              name: "Comparison",
+              icon: "circle"
+            }
+          ]
+        },
+        series: [
+          {
+            type: "graph",
+            layout: "none",
+            legendHoverLink: true,
+            roam: true,
+            label: {
+              normal: {
+                show: true
+              }
+            },
+            edgeSymbol: ["circle", "arrow"],
+            edgeSymbolSize: [4, 10],
+            focusNodeAdjacency: true,
+            data: [],
+            categories: [
+              {
+                name: "Preparation"
+              },
+              {
+                name: "Analysis"
+              },
+              {
+                name: "Simulation"
+              },
+              {
+                name: "Modeling"
+              },
+              {
+                name: "Verification"
+              },
+              {
+                name: "Comparison"
+              }
+            ],
+            links: [],
+            lineStyle: {
+              normal: {
+                opacity: 1,
+                width: 3,
+                curveness: 0
+              }
             }
           }
-          this.historyRecords = records;
-        } else {
-          let noRecords = true;
-          for (let i = 0; i < this.allRecords.length; i++) {
-            if (this.allRecords[i].type != "participants") {
-              noRecords = false;
+        ]
+      };
+
+      if (this.processStructure.length > 0) {
+        this.selectedModule = [];
+        for (let i = 0; i < this.processStructure.length; i++) {
+          //get data
+          if (this.processStructure[i].stepID == this.currentModule.moduleId) {
+            option.series[0].data.push({
+              name: this.processStructure[i].name,
+              index: this.processStructure[i].id,
+              moduleId: this.processStructure[i].stepID,
+              x: this.processStructure[i].x,
+              y: this.processStructure[i].y,
+              category: this.processStructure[i].category,
+              symbolSize: 45
+            });
+            this.selectedModule.push({
+              moduleId: this.processStructure[i].stepID,
+              index: this.processStructure[i].id,
+              name: this.processStructure[i].name
+            });
+          } else {
+            option.series[0].data.push({
+              name: this.processStructure[i].name,
+              index: this.processStructure[i].id,
+              moduleId: this.processStructure[i].stepID,
+              x: this.processStructure[i].x,
+              y: this.processStructure[i].y,
+              category: this.processStructure[i].category,
+              symbolSize: 30
+            });
+          }
+
+          //get links
+          for (let j = 0; j < this.processStructure[i].next.length; j++) {
+            option.series[0].links.push({
+              source: this.processStructure[i].name,
+              target: this.processStructure[i].next[j].name
+            });
+          }
+        }
+      }
+
+      if (this.stepChart == null) {
+        this.stepChart = echarts.init(document.getElementById("steps"));
+      } else {
+        this.stepChart.off("click");
+        this.stepChart.off("dblclick");
+      }
+      this.stepChart.setOption(option);
+      let _this = this;
+      // 单击选择步骤
+      this.stepChart.on("click", function(params) {
+        if (option.series[0].data[params.data.index].symbolSize == 30) {
+          option.series[0].data[params.data.index].symbolSize = 45;
+
+          // record the selected step nodes
+          _this.selectedModule.push({
+            moduleId: params.data.moduleId,
+            index: params.data.index,
+            name: params.data.name
+          });
+        } else if (option.series[0].data[params.data.index].symbolSize == 45) {
+          option.series[0].data[params.data.index].symbolSize = 30;
+
+          // remove these not selected step nodes
+          for (let i = 0; i < _this.selectedModule.length; i++) {
+            if (_this.selectedModule[i].moduleId == params.data.moduleId) {
+              _this.selectedModule.splice(i, 1);
               break;
             }
           }
-          if (noRecords) {
-            for (let i = 0; i < this.allHistRecords.length; i++) {
-              if (
-                this.currentModule.moduleId == this.allHistRecords[i].moduleId
-              ) {
-                let record = this.allHistRecords[i];
-                records.push(record);
-              }
+        }
+        _this.stepChart.setOption(option);
+      });
+      // 双击切换当前步骤
+      this.stepChart.on("dblclick", function(params) {
+        _this.currentStep = _this.processStructure[params.data.index];
+        _this.getModuleInfo(params.data.moduleId);
+
+        _this.selectedModule = [];
+        option.series[0].data = [];
+        for (let i = 0; i < _this.processStructure.length; i++) {
+          //get data
+          if (_this.processStructure[i].stepID == params.data.moduleId) {
+            option.series[0].data.push({
+              name: _this.processStructure[i].name,
+              index: _this.processStructure[i].id,
+              moduleId: _this.processStructure[i].stepID,
+              x: _this.processStructure[i].x,
+              y: _this.processStructure[i].y,
+              category: _this.processStructure[i].category,
+              symbolSize: 45
+            });
+            _this.selectedModule.push({
+              moduleId: _this.processStructure[i].stepID,
+              index: _this.processStructure[i].id,
+              name: _this.processStructure[i].name
+            });
+          } else {
+            option.series[0].data.push({
+              name: _this.processStructure[i].name,
+              index: _this.processStructure[i].id,
+              moduleId: _this.processStructure[i].stepID,
+              x: _this.processStructure[i].x,
+              y: _this.processStructure[i].y,
+              category: _this.processStructure[i].category,
+              symbolSize: 30
+            });
+          }
+        }
+        _this.stepChart.setOption(option);
+      });
+      this.stepsModal = true;
+    },
+    addNewStep() {
+      // 重复命名检测
+      for (let i = 0; i < this.processStructure.length; i++) {
+        if (this.formValidate1.moduleTitle == this.processStructure[i].name) {
+          this.$Notice.info({
+            desc: "The name of new step should not be different!"
+          });
+          return;
+        }
+      }
+      if (
+        this.formValidate1.moduleTitle != "" &&
+        this.formValidate1.moduleType != ""
+      ) {
+        if (this.selectedModule.length > 0) {
+          //  计算新增节点的属性信息
+          let lastNode = [];
+          let nodeLevel = 0;
+          let nodeY = 0;
+          let nodeCategory = 0;
+          for (let i = 0; i < this.selectedModule.length; i++) {
+            lastNode.push({
+              name: this.selectedModule[i].name,
+              id: this.selectedModule[i].index
+            });
+
+            if (
+              this.processStructure[this.selectedModule[i].index].level >=
+              nodeLevel
+            ) {
+              nodeLevel =
+                this.processStructure[this.selectedModule[i].index].level + 1;
             }
-            let temp = records.concat(this.allRecords);
-            this.allRecords = temp;
+
+            // modify original step node
+            this.processStructure[this.selectedModule[i].index].next.push({
+              name: this.formValidate1.moduleTitle,
+              id: this.processStructure.length
+            });
+            this.processStructure[this.selectedModule[i].index].end = false;
+
+            // calculate y
+            if (this.processStructure[i].last == []) {
+              nodeY = 200;
+            } else {
+              let sumY = 0;
+              for (let j = 0; j < this.selectedModule.length; j++) {
+                sumY += this.processStructure[this.selectedModule[j].index].y;
+              }
+              nodeY = sumY / this.selectedModule.length;
+            }
           }
+
+          let isOverlap = false;
+          // 统计每层的节点数 并 非激活现有的step
+          let levelNum = [];
+          for (let i = 0; i < this.processStructure.length; i++) {
+            if (this.processStructure[i].level == nodeLevel) {
+              levelNum.push(this.processStructure[i].id);
+            }
+            this.processStructure[i].activeStatus = false;
+          }
+          // 节点重复检测
+          for (let i = 0; i < levelNum.length; i++) {
+            if (Math.abs(this.processStructure[levelNum[i]].y - nodeY) < 30) {
+              isOverlap = true;
+              break;
+            }
+          }
+
+          // 新步骤的类别
+          if (this.formValidate1.moduleType == "Preparation") {
+            nodeCategory = 0;
+          } else if (this.formValidate1.moduleType == "Analysis") {
+            nodeCategory = 1;
+          } else if (this.formValidate1.moduleType == "Modeling") {
+            nodeCategory = 2;
+          } else if (this.formValidate1.moduleType == "Simulation") {
+            nodeCategory = 3;
+          } else if (this.formValidate1.moduleType == "Validation") {
+            nodeCategory = 4;
+          } else if (this.formValidate1.moduleType == "Comparison") {
+            nodeCategory = 5;
+          }
+
+          // create step node
+          let newStepNode = {
+            id: this.processStructure.length,
+            stepID: "",
+            name: this.formValidate1.moduleTitle,
+            category: nodeCategory,
+            last: lastNode,
+            next: [],
+            x: 0,
+            y: nodeY,
+            level: nodeLevel,
+            end: true,
+            activeStatus: true
+          };
+          this.processStructure.push(newStepNode);
+          levelNum.push(newStepNode.id);
+
+          // 如果重叠，修改y坐标
+          if (isOverlap) {
+            for (let i = 0; i < levelNum.length; i++) {
+              this.processStructure[levelNum[i]].y =
+                (400 / (levelNum.length + 1)) * (i + 1);
+            }
+            isOverlap = false;
+          }
+
+          // calculate x
+          let maxLevel = 0;
+          for (let i = 0; i < this.processStructure.length; i++) {
+            if (this.processStructure[i].level > maxLevel) {
+              maxLevel = this.processStructure[i].level;
+            }
+          }
+          for (let i = 0; i < this.processStructure.length; i++) {
+            this.processStructure[i].x =
+              (800 / (maxLevel + 1)) * (this.processStructure[i].level + 1);
+          }
+
+          this.stepChart.dispose();
+          this.stepChart = null;
+          //关闭当前模态框
+          this.stepsModal = false;
+          //选择资源
+          this.chooseResource();
+        } else {
+          this.$Notice.info({
+            desc: "There is no step node being selected!"
+          });
         }
+      } else if (this.formValidate1.moduleTitle == "") {
+        this.$Notice.info({
+          desc: "The name of new step should not be empty!"
+        });
+      } else if (this.formValidate1.moduleType == "") {
+        this.$Notice.info({
+          desc: "The type of new step should not be empty!"
+        });
       }
     },
-    moudelMove(direction) {
-      if (direction == "back") {
-        this.showModules("back");
-      } else if (direction == "forward") {
-        this.showModules("forward");
-      }
-    },
-    showModules(type) {
-      this.showedModules = [];
-      if (this.moduleList.length > 5) {
-        if (type == "init") {
-          this.order = Math.round(
-            (this.currentModuleIndex / 5 -
-              Math.floor(this.currentModuleIndex / 5)) *
-              5
-          );
-          this.showedModuleLevel = Math.floor(this.currentModuleIndex / 5);
-        } else if (type == "back") {
-          this.showedModuleLevel--;
-          if (
-            this.showedModuleLevel == Math.floor(this.currentModuleIndex / 5)
-          ) {
-            this.order = Math.round(
-              (this.currentModuleIndex / 5 -
-                Math.floor(this.currentModuleIndex / 5)) *
-                5
-            );
-          } else {
-            this.order = -1;
-          }
-        } else if (type == "forward") {
-          this.showedModuleLevel++;
-          if (
-            this.showedModuleLevel == Math.floor(this.currentModuleIndex / 5)
-          ) {
-            this.order = Math.round(
-              (this.currentModuleIndex / 5 -
-                Math.floor(this.currentModuleIndex / 5)) *
-                5
-            );
-          } else {
-            this.order = -1;
-          }
-        }
-
-        for (
-          let i = this.showedModuleLevel * 5;
-          i < (this.showedModuleLevel + 1) * 5;
-          i++
-        ) {
-          if (i == this.moduleList.length) {
-            break;
-          }
-          this.showedModules.push(this.moduleList[i]);
-        }
-
-        if (this.showedModuleLevel > 0) {
-          this.moduleLeftMove = type;
-        } else {
-          this.moduleLeftMove = false;
-        }
-        if (
-          this.showedModuleLevel < Math.floor((this.moduleList.length - 1) / 5)
-        ) {
-          this.moduleRightMove = true;
-        } else {
-          this.moduleRightMove = false;
-        }
+    removeStep() {
+      if (this.selectedModule.length > 0) {
+        this.stepsModal = false;
+        this.delModal = true;
       } else {
-        this.showedModules = this.moduleList;
-        this.moduleRightMove = false;
-        this.moduleLeftMove = false;
-        this.showedModuleLevel = 0;
-        this.order = this.currentModuleIndex;
+        this.$Notice.info({
+          desc: "There is no step selected! "
+        });
       }
     },
     closeModuleSocket() {
@@ -1743,7 +1919,8 @@ export default {
         this.subprojectSocket = null;
       }
       let subProjectId = this.subProjectInfo.subProjectId;
-      var subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + subProjectId;
+      var subprojectSocketURL =
+        "ws://localhost:8081/GeoProblemSolving/Module/" + subProjectId;
       // var subprojectSocketURL = "ws://" + this.$store.state.IP_Port + "/GeoProblemSolving/Module/" + subProjectId;
       this.subprojectSocket = new WebSocket(subprojectSocketURL);
       this.subprojectSocket.onopen = this.onOpen;
@@ -1783,8 +1960,8 @@ export default {
         this.allRecords.push(messageJson);
       }
       // module 更新
-      else if (messageJson.type == "module") {
-        this.getAllModules("init");
+      else if (messageJson.type == "step") {
+        this.processStructure = messageJson.content;
       } else if (messageJson.type == "members") {
         // 比较 判断人员动态 更新records
 
@@ -1794,7 +1971,7 @@ export default {
           .replace(/\s/g, "")
           .split(",");
 
-        this.olParticipantChange(members, this.ofParticipant);
+        this.olParticipantChange(members);
       }
     },
     onClose(e) {
@@ -1822,7 +1999,7 @@ export default {
     removeTimer() {
       clearInterval(this.timer);
     },
-    olParticipantChange(members, callback) {
+    olParticipantChange(members) {
       let userIndex = -1;
       var record = {
         type: "participants",
@@ -1906,19 +2083,6 @@ export default {
       }
       //records 更新
       this.allRecords.push(record);
-      // callback(members);
-    },
-    ofParticipant(olPersons) {
-      // this.ofParticipants = [];
-      // for (let i = 0; i < this.participants.length; i++) {
-      //   for (var j = 0; j < olPersons.length; j++) {
-      //     this.participants[i].userId == olPersons[j];
-      //     break;
-      //   }
-      //   if (j == olPersons.length) {
-      //     this.ofParticipants.push(this.participants[i]);
-      //   }
-      // }
     },
     getHistoryRecords() {
       this.allHistRecords = [];
@@ -1932,11 +2096,10 @@ export default {
             this.subProjectInfo.subProjectId
         )
         .then(res => {
-          if(res.data == "Offline"){
+          if (res.data == "Offline") {
             this.$store.commit("userLogout");
             this.$router.push({ name: "Login" });
-          }
-          else if(res.data !="None"&&res.data !="Fail"){
+          } else if (res.data != "None" && res.data != "Fail") {
             for (let i = 0; i < res.data.length; i++) {
               let record = JSON.parse(res.data[i].description);
               that.allHistRecords.push(record);
@@ -1945,25 +2108,111 @@ export default {
         });
     },
     chooseResource() {
-      this.inheritData = true;
       this.inheritResource = this.getMockData();
-      // this.targetKeys = this.getTargetKeys();
     },
     createModule() {
-      this.addModal = true;
       this.selectResource = [];
       this.selectResource = this.getTargetKeys();
+
+      // 创建项目
+      let index = this.processStructure.length - 1;
+      let Module = {};
+      Module["subProjectId"] = this.$route.params.id;
+      Module["title"] = this.formValidate1.moduleTitle;
+      Module["description"] = "There is no description of this module.";
+      Module["creator"] = this.$store.getters.userId;
+      Module["type"] = this.formValidate1.moduleType;
+      this.axios
+        .post("/GeoProblemSolving/module/create", Module)
+        .then(res => {
+          if (res.data == "Offline") {
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          } else if (res.data === "Fail") {
+            this1.$Message.info("Fail");
+          } else {
+            // new StepID
+            this.processStructure[index].stepID = res.data;
+
+            // current step and module
+            this.currentStep = this.processStructure[index];
+            Module["moduleId"] = res.data;
+            this.currentModule = Module;
+            // 存储Step
+            this.updateSteps();
+
+            // collaborative
+            let socketMsg = {
+              type: "step",
+              operate: "update",
+              content: JSON.stringify(this.processStructure)
+            };
+            this.subprojectSocket.send(socketMsg);
+
+            //更新新module的资源---------------------静态化之后完成
+            // this.copyResource(res.data);
+
+            this.createModuleSuccess(Module["title"]);
+          }
+        })
+        .catch(err => {
+          console.log(err.data);
+        });
     },
     getMockData() {
       let mockData = [];
-      for (let i = 0; i < this.resourceList.length; i++) {
-        mockData.push({
-          key: i,
-          name: this.resourceList[i].name,
-          type: this.resourceList[i].type,
-          resourceId: this.resourceList[i].resourceId
-        });
+      for (let i = 0; i < this.selectedModule.length; i++) {
+        let selectedModuleId = this.selectedModule[i].moduleId;
+        if (selectedModuleId == this.currentModule.moduleId) {
+          for (let i = 0; i < this.resourceList.length; i++) {
+            mockData.push({
+              key: i,
+              name: this.resourceList[i].name,
+              type: this.resourceList[i].type,
+              resourceId: this.resourceList[i].resourceId
+            });
+          }
+        } else {
+          let selectedRes = [];
+          $.ajax({
+            url:
+              "/GeoProblemSolving/resource/inquiry" +
+              "?key=scope.moduleId" +
+              "&value=" +
+              selectedModuleId,
+            type: "GET",
+            async: false,
+            success: function(data) {
+              if (data !== "None") {
+                selectedRes = data;
+                for (let i = 0; i < selectedRes.length; i++) {
+                  mockData.push({
+                    key: i,
+                    name: selectedRes.name,
+                    type: selectedRes.type,
+                    resourceId: selectedRes.resourceId
+                  });
+                }
+              } else {
+                selectedRes = [];
+              }
+            },
+            error: function(err) {
+              selectedRes = [];
+              console.log("err!");
+            }
+          });
+        }
       }
+      this.selectedModule = [];
+
+      if (mockData.length > 0) {
+        this.inheritData = true;
+      } else {
+        this.inheritData = false;
+        this.createModule();
+      }
+
       return mockData;
     },
     getTargetKeys() {
@@ -1984,38 +2233,49 @@ export default {
       this.targetKeys = newTargetKeys;
     },
     filterMethod(data, query) {
-      return data.type.indexOf(query) > -1;
+      if (data.length > 0) {
+        return data.type.indexOf(query) > -1;
+      } else {
+        return false;
+      }
     },
     resourceRender(item) {
       return item.type + " - " + item.name;
     },
-    getAllModules(state) {
-      //这里重写以下获取module
-      let subProjectId = this.$route.params.id;
+    getProcessSteps() {
+      if (
+        this.subProjectInfo.solvingProcess == undefined ||
+        this.subProjectInfo.solvingProcess.length == 0
+      ) {
+        // 待处理，为了兼容
+      } else if (this.subProjectInfo.solvingProcess.length > 0) {
+        this.processStructure = JSON.parse(this.subProjectInfo.solvingProcess);
+
+        for (let i = 0; i < this.processStructure.length; i++) {
+          if (this.processStructure[i].activeStatus) {
+            this.currentStep = this.processStructure[i];
+            // 请求module数据
+            this.getModuleInfo(this.processStructure[i].stepID);
+          }
+        }
+      }
+    },
+    getModuleInfo(moduleId) {
       this.axios
         .get(
           "/GeoProblemSolving/module/inquiry" +
-            "?key=subProjectId" +
+            "?key=moduleId" +
             "&value=" +
-            subProjectId
+            moduleId
         )
         .then(res => {
-          if(res.data == "Offline"){
+          if (res.data == "Offline") {
             this.$store.commit("userLogout");
             this.$router.push({ name: "Login" });
-          }else if (res.data != "None" && res.data != "Fail") {
-            this.moduleList = res.data;
-
-            if (state == "init") {
-              let index = this.getActiveModule();
-              this.showedModuleLevel = 0;
-              this.showDetail(index);
-            } else if (state == "update") {
-              this.allRecords = [];
-              this.showDetail(this.order);
-            }
+          } else if (res.data != "None" && res.data != "Fail") {
+            this.currentModule = res.data[0];
           } else if (res.data == "None") {
-            this.moduleList = [];
+            this.currentModule = [];
           }
         })
         .catch(err => {});
@@ -2026,61 +2286,74 @@ export default {
           if (
             this.$store.getters.userInfo.userId == this.subProjectInfo.managerId
           ) {
+            // 创建module
             let Module = {};
-            Module["activeStatus"] = true;
             Module["subProjectId"] = this.$route.params.id;
             Module["title"] = this.formValidate1.moduleTitle;
             Module["description"] = this.moduleDescription;
             Module["creator"] = this.$store.getters.userId;
             Module["type"] = this.formValidate1.moduleType;
-            if (this.moduleList.length !== 0) {
-              Module["foreModuleId"] = this.moduleList[
-                this.moduleList.length - 1
-              ].moduleId;
-            } else {
-              Module["foreModuleId"] = "";
-            }
-            let this1 = this;
             this.axios
               .post("/GeoProblemSolving/module/create", Module)
               .then(res => {
-                if (res.data === "Fail") {
-                  this1.$Message.info("Fail");
+                if (res.data == "Offline") {
+                  this.$store.commit("userLogout");
+                  this.$router.push({ name: "Login" });
+                } else if (res.data === "Fail") {
+                  this.$Message.info("Fail");
                 } else {
-                  //更新新module的资源
-                  this1.copyResource(res.data);
+                  this.currentModule = Module;
 
-                  // 使其他module为非激活状态
-                  if (this1.moduleList.length > 0) {
-                    let moduleId = "";
-                    if (this1.currentModule.activeStatus) {
-                      moduleId = this1.currentModule.moduleId;
-                    } else {
-                      let index = this1.getActiveModule();
-                      moduleId = this1.moduleList[index].moduleId;
+                  // 创建步骤
+                  if (this.processStructure.length === 0) {
+                    let nodeCategory = 0;
+                    if (this.formValidate1.moduleType == "Preparation") {
+                      nodeCategory = 0;
+                    } else if (this.formValidate1.moduleType == "Analysis") {
+                      nodeCategory = 1;
+                    } else if (this.formValidate1.moduleType == "Modeling") {
+                      nodeCategory = 2;
+                    } else if (this.formValidate1.moduleType == "Simulation") {
+                      nodeCategory = 3;
+                    } else if (this.formValidate1.moduleType == "Validation") {
+                      nodeCategory = 4;
+                    } else if (this.formValidate1.moduleType == "Comparison") {
+                      nodeCategory = 5;
                     }
-                    let updateObject = new URLSearchParams();
-                    updateObject.append("moduleId", moduleId);
-                    updateObject.append("activeStatus", false);
-                    this1.axios
-                      .post("/GeoProblemSolving/module/update", updateObject)
-                      .then(res => {
-                        this1.allRecords = [];
-                        this1.getAllModules("init");
 
-                        let socketMsg = { type: "module", operate: "update" };
-                        this1.subprojectSocket.send(JSON.stringify(socketMsg));
-                      })
-                      .catch(err => {
-                        console.log(err.data);
-                      });
-                  } else {
-                    this1.getAllModules("init");
+                    // create step node
+                    let newStepNode = {
+                      id: this.processStructure.length,
+                      stepID: res.data,
+                      name: this.formValidate1.moduleTitle,
+                      category: nodeCategory,
+                      last: [],
+                      next: [],
+                      x: 400,
+                      y: 200,
+                      level: 0,
+                      end: true,
+                      activeStatus: true
+                    };
+                    this.processStructure.push(newStepNode);
+                    this.currentStep = newStepNode;
+
+                    // 存储Step
+                    this.updateSteps();
+
+                    // collaborative
+                    let socketMsg = {
+                      type: "step",
+                      operate: "update",
+                      content: JSON.stringify(this.processStructure)
+                    };
+                    this.subprojectSocket.send(socketMsg);
                   }
-                  this1.createModuleSuccess(Module["title"]);
-                  this1.formValidate1.moduleTitle = "";
-                  this1.moduleDescription = "";
-                  this1.formValidate1.moduleType = "";
+
+                  this.createModuleSuccess(Module["title"]);
+                  this.formValidate1.moduleTitle = "";
+                  this.moduleDescription = "";
+                  this.formValidate1.moduleType = "";
                 }
               })
               .catch(err => {
@@ -2097,94 +2370,225 @@ export default {
       if (
         this.$store.getters.userInfo.userId == this.subProjectInfo.managerId
       ) {
-        if (!this.currentModule.activeStatus) {
-          let updateObject = new URLSearchParams();
-          updateObject.append("moduleId", this.currentModule.moduleId);
-          updateObject.append("activeStatus", true);
-          this.axios
-            .post("/GeoProblemSolving/module/update", updateObject)
-            .then(res => {
-              let activeModelIndex = this1.getActiveModule();
-              if (this1.moduleList[activeModelIndex].activeStatus) {
-                let updateObject = new URLSearchParams();
-                updateObject.append(
-                  "moduleId",
-                  this1.moduleList[activeModelIndex].moduleId
-                );
-                updateObject.append("activeStatus", false);
-                this.axios
-                  .post("/GeoProblemSolving/module/update", updateObject)
-                  .then(res => {
-                    this1.getAllModules("update");
+        if (!this.currentStep.activeStatus) {
+          for (let i = 0; i < this.processStructure.length; i++) {
+            this.processStructure[i].activeStatus = false;
+          }
+          this.processStructure[this.currentStep.id].activeStatus = true;
+          this.currentStep = this.processStructure[this.currentStep.id];
 
-                    let socketMsg = { type: "module", operate: "update" };
-                    this1.subprojectSocket.send(JSON.stringify(socketMsg));
-                  })
-                  .catch(err => {
-                    console.log(err.data);
-                  });
-              }
-            })
-            .catch(err => {
-              console.log(err.data);
-            });
+          // 保存 step
+          this.updateSteps();
+
+          // collaborative
+          let socketMsg = {
+            type: "step",
+            operate: "update",
+            content: JSON.stringify(this.processStructure)
+          };
+          this.subprojectSocket.send(socketMsg);
         }
       }
     },
     delModule() {
-      let that = this;
       if (
         this.$store.getters.userInfo.userId == this.subProjectInfo.managerId
       ) {
-        this.axios
-          .get(
-            "/GeoProblemSolving/module/delete" +
-              "?moduleId=" +
-              this.currentModule.moduleId
-          )
-          .then(res => {
-            if (res.data === "Success") {
-              that.deleteModuleSuccess();
-              // this.getAllModules("delete");
-              if (that.moduleList.length > 1) {
-                that.moduleList.splice(that.currentModuleIndex, 1);
+        for (let i = 0; i < this.selectedModule.length; i++) {
+          let currentIndex = this.selectedModule[i].index;
+          if (
+            this.processStructure[currentIndex].end &&
+            this.processStructure[currentIndex].name != this.currentStep.name
+          ) {
+            // 删除module
+            this.axios
+              .get(
+                "/GeoProblemSolving/module/delete" +
+                  "?moduleId=" +
+                  this.processStructure[currentIndex].stepID
+              )
+              .then(res => {
+                if (res.data === "Success") {
+                }
+              })
+              .catch(err => {
+                console.log(err.data);
+              });
 
-                let index = that.getActiveModule();
-                this.showedModuleLevel = 0;
-                that.showDetail(index);
-
-                let socketMsg = { type: "module", operate: "update" };
-                that.subprojectSocket.send(JSON.stringify(socketMsg));
-              } else {
-                that.moduleList = [];
+            // 删除step节点
+            if (currentIndex > 0) {
+              // 处理被删除节点的前驱节点
+              for (
+                let j = 0;
+                j < this.processStructure[currentIndex].last.length;
+                j++
+              ) {
+                let lastIndex = this.processStructure[currentIndex].last[j].id;
+                if (this.processStructure[lastIndex].next.length === 1) {
+                  this.processStructure[lastIndex].next = [];
+                } else if (this.processStructure[lastIndex].next.length > 1) {
+                  for (
+                    let s = 0;
+                    s < this.processStructure[lastIndex].next.length;
+                    s++
+                  ) {
+                    if (
+                      this.processStructure[lastIndex].next[s].name ===
+                      this.selectedModule[i].name
+                    ) {
+                      this.processStructure[lastIndex].next.splice(s, 1);
+                    }
+                  }
+                }
+                this.processStructure[lastIndex].end = true;
               }
+
+              // 删除节点
+              this.processStructure.splice(currentIndex, 1);
+
+              // 处理后继节点, 统一步骤id与step在数组里的位置index
+              for (
+                let j = currentIndex;
+                j < this.processStructure.length;
+                j++
+              ) {
+                if (this.processStructure[j].id !== j) {
+                  this.processStructure[j].id = j;
+                }
+              }
+            } else if (currentIndex === 0) {
+              // 删除节点
+              this.processStructure.splice(currentIndex, 1);
             }
-          })
-          .catch(err => {
-            console.log(err.data);
-          });
+            this.updateSteps();
+
+            // collaborative
+            let socketMsg = {
+              type: "step",
+              operate: "update",
+              content: JSON.stringify(this.processStructure)
+            };
+            this.subprojectSocket.send(socketMsg);
+          } else {
+            this.$Notice.info({
+              desc:
+                "The selected step " +
+                this.selectedModule[i].name +
+                "can not be removed. Because it has the next step, or it is a active step."
+            });
+          }
+        }
       }
     },
     updateModule(name) {
+      let _this = this;
+      let this1 = this;
       this.$refs[name].validate(valid => {
         if (valid) {
           if (
-            this.$store.getters.userInfo.userId == this.subProjectInfo.managerId
+            _this.$store.getters.userInfo.userId ==
+            _this.subProjectInfo.managerId
           ) {
-            var that = this;
             let updateObject = new URLSearchParams();
-            updateObject.append("moduleId", this.currentModule.moduleId);
-            updateObject.append("title", this.formValidate2.updateModuleTitle);
-            updateObject.append("description", this.updateModuleDescription);
-            updateObject.append("type", this.formValidate2.updateModuleType);
-            updateObject.append("creater", this.$store.getters.userId);
-            this.axios
+            updateObject.append("moduleId", _this.currentModule.moduleId);
+            updateObject.append("title", _this.formValidate2.updateModuleTitle);
+            updateObject.append("description", _this.updateModuleDescription);
+            updateObject.append("type", _this.formValidate2.updateModuleType);
+            updateObject.append("creater", _this.$store.getters.userId);
+            _this.axios
               .post("/GeoProblemSolving/module/update", updateObject)
               .then(res => {
-                that.getAllModules("init");
+                if (res.data == "Success") {
+                  // module update
+                  this1.currentModule.title =
+                    this1.formValidate2.updateModuleTitle;
+                  this1.currentModule.description =
+                    this1.updateModuleDescription;
+                  this1.currentModule.type =
+                    this1.formValidate2.updateModuleType;
 
-                let socketMsg = { type: "module", operate: "update" };
-                that.subprojectSocket.send(JSON.stringify(socketMsg));
+                  // step update
+                  if (
+                    this.formValidate2.updateModuleTitle !=
+                    this.currentStep.name
+                  ) {
+                    // 更新后继步骤
+                    for (let i = 0; i < this.currentStep.next.length; i++) {
+                      let index = this.currentStep.next[i].id;
+                      for (
+                        let j = 0;
+                        i < this.processStructure[index].last.length;
+                        j++
+                      ) {
+                        if (
+                          this.processStructure[index].last[j].name ==
+                          this.currentStep.name
+                        ) {
+                          this.processStructure[index].last[
+                            j
+                          ].name = this.formValidate2.updateModuleTitle;
+                        }
+                      }
+                    }
+                    // 更新前驱步骤
+                    for (let i = 0; i < this.currentStep.last.length; i++) {
+                      let index = this.currentStep.last[i].id;
+                      for (
+                        let j = 0;
+                        j < this.processStructure[index].next.length;
+                        j++
+                      ) {
+                        if (
+                          this.processStructure[index].next[j].name ==
+                          this.currentStep.name
+                        ) {
+                          this.processStructure[index].next[
+                            j
+                          ].name = this.formValidate2.updateModuleTitle;
+                        }
+                      }
+                    }
+                  }
+                  // 更新当前步骤
+                  let nodeCategory = 0;
+                  if (this.formValidate2.updateModuleType == "Preparation") {
+                    nodeCategory = 0;
+                  } else if (
+                    this.formValidate2.updateModuleType == "Analysis"
+                  ) {
+                    nodeCategory = 1;
+                  } else if (
+                    this.formValidate2.updateModuleType == "Modeling"
+                  ) {
+                    nodeCategory = 2;
+                  } else if (
+                    this.formValidate2.updateModuleType == "Simulation"
+                  ) {
+                    nodeCategory = 3;
+                  } else if (
+                    this.formValidate2.updateModuleType == "Validation"
+                  ) {
+                    nodeCategory = 4;
+                  } else if (
+                    this.formValidate2.updateModuleType == "Comparison"
+                  ) {
+                    nodeCategory = 5;
+                  }
+                  this.currentStep.name = this.formValidate2.updateModuleTitle;
+                  this.currentStep.category = nodeCategory;
+                  let index = this.currentStep.index;
+                  this.processStructure[index] = this.currentStep;
+
+                  this.updateSteps();
+
+                  // collaborative
+                  let socketMsg = {
+                    type: "step",
+                    operate: "update",
+                    content: JSON.stringify(this.processStructure)
+                  };
+                  this.subprojectSocket.send(socketMsg);
+                }
               })
               .catch(err => {
                 console.log(err.data);
@@ -2195,58 +2599,70 @@ export default {
         }
       });
     },
-    copyResource(newModuleId) {
-      for (let i = 0; i < this.selectResource.length; i++) {
-        for (let j = 0; j < this.resourceList.length; j++) {
-          if (
-            this.resourceList[j].resourceId == this.selectResource[i].resourceId
-          ) {
-            let resourceInfo = this.resourceList[j];
-            let shareForm = new FormData();
-            shareForm.append("name", resourceInfo.name);
-            shareForm.append("description", resourceInfo.description);
-            shareForm.append("belong", resourceInfo.belong);
-            shareForm.append("type", resourceInfo.type);
-            shareForm.append("fileSize", resourceInfo.fileSize);
-            shareForm.append("pathURL", resourceInfo.pathURL);
-            shareForm.append("uploaderId", resourceInfo.uploaderId);
-            let scopeObject = {
-              projectId: "",
-              subProjectId: "",
-              moduleId: newModuleId
-            };
-            shareForm.append("scope", JSON.stringify(scopeObject));
-
-            if (
-              newModuleId != null &&
-              newModuleId != undefined &&
-              newModuleId.length > 0
-            ) {
-              this.axios
-                .post("/GeoProblemSolving/resource/share", shareForm)
-                .then(res => {
-                  if (res.data != "Fail") {
-                    //...
-                  }
-                })
-                .catch(err => {
-                  console.log(err);
-                });
-            }
-            break;
+    updateSteps() {
+      let obj = new URLSearchParams();
+      obj.append("subProjectId", this.subProjectInfo.subProjectId);
+      obj.append("solvingProcess", JSON.stringify(this.processStructure));
+      this.axios
+        .post("/GeoProblemSolving/subProject/update", obj)
+        .then(res => {
+          if (res.data == "Offline") {
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          } else if (res.data != "Fail") {
+            this.$Notice.info({
+              desc: "Update successfully!"
+            });
+          } else {
+            this.$Message.error("Update sub-project failed.");
           }
-        }
-      }
+        })
+        .catch(err => {
+          console.log(err.data);
+        });
     },
-    getActiveModule() {
-      var index = 0;
-      for (let i = 0; i < this.moduleList.length; i++) {
-        if (this.moduleList[i].activeStatus) {
-          index = i;
-          break;
-        }
-      }
-      return index;
+    copyResource(newModuleId) {
+      // for (let i = 0; i < this.selectResource.length; i++) {
+      //   for (let j = 0; j < this.resourceList.length; j++) {
+      //     if (
+      //       this.resourceList[j].resourceId == this.selectResource[i].resourceId
+      //     ) {
+      //       let resourceInfo = this.resourceList[j];
+      //       let shareForm = new FormData();
+      //       shareForm.append("name", resourceInfo.name);
+      //       shareForm.append("description", resourceInfo.description);
+      //       shareForm.append("belong", resourceInfo.belong);
+      //       shareForm.append("type", resourceInfo.type);
+      //       shareForm.append("fileSize", resourceInfo.fileSize);
+      //       shareForm.append("pathURL", resourceInfo.pathURL);
+      //       shareForm.append("uploaderId", resourceInfo.uploaderId);
+      //       let scopeObject = {
+      //         projectId: "",
+      //         subProjectId: "",
+      //         moduleId: newModuleId
+      //       };
+      //       shareForm.append("scope", JSON.stringify(scopeObject));
+
+      //       if (
+      //         newModuleId != null &&
+      //         newModuleId != undefined &&
+      //         newModuleId.length > 0
+      //       ) {
+      //         this.axios
+      //           .post("/GeoProblemSolving/resource/share", shareForm)
+      //           .then(res => {
+      //             if (res.data != "Fail") {
+      //               //...
+      //             }
+      //           })
+      //           .catch(err => {
+      //             console.log(err);
+      //           });
+      //       }
+      //       break;
+      //     }
+      //   }
+      // }
     },
     toResourceList() {
       this.$router.push({ path: "/resourceList" });
@@ -2299,63 +2715,61 @@ export default {
               formData.append("uploaderId", this.$store.getters.userId);
               formData.append("belong", this.currentModule.title);
               let scopeObject = {
-                  projectId: "",
-                  subProjectId: "",
-                  moduleId: this.currentModule.moduleId
-                };
+                projectId: "",
+                subProjectId: "",
+                moduleId: this.currentModule.moduleId
+              };
               formData.append("scope", JSON.stringify(scopeObject));
               formData.append("privacy", this.formValidate3.filePrivacy);
-                this.progressModalShow = true;
-                this.axios({
-                  url: "/GeoProblemSolving/resource/upload",
-                  method: "post",
-                  onUploadProgress: progressEvent => {
-                    this.uploadProgress =
-                      ((progressEvent.loaded / progressEvent.total) * 100) | 0;
-                  },
-                  data: formData
-                })
-                  .then(res => {
-                    if(res.data == "Offline"){
-                      that.$store.commit("userLogout");
-                      that.$router.push({ name: "Login" });
-                    }else if (res.data != "Size over" && res.data.length > 0) {
-                      this.$Notice.open({
-                        title: "Upload notification title",
-                        desc: "File uploaded successfully",
-                      });
-                      that.progressModalShow = false;
+              this.progressModalShow = true;
+              this.axios({
+                url: "/GeoProblemSolving/resource/upload",
+                method: "post",
+                onUploadProgress: progressEvent => {
+                  this.uploadProgress =
+                    ((progressEvent.loaded / progressEvent.total) * 100) | 0;
+                },
+                data: formData
+              })
+                .then(res => {
+                  if (res.data == "Offline") {
+                    that.$store.commit("userLogout");
+                    that.$router.push({ name: "Login" });
+                  } else if (res.data != "Size over" && res.data.length > 0) {
+                    this.$Notice.open({
+                      title: "Upload notification title",
+                      desc: "File uploaded successfully"
+                    });
+                    that.progressModalShow = false;
                     that.uploadProgress = 0;
                     that.getAllResource();
                     that.file = [];
                     that.fileDescription = "";
                     that.filePrivacy = "private";
                     that.fileType = "data";
-                      // 同步
-                      let record = {
-                        who: that.$store.getters.userName,
-                        whoid: that.$store.getters.userId,
-                        type: "resource",
-                        content:
-                          "upload a/an " +
-                          that.formValidate3.fileType +
-                          " : " +
-                          that.file.name,
-                        moduleId: this.currentModule.moduleId,
-                        time: new Date().toLocaleString(),
-                        file: res.data[0].fileName
-                      };
-                      that.subprojectSocket.send(JSON.stringify(record));
+                    // 同步
+                    let record = {
+                      who: that.$store.getters.userName,
+                      whoid: that.$store.getters.userId,
+                      type: "resource",
+                      content:
+                        "upload a/an " +
+                        that.formValidate3.fileType +
+                        " : " +
+                        that.file.name,
+                      moduleId: this.currentModule.moduleId,
+                      time: new Date().toLocaleString(),
+                      file: res.data[0].fileName
+                    };
+                    that.subprojectSocket.send(JSON.stringify(record));
 
-                      // 创建一个函数根据pid去后台查询该项目下的资源
-                    }
-
-                  })
-                  .catch(err => {
-                    this.progressModalShow = false;
-                    this.uploadProgress = 0;
-                  });
-              };
+                  }
+                })
+                .catch(err => {
+                  this.progressModalShow = false;
+                  this.uploadProgress = 0;
+                });
+            }
           }
         } else {
           this.$Message.error(
@@ -2395,10 +2809,9 @@ export default {
     },
     editModalShow() {
       this.editModal = true;
-      let order = this.currentModuleIndex;
-      this.formValidate2.updateModuleTitle = this.moduleList[order].title;
-      this.formValidate2.updateModuleType = this.moduleList[order].type;
-      this.updateModuleDescription = this.moduleList[order].description;
+      this.formValidate2.updateModuleTitle = this.currentModule.title;
+      this.formValidate2.updateModuleType = this.currentModule.type;
+      this.updateModuleDescription = this.currentModule.description;
     },
     ok() {
       this.$Message.info("Clicked ok");
@@ -2486,156 +2899,195 @@ export default {
     // jspanel工具
     toolPanel(type) {
       this.axios
-      .get("/GeoProblemSolving/user/state")
-      .then(res=>{
-        if (!res.data) {
-          this.$store.commit("userLogout");
-          this.$router.push({ name: "Login" });
-        }else{
-          var toolURL = "";
-          let toolName = "";
-          if (type == "map") {
-            toolURL = '<iframe src="'+'http://'+this.$store.state.IP_Port+'/GeoProblemSolving/map" style="width: 100%;height:100%"></iframe>';
-            toolName = "Map";
-          } else if (type == "draw") {
-            toolURL =  '<iframe src="'+'http://'+this.$store.state.IP_Port+'/GeoProblemSolving/draw" style="width: 100%;height:100%"></iframe>';
-            toolName = "Drawing";
-          } else if (type == "chart") {
-            toolURL = '<iframe src="'+'http://'+this.$store.state.IP_Port+'/GeoProblemSolving/charts" style="width: 100%;height:100%"></iframe>';
-            toolName = "Chart";
-          } else if (type == "chat") {
-            toolURL = '<iframe src="'+'http://'+this.$store.state.IP_Port+'/GeoProblemSolving/chat" style="width: 100%;height:100%"></iframe>';
-            toolName = "Chatroom";
-          } else if (type == "graphEditor") {
-            toolURL =
-              '<iframe src="/GeoProblemSolving/Collaborative/GraphEditor/index.html' +
-              "?groupID=" +
-              this.currentModule.moduleId +
-              '" style="width: 100%;height:100%"></iframe>';
-            toolName = "Sketchpad";
-          } else if (type == "3DmodelViewer") {
-            toolURL =
-              '<iframe src="/GeoProblemSolving/Collaborative/3DmodelViewer/index.html' +
-              "?groupID=" +
-              this.currentModule.moduleId +
-              '" style="width: 100%;height:100%"></iframe>';
-            toolName = "3D model viewer";
-          } else if (type == "LogicalModel") {
-            toolURL =
-              '<iframe src="/GeoProblemSolving/Collaborative/LogicalModel/index.html' +
-              "?groupID=" +
-              this.currentModule.moduleId +
-              '" style="width: 100%;height:100%"></iframe>';
-            toolName = "Logical modeling";
-          } else if (type == "ConceptualModel") {
-            toolURL =
-              '<iframe src="/GeoProblemSolving/Collaborative/ConceptualModel/index.html' +
-              "?groupID=" +
-              this.currentModule.moduleId +
-              '" style="width: 100%;height:100%"></iframe>';
-            toolName = "Conceptual modeling";
-          } else if (type == "ComputationalModel") {
-            toolURL =
-              '<iframe src="/GeoProblemSolving/Collaborative/ComputationalModel/index.html' +
-              "?groupID=" +
-              this.currentModule.moduleId +
-              '" style="width: 100%;height:100%"></iframe>';
-            toolName = "Computational modeling";
-          } else if (type == "tableEditor") {
-            toolURL =
-              '<iframe src="/GeoProblemSolving/Collaborative/jexcelTool/index.html' +
-              "?groupID=" +
-              this.currentModule.moduleId +
-              '" style="width: 100%;height:100%"></iframe>';
-            toolName = "Table editor";
-          } else if (type == "nc-map") {
-            toolURL =
-              '<iframe src="'+'http://'+this.$store.state.IP_Port+'/GeoProblemSolving/nc/map" style="width: 100%;height:100%"></iframe>';
-            toolName = "Map";
-          } else if (type == "nc-draw") {
-            toolURL =
-              '<iframe src="'+'http://'+this.$store.state.IP_Port+'/GeoProblemSolving/nc/draw" style="width: 100%;height:100%"></iframe>';
-            toolName = "Drawing";
-          } else if (type == "nc-chart") {
-            toolURL =
-              '<iframe src="'+'http://'+this.$store.state.IP_Port+'/GeoProblemSolving/nc/charts" style="width: 100%;height:100%"></iframe>';
-            toolName = "Chart";
-          } else if (type == "cn-tableEditor") {
-            toolURL =
-              '<iframe src="/GeoProblemSolving/Collaborative/jexcelTool/excelToolSingle.html' +
-              '" style="width: 100%;height:100%"></iframe>';
-            toolName = "Table editor";
-          } else if (type == "nc-3DmodelViewer") {
-            toolURL =
-              '<iframe src="/GeoProblemSolving/Collaborative/3DmodelViewer/indexSingle.html' +
-              '" style="width: 100%;height:100%"></iframe>';
-            toolName = "3D model viewer";
-          } else if (type == "nc-video") {
-            toolURL =
-              '<iframe src="'+'http://'+this.$store.state.IP_Port+'/GeoProblemSolving/video" style="width: 100%;height:100%"></iframe>';
-            toolName = "Video player";
-          } else if (type == "nc-pdf") {
-            toolURL =
-              '<iframe src="'+'http://'+this.$store.state.IP_Port+'/GeoProblemSolving/pdfview" style="width: 100%;height:100%"></iframe>';
-            toolName = "Pdf viewer";
-          } else if (type == "Doc Edit") {
-            toolURL =
-              '<iframe src="'+'http://'+this.$store.state.IP_Port+'/GeoProblemSolving/tinymce" style="width: 100%;height:100%"></iframe>';
-            toolName = "Text editor";
-          } else if (type == "Video Tool") {
-            var userId = this.$store.getters.userId;
-            var moduleId = this.currentModule.moduleId;
-            var reg = /(\S)*:80/;
-            var IP_Port = this.$store.state.IP_Port;
-            var videoIP_Port = IP_Port.match(reg)[1];
-            toolURL =
-            '<iframe src="https://'+videoIP_Port+':8083/GeoProblemSolving/Collaborative/vedioChat/WebRtcTest.html'+
-            "?roomId="+moduleId+"&userId="+userId+'" style="width: 100%;height:100%"></iframe>';
-            toolName = "Video Tool";
-          } else if (type == "Web-SWMM") {
-            toolURL =
-            '<iframe src="http://geomodeling.njnu.edu.cn/hydro-model-integration/webswmm" style="width: 100%; height:100%"></iframe>';
-            toolName = "Web-SWMM";
-          } else if (type == "TrafficNoise") {
-            toolURL =
-            '<iframe src="http://geomodeling.njnu.edu.cn/TrafficNoiseTheme/trafficNoise.html" style="width: 100%; height:100%"></iframe>';
-            toolName = "Traffic Noise";
-          }
-
-          let panel = jsPanel.create({
-            theme: "success",
-            headerTitle: toolName,
-            footerToolbar: '<p style="height:10px"></p>',
-            contentSize: "1200 600",
-            content: toolURL,
-            disableOnMaximized: true,
-            dragit: {
-              containment: 5
-            },
-            callback: function() {
-              // this.content.style.padding = "20px";
+        .get("/GeoProblemSolving/user/state")
+        .then(res => {
+          if (!res.data) {
+            this.$store.commit("userLogout");
+            this.$router.push({ name: "Login" });
+          } else {
+            var toolURL = "";
+            let toolName = "";
+            if (type == "map") {
+              toolURL =
+                '<iframe src="' +
+                "http://" +
+                this.$store.state.IP_Port +
+                '/GeoProblemSolving/map" style="width: 100%;height:100%"></iframe>';
+              toolName = "Map";
+            } else if (type == "draw") {
+              toolURL =
+                '<iframe src="' +
+                "http://" +
+                this.$store.state.IP_Port +
+                '/GeoProblemSolving/draw" style="width: 100%;height:100%"></iframe>';
+              toolName = "Drawing";
+            } else if (type == "chart") {
+              toolURL =
+                '<iframe src="' +
+                "http://" +
+                this.$store.state.IP_Port +
+                '/GeoProblemSolving/charts" style="width: 100%;height:100%"></iframe>';
+              toolName = "Chart";
+            } else if (type == "chat") {
+              toolURL =
+                '<iframe src="' +
+                "http://" +
+                this.$store.state.IP_Port +
+                '/GeoProblemSolving/chat" style="width: 100%;height:100%"></iframe>';
+              toolName = "Chatroom";
+            } else if (type == "graphEditor") {
+              toolURL =
+                '<iframe src="/GeoProblemSolving/Collaborative/GraphEditor/index.html' +
+                "?groupID=" +
+                this.currentModule.moduleId +
+                '" style="width: 100%;height:100%"></iframe>';
+              toolName = "Sketchpad";
+            } else if (type == "3DmodelViewer") {
+              toolURL =
+                '<iframe src="/GeoProblemSolving/Collaborative/3DmodelViewer/index.html' +
+                "?groupID=" +
+                this.currentModule.moduleId +
+                '" style="width: 100%;height:100%"></iframe>';
+              toolName = "3D model viewer";
+            } else if (type == "LogicalModel") {
+              toolURL =
+                '<iframe src="/GeoProblemSolving/Collaborative/LogicalModel/index.html' +
+                "?groupID=" +
+                this.currentModule.moduleId +
+                '" style="width: 100%;height:100%"></iframe>';
+              toolName = "Logical modeling";
+            } else if (type == "ConceptualModel") {
+              toolURL =
+                '<iframe src="/GeoProblemSolving/Collaborative/ConceptualModel/index.html' +
+                "?groupID=" +
+                this.currentModule.moduleId +
+                '" style="width: 100%;height:100%"></iframe>';
+              toolName = "Conceptual modeling";
+            } else if (type == "ComputationalModel") {
+              toolURL =
+                '<iframe src="/GeoProblemSolving/Collaborative/ComputationalModel/index.html' +
+                "?groupID=" +
+                this.currentModule.moduleId +
+                '" style="width: 100%;height:100%"></iframe>';
+              toolName = "Computational modeling";
+            } else if (type == "tableEditor") {
+              toolURL =
+                '<iframe src="/GeoProblemSolving/Collaborative/jexcelTool/index.html' +
+                "?groupID=" +
+                this.currentModule.moduleId +
+                '" style="width: 100%;height:100%"></iframe>';
+              toolName = "Table editor";
+            } else if (type == "nc-map") {
+              toolURL =
+                '<iframe src="' +
+                "http://" +
+                this.$store.state.IP_Port +
+                '/GeoProblemSolving/nc/map" style="width: 100%;height:100%"></iframe>';
+              toolName = "Map";
+            } else if (type == "nc-draw") {
+              toolURL =
+                '<iframe src="' +
+                "http://" +
+                this.$store.state.IP_Port +
+                '/GeoProblemSolving/nc/draw" style="width: 100%;height:100%"></iframe>';
+              toolName = "Drawing";
+            } else if (type == "nc-chart") {
+              toolURL =
+                '<iframe src="' +
+                "http://" +
+                this.$store.state.IP_Port +
+                '/GeoProblemSolving/nc/charts" style="width: 100%;height:100%"></iframe>';
+              toolName = "Chart";
+            } else if (type == "cn-tableEditor") {
+              toolURL =
+                '<iframe src="/GeoProblemSolving/Collaborative/jexcelTool/excelToolSingle.html' +
+                '" style="width: 100%;height:100%"></iframe>';
+              toolName = "Table editor";
+            } else if (type == "nc-3DmodelViewer") {
+              toolURL =
+                '<iframe src="/GeoProblemSolving/Collaborative/3DmodelViewer/indexSingle.html' +
+                '" style="width: 100%;height:100%"></iframe>';
+              toolName = "3D model viewer";
+            } else if (type == "nc-video") {
+              toolURL =
+                '<iframe src="' +
+                "http://" +
+                this.$store.state.IP_Port +
+                '/GeoProblemSolving/video" style="width: 100%;height:100%"></iframe>';
+              toolName = "Video player";
+            } else if (type == "nc-pdf") {
+              toolURL =
+                '<iframe src="' +
+                "http://" +
+                this.$store.state.IP_Port +
+                '/GeoProblemSolving/pdfview" style="width: 100%;height:100%"></iframe>';
+              toolName = "Pdf viewer";
+            } else if (type == "Doc Edit") {
+              toolURL =
+                '<iframe src="' +
+                "http://" +
+                this.$store.state.IP_Port +
+                '/GeoProblemSolving/tinymce" style="width: 100%;height:100%"></iframe>';
+              toolName = "Text editor";
+            } else if (type == "Video Tool") {
+              var userId = this.$store.getters.userId;
+              var moduleId = this.currentModule.moduleId;
+              var reg = /(\S)*:80/;
+              var IP_Port = this.$store.state.IP_Port;
+              var videoIP_Port = IP_Port.match(reg)[1];
+              toolURL =
+                '<iframe src="https://' +
+                videoIP_Port +
+                ":8083/GeoProblemSolving/Collaborative/vedioChat/WebRtcTest.html" +
+                "?roomId=" +
+                moduleId +
+                "&userId=" +
+                userId +
+                '" style="width: 100%;height:100%"></iframe>';
+              toolName = "Video Tool";
+            } else if (type == "Web-SWMM") {
+              toolURL =
+                '<iframe src="http://geomodeling.njnu.edu.cn/hydro-model-integration/webswmm" style="width: 100%; height:100%"></iframe>';
+              toolName = "Web-SWMM";
+            } else if (type == "TrafficNoise") {
+              toolURL =
+                '<iframe src="http://geomodeling.njnu.edu.cn/TrafficNoiseTheme/trafficNoise.html" style="width: 100%; height:100%"></iframe>';
+              toolName = "Traffic Noise";
             }
-          });
-          // panel.resizeit("disable");
-          $(".jsPanel-content").css("font-size", "0");
-          this.panelList.push(panel);
-          // 生成records, 同步
-          let record = {
-            who: this.$store.getters.userName,
-            whoid: this.$store.getters.userId,
-            type: "tools",
-            toolType: type,
-            content: "used a tool: " + type,
-            moduleId: this.currentModule.moduleId,
-            time: new Date().toLocaleString()
-          };
-          this.subprojectSocket.send(JSON.stringify(record));
-          // this.allRecords.push(record);
-        }
-      })
-      .catch(err=>{
-        console.log("Get user info fail.");
-      });
+
+            let panel = jsPanel.create({
+              theme: "success",
+              headerTitle: toolName,
+              footerToolbar: '<p style="height:10px"></p>',
+              contentSize: "1200 600",
+              content: toolURL,
+              disableOnMaximized: true,
+              dragit: {
+                containment: 5
+              },
+              callback: function() {
+                // this.content.style.padding = "20px";
+              }
+            });
+            // panel.resizeit("disable");
+            $(".jsPanel-content").css("font-size", "0");
+            this.panelList.push(panel);
+            // 生成records, 同步
+            let record = {
+              who: this.$store.getters.userName,
+              whoid: this.$store.getters.userId,
+              type: "tools",
+              toolType: type,
+              content: "used a tool: " + type,
+              moduleId: this.currentModule.moduleId,
+              time: new Date().toLocaleString()
+            };
+            this.subprojectSocket.send(JSON.stringify(record));
+          }
+        })
+        .catch(err => {
+          console.log("Get user info fail.");
+        });
     },
     closePanel() {
       for (let i = 0; i < this.panelList.length; i++) {
@@ -2650,10 +3102,10 @@ export default {
       this.axios
         .post("/GeoProblemSolving/bulletin/save", noticeForm)
         .then(res => {
-          if(res.data == "Offline"){
+          if (res.data == "Offline") {
             this.$store.commit("userLogout");
             this.$router.push({ name: "Login" });
-          }else if (res.data != "Fail") {
+          } else if (res.data != "Fail") {
             this.$Notice.success({
               title: "Create notice result",
               desc: "The notice has been created successfully!"
@@ -2686,10 +3138,10 @@ export default {
       this.axios
         .post("/GeoProblemSolving/bulletin/update", updateForm)
         .then(res => {
-          if(res.data == "Offline"){
+          if (res.data == "Offline") {
             this.$store.commit("userLogout");
             this.$router.push({ name: "Login" });
-          }else if (res.data != "Fail") {
+          } else if (res.data != "Fail") {
             this.$Notice.info({
               title: "update result",
               desc: "update announcement successfully!"
@@ -2705,10 +3157,10 @@ export default {
       this.axios
         .get("/GeoProblemSolving/bulletin/delete" + "?bulletinId=" + bulletinId)
         .then(res => {
-          if(res.data == "Offline"){
+          if (res.data == "Offline") {
             this.$store.commit("userLogout");
             this.$router.push({ name: "Login" });
-          }else if (res.data != "Fail") {
+          } else if (res.data != "Fail") {
             this.$Notice.info({
               title: "delete result",
               desc: "delete announcement successfully!"
@@ -2729,9 +3181,7 @@ export default {
     previewRes(index) {
       let name = this.resourceList[index].name;
 
-      if (
-        /\.(doc|docx|xls|xlsx|csv|ppt|pptx|zip)$/.test(name.toLowerCase())
-      ) {
+      if (/\.(doc|docx|xls|xlsx|csv|ppt|pptx|zip)$/.test(name.toLowerCase())) {
         if (this.panel != null) {
           this.panel.close();
         }
