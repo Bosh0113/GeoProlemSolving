@@ -2243,11 +2243,141 @@ export default {
       return item.type + " - " + item.name;
     },
     getProcessSteps() {
+      this.processStructure = [];
       if (
         this.subProjectInfo.solvingProcess == undefined ||
         this.subProjectInfo.solvingProcess.length == 0
       ) {
-        // 待处理，为了兼容
+        // 为了兼容
+        this.axios
+          .get(
+            "/GeoProblemSolving/module/inquiry" +
+              "?key=subProjectId" +
+              "&value=" +
+              this.subProjectInfo.subProjectId
+          )
+          .then(res => {
+            if (res.data == "Offline") {
+              this.$store.commit("userLogout");
+              this.$router.push({ name: "Login" });
+            } else if (res.data != "None" && res.data != "Fail") {
+              let moduleList = res.data;
+
+              let nodeCategory = 0;
+              if (moduleList[0].type == "Preparation") {
+                nodeCategory = 0;
+              } else if (moduleList[0].type == "Analysis") {
+                nodeCategory = 1;
+              } else if (moduleList[0].type == "Modeling") {
+                nodeCategory = 2;
+              } else if (moduleList[0].type == "Simulation") {
+                nodeCategory = 3;
+              } else if (moduleList[0].type == "Validation") {
+                nodeCategory = 4;
+              } else if (moduleList[0].type == "Comparison") {
+                nodeCategory = 5;
+              }
+
+              this.processStructure.push({
+                id: 0,
+                stepID: moduleList[0].moduleId,
+                name: moduleList[0].title,
+                category: nodeCategory,
+                last: [],
+                next: [{ name: moduleList[1].title, id: 1 }],
+                x: 0,
+                y: 200,
+                level: 0,
+                end: false,
+                activeStatus: moduleList[0].activeStatus
+              });
+
+              for (let i = 1; i < moduleList.length - 1; i++) {
+                if (moduleList[i].type == "Preparation") {
+                  nodeCategory = 0;
+                } else if (moduleList[i].type == "Analysis") {
+                  nodeCategory = 1;
+                } else if (moduleList[i].type == "Modeling") {
+                  nodeCategory = 2;
+                } else if (moduleList[i].type == "Simulation") {
+                  nodeCategory = 3;
+                } else if (moduleList[i].type == "Validation") {
+                  nodeCategory = 4;
+                } else if (moduleList[i].type == "Comparison") {
+                  nodeCategory = 5;
+                }
+
+                this.processStructure.push({
+                  id: i,
+                  stepID: moduleList[i].moduleId,
+                  name: moduleList[i].title,
+                  category: nodeCategory,
+                  last: [{ name: moduleList[i - 1].title, id: i - 1 }],
+                  next: [{ name: moduleList[i + 1].title, id: i + 1 }],
+                  x: i * (800 / moduleList.length),
+                  y: 200,
+                  level: i,
+                  end: false,
+                  activeStatus: moduleList[i].activeStatus
+                });
+              }
+
+              if (moduleList[moduleList.length - 1].type == "Preparation") {
+                nodeCategory = 0;
+              } else if (moduleList[moduleList.length - 1].type == "Analysis") {
+                nodeCategory = 1;
+              } else if (moduleList[moduleList.length - 1].type == "Modeling") {
+                nodeCategory = 2;
+              } else if (
+                moduleList[moduleList.length - 1].type == "Simulation"
+              ) {
+                nodeCategory = 3;
+              } else if (
+                moduleList[moduleList.length - 1].type == "Validation"
+              ) {
+                nodeCategory = 4;
+              } else if (
+                moduleList[moduleList.length - 1].type == "Comparison"
+              ) {
+                nodeCategory = 5;
+              }
+
+              this.processStructure.push({
+                id: moduleList.length - 1,
+                stepID: moduleList[moduleList.length - 1].moduleId,
+                name: moduleList[moduleList.length - 1].title,
+                category: nodeCategory,
+                last: [
+                  {
+                    name: moduleList[moduleList.length - 1].title,
+                    id: moduleList.length - 1
+                  }
+                ],
+                next: [],
+                x: (moduleList.length - 1) * (800 / moduleList.length),
+                y: 200,
+                level: moduleList.length - 1,
+                end: true,
+                activeStatus: moduleList[moduleList.length - 1].activeStatus
+              });
+              
+              for (let i = 0; i < this.processStructure.length; i++) {
+                if (this.processStructure[i].activeStatus) {
+                  this.currentStep = this.processStructure[i];
+                  this.currentModule = moduleList[i];
+                  break;
+                }
+                else if(i == this.processStructure.length - 1 && this.processStructure[i].activeStatus == undefined) {
+                  this.processStructure[i].activeStatus = true;
+                  this.currentStep = this.processStructure[i];
+                  this.currentModule = moduleList[i];
+                }
+              }
+            } else if (res.data == "None" || res.data == "Fail") {
+              this.currentModule = [];
+            }
+          })
+          .catch(err => {});
       } else if (this.subProjectInfo.solvingProcess.length > 0) {
         this.processStructure = JSON.parse(this.subProjectInfo.solvingProcess);
 
@@ -2642,7 +2772,6 @@ export default {
       //         moduleId: newModuleId
       //       };
       //       shareForm.append("scope", JSON.stringify(scopeObject));
-
       //       if (
       //         newModuleId != null &&
       //         newModuleId != undefined &&
@@ -2762,7 +2891,6 @@ export default {
                       file: res.data[0].fileName
                     };
                     that.subprojectSocket.send(JSON.stringify(record));
-
                   }
                 })
                 .catch(err => {
