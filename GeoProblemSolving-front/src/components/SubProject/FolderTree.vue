@@ -96,7 +96,7 @@
       <div slot="title" class="resourceTitle">
         <strong>Resources</strong>
       </div>
-      <div slot="extra" class="resourceBtnDiv">
+      <div slot="extra" class="resourceBtnDiv" v-show="role != 'Visitor'">
         <Tooltip content="Back" placement="bottom" class="fileBtn">
           <Button @click="backforeFolder">
             <Icon type="md-arrow-round-back" size="20"/>
@@ -326,7 +326,7 @@
 </template>
 <script>
 export default {
-  props: ["subProjectId"],
+  props: ["subProjectId","role"],
   created() {
     this.getSubProjectfileStruct();
   },

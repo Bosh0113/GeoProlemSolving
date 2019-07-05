@@ -255,7 +255,7 @@
                   <img
                     :src="currentProjectDetail.picture"
                     v-if="currentProjectDetail.picture!=''&&currentProjectDetail.picture!='undefined'"
-                  >
+                  />
                   <avatar
                     :username="currentProjectDetail.title"
                     :size="260"
@@ -288,7 +288,7 @@
                   v-show="this.currentProjectDetail.isManager"
                   @click="inviteModalShow()"
                 >
-                  <Icon type="md-person-add" size="20"/>
+                  <Icon type="md-person-add" size="20" />
                 </Button>
               </Poptip>
               <Poptip trigger="hover" content="Remove members" placement="right">
@@ -298,7 +298,7 @@
                   v-show="this.currentProjectDetail.isManager"
                   @click="deleteMemberModal = true"
                 >
-                  <Icon type="md-remove" size="20"/>
+                  <Icon type="md-remove" size="20" />
                 </Button>
               </Poptip>
             </div>
@@ -380,7 +380,7 @@
               />
             </FormItem>
             <FormItem label="Content" prop="emailContent" style="width:100%">
-              <Input type="textarea" style="width:70%" :rows="4" v-model="emailInfo.emailContent"/>
+              <Input type="textarea" style="width:70%" :rows="4" v-model="emailInfo.emailContent" />
             </FormItem>
           </Form>
         </Modal>
@@ -394,7 +394,7 @@
                   @click="subProjectModal = true"
                   v-show="this.currentProjectDetail.isManager||this.currentProjectDetail.isMember"
                 >
-                  <Icon type="md-add" size="20"/>
+                  <Icon type="md-add" size="20" />
                 </Button>
               </Poptip>
               <Modal
@@ -445,36 +445,38 @@
                         </div>
                         <div slot="extra" class="subProjectTitleOperatePanel">
                           <div style="display:flex">
-                            <span
-                              v-show="subProject.isManager == true"
-                              @click.stop="handOverSubProjectShow(index)"
-                              title="Exchange manager"
-                            >
-                              <Icon type="md-person" :size="20"/>
-                            </span>
-                            <span
-                              v-show="subProject['isMember'] == false&&subProject['isManager'] == false"
-                              @click.stop="joinSubProject(subProject)"
-                              title="Apply"
-                            >
-                              <Icon type="md-add"/>
-                            </span>
-                            <span
-                              style="margin-left:10px"
-                              v-show="subProject['isManager'] == true"
-                              @click.stop="editSubProjectShow(index)"
-                              title="Edit"
-                            >
-                              <Icon type="ios-create" :size="20"/>
-                            </span>
-                            <span
-                              style="margin-left:10px"
-                              v-show="subProject['isManager'] == true"
-                              @click.stop="deleteSubProjectShow(index)"
-                              title="Delete"
-                            >
-                              <Icon type="md-close" :size="20"/>
-                            </span>
+                            <template>
+                              <span
+                                v-show="subProject.isManager == true"
+                                @click.stop="handOverSubProjectShow(index)"
+                                title="Exchange manager"
+                              >
+                                <Icon type="md-person" :size="20" />
+                              </span>
+                              <span
+                                v-show="subProject['isMember'] == false && subProject['isManager'] == false && currentProjectDetail.privacy != 'Public'"
+                                @click.stop="joinSubProject(subProject)"
+                                title="Apply to be a member of this subproject"
+                              >
+                                <Icon type="md-add" />
+                              </span>
+                              <span
+                                style="margin-left:10px"
+                                v-show="subProject['isManager'] == true"
+                                @click.stop="editSubProjectShow(index)"
+                                title="Edit"
+                              >
+                                <Icon type="ios-create" :size="20" />
+                              </span>
+                              <span
+                                style="margin-left:10px"
+                                v-show="subProject['isManager'] == true"
+                                @click.stop="deleteSubProjectShow(index)"
+                                title="Delete"
+                              >
+                                <Icon type="md-close" :size="20" />
+                              </span>
+                            </template>
                           </div>
                         </div>
                         <div style="height:100px">
@@ -483,13 +485,13 @@
                             :title="subProject['description']"
                           >{{subProject["description"]}}</p>
                         </div>
-                        <br>
+                        <br />
                         <div class="subProjectTextInfo">
-                          <Icon type="md-body" :size="20"/>Manager
+                          <Icon type="md-body" :size="20" />Manager
                           <span>{{subProject.managerName}}</span>
                         </div>
                         <div class="subProjectTextInfo">
-                          <Icon type="md-clock" :size="20"/>Creation Time
+                          <Icon type="md-clock" :size="20" />Creation Time
                           <span>{{subProject.createTime.split(' ')[0]}}</span>
                         </div>
                       </Card>
@@ -503,7 +505,6 @@
                 ok-text="Ok"
                 cancel-text="Cancel"
                 @on-ok="handOverSubProject()"
-                @on-cancel
                 width="500px"
                 :mask-closable="false"
               >
@@ -565,15 +566,15 @@
         <div class="resourcePanel" style="padding:20px">
           <Card>
             <p slot="title" style="font-size:25px;height:40px;line-height:40px;">Resources</p>
-            <div slot="extra" style="display:flex;align-items:center;height:40px" class="popCenter">
+            <div slot="extra" style="display:flex;align-items:center;height:40px" class="popCenter" v-show="currentProjectDetail.isManager||currentProjectDetail.isMember">
               <Button
                 id="upload"
                 type="default"
                 @click="uploadFileModalShow()"
                 class="uploadBtn"
-                title="upload resource"
+                title="Upload resource"
               >
-                <Icon type="md-cloud-upload" size="20"/>
+                <Icon type="md-cloud-upload" size="20" />
               </Button>
               <Button
                 class="moreBtn"
@@ -582,7 +583,7 @@
                 @click="toResourceList()"
                 title="more"
               >
-                <Icon type="md-more"/>
+                <Icon type="md-more" />
               </Button>
             </div>
             <div style="text-align:center">
@@ -590,7 +591,7 @@
                 <FormItem label="Search specified resource" prop="searchText">
                     <Input type="password" v-model="formCustom.passwd"></Input>
                 </FormItem>
-              </Form> -->
+              </Form>-->
             </div>
             <div style="height:300px;overflow-y:scroll">
               <Table
@@ -608,10 +609,10 @@
                     :download="projectResourceList[index].name"
                     title="Download"
                   >
-                    <Icon type="md-download" :size="20"/>
+                    <Icon type="md-download" :size="20" />
                   </a>
                   <span @click="show(index)" style="margin-left:10px" title="Preview">
-                    <Icon type="md-eye" :size="20" color="#2d8cf0" style="cursor:pointer"/>
+                    <Icon type="md-eye" :size="20" color="#2d8cf0" style="cursor:pointer" />
                   </span>
                 </template>
               </Table>
@@ -667,7 +668,9 @@
               <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
               <p>
                 Click or drag files here to upload(The file size must control in
-                <span style="color:red">1GB</span>)
+                <span
+                  style="color:red"
+                >1GB</span>)
               </p>
             </div>
           </Upload>
@@ -701,7 +704,7 @@
           </div>
           <!-- <h6 style="text-align:center;color:red">The file's size must control smaller than 1 GB.</h6> -->
         </Modal>
-        <br>
+        <br />
       </Col>
       <Modal
         v-model="removeProjectModal"
@@ -744,7 +747,7 @@
             </RadioGroup>
           </FormItem>
           <FormItem label="Title" prop="title">
-            <Input v-model="projectEditForm.title" placeholder="Enter something..."/>
+            <Input v-model="projectEditForm.title" placeholder="Enter something..." />
           </FormItem>
           <FormItem label="Description" prop="description">
             <Input v-model="projectEditForm.description"></Input>
@@ -766,7 +769,7 @@
               style="margin-left:2.5%"
               @click="addTag(inputTag)"
             >Add Tag</Button>
-            <br>
+            <br />
             <Tag
               color="primary"
               v-for="(tag,index) in projectEditForm.editTags"
@@ -792,7 +795,7 @@
             <div class="inline_style">
               <div class="demo-upload-list" v-show="pictureUrl!=''">
                 <template>
-                  <img v-bind:src="pictureUrl">
+                  <img v-bind:src="pictureUrl" />
                   <div class="demo-upload-list-cover">
                     <Icon type="ios-eye-outline" @click.native="handleView()"></Icon>
                     <Icon type="ios-trash-outline" @click.native="handleRemove()"></Icon>
@@ -806,11 +809,11 @@
                   type="file"
                   class="uploadAvatar"
                   accept="image/*"
-                >
+                />
               </div>
-              <br>
+              <br />
               <Modal title="View Image" v-model="visible">
-                <img :src="pictureUrl" v-if="visible" style="width: 100%">
+                <img :src="pictureUrl" v-if="visible" style="width: 100%" />
               </Modal>
             </div>
           </FormItem>
@@ -865,7 +868,8 @@ export default {
         description: [
           {
             required: true,
-            message: "The description cannot be empty and no more than 360 characters",
+            message:
+              "The description cannot be empty and no more than 360 characters",
             trigger: "blur",
             max: 360
           }
@@ -1132,7 +1136,7 @@ export default {
       // 更换项目图片后后台返回的新图片的文件地址
       pictureUrl: "",
       // 当前准备加入子项目的详情
-      currentSubProjectInfo:[],
+      currentSubProjectInfo: []
     };
   },
   mounted() {
@@ -1150,6 +1154,8 @@ export default {
     next(vm => {
       if (!vm.$store.getters.userState) {
         next("/login");
+      } else if (vm.currentProjectDetail.privacy == "Public") {
+        next();
       } else {
         var userId = vm.$store.getters.userId;
         var members = vm.currentProjectDetail.members;
@@ -1276,7 +1282,11 @@ export default {
         }
       }
       if (this.$store.getters.userState) {
-        if (isManager || isMember) {
+        if (
+          isManager ||
+          isMember ||
+          this.currentProjectDetail.privacy == "Public"
+        ) {
           this.$router.push({ path: `${id}/subproject` });
         } else {
           this.$Message.error("You have no property to access it");
@@ -1305,7 +1315,7 @@ export default {
               } else if (res.data != "Fail") {
                 this.$Notice.success({
                   title: "Create result",
-                  desc: "Subproject has been created successfully.",
+                  desc: "Subproject has been created successfully."
                 });
                 this.createSubProjectForm.subProjectTitle = "";
                 this.createSubProjectForm.subProjectDescription = "";
@@ -1581,9 +1591,7 @@ export default {
     show(index) {
       let name = this.projectResourceList[index].name;
 
-      if (
-        /\.(doc|docx|xls|xlsx|csv|ppt|pptx|zip)$/.test(name.toLowerCase())
-      ) {
+      if (/\.(doc|docx|xls|xlsx|csv|ppt|pptx|zip)$/.test(name.toLowerCase())) {
         if (this.panel != null) {
           this.panel.close();
         }
@@ -1807,92 +1815,94 @@ export default {
         .catch(err => {});
     },
     joinSubProject(subProject) {
-      // console.table(subProject);
-      console.log(this.$store.getters.project);
       let projectPrivacy = this.$store.getters.project.privacy;
-      if(projectPrivacy == "Public"){
-        this.axios.get("/GeoProblemSolving/subProject/join?subProjectId="+ subProject.subProjectId + '&userId=' + this.$store.getters.userId)
-        .then(res=> {
-          var that = this;
-          console.log(res.data);
-          if(res.data !== ""){
-              this.$Notice.open({
-                  title: 'Notification title',
-                  desc: 'Success,now you are a member in this sub project.',
-                  // duration: 0
-              });
-              // this.subProject.isMember = true;
-              that.getAllSubProject();
-            }
-        })
-        .catch(err=>{
-          console.log(err.data);
-        })
-      }else if(projectPrivacy == "Discoverable"){
+      if (projectPrivacy == "Public") {
+        // this.axios.get("/GeoProblemSolving/subProject/join?subProjectId="+ subProject.subProjectId + '&userId=' + this.$store.getters.userId)
+        // .then(res=> {
+        //   var that = this;
+        //   console.log(res.data);
+        //   if(res.data !== ""){
+        //       this.$Notice.open({
+        //           title: 'Notification title',
+        //           desc: 'Success,now you are a member in this sub project.',
+        //           // duration: 0
+        //       });
+        //       // this.subProject.isMember = true;
+        //       that.getAllSubProject();
+        //     }
+        // })
+        // .catch(err=>{
+        //   console.log(err.data);
+        // })
+      } else if (projectPrivacy == "Discoverable") {
         let joinSubPForm = {};
-          joinSubPForm["recipientId"] = subProject.managerId;
-          joinSubPForm["type"] = "apply";
-          let userDetail = this.$store.getters.userInfo;
-          joinSubPForm["content"] = {
-            userEmail: userDetail.email,
-            userName: this.$store.getters.userName,
-            userId: this.$store.getters.userId,
-            title: "Group application",
-            description:
-              "User " +
-              this.$store.getters.userName +
-              " apply to join in your subproject: " +
-              subProject.title +
-              " of project: " +
-              this.currentProjectDetail.title +
-              " .",
-            projectId: subProject.subProjectId,
-            projectTitle: subProject.title,
-            scope: "subProject",
-            approve: "unknow"
-          };
-
-          this.axios
-            .post("/GeoProblemSolving/notice/save", joinSubPForm)
-            .then(res => {
-              this.$Message.info("Apply Successfully");
-              this.$emit("sendNotice", subProject.managerId);
-            })
-            .catch(err => {
-              console.log("申请失败的原因是：" + err.data);
-            });
-          let joinSubProjectEmail = {};
-          joinSubProjectEmail["recipient"] = subProject.managerId;
-          joinSubProjectEmail["mailTitle"] = "Join sub project application";
-          joinSubProjectEmail["mailContent"] =
+        joinSubPForm["recipientId"] = subProject.managerId;
+        joinSubPForm["type"] = "apply";
+        let userDetail = this.$store.getters.userInfo;
+        joinSubPForm["content"] = {
+          userEmail: userDetail.email,
+          userName: this.$store.getters.userName,
+          userId: this.$store.getters.userId,
+          title: "Group application",
+          description:
             "User " +
             this.$store.getters.userName +
             " apply to join in your subproject: " +
             subProject.title +
             " of project: " +
             this.currentProjectDetail.title +
-            " ." +
-            " And you can access the subproject from this platform. "+"The url is " + "http://"+this.$store.state.IP_Port+"/GeoProblemSolving/home";;
-          this.axios
-            .post("/GeoProblemSolving/project/applyByMail", joinSubProjectEmail)
-            .then(res => {
-              if (res.data == "Success") {
-                this.$Notice.success({
-                  title: "Email send title",
-                  desc:
-                    "The join email has been sent,if he/she doesn't online,the email will remind the mamnager in time."
-                });
-              } else {
-                this.$Notice.error({
-                  title: "Email send fail",
-                  desc: "The invitation isn't be sent successfully."
-                });
-              }
-            })
-            .catch(err => {
-              console.log(err.data);
-            });
-          }
+            " .",
+          projectId: subProject.subProjectId,
+          projectTitle: subProject.title,
+          scope: "subProject",
+          approve: "unknow"
+        };
+
+        this.axios
+          .post("/GeoProblemSolving/notice/save", joinSubPForm)
+          .then(res => {
+            this.$Message.info("Apply Successfully");
+            this.$emit("sendNotice", subProject.managerId);
+          })
+          .catch(err => {
+            console.log("申请失败的原因是：" + err.data);
+          });
+        let joinSubProjectEmail = {};
+        joinSubProjectEmail["recipient"] = subProject.managerId;
+        joinSubProjectEmail["mailTitle"] = "Join sub project application";
+        joinSubProjectEmail["mailContent"] =
+          "User " +
+          this.$store.getters.userName +
+          " apply to join in your subproject: " +
+          subProject.title +
+          " of project: " +
+          this.currentProjectDetail.title +
+          " ." +
+          " And you can access the subproject from this platform. " +
+          "The url is " +
+          "http://" +
+          this.$store.state.IP_Port +
+          "/GeoProblemSolving/home";
+        this.axios
+          .post("/GeoProblemSolving/project/applyByMail", joinSubProjectEmail)
+          .then(res => {
+            if (res.data == "Success") {
+              this.$Notice.success({
+                title: "Email send title",
+                desc:
+                  "The join email has been sent,if he/she doesn't online,the email will remind the mamnager in time."
+              });
+            } else {
+              this.$Notice.error({
+                title: "Email send fail",
+                desc: "The invitation isn't be sent successfully."
+              });
+            }
+          })
+          .catch(err => {
+            console.log(err.data);
+          });
+      }
     },
     emialAutoFill(value) {
       this.prompt =

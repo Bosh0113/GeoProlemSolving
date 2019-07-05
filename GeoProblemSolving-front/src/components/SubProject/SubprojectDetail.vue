@@ -156,7 +156,7 @@
                                     v-if="member.avatar != '' && member.avatar!='undefined' && member.avatar!='null'"
                                     :src="member.avatar"
                                     style="width:100%;height:100%"
-                                  >
+                                  />
                                   <avatar
                                     :username="member.userName"
                                     :size="50"
@@ -194,7 +194,7 @@
                                   v-if="member.avatar != '' && member.avatar!='undefined' && member.avatar!='null'"
                                   :src="member.avatar"
                                   style="width:100%;height:100%"
-                                >
+                                />
                                 <avatar
                                   :username="member.userName"
                                   :size="50"
@@ -227,7 +227,7 @@
                                 v-show="giveDeleteProperty(index)"
                                 @click="removeMemberAlert=true"
                               >
-                                <Icon type="md-log-out" :size="20"/>
+                                <Icon type="md-log-out" :size="20" />
                               </span>
                             </div>
                             <Modal
@@ -311,8 +311,12 @@
                           style="overflow-y:auto"
                         >{{subProjectInfo.description}}</div>
                       </Card>
-                      <div class="resourcePanel" style="padding-top: 20px" >
-                        <folder-tree :subProjectId = subProjectInfo.subProjectId ref="folderTreeEle"></folder-tree>
+                      <div class="resourcePanel" style="padding-top: 20px">
+                        <folder-tree
+                          :subProjectId="subProjectInfo.subProjectId"
+                          :role="userRole"
+                          ref="folderTreeEle"
+                        ></folder-tree>
                       </div>
                     </Col>
                   </Row>
@@ -355,7 +359,7 @@
                               >
                                 <div>
                                   <span style="float:left;padding:0 2.5px">
-                                    <Icon type="ios-list" color="gray" :size="20"/>
+                                    <Icon type="ios-list" color="gray" :size="20" />
                                   </span>
                                   <span style="padding:5px">
                                     <strong
@@ -364,7 +368,7 @@
                                       :title="item.taskName"
                                     >{{item.taskName}}</strong>
                                   </span>
-                                  <div style="float:right">
+                                  <div style="float:right" v-show="userRole != 'Visitor'">
                                     <Rate
                                       v-model="item.importance"
                                       :count="1"
@@ -386,7 +390,7 @@
                                       title="Delete"
                                       @click="taskRemoveAssure(index,taskTodo)"
                                     >
-                                      <Icon type="ios-trash" :size="20" color="gray"/>
+                                      <Icon type="ios-trash" :size="20" color="gray" />
                                     </span>
                                   </div>
                                   <p
@@ -435,7 +439,7 @@
                                       :title="item.taskName"
                                     >{{item.taskName}}</strong>
                                   </span>
-                                  <div style="float:right">
+                                  <div style="float:right" v-show="userRole != 'Visitor'">
                                     <Rate
                                       v-model="item.importance"
                                       :count="1"
@@ -457,7 +461,7 @@
                                       title="Delete"
                                       @click="taskRemoveAssure(index,taskDoing)"
                                     >
-                                      <Icon type="ios-trash" :size="20" color="gray"/>
+                                      <Icon type="ios-trash" :size="20" color="gray" />
                                     </span>
                                   </div>
                                 </div>
@@ -493,7 +497,7 @@
                               >
                                 <div>
                                   <span style="float:left;padding:0 2.5px">
-                                    <Icon type="md-checkmark-circle-outline"/>
+                                    <Icon type="md-checkmark-circle-outline" />
                                   </span>
                                   <span style="padding:5px">
                                     <strong
@@ -502,7 +506,7 @@
                                       :title="item.taskName"
                                     >{{item.taskName}}</strong>
                                   </span>
-                                  <div style="float:right">
+                                  <div style="float:right" v-show="userRole != 'Visitor'">
                                     <Rate
                                       v-model="item.importance"
                                       :count="1"
@@ -524,7 +528,7 @@
                                       title="Delete"
                                       @click="taskRemoveAssure(index,taskDone)"
                                     >
-                                      <Icon type="ios-trash" :size="20" color="gray"/>
+                                      <Icon type="ios-trash" :size="20" color="gray" />
                                     </span>
                                   </div>
                                   <p
@@ -556,7 +560,6 @@
       v-model="taskDeleteModal"
       title="Delete Task"
       @on-ok="taskRemove()"
-      @on-cancel
       ok-text="Assure"
       cancel-text="Cancel"
     >
@@ -617,7 +620,6 @@
       v-model="editTaskModal"
       title="Edit Task"
       @on-ok="updateTask('formValidate')"
-      @on-cancel
       ok-text="Ok"
       cancel-text="Cancel"
       width="800px"
@@ -771,7 +773,6 @@ export default {
           }
         ]
       },
-      //
       // information of project
       projectInfo: {},
       // info of subproject
@@ -893,7 +894,9 @@ export default {
       ],
       panel: null,
       // 删除成员的提醒
-      removeMemberAlert: false
+      removeMemberAlert: false,
+      // 用户角色
+      userRole: ""
     };
   },
   created() {
@@ -911,6 +914,8 @@ export default {
     next(vm => {
       if (!vm.$store.getters.userState) {
         next("/login");
+      } else if (vm.projectInfo.privacy == "Public") {
+        next();
       } else {
         var userId = vm.$store.getters.userId;
         var members = vm.subProjectInfo.members;
@@ -989,7 +994,10 @@ export default {
             } else if (data != "None" && data != "Fail") {
               subProjectInfo = data[0];
               this.$set(this, "subProjectInfo", subProjectInfo);
-              sessionStorage.setItem("subProjectId", subProjectInfo.subProjectId);
+              sessionStorage.setItem(
+                "subProjectId",
+                subProjectInfo.subProjectId
+              );
               sessionStorage.setItem("subProjectName", subProjectInfo.title);
 
               // this.managerIdentity(subProjectInfo.managerId);
@@ -1004,12 +1012,19 @@ export default {
           }
         });
       }
-    },
-    managerIdentity(managerId) {
-      if (managerId === this.$store.getters.userId) {
-        this.subProjectInfo.isManager = true;
+      // 判断用户权限
+      if (
+        !this.subProjectInfo.isMember &&
+        this.subProjectInfo.managerId != this.$store.getters.userId
+      ) {
+        this.userRole = "Visitor";
       }
     },
+    // managerIdentity(managerId) {
+    //   if (managerId === this.$store.getters.userId) {
+    //     this.subProjectInfo.isManager = true;
+    //   }
+    // },
     memberIdentity(members) {
       for (let i = 0; i < members.length; i++) {
         if (members[i].userId === this.$store.getters.userId) {
@@ -1076,9 +1091,10 @@ export default {
       if (this.subprojectSocket != null) {
         this.subprojectSocket = null;
       }
-      
+
       let roomId = this.subProjectInfo.subProjectId + "task";
-      var subprojectSocketURL = "ws://localhost:8081/GeoProblemSolving/Module/" + roomId;
+      var subprojectSocketURL =
+        "ws://localhost:8081/GeoProblemSolving/Module/" + roomId;
       // var subprojectSocketURL = "ws://"+this.$store.state.IP_Port+"/GeoProblemSolving/Module/" + roomId;
       this.subprojectSocket = new WebSocket(subprojectSocketURL);
       this.subprojectSocket.onopen = this.onOpen;
@@ -1202,31 +1218,31 @@ export default {
     },
     getProjectInfo() {
       let that = this;
-      let projectInfo = this.$store.getters.project;
+      let projectInfo = that.$store.getters.project;
       if (
         JSON.stringify(projectInfo) != "{}" &&
-        projectInfo.projectId == this.subProjectInfo.projectId
+        projectInfo.projectId.substring(0, 36) ==
+          this.subProjectInfo.projectId.substring(0, 36)
       ) {
         this.projectInfo = projectInfo;
       } else {
-        this.axios
-          .get(
+        $.ajax({
+          url:
             "/GeoProblemSolving/project/inquiry" +
-              "?key=projectId" +
-              "&value=" +
-              this.subProjectInfo.projectId
-          )
-          .then(res => {
-            if (res.data != "None" && res.data != "Fail") {
-              that.projectInfo = res.data[0];
-              that.$store.commit("setProjectInfo", res.data[0]);
+            "?key=projectId" +
+            "&value=" +
+            this.subProjectInfo.projectId,
+          type: "GET",
+          async: false,
+          success: data => {
+            if (data != "None" && data != "Fail") {
+              that.projectInfo = data[0];
+              that.$store.commit("setProjectInfo", data[0]);
             } else {
-              console.log(res.data);
+              console.log(data);
             }
-          })
-          .catch(err => {
-            console.log(err.data);
-          });
+          }
+        });
       }
     },
     inviteMembers() {
@@ -1322,23 +1338,26 @@ export default {
             quitNotice["type"] = "notice";
             quitNotice["content"] = {
               userName: this.$store.getters.userId,
-              title:"Member quit notice",
-              description:"User " + this.$store.getters.userName + " quit from your project called " + sessionStorage.getItem("subProjectName"),
+              title: "Member quit notice",
+              description:
+                "User " +
+                this.$store.getters.userName +
+                " quit from your project called " +
+                sessionStorage.getItem("subProjectName"),
               scope: "subProject",
               approve: "unknow"
             };
             this.axios
-                .post("/GeoProblemSolving/notice/save", quitNotice)
-                .then(res => {
-                  if(res.data == "Success") {
-                    this.$emit("sendNotice", this.subProjectInfo.managerId);
-                  }
-                  else{
-                  }
-                })
-                .catch(err => {
-                  console.log(err.data);
-                });
+              .post("/GeoProblemSolving/notice/save", quitNotice)
+              .then(res => {
+                if (res.data == "Success") {
+                  this.$emit("sendNotice", this.subProjectInfo.managerId);
+                } else {
+                }
+              })
+              .catch(err => {
+                console.log(err.data);
+              });
             let projectId = sessionStorage.getItem("projectId");
             this.$router.push({
               name: "ProjectDetail",
@@ -1556,7 +1575,6 @@ export default {
     },
     //查询task
     inquiryTask() {
-      // /task/inquiry
       this.inquiryTodoTask();
       this.inquiryDoingTask();
       this.inquiryDoneTask();
@@ -1631,58 +1649,60 @@ export default {
       this.taskOrderUpdate(taskList, type);
     },
     taskOrderUpdate(taskList, type) {
-      let thisUserName = this.$store.getters.userName;
-      let stateChangeIndex = 0;
-      let count = taskList.length;
-      for (let i = 0; i < taskList.length; i++) {
-        let thisTask = taskList[i];
-        if (thisTask.order != i || thisTask.state != type) {
-          if (thisTask.state != type) {
-            stateChangeIndex = i;
-            let taskUpdateObj = new URLSearchParams();
-            taskUpdateObj.append("taskId", taskList[i]["taskId"]);
-            taskUpdateObj.append("order", i);
-            taskUpdateObj.append("state", type);
-            taskUpdateObj.append("managerName", thisUserName);
-            this.axios
-              .post("/GeoProblemSolving/task/update", taskUpdateObj)
-              .then(res => {
-                count--;
-                if (res.data == "Offline") {
-                  this.$store.commit("userLogout");
-                  this.$router.push({ name: "Login" });
-                } else if (res.data != "Fail") {
-                  //更新数组
-                  taskList[stateChangeIndex].managerName = thisUserName;
-                  if (this.MoveCount == 0 && count == 1) {
-                    this.endMove();
+      if (this.userRole != "Visitor") {
+        let thisUserName = this.$store.getters.userName;
+        let stateChangeIndex = 0;
+        let count = taskList.length;
+        for (let i = 0; i < taskList.length; i++) {
+          let thisTask = taskList[i];
+          if (thisTask.order != i || thisTask.state != type) {
+            if (thisTask.state != type) {
+              stateChangeIndex = i;
+              let taskUpdateObj = new URLSearchParams();
+              taskUpdateObj.append("taskId", taskList[i]["taskId"]);
+              taskUpdateObj.append("order", i);
+              taskUpdateObj.append("state", type);
+              taskUpdateObj.append("managerName", thisUserName);
+              this.axios
+                .post("/GeoProblemSolving/task/update", taskUpdateObj)
+                .then(res => {
+                  count--;
+                  if (res.data == "Offline") {
+                    this.$store.commit("userLogout");
+                    this.$router.push({ name: "Login" });
+                  } else if (res.data != "Fail") {
+                    //更新数组
+                    taskList[stateChangeIndex].managerName = thisUserName;
+                    if (this.MoveCount == 0 && count == 1) {
+                      this.endMove();
+                    }
                   }
-                }
-              })
-              .catch(err => {
-                console.log(err.data);
-              });
-          } else {
-            let taskUpdateObj = new URLSearchParams();
-            taskUpdateObj.append("taskId", taskList[i]["taskId"]);
-            taskUpdateObj.append("order", i);
-            taskUpdateObj.append("state", type);
-            this.axios
-              .post("/GeoProblemSolving/task/update", taskUpdateObj)
-              .then(res => {
-                count--;
-                if (res.data == "Offline") {
-                  this.$store.commit("userLogout");
-                  this.$router.push({ name: "Login" });
-                } else if (res.data != "Fail") {
-                  if (this.MoveCount == 0 && count == 1) {
-                    this.endMove();
+                })
+                .catch(err => {
+                  console.log(err.data);
+                });
+            } else {
+              let taskUpdateObj = new URLSearchParams();
+              taskUpdateObj.append("taskId", taskList[i]["taskId"]);
+              taskUpdateObj.append("order", i);
+              taskUpdateObj.append("state", type);
+              this.axios
+                .post("/GeoProblemSolving/task/update", taskUpdateObj)
+                .then(res => {
+                  count--;
+                  if (res.data == "Offline") {
+                    this.$store.commit("userLogout");
+                    this.$router.push({ name: "Login" });
+                  } else if (res.data != "Fail") {
+                    if (this.MoveCount == 0 && count == 1) {
+                      this.endMove();
+                    }
                   }
-                }
-              })
-              .catch(err => {
-                console.log(err.data);
-              });
+                })
+                .catch(err => {
+                  console.log(err.data);
+                });
+            }
           }
         }
       }

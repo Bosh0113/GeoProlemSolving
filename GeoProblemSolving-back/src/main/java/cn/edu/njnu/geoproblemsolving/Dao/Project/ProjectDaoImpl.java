@@ -75,7 +75,9 @@ public class ProjectDaoImpl implements IProjectDao {
     @Override
     public Object readAllProjects() {
         try {
-            Query queryProjects = Query.query(Criteria.where("privacy").is("Public"));
+            Criteria criteria1 = Criteria.where("privacy").is("Discoverable");
+            Criteria criteria2 = Criteria.where("privacy").is("Public");
+            Query queryProjects = Query.query(new Criteria().orOperator(criteria1, criteria2));
             List<ProjectEntity> projectEntityList = mongoTemplate.find(queryProjects, ProjectEntity.class);
             if (!projectEntityList.isEmpty()) {
                 projectEntityList = encodeProjetId(projectEntityList);
